@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recursos — Digimed Institute</title>
+  <meta name="description" content="Descargue la guía gratuita de tendencias digitales para especialistas médicos en el mundo hispanohablante 2026. Sin costo, acceso inmediato.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/digimed.css">
+  <style>
+    /* Lead magnet hero */
+    .lm-hero {
+      min-height: 90svh; display: flex; align-items: center;
+      padding: 120px 0 80px; border-bottom: 1px solid var(--line);
+      background: var(--bg); position: relative; overflow: hidden;
+    }
+    .lm-hero::before {
+      content: ""; position: absolute; top: -15%; right: -8%;
+      width: 55%; aspect-ratio: 1; border-radius: 50%;
+      background: oklch(70% 0.22 262); filter: blur(100px); opacity: 0.2;
+      pointer-events: none;
+    }
+    .lm-hero::after {
+      content: ""; position: absolute; bottom: -20%; left: -10%;
+      width: 45%; aspect-ratio: 1; border-radius: 50%;
+      background: oklch(60% 0.19 280); filter: blur(110px); opacity: 0.14;
+      pointer-events: none;
+    }
+    .lm-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 80px;
+      align-items: center; width: 100%; position: relative; z-index: 1;
+    }
+    .lm-breadcrumb { display: flex; align-items: center; gap: 14px; margin-bottom: 44px; }
+    .lm-breadcrumb-item {
+      font-family: "DM Mono", monospace; font-size: 10px;
+      letter-spacing: 0.2em; text-transform: uppercase; color: var(--subtle);
+    }
+    .lm-breadcrumb-item.active { color: var(--text); }
+    .lm-breadcrumb-sep { width: 20px; height: 1px; background: var(--line-2); }
+    .lm-h1 {
+      font-family: "Manrope", "DM Sans", sans-serif;
+      font-size: clamp(40px, 5.5vw, 80px); font-weight: 500;
+      letter-spacing: -0.042em; line-height: 0.95; margin-bottom: 28px;
+    }
+    .lm-h1 em { font-style: italic; color: var(--navy); }
+    .lm-desc {
+      font-size: 16px; color: var(--muted); line-height: 1.78;
+      max-width: 480px; margin-bottom: 36px;
+    }
+    .lm-bullets { display: flex; flex-direction: column; gap: 12px; margin-bottom: 0; }
+    .lm-bullet {
+      display: flex; gap: 14px; align-items: flex-start;
+      font-size: 14px; color: var(--muted); line-height: 1.55;
+    }
+    .lm-bullet::before {
+      content: "→"; color: var(--amber); flex-shrink: 0; font-size: 13px; margin-top: 1px;
+    }
+
+    /* PDF mockup */
+    .pdf-mockup {
+      background: var(--bg); border: 1px solid var(--line);
+      border-radius: var(--r-xl); padding: 40px;
+      box-shadow: 0 24px 80px oklch(14% 0.015 252 / 0.08);
+      margin-bottom: 20px;
+    }
+    .pdf-header {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      margin-bottom: 28px; padding-bottom: 20px; border-bottom: 1px solid var(--line);
+    }
+    .pdf-label {
+      font-family: "DM Mono", monospace; font-size: 9px;
+      letter-spacing: 0.2em; text-transform: uppercase; color: var(--amber);
+      margin-bottom: 8px;
+    }
+    .pdf-title {
+      font-family: "Manrope", "DM Sans", sans-serif;
+      font-size: 18px; font-weight: 600; letter-spacing: -0.025em;
+      line-height: 1.2; max-width: 260px; color: var(--text);
+    }
+    .pdf-badge {
+      background: var(--navy); color: var(--bg);
+      font-family: "DM Mono", monospace; font-size: 9px;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      padding: 8px 14px; border-radius: var(--r-sm); flex-shrink: 0;
+    }
+    .pdf-preview-lines { display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px; }
+    .pdf-line { height: 7px; border-radius: 4px; background: var(--bg-1); }
+    .pdf-line.accent { background: var(--amber-light); }
+    .pdf-trends { display: flex; flex-direction: column; gap: 10px; }
+    .pdf-trend {
+      display: flex; gap: 12px; align-items: center;
+      font-size: 13px; color: var(--muted);
+      background: var(--bg-1); border-radius: var(--r-sm); padding: 10px 14px;
+    }
+    .pdf-trend-num {
+      font-family: "DM Mono", monospace; font-size: 10px;
+      font-weight: 500; color: var(--amber); width: 22px; flex-shrink: 0;
+    }
+    .pdf-watermark {
+      margin-top: 20px; text-align: center;
+      font-family: "DM Mono", monospace; font-size: 9px;
+      letter-spacing: 0.12em; text-transform: uppercase; color: var(--subtle);
+    }
+
+    /* Form card */
+    .recursos-form-card {
+      background: oklch(99% 0.005 252); border: 1px solid var(--line);
+      border-radius: var(--r-xl); padding: 40px 36px;
+      box-shadow: 0 20px 60px oklch(14% 0.015 252 / 0.07);
+    }
+    .rfc-badge {
+      font-family: "DM Mono", monospace; font-size: 9px;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      background: var(--amber-light); color: oklch(38% 0.12 262);
+      padding: 6px 14px; border-radius: var(--r-sm); display: inline-block; margin-bottom: 20px;
+    }
+    .rfc-title {
+      font-family: "Manrope", "DM Sans", sans-serif;
+      font-size: 22px; font-weight: 600; letter-spacing: -0.03em;
+      line-height: 1.1; color: var(--text); margin-bottom: 8px;
+    }
+    .rfc-sub { font-size: 13px; color: var(--muted); line-height: 1.65; margin-bottom: 28px; }
+    .rfc-form { display: flex; flex-direction: column; gap: 14px; }
+    .rfc-field { display: flex; flex-direction: column; gap: 6px; }
+    .rfc-label {
+      font-family: "DM Mono", monospace; font-size: 9px;
+      letter-spacing: 0.18em; text-transform: uppercase; color: var(--subtle);
+    }
+    .rfc-input, .rfc-select {
+      background: var(--bg); border: 1px solid var(--line-2);
+      border-radius: var(--r-md); padding: 13px 18px;
+      font-family: "DM Sans", sans-serif; font-size: 14px; color: var(--text);
+      outline: none; transition: border-color 0.15s, box-shadow 0.15s; width: 100%;
+      appearance: none;
+    }
+    .rfc-input:focus, .rfc-select:focus {
+      border-color: var(--navy);
+      box-shadow: 0 0 0 3px oklch(21% 0.065 253 / 0.08);
+    }
+    .rfc-input::placeholder { color: var(--subtle); }
+    .rfc-submit {
+      background: var(--navy); color: var(--bg); border-radius: var(--r-pill);
+      padding: 16px 28px; font-size: 14px; font-weight: 500;
+      letter-spacing: 0.01em; width: 100%; cursor: pointer;
+      transition: background 0.15s, transform 0.15s; margin-top: 4px;
+      border: none; font-family: "DM Sans", sans-serif;
+    }
+    .rfc-submit:hover { background: var(--navy-2); transform: translateY(-1px); }
+    .rfc-fine {
+      font-size: 11px; color: var(--subtle); text-align: center; line-height: 1.5;
+    }
+
+    /* Coming soon resources */
+    .resources-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 56px; }
+    .resource-card {
+      background: var(--bg); border: 1px solid var(--line);
+      border-radius: var(--r-xl); padding: 32px;
+      transition: border-color 0.15s;
+    }
+    .resource-card:hover { border-color: var(--line-2); }
+    .resource-type {
+      font-family: "DM Mono", monospace; font-size: 9px;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      background: var(--amber-light); color: oklch(38% 0.12 262);
+      padding: 5px 12px; border-radius: var(--r-sm);
+      display: inline-block; margin-bottom: 18px;
+    }
+    .resource-title {
+      font-family: "Manrope", "DM Sans", sans-serif;
+      font-size: 18px; font-weight: 600; letter-spacing: -0.025em;
+      color: var(--text); margin-bottom: 10px; line-height: 1.2;
+    }
+    .resource-desc { font-size: 13px; color: var(--muted); line-height: 1.7; margin-bottom: 20px; }
+    .resource-coming {
+      font-family: "DM Mono", monospace; font-size: 9px;
+      letter-spacing: 0.16em; text-transform: uppercase; color: var(--subtle);
+    }
+
+    /* What happens next */
+    .next-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 56px; }
+    .next-card {
+      background: var(--bg); border: 1px solid var(--line);
+      border-radius: var(--r-xl); padding: 36px 32px;
+    }
+    .next-num {
+      font-family: "Manrope", "DM Sans", sans-serif;
+      font-size: 52px; font-weight: 700; letter-spacing: -0.05em;
+      color: var(--amber-light); line-height: 0.9; margin-bottom: 20px;
+    }
+    .next-title { font-size: 15px; font-weight: 500; color: var(--text); margin-bottom: 8px; }
+    .next-desc { font-size: 13px; color: var(--muted); line-height: 1.7; }
+
+    @media (max-width: 900px) {
+      .lm-grid { grid-template-columns: 1fr; gap: 48px; }
+      .lm-hero { min-height: auto; padding: 100px 0 64px; }
+      .resources-grid, .next-grid { grid-template-columns: 1fr; max-width: 480px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="announce">
+  <div class="announce-inner">
+    <div class="announce-left">
+      <span class="announce-badge">Guía gratuita 2026</span>
+      <span class="announce-text"><strong>Las tendencias digitales</strong> que están redefiniendo al profesional de la salud de referencia en el mundo hispanohablante — descargue la guía gratuita</span>
+    </div>
+    <a href="#descargar" class="announce-btn">Descargar →</a>
+  </div>
+</div>
+
+<nav class="site-nav">
+  <div class="wrap nav-inner">
+    <a href="index.html" class="nav-brand">
+      <div class="nav-brand-name">Digimed Institute</div>
+      <div class="nav-brand-sub">Educación Médica Superior</div>
+    </a>
+    <div class="nav-links">
+      <a href="metodo.html">Metodología</a>
+      <a href="precios.html">Programas</a>
+      <a href="blog/index.html">Blog</a>
+      <a href="sobre.html">El Instituto</a>
+    </div>
+    <a href="#descargar" class="nav-cta">Solicitar acceso</a>
+  
+    <button class="nav-toggle" aria-label="Menú"><span></span><span></span><span></span></button></div>
+</nav>
+
+<div class="ticker" aria-hidden="true">
+  <div class="ticker-track">
+    <span class="ticker-item">Digital Opinion Leader<span class="ticker-dot"></span></span>
+    <span class="ticker-item">Referente clínico digital<span class="ticker-dot"></span></span>
+    <span class="ticker-item">Visibilidad entre pares<span class="ticker-dot"></span></span>
+    <span class="ticker-item">IA Clínica<span class="ticker-dot"></span></span>
+    <span class="ticker-item">Instagram médico<span class="ticker-dot"></span></span>
+    <span class="ticker-item">LinkedIn especialista<span class="ticker-dot"></span></span>
+    <span class="ticker-item">Autoridad clínica digital<span class="ticker-dot"></span></span>
+    <span class="ticker-item">TikTok clínico<span class="ticker-dot"></span></span>
+    <span class="ticker-item">200+ prompts IA<span class="ticker-dot"></span></span>
+    <span class="ticker-item">7 módulos certificados<span class="ticker-dot"></span></span>
+    <span class="ticker-item">Presencia digital médica<span class="ticker-dot"></span></span>
+    <span class="ticker-item">Posicionamiento digital<span class="ticker-dot"></span></span>
+    <span class="ticker-item">Impacto académico<span class="ticker-dot"></span></span>
+    <span class="ticker-item">Ecosistema digital clínico<span class="ticker-dot"></span></span>
+    <span class="ticker-item">Digital Opinion Leader<span class="ticker-dot"></span></span>
+    <span class="ticker-item">Referente clínico digital<span class="ticker-dot"></span></span>
+    <span class="ticker-item">Visibilidad entre pares<span class="ticker-dot"></span></span>
+    <span class="ticker-item">IA Clínica<span class="ticker-dot"></span></span>
+    <span class="ticker-item">Instagram médico<span class="ticker-dot"></span></span>
+    <span class="ticker-item">LinkedIn especialista<span class="ticker-dot"></span></span>
+    <span class="ticker-item">Autoridad clínica digital<span class="ticker-dot"></span></span>
+    <span class="ticker-item">TikTok clínico<span class="ticker-dot"></span></span>
+    <span class="ticker-item">200+ prompts IA<span class="ticker-dot"></span></span>
+    <span class="ticker-item">7 módulos certificados<span class="ticker-dot"></span></span>
+    <span class="ticker-item">Presencia digital médica<span class="ticker-dot"></span></span>
+    <span class="ticker-item">Posicionamiento digital<span class="ticker-dot"></span></span>
+    <span class="ticker-item">Impacto académico<span class="ticker-dot"></span></span>
+    <span class="ticker-item">Ecosistema digital clínico<span class="ticker-dot"></span></span>
+  </div>
+</div>
+
+<section class="lm-hero" id="descargar">
+  <div class="wrap lm-grid">
+    <div class="reveal">
+      <div class="lm-breadcrumb">
+        <span class="lm-breadcrumb-item active">Digimed Institute</span>
+        <span class="lm-breadcrumb-sep"></span>
+        <span class="lm-breadcrumb-item">Recursos Gratuitos</span>
+      </div>
+      <h1 class="lm-h1">El especialista <em>visible</em> en su área — cómo se construye.</h1>
+      <p class="lm-desc">Las tendencias que están redefiniendo al médico de referencia en el mundo hispanohablante en 2026. Qué plataformas, qué tipo de contenido clínico, y qué sistema están usando los especialistas que ya construyeron presencia digital reconocida. Con rigor académico, sin sacrificar consulta ni investigación.</p>
+      <div class="lm-bullets">
+        <div class="lm-bullet">Las plataformas que funcionan para cada especialidad clínica en el mundo hispanohablante</div>
+        <div class="lm-bullet">Por qué la audiencia de pares lo cambia todo — y cómo construirla en Instagram, LinkedIn, TikTok</div>
+        <div class="lm-bullet">El sistema de contenido clínico que opera en 45 minutos al día</div>
+        <div class="lm-bullet">Qué hace diferente a un especialista visible de uno invisible en su área</div>
+      </div>
+    </div>
+
+    <div class="reveal rd1">
+      <div class="pdf-mockup">
+        <div class="pdf-header">
+          <div>
+            <div class="pdf-label">Digimed Institute · Guía 2026</div>
+            <div class="pdf-title">Tendencias Digitales para el Especialista Médico de Referencia</div>
+          </div>
+          <div class="pdf-badge">Gratis</div>
+        </div>
+        <div class="pdf-preview-lines">
+          <div class="pdf-line accent" style="width:65%"></div>
+          <div class="pdf-line" style="width:100%"></div>
+          <div class="pdf-line" style="width:82%"></div>
+          <div class="pdf-line" style="width:75%"></div>
+        </div>
+        <div class="pdf-trends">
+          <div class="pdf-trend"><span class="pdf-trend-num">01</span>El nuevo perfil del especialista de referencia en el mundo hispanohablante</div>
+          <div class="pdf-trend"><span class="pdf-trend-num">02</span>Instagram, TikTok, LinkedIn: qué funciona por especialidad</div>
+          <div class="pdf-trend"><span class="pdf-trend-num">03</span>Audiencia de pares vs. audiencia de pacientes — la distinción clave</div>
+          <div class="pdf-trend"><span class="pdf-trend-num">04</span>IA clínica: el sistema de 45 minutos que ya usan los mejores</div>
+          <div class="pdf-trend"><span class="pdf-trend-num">05</span>Cómo la industria descubre al especialista digital hoy</div>
+        </div>
+        <div class="pdf-watermark">digimedinstitute.com · descarga gratuita</div>
+      </div>
+
+      <div class="recursos-form-card">
+        <div class="rfc-badge">Acceso inmediato · Sin costo</div>
+        <div class="rfc-title">Descargar la guía gratuita</div>
+        <div class="rfc-sub">Complete el formulario. La guía llega a su correo de inmediato.</div>
+        <form class="rfc-form" onsubmit="handleRecursosSubmit(event)">
+          <div class="rfc-field">
+            <label class="rfc-label">Nombre</label>
+            <input type="text" class="rfc-input" placeholder="Dr. / Dra." autocomplete="given-name" required>
+          </div>
+          <div class="rfc-field">
+            <label class="rfc-label">Correo electrónico</label>
+            <input type="email" class="rfc-input" placeholder="su@email.com" autocomplete="email" required>
+          </div>
+          <div class="rfc-field">
+            <label class="rfc-label">Especialidad</label>
+            <select class="rfc-select" required>
+              <option value="" disabled selected>Seleccione su especialidad</option>
+              <option>Cardiología</option>
+              <option>Endocrinología</option>
+              <option>Dermatología</option>
+              <option>Neurología</option>
+              <option>Oncología</option>
+              <option>Medicina Interna</option>
+              <option>Reumatología</option>
+              <option>Neumología</option>
+              <option>Gastroenterología</option>
+              <option>Otra especialidad</option>
+            </select>
+          </div>
+          <div class="rfc-field">
+            <label class="rfc-label">País</label>
+            <select class="rfc-select" required>
+              <option value="" disabled selected>Seleccione su país</option>
+              <option>España</option>
+              <option></option>
+              <option></option>
+              <option>Chile</option>
+              <option>Perú</option>
+              <option></option>
+              <option>España</option>
+              <option>Otro</option>
+            </select>
+          </div>
+          <button type="submit" class="rfc-submit">Descargar la guía gratuita →</button>
+          <p class="rfc-fine">Sin comunicaciones no solicitadas. Baja en cualquier momento.</p>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMING SOON RESOURCES -->
+<section class="section section-alt">
+  <div class="wrap">
+    <div class="section-eyebrow reveal">
+      <span class="eyebrow-text">Próximamente</span>
+      <span class="eyebrow-line"></span>
+    </div>
+    <h2 class="section-h2 reveal">Más recursos<br><em>en preparación.</em></h2>
+    <div class="resources-grid">
+      <div class="resource-card reveal">
+        <div class="resource-type">Checklist</div>
+        <div class="resource-title">Auditoría de Perfil Digital para Especialistas</div>
+        <div class="resource-desc">Una lista de verificación de 25 puntos para evaluar si su perfil digital está correctamente posicionado para la audiencia de pares clínicos en LinkedIn e Instagram.</div>
+        <div class="resource-coming">Disponible en Junio 2026</div>
+      </div>
+      <div class="resource-card reveal rd1">
+        <div class="resource-type">Video · 20 min</div>
+        <div class="resource-title">Su Primer Contenido Clínico con Rigor Académico</div>
+        <div class="resource-desc">Guía en video con plantilla. Cómo escribir un post para LinkedIn o Instagram que posicione autoridad de especialidad — no marca personal.</div>
+        <div class="resource-coming">Disponible en Julio 2026</div>
+      </div>
+      <div class="resource-card reveal rd2">
+        <div class="resource-type">Herramienta</div>
+        <div class="resource-title">Calculadora de Potencial DOL</div>
+        <div class="resource-desc">Herramienta interactiva para estimar el potencial de contratación por parte de la industria basado en su especialidad, mercado y presencia digital actual.</div>
+        <div class="resource-coming">Disponible en Agosto 2026</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHAT HAPPENS NEXT -->
+<section class="section">
+  <div class="wrap">
+    <div class="section-eyebrow reveal">
+      <span class="eyebrow-text">Después de descargar</span>
+      <span class="eyebrow-line"></span>
+    </div>
+    <h2 class="section-h2 reveal">¿Qué sucede<br><em>después?</em></h2>
+    <div class="next-grid">
+      <div class="next-card reveal">
+        <div class="next-num">01</div>
+        <div class="next-title">Recibe la guía por correo</div>
+        <div class="next-desc">Las tendencias digitales del especialista de referencia en el mundo hispanohablante — en un PDF diseñado para leer en 15 minutos, sin teoría innecesaria.</div>
+      </div>
+      <div class="next-card reveal rd1">
+        <div class="next-num">02</div>
+        <div class="next-title">Secuencia de 5 correos</div>
+        <div class="next-desc">Durante la semana siguiente, 5 correos cortos que profundizan en las tendencias con casos de especialistas que ya implementaron el sistema en el mundo hispanohablante.</div>
+      </div>
+      <div class="next-card reveal rd2">
+        <div class="next-num">03</div>
+        <div class="next-title">Invitación al masterclass</div>
+        <div class="next-desc">Al final de la secuencia, una invitación al masterclass en vivo de 60 minutos donde el equipo del Instituto presenta el sistema completo.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="foot-brand-name">Digimed Institute</div>
+        <div class="foot-brand-sub">Educación Médica Superior</div>
+        <p class="foot-brand-p">El único programa en el mundo hispanohablante de formación en Autoridad Clínica Digital e IA Aplicada para profesionales de la salud, desarrollado desde el interior de la industria farmacéutica.</p>
+      </div>
+      <div class="foot-col">
+        <div class="foot-col-title">Instituto</div>
+        <ul>
+          <li><a href="metodo.html">Metodología</a></li>
+          <li><a href="sobre.html">El Instituto</a></li>
+          <li><a href="precios.html">Programas</a></li>
+          <li><a href="blog/index.html">Publicaciones</a></li>
+          <li><a href="recursos.html">Recursos</a></li>
+        </ul>
+      </div>
+      <div class="foot-col">
+        <div class="foot-col-title">Programas</div>
+        <ul>
+          <li><a href="precios.html">Formación independiente — $960</a></li>
+          <li><a href="precios.html">Ecosistema clínico — $1,440</a></li>
+          <li><a href="precios.html">Implementación dirigida — $2,800</a></li>
+          <li><a href="ia-clinica.html">IA Clínica · El Sistema — $350</a></li>
+        </ul>
+      </div>
+      <div class="foot-col">
+        <div class="foot-col-title">Legal</div>
+        <ul>
+          <li><a href="privacidad.html">Política de privacidad</a></li>
+          <li><a href="terminos.html">Términos y condiciones</a></li>
+          <li><a href="mailto:contacto@digimedinstitute.com">Contacto</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <div>© 2026 Digimed Institute. Todos los derechos reservados.</div>
+      <div class="foot-legal">
+        <a href="privacidad.html">Privacidad</a>
+        <a href="terminos.html">Términos</a>
+        <a href="mailto:contacto@digimedinstitute.com">Contacto</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+const revealObs = new IntersectionObserver(
+  entries => entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('in'); revealObs.unobserve(e.target); }
+  }),
+  { threshold: 0.06, rootMargin: '0px 0px -44px 0px' }
+);
+document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
+
+function handleRecursosSubmit(e) {
+  e.preventDefault();
+  const btn = e.target.querySelector('.rfc-submit');
+  btn.textContent = 'Enviado — revise su correo';
+  btn.style.background = 'oklch(50% 0.13 145)';
+  btn.disabled = true;
+  e.target.reset();
+}
+</script>
+
+<script src="js/main.js" defer></script>
+</body>
+</html>

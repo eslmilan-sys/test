@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Publicaciones — Digimed Institute</title>
+  <meta name="description" content="Estrategia digital, contenido médico con IA y posicionamiento de especialidad para médicos en el mundo hispanohablante. Publicaciones del Digimed Institute.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/digimed.css">
+  <style>
+
+    /* ── Page hero ──────────────────────────────────────── */
+    .blog-hero {
+      padding: 96px 0 72px;
+      border-bottom: 1px solid var(--line);
+      background: var(--bg);
+      position: relative;
+      overflow: hidden;
+    }
+    .blog-hero::before {
+      content: "";
+      position: absolute; top: -30%; left: -8%;
+      width: 44%; aspect-ratio: 1; border-radius: 50%;
+      background: oklch(70% 0.22 262);
+      filter: blur(100px); opacity: 0.13; pointer-events: none;
+    }
+    .blog-hero-inner { position: relative; z-index: 1; }
+    .blog-hero-kicker {
+      font-family: "DM Mono", monospace;
+      font-size: 10px; letter-spacing: 0.22em;
+      text-transform: uppercase; color: var(--amber);
+      margin-bottom: 28px; display: block;
+    }
+    .blog-h1 {
+      font-family: "Manrope", "DM Sans", sans-serif;
+      font-size: clamp(52px, 8vw, 108px);
+      font-weight: 500; letter-spacing: -0.044em; line-height: 0.9;
+      margin-bottom: 36px;
+    }
+    .blog-h1 em { font-style: italic; color: var(--navy); }
+    .blog-h1 .dim { color: var(--muted); font-weight: 300; }
+    .blog-hero-sub {
+      font-size: 15px; color: var(--muted); line-height: 1.75;
+      max-width: 500px; margin-bottom: 0;
+    }
+
+    /* ── Featured article ──────────────────────────────── */
+    .featured-wrap {
+      padding: 72px 0 0;
+    }
+    .featured-eyebrow {
+      display: flex; align-items: center; gap: 20px;
+      margin-bottom: 36px;
+    }
+    .featured-eyebrow-text {
+      font-family: "DM Mono", monospace; font-size: 9px;
+      letter-spacing: 0.22em; text-transform: uppercase; color: var(--subtle);
+      white-space: nowrap;
+    }
+    .featured-eyebrow-line {
+      flex: 1; height: 1px; background: var(--line);
+    }
+
+    .featured-card {
+      display: grid; grid-template-columns: 1fr 1fr;
+      border: 1px solid var(--line); border-radius: var(--r-xl);
+      overflow: hidden; background: var(--bg);
+      margin-bottom: 80px;
+    }
+    .featured-visual {
+      background: var(--amber-light);
+      position: relative; min-height: 380px;
+      display: flex; align-items: flex-end;
+      padding: 40px;
+      overflow: hidden;
+    }
+    .featured-visual::before {
+      content: "";
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg,
+        oklch(56% 0.27 262 / 0.12) 0%,
+        oklch(90% 0.07 252 / 0.55) 100%
+      );
+    }
+    .featured-visual-num {
+      position: absolute; top: -20px; right: -10px;
+      font-family: "Manrope", "DM Sans", sans-serif;
+      font-size: 200px; font-weight: 700; line-height: 1;
+      color: var(--navy); opacity: 0.08; letter-spacing: -0.06em;
+      pointer-events: none; user-select: none;
+    }
+    .featured-tag {
+      position: relative; z-index: 1;
+      font-family: "DM Mono", monospace;
+      font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase;
+      background: var(--navy); color: #fff;
+      padding: 6px 14px; border-radius: var(--r-pill);
+    }
+    .featured-body {
+      padding: 56px;
+      display: flex; flex-direction: column; justify-content: center;
+    }
+    .featured-cat {
+      font-family: "DM Mono", monospace;
+      font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--amber); margin-bottom: 18px;
+    }
+    .featured-title {
+      font-family: "Manrope", "DM Sans", sans-serif;
+      font-size: clamp(24px, 2.6vw, 36px);
+      font-weight: 500; letter-spacing: -0.03em; line-height: 1.15;
+      margin-bottom: 20px;
+    }
+    .featured-title a { color: var(--text); text-decoration: none; }
+    .featured-title a:hover { color: var(--navy); }
+    .featured-excerpt {
+      font-size: 14px; color: var(--muted); line-height: 1.8;
+      margin-bottom: 32px;
+    }
+    .featured-meta {
+      font-family: "DM Mono", monospace;
+      font-size: 10px; letter-spacing: 0.1em;
+      color: var(--subtle); margin-bottom: 24px;
+    }
+    .featured-link {
+      font-size: 13px; font-weight: 500; color: var(--navy);
+      text-decoration: none; display: inline-flex; align-items: center; gap: 6px;
+      transition: gap 0.2s;
+    }
+    .featured-link:hover { gap: 10px; }
+
+    /* ── Blog layout: main + sidebar ─────────────────── */
+    .blog-layout {
+      display: grid;
+      grid-template-columns: 1fr 288px;
+      gap: 60px;
+      align-items: start;
+      padding-bottom: 100px;
+    }
+
+    /* ── Articles grid ───────────────────────────────── */
+    .articles-section-eyebrow {
+      display: flex; align-items: center; gap: 20px;
+      margin-bottom: 36px;
+    }
+    .articles-section-eyebrow-text {
+      font-family: "DM Mono", monospace; font-size: 9px;
+      letter-spacing: 0.22em; text-transform: uppercase; color: var(--subtle);
+      white-space: nowrap;
+    }
+    .articles-section-eyebrow-line {
+      flex: 1; height: 1px; background: var(--line);
+    }
+
+    .blog-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-bottom: 48px;
+    }
+    .blog-card {
+      border: 1px solid var(--line); border-radius: var(--r-lg);
+      background: var(--bg); overflow: hidden;
+      display: flex; flex-direction: column;
+      transition: border-color 0.22s, transform 0.22s;
+    }
+    .blog-card:hover {
+      border-color: var(--line-2); transform: translateY(-3px);
+    }
+    .blog-card-visual {
+      aspect-ratio: 16/9; background: var(--amber-light);
+      position: relative; overflow: hidden;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .blog-card-num {
+      font-family: "Manrope", "DM Sans", sans-serif;
+      font-size: 80px; font-weight: 700; letter-spacing: -0.05em;
+      color: var(--navy); opacity: 0.12;
+      user-select: none;
+    }
+    .blog-card-label {
+      position: absolute; bottom: 14px; left: 16px;
+      font-family: "DM Mono", monospace;
+      font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--navy); background: oklch(90% 0.07 252 / 0.85);
+      border: 1px solid var(--line-2); padding: 4px 10px;
+      border-radius: var(--r-pill);
+    }
+    .blog-card-body {
+      padding: 28px 28px 32px; flex: 1;
+      display: flex; flex-direction: column;
+    }
+    .blog-card-meta {
+      font-family: "DM Mono", monospace;
+      font-size: 9px; letter-spacing: 0.1em; color: var(--subtle);
+      display: flex; gap: 14px; margin-bottom: 14px;
+    }
+    .blog-card-title {
+      font-family: "Manrope", "DM Sans", sans-serif;
+      font-size: 19px; font-weight: 500; line-height: 1.28;
+      letter-spacing: -0.02em; margin-bottom: 12px; flex: 1;
+    }
+    .blog-card-title a { color: var(--text); text-decoration: none; }
+    .blog-card-title a:hover { color: var(--navy); }
+    .blog-card-excerpt {
+      font-size: 13px; color: var(--muted); line-height: 1.75;
+      margin-bottom: 24px;
+    }
+    .blog-card-link {
+      font-size: 12px; font-weight: 500; color: var(--navy);
+      text-decoration: none; display: inline-flex; align-items: center; gap: 5px;
+      transition: gap 0.2s;
+    }
+    .blog-card:hover .blog-card-link { gap: 9px; }
+
+    /* ── Newsletter block ────────────────────────────── */
+    .newsletter-block {
+      border: 1px solid var(--line-2); border-radius: var(--r-xl);
+      background: oklch(95% 0.012 252);
+      padding: 52px; text-align: center;
+      margin-bottom: 16px;
+    }
+    .newsletter-kicker {
+      font-family: "DM Mono", monospace;
+      font-size: 9px; letter-spacing: 0.22em; text-transform: uppercase;
+      color: var(--amber); margin-bottom: 16px; display: block;
+    }
+    .newsletter-h {
+      font-family: "Manrope", "DM Sans", sans-serif;
+      font-size: clamp(26px, 3vw, 38px);
+      font-weight: 500; letter-spacing: -0.035em;
+      line-height: 1.1; margin-bottom: 14px;
+    }
+    .newsletter-sub {
+      font-size: 14px; color: var(--muted); line-height: 1.75;
+      max-width: 420px; margin: 0 auto 32px;
+    }
+    .newsletter-form {
+      display: flex; gap: 10px; max-width: 440px; margin: 0 auto 14px;
+    }
+    .newsletter-input {
+      flex: 1; padding: 13px 18px;
+      border: 1px solid var(--line-2); border-radius: var(--r-md);
+      background: #fff; color: var(--text);
+      font-family: "DM Sans", sans-serif; font-size: 14px;
+      outline: none; transition: border-color 0.2s;
+    }
+    .newsletter-input:focus { border-color: var(--navy); }
+    .newsletter-input::placeholder { color: var(--subtle); }
+    .newsletter-submit {
+      padding: 13px 24px; border-radius: var(--r-md);
+      background: var(--navy); color: #fff;
+      font-family: "DM Sans", sans-serif; font-size: 13px; font-weight: 500;
+      border: none; cursor: pointer; white-space: nowrap;
+      transition: background 0.2s;
+    }
+    .newsletter-submit:hover { background: oklch(25% 0.08 253); }
+    .newsletter-fine {
+      font-size: 11px; color: var(--subtle);
+    }
+
+    /* ── Sidebar ─────────────────────────────────────── */
+    .blog-sidebar { position: sticky; top: 96px; }
+    .sidebar-widget {
+      border: 1px solid var(--line); border-radius: var(--r-lg);
+      background: var(--bg); padding: 28px;
+      margin-bottom: 16px;
+    }
+    .sidebar-widget-title {
+      font-family: "DM Mono", monospace;
+      font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--subtle); margin-bottom: 18px;
+    }
+    .topic-pills { display: flex; flex-wrap: wrap; gap: 6px; }
+    .topic-pill {
+      font-size: 12px; font-weight: 400; color: var(--muted);
+      padding: 5px 12px; border-radius: var(--r-pill);
+      border: 1px solid var(--line); background: transparent;
+      cursor: pointer; transition: all 0.18s; text-decoration: none;
+      display: inline-block;
+    }
+    .topic-pill:hover {
+      border-color: var(--line-2); color: var(--navy);
+      background: oklch(93% 0.008 252);
+    }
+
+    .guide-widget {
+      background: oklch(22% 0.06 253);
+      border-radius: var(--r-md);
+      padding: 24px; margin-bottom: 18px;
+    }
+    .guide-tag {
+      font-family: "DM Mono", monospace;
+      font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--amber); margin-bottom: 10px; display: block;
+    }
+    .guide-title {
+      font-family: "Manrope", "DM Sans", sans-serif;
+      font-size: 17px; font-weight: 500; line-height: 1.3;
+      color: #fff; margin-bottom: 8px;
+    }
+    .guide-desc { font-size: 12px; color: oklch(75% 0.012 252); line-height: 1.6; }
+
+    .author-avatar {
+      width: 48px; height: 48px; border-radius: 50%;
+      background: var(--amber-light); border: 1px solid var(--line-2);
+      display: flex; align-items: center; justify-content: center;
+      font-family: "Manrope", "DM Sans", sans-serif;
+      font-size: 20px; font-weight: 600; color: var(--navy);
+      flex-shrink: 0;
+    }
+    .author-info-name {
+      font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 2px;
+    }
+    .author-info-role {
+      font-family: "DM Mono", monospace;
+      font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--amber);
+    }
+    .author-bio {
+      font-size: 12px; color: var(--muted); line-height: 1.7;
+      margin: 14px 0 14px; padding-top: 14px;
+      border-top: 1px solid var(--line);
+    }
+    .author-link {
+      font-size: 12px; color: var(--navy); text-decoration: none; font-weight: 500;
+    }
+    .author-link:hover { text-decoration: underline; }
+
+    /* ── Responsive ──────────────────────────────────── */
+    @media (max-width: 1080px) {
+      .blog-layout { grid-template-columns: 1fr; }
+      .blog-sidebar { position: static; }
+      .blog-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 780px) {
+      .featured-card { grid-template-columns: 1fr; }
+      .featured-visual { min-height: 220px; }
+      .featured-body { padding: 36px; }
+      .blog-grid { grid-template-columns: 1fr; }
+      .newsletter-form { flex-direction: column; }
+      .newsletter-block { padding: 36px 24px; }
+    }
+    @media (max-width: 600px) {
+      .blog-hero { padding: 72px 0 56px; }
+      .featured-wrap { padding: 56px 0 0; }
+      .featured-body { padding: 28px 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="announce">
+  <div class="announce-inner">
+    <div class="announce-left">
+      <span class="announce-badge">Guía gratuita 2026</span>
+      <span class="announce-text"><strong>Las tendencias digitales</strong> que están redefiniendo al profesional de la salud de referencia en el mundo hispanohablante — descargue la guía gratuita</span>
+    </div>
+    <a href="../recursos.html" class="announce-btn">Descargar →</a>
+  </div>
+</div>
+
+<nav class="site-nav">
+  <div class="wrap nav-inner">
+    <a href="../index.html" class="nav-brand">
+      <div class="nav-brand-name">Digimed Institute</div>
+      <div class="nav-brand-sub">Educación Médica Superior</div>
+    </a>
+    <div class="nav-links">
+      <a href="../metodo.html">Metodología</a>
+      <a href="../precios.html">Programas</a>
+      <a href="index.html" class="active">Blog</a>
+      <a href="../sobre.html">El Instituto</a>
+    </div>
+    <a href="../recursos.html" class="nav-cta">Solicitar acceso</a>
+  
+    <button class="nav-toggle" aria-label="Menú"><span></span><span></span><span></span></button></div>
+</nav>
+
+<div class="ticker" aria-hidden="true">
+  <div class="ticker-track">
+    <span class="ticker-item">Digital Opinion Leader<span class="ticker-dot"></span></span>
+    <span class="ticker-item">Referente clínico digital<span class="ticker-dot"></span></span>
+    <span class="ticker-item">Visibilidad entre pares<span class="ticker-dot"></span></span>
+    <span class="ticker-item">IA Clínica<span class="ticker-dot"></span></span>
+    <span class="ticker-item">Instagram médico<span class="ticker-dot"></span></span>
+    <span class="ticker-item">LinkedIn especialista<span class="ticker-dot"></span></span>
+    <span class="ticker-item">Autoridad clínica digital<span class="ticker-dot"></span></span>
+    <span class="ticker-item">TikTok clínico<span class="ticker-dot"></span></span>
+    <span class="ticker-item">200+ prompts IA<span class="ticker-dot"></span></span>
+    <span class="ticker-item">7 módulos certificados<span class="ticker-dot"></span></span>
+    <span class="ticker-item">Presencia digital médica<span class="ticker-dot"></span></span>
+    <span class="ticker-item">Posicionamiento digital<span class="ticker-dot"></span></span>
+    <span class="ticker-item">Impacto académico<span class="ticker-dot"></span></span>
+    <span class="ticker-item">Ecosistema digital clínico<span class="ticker-dot"></span></span>
+    <span class="ticker-item">Digital Opinion Leader<span class="ticker-dot"></span></span>
+    <span class="ticker-item">Referente clínico digital<span class="ticker-dot"></span></span>
+    <span class="ticker-item">Visibilidad entre pares<span class="ticker-dot"></span></span>
+    <span class="ticker-item">IA Clínica<span class="ticker-dot"></span></span>
+    <span class="ticker-item">Instagram médico<span class="ticker-dot"></span></span>
+    <span class="ticker-item">LinkedIn especialista<span class="ticker-dot"></span></span>
+    <span class="ticker-item">Autoridad clínica digital<span class="ticker-dot"></span></span>
+    <span class="ticker-item">TikTok clínico<span class="ticker-dot"></span></span>
+    <span class="ticker-item">200+ prompts IA<span class="ticker-dot"></span></span>
+    <span class="ticker-item">7 módulos certificados<span class="ticker-dot"></span></span>
+    <span class="ticker-item">Presencia digital médica<span class="ticker-dot"></span></span>
+    <span class="ticker-item">Posicionamiento digital<span class="ticker-dot"></span></span>
+    <span class="ticker-item">Impacto académico<span class="ticker-dot"></span></span>
+    <span class="ticker-item">Ecosistema digital clínico<span class="ticker-dot"></span></span>
+  </div>
+</div>
+
+<!-- HERO -->
+<section class="blog-hero">
+  <div class="wrap blog-hero-inner">
+    <span class="blog-hero-kicker reveal">Publicaciones · Digimed Institute</span>
+    <h1 class="blog-h1 reveal">
+      Lo que pharma<br><em>nunca publica.</em><br><span class="dim">Nosotros sí.</span>
+    </h1>
+    <p class="blog-hero-sub reveal rd1">
+      Estrategia digital, contenido médico con IA y posicionamiento de especialidad — desde el interior de la industria farmacéutica de habla hispana.
+    </p>
+  </div>
+</section>
+
+<!-- FEATURED -->
+<section class="section featured-wrap">
+  <div class="wrap">
+    <div class="featured-eyebrow reveal">
+      <span class="featured-eyebrow-text">Artículo destacado</span>
+      <span class="featured-eyebrow-line"></span>
+    </div>
+
+    <div class="featured-card reveal">
+      <div class="featured-visual">
+        <div class="featured-visual-num">01</div>
+        <span class="featured-tag">Contenido con IA</span>
+      </div>
+      <div class="featured-body">
+        <div class="featured-cat">Creación de contenido · Mayo 2026 · 8 min</div>
+        <div class="featured-title">
+          <a href="#">Cómo pasar de cero a su primer carrusel médico en Instagram — con IA y sin invertir cuatro horas</a>
+        </div>
+        <p class="featured-excerpt">El flujo de trabajo exacto: de una idea clínica a un carrusel de ocho slides listo para publicar, usando Claude y Canva AI. Incluye el prompt de partida y los tres errores que convierten contenido médico en contenido genérico que ningún par comparte.</p>
+        <div class="featured-meta">Milan · Digimed Institute · 12 de mayo, 2026</div>
+        <a href="#" class="featured-link">Leer artículo completo →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MAIN + SIDEBAR -->
+<section class="section" style="padding-top: 0;">
+  <div class="wrap blog-layout">
+
+    <!-- MAIN -->
+    <div>
+      <div class="articles-section-eyebrow reveal">
+        <span class="articles-section-eyebrow-text">Publicaciones recientes</span>
+        <span class="articles-section-eyebrow-line"></span>
+      </div>
+
+      <div class="blog-grid">
+
+        <div class="blog-card reveal">
+          <div class="blog-card-visual">
+            <span class="blog-card-num">02</span>
+            <span class="blog-card-label">Plataformas Digitales</span>
+          </div>
+          <div class="blog-card-body">
+            <div class="blog-card-meta">
+              <span>Milan</span>
+              <span>5 mayo 2026</span>
+              <span>6 min</span>
+            </div>
+            <div class="blog-card-title">
+              <a href="#">Qué puede y qué no puede publicar como médico en sus redes — la guía real para el especialista en el mundo hispanohablante</a>
+            </div>
+            <p class="blog-card-excerpt">Los tres errores de contenido que descartan un perfil clínico antes de que pharma lo considere. Con ejemplos reales de posts que refuerzan y posts que erosionan la autoridad de especialidad.</p>
+            <a href="#" class="blog-card-link">Leer más →</a>
+          </div>
+        </div>
+
+        <div class="blog-card reveal rd1">
+          <div class="blog-card-visual">
+            <span class="blog-card-num">03</span>
+            <span class="blog-card-label">IA para Médicos</span>
+          </div>
+          <div class="blog-card-body">
+            <div class="blog-card-meta">
+              <span>Milan</span>
+              <span>28 abril 2026</span>
+              <span>5 min</span>
+            </div>
+            <div class="blog-card-title">
+              <a href="#">5 prompts de Claude que todo médico especialista debería tener guardados</a>
+            </div>
+            <p class="blog-card-excerpt">De abstract de congreso a post de LinkedIn, carrusel de Instagram y newsletter — en 30 minutos. Los cinco prompts base que más usan los especialistas del programa para producir contenido con rigor clínico.</p>
+            <a href="#" class="blog-card-link">Leer más →</a>
+          </div>
+        </div>
+
+        <div class="blog-card reveal rd2">
+          <div class="blog-card-visual">
+            <span class="blog-card-num">04</span>
+            <span class="blog-card-label">Estrategia de Contenido</span>
+          </div>
+          <div class="blog-card-body">
+            <div class="blog-card-meta">
+              <span>Milan</span>
+              <span>20 abril 2026</span>
+              <span>7 min</span>
+            </div>
+            <div class="blog-card-title">
+              <a href="#">Los 12 tipos de contenido que funcionan para médicos en Instagram — y los 3 que destruyen la credibilidad</a>
+            </div>
+            <p class="blog-card-excerpt">El mapa completo de formatos: qué genera reconocimiento entre pares, qué posiciona frente a la industria, y qué señala que el especialista es un candidato DOL serio y no un divulgador genérico.</p>
+            <a href="#" class="blog-card-link">Leer más →</a>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- NEWSLETTER -->
+      <div class="newsletter-block reveal">
+        <span class="newsletter-kicker">Newsletter</span>
+        <h3 class="newsletter-h">Una vez por semana.<br>Lo que pharma no publica.</h3>
+        <p class="newsletter-sub">Estrategia DOL, casos reales, actualizaciones de plataformas e IA aplicada — para profesionales de la salud en el mundo hispanohablante que van en serio.</p>
+        <form class="newsletter-form" onsubmit="return false;">
+          <input type="email" class="newsletter-input" placeholder="correo@ejemplo.com" required>
+          <button type="submit" class="newsletter-submit">Suscribirse →</button>
+        </form>
+        <p class="newsletter-fine">Sin publicidad. Puede darse de baja en cualquier momento.</p>
+      </div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <div class="blog-sidebar reveal rd1">
+
+      <div class="sidebar-widget">
+        <div class="sidebar-widget-title">Temas</div>
+        <div class="topic-pills">
+          <a href="#" class="topic-pill">Estrategia DOL</a>
+          <a href="#" class="topic-pill">LinkedIn médico</a>
+          <a href="#" class="topic-pill">IA + contenido clínico</a>
+          <a href="#" class="topic-pill">Pharma partnerships</a>
+          <a href="#" class="topic-pill">Advisory boards</a>
+          <a href="#" class="topic-pill">Instagram médico</a>
+          <a href="#" class="topic-pill">TikTok clínico</a>
+          <a href="#" class="topic-pill">Posicionamiento digital</a>
+          <a href="#" class="topic-pill">España</a>
+          <a href="#" class="topic-pill"></a>
+          <a href="#" class="topic-pill"></a>
+        </div>
+      </div>
+
+      <div class="sidebar-widget">
+        <div class="sidebar-widget-title">Recurso Gratuito</div>
+        <div class="guide-widget">
+          <span class="guide-tag">PDF · Descarga inmediata</span>
+          <div class="guide-title">Tendencias Digitales para el Especialista Médico 2026</div>
+          <p class="guide-desc">Las dinámicas que están redefiniendo la visibilidad clínica en el mundo hispanohablante — y cómo el especialista puede posicionarse antes que su especialidad lo haga por él.</p>
+        </div>
+        <a href="../recursos.html" class="btn-amber" style="width:100%; text-align:center; display:block;">Descargar gratis →</a>
+      </div>
+
+      <div class="sidebar-widget">
+        <div class="sidebar-widget-title">Sobre el Autor</div>
+        <div style="display:flex; gap:14px; align-items:center;">
+          <div class="author-avatar">M</div>
+          <div>
+            <div class="author-info-name">Milan</div>
+            <div class="author-info-role">Fundador · Digimed Institute</div>
+          </div>
+        </div>
+        <p class="author-bio">5+ años en la industria farmacéutica de habla hispana identificando y desarrollando Digital Opinion Leaders. Ahora enseña el sistema desde adentro — para el especialista que quiere ser visto por quienes pagan.</p>
+        <a href="../sobre.html" class="author-link">Ver trayectoria completa →</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="foot-brand-name">Digimed Institute</div>
+        <div class="foot-brand-sub">Educación Médica Superior</div>
+        <p class="foot-brand-p">El único programa en el mundo hispanohablante de formación en Autoridad Clínica Digital e IA Aplicada para profesionales de la salud, desarrollado desde el interior de la industria farmacéutica.</p>
+      </div>
+      <div class="foot-col">
+        <div class="foot-col-title">Instituto</div>
+        <ul>
+          <li><a href="../metodo.html">Metodología</a></li>
+          <li><a href="../sobre.html">El Instituto</a></li>
+          <li><a href="../precios.html">Programas</a></li>
+          <li><a href="index.html">Publicaciones</a></li>
+          <li><a href="../recursos.html">Recursos</a></li>
+        </ul>
+      </div>
+      <div class="foot-col">
+        <div class="foot-col-title">Programas</div>
+        <ul>
+          <li><a href="../precios.html">Formación independiente — $960</a></li>
+          <li><a href="../precios.html">Ecosistema clínico — $1,440</a></li>
+          <li><a href="../precios.html">Implementación dirigida — $2,800</a></li>
+          <li><a href="../precios.html">IA Clínica · El Sistema — $350</a></li>
+        </ul>
+      </div>
+      <div class="foot-col">
+        <div class="foot-col-title">Legal</div>
+        <ul>
+          <li><a href="privacidad.html">Política de privacidad</a></li>
+          <li><a href="terminos.html">Términos y condiciones</a></li>
+          <li><a href="mailto:contacto@digimedinstitute.com">Contacto</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <div>© 2026 Digimed Institute. Todos los derechos reservados.</div>
+      <div class="foot-legal">
+        <a href="privacidad.html">Privacidad</a>
+        <a href="terminos.html">Términos</a>
+        <a href="mailto:contacto@digimedinstitute.com">Contacto</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+const revealObs = new IntersectionObserver(
+  entries => entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('in'); revealObs.unobserve(e.target); }
+  }),
+  { threshold: 0.06, rootMargin: '0px 0px -44px 0px' }
+);
+document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
+</script>
+
+<script src="../js/main.js" defer></script>
+</body>
+</html>

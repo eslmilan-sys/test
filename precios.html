@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Programas — Digimed Institute</title>
+  <meta name="description" content="Tres programas de formación en Autoridad Clínica Digital para profesionales de la salud en el mundo hispanohablante. Desde $960 hasta $2,800. Acceso inmediato.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/digimed.css">
+  <style>
+    .page-hero {
+      padding: 100px 0 80px; border-bottom: 1px solid var(--line);
+      background: var(--bg); position: relative; overflow: hidden;
+    }
+    .page-hero::before {
+      content: ""; position: absolute; top: -20%; right: -10%;
+      width: 50%; aspect-ratio: 1; border-radius: 50%;
+      background: oklch(70% 0.22 262); filter: blur(90px); opacity: 0.16; pointer-events: none;
+    }
+    .page-hero-inner { position: relative; z-index: 1; }
+    .page-breadcrumb { display: flex; align-items: center; gap: 14px; margin-bottom: 44px; }
+    .page-breadcrumb-item {
+      font-family: "DM Mono", monospace; font-size: 10px;
+      letter-spacing: 0.2em; text-transform: uppercase; color: var(--subtle);
+    }
+    .page-breadcrumb-item.active { color: var(--text); }
+    .page-breadcrumb-sep { width: 20px; height: 1px; background: var(--line-2); }
+    .page-h1 {
+      font-family: "Manrope", "DM Sans", sans-serif;
+      font-size: clamp(48px, 7vw, 96px); font-weight: 500;
+      letter-spacing: -0.042em; line-height: 0.92; margin-bottom: 32px;
+    }
+    .page-h1 em { font-style: italic; color: var(--navy); }
+    .page-sub {
+      font-size: 16px; color: var(--muted); line-height: 1.75;
+      max-width: 560px; margin-bottom: 48px;
+    }
+    .hero-roi {
+      display: flex; gap: 48px; flex-wrap: wrap;
+      padding-top: 36px; border-top: 1px solid var(--line);
+    }
+    .roi-stat-val {
+      font-family: "Manrope", "DM Sans", sans-serif;
+      font-size: clamp(24px, 3vw, 38px); font-weight: 600;
+      letter-spacing: -0.04em; line-height: 1; color: var(--text); margin-bottom: 6px;
+    }
+    .roi-stat-label {
+      font-family: "DM Mono", monospace; font-size: 9px;
+      letter-spacing: 0.16em; text-transform: uppercase; color: var(--subtle);
+    }
+
+    /* ROI cards */
+    .roi-section { padding: 80px 0; background: linear-gradient(180deg, var(--bg-1) 0%, var(--bg) 100%); }
+    .roi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 48px; }
+    .roi-card {
+      background: var(--bg); border: 1px solid var(--line);
+      border-radius: var(--r-xl); padding: 36px 32px;
+    }
+    .roi-type {
+      font-family: "DM Mono", monospace; font-size: 9px;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--amber); margin-bottom: 16px;
+    }
+    .roi-range {
+      font-family: "Manrope", "DM Sans", sans-serif;
+      font-size: clamp(28px, 3vw, 40px); font-weight: 600;
+      letter-spacing: -0.04em; line-height: 1; color: var(--text); margin-bottom: 12px;
+    }
+    .roi-desc { font-size: 13px; color: var(--muted); line-height: 1.7; }
+
+    /* Compare table */
+    .compare-section { padding: 80px 0; }
+    .compare-wrap { overflow-x: auto; margin-top: 48px; }
+    .compare-table {
+      width: 100%; border-collapse: collapse; font-size: 13px;
+    }
+    .compare-table th {
+      padding: 14px 20px; text-align: left; font-size: 9px;
+      font-family: "DM Mono", monospace; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--subtle);
+      border-bottom: 1px solid var(--line);
+    }
+    .compare-table th.hl { color: var(--navy); }
+    .compare-table td {
+      padding: 12px 20px; border-bottom: 1px solid var(--line);
+      color: var(--muted); vertical-align: middle;
+    }
+    .compare-table td:first-child { font-size: 13px; color: var(--text); font-weight: 400; }
+    .compare-table td.hl { background: oklch(21% 0.065 253 / 0.03); }
+    .compare-table td.check { color: var(--amber); font-weight: 600; }
+    .compare-table td.dash { color: var(--subtle); }
+    .compare-table tr:hover td { background: var(--bg-1); }
+    .compare-table tr:hover td.hl { background: oklch(21% 0.065 253 / 0.05); }
+    .compare-table .section-row td {
+      font-family: "DM Mono", monospace; font-size: 9px;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--amber); background: var(--bg-1);
+      padding: 10px 20px; border-bottom: 1px solid var(--line);
+    }
+
+    /* FAQ */
+    .faq-section { padding: 80px 0; background: linear-gradient(180deg, var(--bg-1) 0%, var(--bg) 100%); }
+    .faq-grid { display: grid; grid-template-columns: 280px 1fr; gap: 80px; align-items: start; margin-top: 56px; }
+    .faq-sticky { position: sticky; top: 96px; }
+
+    /* CTA section */
+    .cta-section { background: var(--navy); padding: 80px 0; text-align: center; }
+    .cta-eyebrow {
+      font-family: "DM Mono", monospace; font-size: 9px; letter-spacing: 0.22em;
+      text-transform: uppercase; color: var(--amber); margin-bottom: 20px;
+    }
+    .cta-h2 {
+      font-family: "Manrope", "DM Sans", sans-serif;
+      font-size: clamp(36px, 5vw, 64px); font-weight: 500;
+      letter-spacing: -0.04em; line-height: 0.95;
+      color: oklch(95% 0.006 252); margin-bottom: 20px;
+    }
+    .cta-h2 em { font-style: italic; color: var(--amber-2); }
+    .cta-sub { font-size: 15px; color: oklch(60% 0.02 250); line-height: 1.7; max-width: 460px; margin: 0 auto 40px; }
+    .cta-actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+    .btn-amber {
+      background: var(--amber); color: var(--navy); padding: 16px 32px;
+      border-radius: var(--r-pill); font-size: 14px; font-weight: 600;
+      letter-spacing: 0.02em; transition: background 0.15s; display: inline-flex;
+    }
+    .btn-amber:hover { background: var(--amber-2); }
+    .btn-ghost {
+      border: 1px solid oklch(100% 0 0 / 0.18); color: oklch(70% 0.02 250);
+      padding: 15px 32px; border-radius: var(--r-pill); font-size: 14px;
+      transition: border-color 0.15s, color 0.15s; display: inline-flex;
+    }
+    .btn-ghost:hover { border-color: oklch(100% 0 0 / 0.35); color: oklch(88% 0.008 252); }
+
+    @media (max-width: 960px) {
+      .roi-grid { grid-template-columns: 1fr; max-width: 480px; }
+      .faq-grid { grid-template-columns: 1fr; gap: 40px; }
+      .faq-sticky { position: static; }
+    }
+    @media (max-width: 680px) { .hero-roi { gap: 24px; } }
+  </style>
+</head>
+<body>
+
+<div class="announce">
+  <div class="announce-inner">
+    <div class="announce-left">
+      <span class="announce-badge">Guía gratuita 2026</span>
+      <span class="announce-text"><strong>Las tendencias digitales</strong> que están redefiniendo al profesional de la salud de referencia en el mundo hispanohablante — descargue la guía gratuita</span>
+    </div>
+    <a href="recursos.html" class="announce-btn">Descargar →</a>
+  </div>
+</div>
+
+<nav class="site-nav">
+  <div class="wrap nav-inner">
+    <a href="index.html" class="nav-brand">
+      <div class="nav-brand-name">Digimed Institute</div>
+      <div class="nav-brand-sub">Educación Médica Superior</div>
+    </a>
+    <div class="nav-links">
+      <a href="metodo.html">Metodología</a>
+      <a href="precios.html" class="active">Programas</a>
+      <a href="blog/index.html">Blog</a>
+      <a href="sobre.html">El Instituto</a>
+    </div>
+    <a href="recursos.html" class="nav-cta">Solicitar acceso</a>
+  
+    <button class="nav-toggle" aria-label="Menú"><span></span><span></span><span></span></button></div>
+</nav>
+
+<div class="ticker" aria-hidden="true">
+  <div class="ticker-track">
+    <span class="ticker-item">Digital Opinion Leader<span class="ticker-dot"></span></span>
+    <span class="ticker-item">Referente clínico digital<span class="ticker-dot"></span></span>
+    <span class="ticker-item">Visibilidad entre pares<span class="ticker-dot"></span></span>
+    <span class="ticker-item">IA Clínica<span class="ticker-dot"></span></span>
+    <span class="ticker-item">Instagram médico<span class="ticker-dot"></span></span>
+    <span class="ticker-item">LinkedIn especialista<span class="ticker-dot"></span></span>
+    <span class="ticker-item">Autoridad clínica digital<span class="ticker-dot"></span></span>
+    <span class="ticker-item">TikTok clínico<span class="ticker-dot"></span></span>
+    <span class="ticker-item">200+ prompts IA<span class="ticker-dot"></span></span>
+    <span class="ticker-item">7 módulos certificados<span class="ticker-dot"></span></span>
+    <span class="ticker-item">Presencia digital médica<span class="ticker-dot"></span></span>
+    <span class="ticker-item">Posicionamiento digital<span class="ticker-dot"></span></span>
+    <span class="ticker-item">Impacto académico<span class="ticker-dot"></span></span>
+    <span class="ticker-item">Ecosistema digital clínico<span class="ticker-dot"></span></span>
+    <span class="ticker-item">Digital Opinion Leader<span class="ticker-dot"></span></span>
+    <span class="ticker-item">Referente clínico digital<span class="ticker-dot"></span></span>
+    <span class="ticker-item">Visibilidad entre pares<span class="ticker-dot"></span></span>
+    <span class="ticker-item">IA Clínica<span class="ticker-dot"></span></span>
+    <span class="ticker-item">Instagram médico<span class="ticker-dot"></span></span>
+    <span class="ticker-item">LinkedIn especialista<span class="ticker-dot"></span></span>
+    <span class="ticker-item">Autoridad clínica digital<span class="ticker-dot"></span></span>
+    <span class="ticker-item">TikTok clínico<span class="ticker-dot"></span></span>
+    <span class="ticker-item">200+ prompts IA<span class="ticker-dot"></span></span>
+    <span class="ticker-item">7 módulos certificados<span class="ticker-dot"></span></span>
+    <span class="ticker-item">Presencia digital médica<span class="ticker-dot"></span></span>
+    <span class="ticker-item">Posicionamiento digital<span class="ticker-dot"></span></span>
+    <span class="ticker-item">Impacto académico<span class="ticker-dot"></span></span>
+    <span class="ticker-item">Ecosistema digital clínico<span class="ticker-dot"></span></span>
+  </div>
+</div>
+
+<section class="page-hero">
+  <div class="wrap page-hero-inner">
+    <div class="page-breadcrumb reveal">
+      <span class="page-breadcrumb-item active">Digimed Institute</span>
+      <span class="page-breadcrumb-sep"></span>
+      <span class="page-breadcrumb-item">Programas</span>
+    </div>
+    <h1 class="page-h1 reveal">
+      Un retorno<br><em>documentable.</em>
+    </h1>
+    <p class="page-sub reveal rd1">Una sola colaboración con la industria suele cubrir el costo del programa. La pregunta no es si la inversión es razonable, sino cuántas oportunidades se están perdiendo sin el sistema.</p>
+    <div class="hero-roi reveal rd2">
+      <div>
+        <div class="roi-stat-val">desde $2K</div>
+        <div class="roi-stat-label">speaking engagement pharma</div>
+      </div>
+      <div>
+        <div class="roi-stat-val">$5K+/año</div>
+        <div class="roi-stat-label">retención anual · industria</div>
+      </div>
+      <div>
+        <div class="roi-stat-val">$10K+</div>
+        <div class="roi-stat-label">partnership de marca farmacéutica</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROGRAMS -->
+<section class="section" id="programas">
+  <div class="wrap">
+    <div class="section-eyebrow reveal">
+      <span class="eyebrow-text">Programas de formación</span>
+      <span class="eyebrow-line"></span>
+    </div>
+    <h2 class="section-h2 reveal">Elija el programa<br><em>adecuado para su perfil.</em></h2>
+    <p class="section-body reveal rd1" style="margin-top:16px;">Los tres programas comparten el mismo currículo de 7 módulos. La diferencia está en el nivel de acompañamiento y el acceso al equipo del Instituto.</p>
+
+    <div class="pricing-grid" style="margin-top: 56px;">
+      <div class="price-card reveal">
+        <div class="price-tier">Programa 01</div>
+        <div class="price-name">Formación independiente</div>
+        <div class="price-amount-block">
+          <span class="price-currency">USD</span>
+          <span class="price-amount">960</span>
+        </div>
+        <div class="price-note">USD 960 único · o desde <strong>USD 89/mes</strong></div>
+        <ul class="price-features">
+          <li><span class="fi">✓</span>7 módulos en video (acceso de por vida)</li>
+          <li><span class="fi">✓</span>Biblioteca de 200+ prompts especializados</li>
+          <li><span class="fi">✓</span>Plantillas de contenido clínico validadas</li>
+          <li><span class="fi">✓</span>Guías de plataformas por tipo de especialidad</li>
+          <li><span class="fi">✓</span>Materiales descargables completos</li>
+          <li class="off"><span class="fi-off">—</span>Ecosistema privado de especialistas</li>
+          <li class="off"><span class="fi-off">—</span>Sesiones de revisión en vivo</li>
+          <li class="off"><span class="fi-off">—</span>Plan DOL personalizado</li>
+        </ul>
+        <a href="recursos.html" class="price-cta">Iniciar Formación</a>
+      </div>
+
+      <div class="price-card featured reveal rd1">
+        <div class="pop-label">Más solicitado</div>
+        <div class="price-tier">Programa 02</div>
+        <div class="price-name">Ecosistema clínico Digital</div>
+        <div class="price-amount-block">
+          <span class="price-currency">USD</span>
+          <span class="price-amount">1,440</span>
+        </div>
+        <div class="price-note">USD 1,440 único · o desde <strong>USD 129/mes</strong></div>
+        <ul class="price-features">
+          <li><span class="fi">✓</span>Todo lo incluido en Programa 01</li>
+          <li><span class="fi">✓</span>Acceso al ecosistema privado de especialistas</li>
+          <li><span class="fi">✓</span>Verificación de perfil como médico especialista</li>
+          <li><span class="fi">✓</span>Sesión mensual de revisión de perfiles en vivo</li>
+          <li><span class="fi">✓</span>Revisión personalizada del perfil digital</li>
+          <li><span class="fi">✓</span>Casos documentados de implementación real</li>
+          <li class="off"><span class="fi-off">—</span>Plan DOL personalizado</li>
+          <li class="off"><span class="fi-off">—</span>Introducción a red farmacéutica</li>
+        </ul>
+        <a href="recursos.html" class="price-cta">Acceder al Ecosistema</a>
+      </div>
+
+      <div class="price-card reveal rd2">
+        <div class="price-tier">Programa 03</div>
+        <div class="price-name">Implementación dirigida</div>
+        <div class="price-amount-block">
+          <span class="price-currency">USD</span>
+          <span class="price-amount">2,800</span>
+        </div>
+        <div class="price-note">USD 2,800 único · o desde <strong>USD 249/mes</strong> · Garantía 30 días</div>
+        <ul class="price-features">
+          <li><span class="fi">✓</span>Todo lo incluido en Programa 02</li>
+          <li><span class="fi">✓</span>8 semanas de implementación en vivo</li>
+          <li><span class="fi">✓</span>Plan DOL personalizado por sub-especialidad</li>
+          <li><span class="fi">✓</span>Estrategia de contenido personalizada 90 días</li>
+          <li><span class="fi">✓</span>Introducción a red de contactos farmacéuticos</li>
+          <li><span class="fi">✓</span>Sesiones de mentoría 1:1 incluidas</li>
+          <li><span class="fi">✓</span>Garantía de reembolso a 30 días</li>
+        </ul>
+        <a href="recursos.html" class="price-cta">Consultar Disponibilidad</a>
+      </div>
+    </div>
+
+    <!-- AI Product -->
+    <div class="ai-divider reveal">
+      <span class="ai-divider-text">También disponible como herramienta independiente</span>
+    </div>
+    <div class="ai-product-card reveal">
+      <div class="ai-product-left">
+        <div class="ai-product-tag">IA Clínica · Descarga inmediata</div>
+        <h3 class="ai-product-title">El Sistema de IA<br><em>para Especialistas</em></h3>
+        <p class="ai-product-desc">Todo el sistema de inteligencia artificial para producir contenido clínico de calidad académica. 200+ prompts, flujos de trabajo con Claude y GPT-4, plantillas por plataforma. Sin programa. Sin cohorte. Solo la herramienta.</p>
+      </div>
+      <div class="ai-product-features">
+        <ul>
+          <li>200+ prompts especializados para medicina clínica</li>
+          <li>Flujos de trabajo completos con Claude y GPT-4</li>
+          <li>Plantillas de contenido para Instagram, LinkedIn, TikTok y Facebook</li>
+          <li>Sistema de publicación semanal operativo en 45 min/día</li>
+          <li>Guía de implementación en PDF — descarga instantánea</li>
+        </ul>
+      </div>
+      <div class="ai-product-right">
+        <div class="ai-product-price-block">
+          <span class="ai-price-currency">USD</span>
+          <span class="ai-price-amount">350</span>
+        </div>
+        <div class="ai-price-note">PDF · Acceso inmediato</div>
+        <a href="recursos.html" class="ai-product-cta">Obtener acceso →</a>
+        <p class="ai-product-fine">Pago único. Sin suscripción.</p>
+      </div>
+    </div>
+
+    <p style="text-align:center;margin-top:36px;font-size:13px;color:var(--subtle);">¿Dudas sobre el programa adecuado para su perfil? <a href="sobre.html" style="color:var(--navy);border-bottom:1px solid oklch(21% 0.065 253 / 0.25);">Consulte con el equipo del Instituto.</a></p>
+  </div>
+</section>
+
+<!-- ROI -->
+<section class="roi-section">
+  <div class="wrap">
+    <div class="section-eyebrow reveal">
+      <span class="eyebrow-text">Retorno real</span>
+      <span class="eyebrow-line"></span>
+    </div>
+    <h2 class="section-h2 reveal">Lo que un solo<br><em>engagement cubre.</em></h2>
+    <div class="roi-grid">
+      <div class="roi-card reveal">
+        <div class="roi-type">Speaking Engagement</div>
+        <div class="roi-range">$2K – $15K</div>
+        <div class="roi-desc">Por conferencia, simposio o webinar farmacéutico. Una o dos al año cubren con creces el costo de cualquier programa del Instituto.</div>
+      </div>
+      <div class="roi-card reveal rd1">
+        <div class="roi-type">Colaboraciones anuales</div>
+        <div class="roi-range">$5K – $30K/año</div>
+        <div class="roi-desc">Retainers anuales como asesor médico especialista. Muchos DOLs activos en el mundo hispanohablante tienen 2–3 contratos simultáneos con diferentes laboratorios.</div>
+      </div>
+      <div class="roi-card reveal rd2">
+        <div class="roi-type">Brand Partnership</div>
+        <div class="roi-range">$10K – $50K+</div>
+        <div class="roi-desc">Colaboraciones de contenido, embajadores de especialidad y programas de educación médica. El mayor upside para un DOL con audiencia de pares establecida.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMPARE TABLE -->
+<section class="compare-section">
+  <div class="wrap">
+    <div class="section-eyebrow reveal">
+      <span class="eyebrow-text">Comparar</span>
+      <span class="eyebrow-line"></span>
+    </div>
+    <h2 class="section-h2 reveal">¿Cuál es el programa<br><em>correcto para usted?</em></h2>
+    <div class="compare-wrap reveal rd1">
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th>Característica</th>
+            <th>Formación independiente</th>
+            <th class="hl">Ecosistema clínico</th>
+            <th>Implementación dirigida</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="section-row"><td colspan="4">Contenido</td></tr>
+          <tr><td>7 módulos en video</td><td class="check">✓</td><td class="check hl">✓</td><td class="check">✓</td></tr>
+          <tr><td>Biblioteca 200+ prompts IA</td><td class="check">✓</td><td class="check hl">✓</td><td class="check">✓</td></tr>
+          <tr><td>Plantillas por plataforma de habla hispana</td><td class="check">✓</td><td class="check hl">✓</td><td class="check">✓</td></tr>
+          <tr><td>Acceso de por vida + actualizaciones</td><td class="check">✓</td><td class="check hl">✓</td><td class="check">✓</td></tr>
+          <tr class="section-row"><td colspan="4">Comunidad y Acompañamiento</td></tr>
+          <tr><td>Ecosistema privado de especialistas</td><td class="dash">—</td><td class="check hl">✓</td><td class="check">✓</td></tr>
+          <tr><td>Sesiones de revisión mensuales</td><td class="dash">—</td><td class="check hl">✓</td><td class="check">✓</td></tr>
+          <tr><td>Revisión de perfil personalizada</td><td class="dash">—</td><td class="check hl">✓</td><td class="check">✓</td></tr>
+          <tr class="section-row"><td colspan="4">Acceso Directo al Instituto</td></tr>
+          <tr><td>8 semanas de implementación en vivo</td><td class="dash">—</td><td class="dash hl">—</td><td class="check">✓</td></tr>
+          <tr><td>Plan DOL personalizado por especialidad</td><td class="dash">—</td><td class="dash hl">—</td><td class="check">✓</td></tr>
+          <tr><td>Introducción a red pharma de habla hispana</td><td class="dash">—</td><td class="dash hl">—</td><td class="check">✓</td></tr>
+          <tr class="section-row"><td colspan="4">Garantía y Precio</td></tr>
+          <tr><td>Garantía de satisfacción</td><td class="dash">—</td><td class="hl" style="color:var(--muted);">—</td><td>30 días</td></tr>
+          <tr><td>Pago en cuotas</td><td class="dash">—</td><td class="hl" style="color:var(--navy);">3 × $520</td><td style="color:var(--muted);">Consultar</td></tr>
+          <tr><td>Precio</td><td>$960</td><td class="hl" style="font-weight:600; color:var(--navy);">$1,440</td><td>$2,800</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq-section" id="faq">
+  <div class="wrap">
+    <div class="faq-grid">
+      <div class="faq-sticky">
+        <div class="section-eyebrow reveal">
+          <span class="eyebrow-text">Preguntas frecuentes</span>
+          <span class="eyebrow-line"></span>
+        </div>
+        <h2 class="faq-h2 reveal">Dudas sobre<br><em>la inversión.</em></h2>
+        <p class="faq-note reveal rd1">Si su entorno clínico no aparece aquí, escríbanos directamente al equipo del Instituto.</p>
+        <a href="sobre.html" class="btn-primary" style="margin-top:24px;display:inline-flex;font-size:13px;padding:14px 24px;">Consultar al Instituto →</a>
+      </div>
+      <div class="reveal rd1">
+        <div class="faq-list">
+          <div class="faq-item">
+            <button class="faq-q"><span>¿Se puede pagar en cuotas o mensualmente?</span><span class="faq-toggle">+</span></button>
+            <div class="faq-body"><div class="faq-body-inner">Todos los programas tienen opción de pago mensual: Programa 01 desde USD 89/mes, Programa 02 desde USD 129/mes, Programa 03 desde USD 249/mes. El pago mensual se gestiona automáticamente y puede cancelarse en cualquier momento una vez completado el acceso mínimo. También se acepta pago único con acceso inmediato.</div></div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-q"><span>¿Qué sucede si el programa no es lo que esperaba?</span><span class="faq-toggle">+</span></button>
+            <div class="faq-body"><div class="faq-body-inner">El Programa 03 incluye garantía de reembolso completo a 30 días sin condiciones. El Programa 01 y 02 no incluyen garantía por ser productos digitales con acceso inmediato al contenido. Si tiene dudas antes de inscribirse, le recomendamos comenzar con la guía gratuita o contactar al equipo.</div></div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-q"><span>¿Qué métodos de pago aceptan?</span><span class="faq-toggle">+</span></button>
+            <div class="faq-body"><div class="faq-body-inner">Aceptamos tarjetas de crédito y débito internacionales (Visa, Mastercard, Amex), transferencia bancaria y métodos de pago locales según el país. El precio se muestra en USD y el cobro se realiza al tipo de cambio del día. El Instituto emite comprobante de pago con todos los datos fiscales.</div></div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-q"><span>¿Es deducible de impuestos?</span><span class="faq-toggle">+</span></button>
+            <div class="faq-body"><div class="faq-body-inner">En la mayoría de países, los gastos en educación y desarrollo profesional son deducibles para médicos en ejercicio independiente. El Instituto emite factura electrónica con datos fiscales completos. Consulte con su contador para confirmar la aplicabilidad en su situación específica.</div></div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-q"><span>¿Cuál es la diferencia entre el toolkit de IA ($350) y los programas?</span><span class="faq-toggle">+</span></button>
+            <div class="faq-body"><div class="faq-body-inner">El toolkit IA Clínica ($350) es solo el sistema de producción de contenido: prompts, flujos de trabajo, plantillas y guía de implementación. No incluye los 7 módulos del currículo, ni acompañamiento, ni acceso al ecosistema. Es ideal para especialistas que ya tienen conocimiento estratégico y solo necesitan las herramientas operativas.</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="wrap">
+    <div class="cta-eyebrow reveal">Empezar</div>
+    <h2 class="cta-h2 reveal">¿No está seguro<br><em>todavía?</em></h2>
+    <p class="cta-sub reveal rd1">Descargue la guía gratuita de tendencias digitales para especialistas. El mejor punto de partida para evaluar si el programa es para usted.</p>
+    <div class="cta-actions reveal rd2">
+      <a href="recursos.html" class="btn-amber">Descargar guía gratuita →</a>
+      <a href="sobre.html" class="btn-ghost">Conocer el Instituto</a>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="foot-brand-name">Digimed Institute</div>
+        <div class="foot-brand-sub">Educación Médica Superior</div>
+        <p class="foot-brand-p">El único programa en el mundo hispanohablante de formación en Autoridad Clínica Digital e IA Aplicada para profesionales de la salud, desarrollado desde el interior de la industria farmacéutica.</p>
+      </div>
+      <div class="foot-col">
+        <div class="foot-col-title">Instituto</div>
+        <ul>
+          <li><a href="metodo.html">Metodología</a></li>
+          <li><a href="sobre.html">El Instituto</a></li>
+          <li><a href="precios.html">Programas</a></li>
+          <li><a href="blog/index.html">Publicaciones</a></li>
+          <li><a href="recursos.html">Recursos</a></li>
+        </ul>
+      </div>
+      <div class="foot-col">
+        <div class="foot-col-title">Programas</div>
+        <ul>
+          <li><a href="precios.html">Formación independiente — $960</a></li>
+          <li><a href="precios.html">Ecosistema clínico — $1,440</a></li>
+          <li><a href="precios.html">Implementación dirigida — $2,800</a></li>
+          <li><a href="ia-clinica.html">IA Clínica · El Sistema — $350</a></li>
+        </ul>
+      </div>
+      <div class="foot-col">
+        <div class="foot-col-title">Legal</div>
+        <ul>
+          <li><a href="privacidad.html">Política de privacidad</a></li>
+          <li><a href="terminos.html">Términos y condiciones</a></li>
+          <li><a href="mailto:contacto@digimedinstitute.com">Contacto</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <div>© 2026 Digimed Institute. Todos los derechos reservados.</div>
+      <div class="foot-legal">
+        <a href="privacidad.html">Privacidad</a>
+        <a href="terminos.html">Términos</a>
+        <a href="mailto:contacto@digimedinstitute.com">Contacto</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+const revealObs = new IntersectionObserver(
+  entries => entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('in'); revealObs.unobserve(e.target); }
+  }),
+  { threshold: 0.06, rootMargin: '0px 0px -44px 0px' }
+);
+document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
+
+document.querySelectorAll('.faq-item').forEach(item => {
+  item.querySelector('.faq-q').addEventListener('click', () => {
+    const open = item.classList.contains('open');
+    document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
+    if (!open) item.classList.add('open');
+  });
+});
+</script>
+
+<script src="js/main.js" defer></script>
+</body>
+</html>

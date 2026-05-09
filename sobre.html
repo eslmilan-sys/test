@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>El Instituto — Digimed Institute</title>
+  <meta name="description" content="Digimed Institute fue fundado por profesionales con 5+ años de experiencia en marketing digital, omnicanal y la industria farmacéutica global.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/digimed.css">
+  <style>
+    .page-hero {
+      padding: 100px 0 80px;
+      border-bottom: 1px solid var(--line);
+      background: var(--bg);
+      position: relative; overflow: hidden;
+    }
+    .page-hero::before {
+      content: ""; position: absolute; top: -20%; right: -10%;
+      width: 50%; aspect-ratio: 1; border-radius: 50%;
+      background: oklch(70% 0.22 262); filter: blur(90px);
+      opacity: 0.16; pointer-events: none;
+    }
+    .page-hero-inner { position: relative; z-index: 1; }
+    .page-breadcrumb { display: flex; align-items: center; gap: 14px; margin-bottom: 44px; }
+    .page-breadcrumb-item {
+      font-family: "DM Mono", monospace; font-size: 10px;
+      letter-spacing: 0.2em; text-transform: uppercase; color: var(--subtle);
+    }
+    .page-breadcrumb-item.active { color: var(--text); }
+    .page-breadcrumb-sep { width: 20px; height: 1px; background: var(--line-2); }
+    .page-h1 {
+      font-family: "Manrope", "DM Sans", sans-serif;
+      font-size: clamp(48px, 7vw, 96px); font-weight: 500;
+      letter-spacing: -0.042em; line-height: 0.92; margin-bottom: 32px;
+    }
+    .page-h1 em { font-style: italic; color: var(--navy); }
+    .page-sub {
+      font-size: 16px; color: var(--muted); line-height: 1.75;
+      max-width: 560px; margin-bottom: 0;
+    }
+
+    /* Bio section */
+    .bio-section { padding: 96px 0; }
+    .bio-grid {
+      display: grid; grid-template-columns: 1fr 1.7fr; gap: 88px; align-items: start;
+    }
+    .bio-left { position: sticky; top: 96px; }
+    .photo-frame {
+      aspect-ratio: 3/4; background: var(--bg-1);
+      border: 1px solid var(--line); border-radius: var(--r-xl);
+      position: relative; overflow: hidden; margin-bottom: 24px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+    }
+    .photo-monogram {
+      font-family: "Manrope", "DM Sans", sans-serif;
+      font-size: 96px; font-weight: 700; color: var(--amber-light);
+      line-height: 1; opacity: 0.6; letter-spacing: -0.04em;
+    }
+    .photo-hint {
+      font-family: "DM Mono", monospace; font-size: 9px;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--subtle); margin-top: 16px;
+    }
+    .profile-stats {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px;
+    }
+    .profile-stat {
+      background: var(--bg-1); border: 1px solid var(--line);
+      border-radius: var(--r-md); padding: 16px; text-align: center;
+    }
+    .profile-stat-n {
+      font-family: "Manrope", "DM Sans", sans-serif;
+      font-size: 26px; font-weight: 600; letter-spacing: -0.03em;
+      color: var(--text); line-height: 1; margin-bottom: 4px;
+    }
+    .profile-stat-l {
+      font-family: "DM Mono", monospace; font-size: 9px;
+      letter-spacing: 0.14em; text-transform: uppercase; color: var(--subtle);
+    }
+    .lang-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .lang-pill {
+      font-family: "DM Mono", monospace; font-size: 9px;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      padding: 7px 14px; border-radius: var(--r-pill);
+      background: var(--bg-1); border: 1px solid var(--line);
+      color: var(--muted);
+    }
+
+    /* Bio body */
+    .bio-body h2 {
+      font-family: "Manrope", "DM Sans", sans-serif;
+      font-size: clamp(28px, 3vw, 42px); font-weight: 500;
+      letter-spacing: -0.035em; line-height: 1.1; margin-bottom: 28px;
+    }
+    .bio-body h2 em { font-style: italic; color: var(--navy); }
+    .bio-body p {
+      font-size: 15px; color: var(--muted); line-height: 1.85; margin-bottom: 22px;
+    }
+    .bio-body p strong { color: var(--text); font-weight: 500; }
+
+    .quote-block {
+      background: var(--bg-1); border: 1px solid var(--line);
+      border-radius: var(--r-lg); padding: 32px 36px; margin: 32px 0;
+      position: relative;
+    }
+    .quote-block::before {
+      content: "\201C";
+      font-family: "Manrope", "DM Sans", sans-serif;
+      font-size: 64px; color: var(--amber-light);
+      position: absolute; top: 16px; left: 28px; line-height: 0.6;
+    }
+    .quote-block p {
+      font-family: "Manrope", "DM Sans", sans-serif;
+      font-size: 20px; font-weight: 400; font-style: italic;
+      color: var(--text); line-height: 1.65; margin: 0;
+      padding-left: 20px;
+    }
+
+    .timeline-mini {
+      margin: 44px 0; border-left: 2px solid var(--amber-light); padding-left: 32px;
+    }
+    .tm-item { margin-bottom: 32px; position: relative; }
+    .tm-item::before {
+      content: ""; position: absolute; left: -40px; top: 7px;
+      width: 10px; height: 10px; border-radius: 50%;
+      background: var(--amber); box-shadow: 0 0 0 3px var(--bg), 0 0 0 5px var(--amber-light);
+    }
+    .tm-year {
+      font-family: "DM Mono", monospace; font-size: 9px;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--amber); margin-bottom: 6px;
+    }
+    .tm-role {
+      font-family: "Manrope", "DM Sans", sans-serif;
+      font-size: 17px; font-weight: 600; letter-spacing: -0.02em;
+      color: var(--text); margin-bottom: 6px; line-height: 1.2;
+    }
+    .tm-desc { font-size: 13px; color: var(--muted); line-height: 1.65; }
+
+    /* Why section */
+    .why-section { background: linear-gradient(180deg, var(--bg-1) 0%, var(--bg) 100%); padding: 96px 0; }
+    .why-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 56px; }
+    .why-card {
+      background: var(--bg); border: 1px solid var(--line);
+      border-radius: var(--r-xl); padding: 36px 32px;
+      transition: border-color 0.15s;
+    }
+    .why-card:hover { border-color: var(--line-2); }
+    .why-num {
+      font-family: "Manrope", "DM Sans", sans-serif;
+      font-size: 48px; font-weight: 700; letter-spacing: -0.05em;
+      color: var(--amber-light); line-height: 0.9; margin-bottom: 20px;
+    }
+    .why-title {
+      font-family: "Manrope", "DM Sans", sans-serif;
+      font-size: 20px; font-weight: 600; letter-spacing: -0.02em;
+      color: var(--text); margin-bottom: 10px;
+    }
+    .why-desc { font-size: 13px; color: var(--muted); line-height: 1.75; }
+
+    /* CTA section */
+    .cta-section { background: var(--navy); padding: 80px 0; text-align: center; }
+    .cta-eyebrow {
+      font-family: "DM Mono", monospace; font-size: 9px; letter-spacing: 0.22em;
+      text-transform: uppercase; color: var(--amber); margin-bottom: 20px;
+    }
+    .cta-h2 {
+      font-family: "Manrope", "DM Sans", sans-serif;
+      font-size: clamp(36px, 5vw, 64px); font-weight: 500;
+      letter-spacing: -0.04em; line-height: 0.95;
+      color: oklch(95% 0.006 252); margin-bottom: 20px;
+    }
+    .cta-h2 em { font-style: italic; color: var(--amber-2); }
+    .cta-sub {
+      font-size: 15px; color: oklch(60% 0.02 250);
+      line-height: 1.7; max-width: 460px; margin: 0 auto 40px;
+    }
+    .cta-actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+    .btn-amber {
+      background: var(--amber); color: var(--navy); padding: 16px 32px;
+      border-radius: var(--r-pill); font-size: 14px; font-weight: 600;
+      letter-spacing: 0.02em; transition: background 0.15s; display: inline-flex;
+    }
+    .btn-amber:hover { background: var(--amber-2); }
+    .btn-ghost {
+      border: 1px solid oklch(100% 0 0 / 0.18); color: oklch(70% 0.02 250);
+      padding: 15px 32px; border-radius: var(--r-pill); font-size: 14px;
+      transition: border-color 0.15s, color 0.15s; display: inline-flex;
+    }
+    .btn-ghost:hover { border-color: oklch(100% 0 0 / 0.35); color: oklch(88% 0.008 252); }
+
+    @media (max-width: 960px) {
+      .bio-grid { grid-template-columns: 1fr; gap: 48px; }
+      .bio-left { position: static; }
+      .why-grid { grid-template-columns: 1fr; max-width: 560px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="announce">
+  <div class="announce-inner">
+    <div class="announce-left">
+      <span class="announce-badge">Guía gratuita 2026</span>
+      <span class="announce-text"><strong>Las tendencias digitales</strong> que están redefiniendo al profesional de la salud de referencia en el mundo hispanohablante — descargue la guía gratuita</span>
+    </div>
+    <a href="recursos.html" class="announce-btn">Descargar →</a>
+  </div>
+</div>
+
+<nav class="site-nav">
+  <div class="wrap nav-inner">
+    <a href="index.html" class="nav-brand">
+      <div class="nav-brand-name">Digimed Institute</div>
+      <div class="nav-brand-sub">Educación Médica Superior</div>
+    </a>
+    <div class="nav-links">
+      <a href="metodo.html">Metodología</a>
+      <a href="precios.html">Programas</a>
+      <a href="blog/index.html">Blog</a>
+      <a href="sobre.html" class="active">El Instituto</a>
+    </div>
+    <a href="recursos.html" class="nav-cta">Solicitar acceso</a>
+  
+    <button class="nav-toggle" aria-label="Menú"><span></span><span></span><span></span></button></div>
+</nav>
+
+<div class="ticker" aria-hidden="true">
+  <div class="ticker-track">
+    <span class="ticker-item">Digital Opinion Leader<span class="ticker-dot"></span></span>
+    <span class="ticker-item">Referente clínico digital<span class="ticker-dot"></span></span>
+    <span class="ticker-item">Visibilidad entre pares<span class="ticker-dot"></span></span>
+    <span class="ticker-item">IA Clínica<span class="ticker-dot"></span></span>
+    <span class="ticker-item">Instagram médico<span class="ticker-dot"></span></span>
+    <span class="ticker-item">LinkedIn especialista<span class="ticker-dot"></span></span>
+    <span class="ticker-item">Autoridad clínica digital<span class="ticker-dot"></span></span>
+    <span class="ticker-item">TikTok clínico<span class="ticker-dot"></span></span>
+    <span class="ticker-item">200+ prompts IA<span class="ticker-dot"></span></span>
+    <span class="ticker-item">7 módulos certificados<span class="ticker-dot"></span></span>
+    <span class="ticker-item">Presencia digital médica<span class="ticker-dot"></span></span>
+    <span class="ticker-item">Posicionamiento digital<span class="ticker-dot"></span></span>
+    <span class="ticker-item">Impacto académico<span class="ticker-dot"></span></span>
+    <span class="ticker-item">Ecosistema digital clínico<span class="ticker-dot"></span></span>
+    <span class="ticker-item">Digital Opinion Leader<span class="ticker-dot"></span></span>
+    <span class="ticker-item">Referente clínico digital<span class="ticker-dot"></span></span>
+    <span class="ticker-item">Visibilidad entre pares<span class="ticker-dot"></span></span>
+    <span class="ticker-item">IA Clínica<span class="ticker-dot"></span></span>
+    <span class="ticker-item">Instagram médico<span class="ticker-dot"></span></span>
+    <span class="ticker-item">LinkedIn especialista<span class="ticker-dot"></span></span>
+    <span class="ticker-item">Autoridad clínica digital<span class="ticker-dot"></span></span>
+    <span class="ticker-item">TikTok clínico<span class="ticker-dot"></span></span>
+    <span class="ticker-item">200+ prompts IA<span class="ticker-dot"></span></span>
+    <span class="ticker-item">7 módulos certificados<span class="ticker-dot"></span></span>
+    <span class="ticker-item">Presencia digital médica<span class="ticker-dot"></span></span>
+    <span class="ticker-item">Posicionamiento digital<span class="ticker-dot"></span></span>
+    <span class="ticker-item">Impacto académico<span class="ticker-dot"></span></span>
+    <span class="ticker-item">Ecosistema digital clínico<span class="ticker-dot"></span></span>
+  </div>
+</div>
+
+<section class="page-hero">
+  <div class="wrap page-hero-inner">
+    <div class="page-breadcrumb reveal">
+      <span class="page-breadcrumb-item active">Digimed Institute</span>
+      <span class="page-breadcrumb-sep"></span>
+      <span class="page-breadcrumb-item">El Instituto</span>
+    </div>
+    <h1 class="page-h1 reveal">
+      Ingeniería<br><em>farmacéutica,</em><br>no marketing digital.
+    </h1>
+    <p class="page-sub reveal rd1">Digimed Institute fue fundado por profesionales con experiencia directa en los equipos de marketing digital, omnicanal y la industria farmacéutica. No por médicos que aprendieron marketing digital.</p>
+  </div>
+</section>
+
+<!-- BIO -->
+<section class="bio-section">
+  <div class="wrap">
+    <div class="bio-grid">
+      <div class="bio-left reveal">
+        <div class="photo-frame">
+          <div class="photo-monogram">M</div>
+          <div class="photo-hint">Foto del fundador · proximamente</div>
+        </div>
+        <div class="profile-stats">
+          <div class="profile-stat">
+            <div class="profile-stat-n">5+</div>
+            <div class="profile-stat-l">años en pharma</div>
+          </div>
+          <div class="profile-stat">
+            <div class="profile-stat-n">3</div>
+            <div class="profile-stat-l">idiomas</div>
+          </div>
+          <div class="profile-stat">
+            <div class="profile-stat-n">de habla hispana</div>
+            <div class="profile-stat-l">región cubierta</div>
+          </div>
+          <div class="profile-stat">
+            <div class="profile-stat-n">2026</div>
+            <div class="profile-stat-l">fundación</div>
+          </div>
+        </div>
+        <div class="lang-row">
+          <div class="lang-pill">Español</div>
+          <div class="lang-pill">English</div>
+          <div class="lang-pill">Français</div>
+        </div>
+      </div>
+
+      <div class="bio-body reveal rd1">
+        <h2>Del lado del evaluador al lado del<br><em>especialista — y de vuelta.</em></h2>
+        <p>La carrera en la industria farmacéutica ubicó al fundador de Digimed Institute en un lugar inusual: del lado del comprador. Como parte del equipo de <strong>Marketing Digital, Omnicanal y Estrategia Médica</strong> de una empresa farmacéutica internacional, una parte central del rol fue identificar, evaluar y contratar profesionales de la salud para programas de Digital Opinion Leaders.</p>
+        <p>Eso significó <strong>revisar cientos de perfiles</strong>, participar en reuniones internas de la industria farmacéutica, aplicar instrumentos de evaluación internos y entender exactamente qué separa a un médico que llega al radar de uno que nunca es considerado.</p>
+
+        <div class="quote-block">
+          <p>La mayoría de los especialistas que quieren trabajar con la industria nunca vieron los criterios de evaluación que se usan para juzgarlos. En Digimed Institute los enseñamos desde adentro — porque los aplicamos durante años.</p>
+        </div>
+
+        <p>Paralelamente, se construyó expertise en <strong>estrategia de marketing digital, omnicanal y producción de contenido con IA</strong>. Esa combinación es la que no existe en ningún otro programa de educación médica digital: la perspectiva interna del evaluador farmacéutico combinada con la capacidad técnica de enseñar el sistema de contenido.</p>
+        <p>La formación trilingüe — español, inglés y francés — es parte de la visión global: el programa opera primero en español y se expande progresivamente hacia otros mercados de habla inglesa y francesa.</p>
+
+        <div class="timeline-mini">
+          <div class="tm-item">
+            <div class="tm-year">2020 – 2026</div>
+            <div class="tm-role">Marketing Digital, Omnicanal y Estrategia Médica · Industria Farmacéutica Internacional</div>
+            <div class="tm-desc">Identificación, evaluación y contratación de KOLs y DOLs en mercados hispanohablantes. Diseño e implementación de estrategias omnicanal y marketing digital médico en la industria farmacéutica.</div>
+          </div>
+          <div class="tm-item">
+            <div class="tm-year">2026</div>
+            <div class="tm-role">Fundador · Digimed Institute</div>
+            <div class="tm-desc">Lanzamiento del primer programa en español para profesionales de la salud que forma en Autoridad Clínica Digital e IA desde la perspectiva del evaluador farmacéutico.</div>
+          </div>
+        </div>
+
+        <p>La ventaja competitiva de Digimed Institute es <strong>temporal por diseño</strong>: el valor del conocimiento interno es máximo en los primeros años — mientras el mercado es nuevo, el programa es el primero en su clase en español. A medida que crecen los casos de éxito documentados, la ventaja se vuelve estructural a través del network y la prueba social.</p>
+        <p>Por eso el programa existe en 2026 y no en 2029.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHY -->
+<section class="why-section">
+  <div class="wrap">
+    <div class="section-eyebrow reveal">
+      <span class="eyebrow-text">Por qué importa</span>
+      <span class="eyebrow-line"></span>
+    </div>
+    <h2 class="section-h2 reveal">Lo que ningún otro<br><em>programa puede ofrecer.</em></h2>
+    <div class="why-grid">
+      <div class="why-card reveal">
+        <div class="why-num">01</div>
+        <div class="why-title">Criterios internos reales</div>
+        <div class="why-desc">Un consultor de marketing sabe cómo crecer una audiencia. No sabe cómo un equipo de selección de especialistas de pharma evalúa esa audiencia. Los académicos de Digimed Institute fueron ese equipo.</div>
+      </div>
+      <div class="why-card reveal rd1">
+        <div class="why-num">02</div>
+        <div class="why-title">de habla hispana desde adentro</div>
+        <div class="why-desc">Años de trabajo activo de habla hispana,  y América Central. No es investigación de mercado — es experiencia de primera mano en los mercados donde operan los especialistas del programa.</div>
+      </div>
+      <div class="why-card reveal rd2">
+        <div class="why-num">03</div>
+        <div class="why-title">Plataformas con rigor clínico</div>
+        <div class="why-desc">La mayoría de los programas enseñan a conseguir seguidores. Digimed Institute enseña a construir la audiencia correcta — pares clínicos, no pacientes — en Instagram, TikTok, LinkedIn y Facebook según la especialidad.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="wrap">
+    <div class="cta-eyebrow reveal">Siguiente paso</div>
+    <h2 class="cta-h2 reveal">¿Listo para trabajar<br><em>con el Instituto?</em></h2>
+    <p class="cta-sub reveal rd1">El programa de Implementación dirigida opera con plazas limitadas. Descargue la guía gratuita para recibir la fecha de apertura de la próxima cohorte.</p>
+    <div class="cta-actions reveal rd2">
+      <a href="recursos.html" class="btn-amber">Descargar guía gratuita →</a>
+      <a href="precios.html" class="btn-ghost">Ver programas y precios</a>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="foot-brand-name">Digimed Institute</div>
+        <div class="foot-brand-sub">Educación Médica Superior</div>
+        <p class="foot-brand-p">El único programa en el mundo hispanohablante de formación en Autoridad Clínica Digital e IA Aplicada para profesionales de la salud, desarrollado desde el interior de la industria farmacéutica.</p>
+      </div>
+      <div class="foot-col">
+        <div class="foot-col-title">Instituto</div>
+        <ul>
+          <li><a href="metodo.html">Metodología</a></li>
+          <li><a href="sobre.html">El Instituto</a></li>
+          <li><a href="precios.html">Programas</a></li>
+          <li><a href="blog/index.html">Publicaciones</a></li>
+          <li><a href="recursos.html">Recursos</a></li>
+        </ul>
+      </div>
+      <div class="foot-col">
+        <div class="foot-col-title">Programas</div>
+        <ul>
+          <li><a href="precios.html">Formación independiente — $960</a></li>
+          <li><a href="precios.html">Ecosistema clínico — $1,440</a></li>
+          <li><a href="precios.html">Implementación dirigida — $2,800</a></li>
+          <li><a href="ia-clinica.html">IA Clínica · El Sistema — $350</a></li>
+        </ul>
+      </div>
+      <div class="foot-col">
+        <div class="foot-col-title">Legal</div>
+        <ul>
+          <li><a href="privacidad.html">Política de privacidad</a></li>
+          <li><a href="terminos.html">Términos y condiciones</a></li>
+          <li><a href="mailto:contacto@digimedinstitute.com">Contacto</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <div>© 2026 Digimed Institute. Todos los derechos reservados.</div>
+      <div class="foot-legal">
+        <a href="privacidad.html">Privacidad</a>
+        <a href="terminos.html">Términos</a>
+        <a href="mailto:contacto@digimedinstitute.com">Contacto</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+const revealObs = new IntersectionObserver(
+  entries => entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('in'); revealObs.unobserve(e.target); }
+  }),
+  { threshold: 0.06, rootMargin: '0px 0px -44px 0px' }
+);
+document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
+</script>
+
+<script src="js/main.js" defer></script>
+</body>
+</html>
