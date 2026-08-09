@@ -1,0 +1,240 @@
+@import "tailwindcss";
+
+/* =====================================================================
+   PARTIMOS — SYSTÈME DE DESIGN
+   ---------------------------------------------------------------------
+   Discipline chromatique (volontairement plus stricte que la maquette) :
+
+   1. UNE rampe neutre froide dérivée de l'asphalte porte ~90 % de l'UI.
+   2. UN seul accent : le bleu. Liens, focus, états actifs, illustrations.
+      Deux jetons : --accent (surfaces / fonds sombres, contraste 5.7:1 sur
+      l'asphalte) et --accent-ink (texte sur blanc, contraste 5.6:1).
+   3. Le VERT n'est plus une couleur d'information : il ne veut pas dire
+      « validé », il veut dire « Partimos ». Réservé à la marque —
+      logo, points d'arrêt du ruban, dégradé. Jamais un libellé, jamais
+      un état, jamais une icône fonctionnelle.
+   4. Le CORAIL est réservé aux erreurs et aux avertissements. Nulle part
+      ailleurs.
+   5. Le DÉGRADÉ apparaît trois fois au maximum par page : la marque,
+      le chiffre du calculateur, l'avatar. Jamais en fond, jamais sur du
+      texte long, jamais sur un bouton (l'action principale est de l'encre,
+      pas de la couleur — c'est plus lisible et moins bruyant).
+   ===================================================================== */
+
+@theme {
+  /* ---- Rampe neutre (asphalte désaturé) ---- */
+  --color-ink-950: #08202a;
+  --color-ink-900: #0e2a35; /* asfalto — fonds sombres, texte principal */
+  --color-ink-800: #17414f;
+  --color-ink-700: #2b5566;
+  --color-ink-600: #3c6070;
+  --color-ink-500: #4f6c78; /* texte secondaire — 5.7:1 sur blanc */
+  --color-ink-400: #7f9aa6; /* texte secondaire sur fond sombre */
+  --color-ink-300: #a8bcc5;
+  --color-ink-200: #dce9ee; /* bordures */
+  --color-ink-100: #e9f1f4;
+  --color-ink-50: #f2f7f9; /* niebla — fonds clairs */
+
+  /* ---- Accent unique ---- */
+  --color-accent: #20a8f8; /* fonds sombres, remplissages, focus */
+  --color-accent-ink: #0a6dab; /* texte et icônes sur blanc — 5.6:1 */
+  --color-accent-soft: #e3f3fe;
+
+  /* ---- Marque (jamais informatif) ---- */
+  --color-brand-green: #a0d838;
+  --color-brand-green-deep: #6fa82b;
+
+  /* ---- Erreur uniquement ---- */
+  --color-danger: #d64a3d;
+  --color-danger-soft: #fdecea;
+
+  /* ---- Typographie ---- */
+  --font-display: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-instrument), ui-sans-serif, system-ui, sans-serif;
+
+  /* ---- Rayons : 13–15 px, le logo est rond ---- */
+  --radius-lg: 14px;
+  --radius-xl: 18px;
+  --radius-2xl: 24px;
+
+  /* ---- Ombres douces, jamais dures ---- */
+  --shadow-card: 0 1px 2px rgb(14 42 53 / 0.04), 0 8px 24px -12px rgb(14 42 53 / 0.18);
+  --shadow-lift: 0 2px 4px rgb(14 42 53 / 0.05), 0 18px 40px -18px rgb(14 42 53 / 0.28);
+  --shadow-float: 0 24px 60px -24px rgb(8 32 42 / 0.55);
+
+  /* ---- Défilement du bandeau « publicados hoy » ---- */
+  @keyframes strip {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+}
+
+@layer base {
+  :root {
+    --gradient-brand: linear-gradient(118deg, #20a8f8 0%, #a0d838 100%);
+    --rail-gutter: 0px;
+    color-scheme: light;
+  }
+
+  /* Le décalage du contenu et l'apparition du ruban partagent le même seuil :
+     un contenu décalé sans ruban donnerait une marge gauche inexpliquée. */
+  @media (min-width: 1160px) {
+    :root {
+      --rail-gutter: 60px;
+    }
+  }
+
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    /* la nav collante ne doit pas recouvrir la cible d'une ancre */
+    scroll-padding-top: 84px;
+  }
+
+  body {
+    background: #fff;
+    color: var(--color-ink-900);
+    font-family: var(--font-sans);
+    font-size: 16.5px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.03em;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /* Tous les montants et distances s'alignent verticalement. */
+  .tnum {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum";
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--color-accent);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+
+  ::selection {
+    background: var(--color-accent-soft);
+    color: var(--color-ink-900);
+  }
+
+  /* Champs de formulaire : la remise à zéro évite les styles OS incohérents. */
+  input,
+  select,
+  textarea,
+  button {
+    font: inherit;
+    color: inherit;
+  }
+}
+
+@layer components {
+  /* ---- Marque : le seul endroit où le dégradé porte du texte ---- */
+  .brand-gradient-text {
+    background: var(--gradient-brand);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .brand-gradient {
+    background: var(--gradient-brand);
+  }
+
+  /* ---- Le ruban d'asphalte : signature visuelle ----
+     Une seule route continue traverse la page, alignée sur la gouttière
+     gauche du conteneur. Chaque section est une « parada ».
+     Purement décoratif : masqué au clavier, au lecteur d'écran et sous
+     1160 px, où l'espace horizontal ne le permet pas. */
+  .road {
+    position: relative;
+  }
+
+  @media (min-width: 1160px) {
+    .road::before,
+    .road::after {
+      content: "";
+      position: absolute;
+      top: -16px;
+      bottom: -16px;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    /* Filet de sécurité : si le conteneur venait à s'élargir, `max()` empêche
+       le ruban de sortir de l'écran quand `50% - 560px` devient négatif. */
+    .road::before {
+      left: max(20px, calc(50% - 560px + 26px));
+      width: 20px;
+      background: var(--color-ink-900);
+      border-radius: 10px;
+    }
+
+    .road::after {
+      left: max(29px, calc(50% - 560px + 35px));
+      width: 2px;
+      border-radius: 1px;
+      background: repeating-linear-gradient(
+        180deg,
+        #f5d95c 0 18px,
+        transparent 18px 44px
+      );
+    }
+  }
+
+  /* Le point d'arrêt vert — usage « marque », pas « validé ». */
+  .parada::before {
+    content: "";
+    position: absolute;
+    left: 7px;
+    top: 12px;
+    width: 18px;
+    height: 18px;
+    border-radius: 999px;
+    background: var(--color-brand-green);
+    border: 4px solid var(--stop-ring, #fff);
+    z-index: 2;
+    display: none;
+  }
+
+  @media (min-width: 1160px) {
+    .parada::before {
+      display: block;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -1,0 +1,86 @@
+/**
+ * Accès Supabase — tolérant à l'absence de configuration.
+ *
+ * Le site public doit rendre et se déployer avant que le projet Supabase
+ * existe (c'est une étape ⛔ HUMAIN du brief). Chaque fonction d'accès
+ * renvoie donc un repli explicite plutôt que de lever une exception : une
+ * page corridor sans base affiche son contenu éditorial et masque la liste
+ * des départs, au lieu de rendre une erreur 500.
+ */
+
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+
+const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+export const isSupabaseConfigured = Boolean(url && anonKey);
+
+let browserClient: SupabaseClient | null = null;
+
+/** Client lecture publique (RLS active). */
+export function getSupabase(): SupabaseClient | null {
+  if (!url || !anonKey) return null;
+  browserClient ??= createClient(url, anonKey, {
+    auth: { persistSession: false },
+  });
+  return browserClient;
+}
+
+/**
+ * Client serveur avec la clé de service. Réservé aux écritures que le
+ * visiteur anonyme ne peut pas faire lui-même (journalisation des recherches
+ * infructueuses, préinscription). Jamais importé dans un composant client :
+ * la clé ne doit pas franchir la frontière réseau.
+ */
+export function getServiceSupabase(): SupabaseClient | null {
+  if (!url || !serviceKey) return null;
+  return createClient(url, serviceKey, {
+    auth: { persistSession: false },
+  });
+}
+
+/** Un départ publié, tel qu'affiché sur une page corridor. */
+export type UpcomingTrip = {
+  id: string;
+  departureAt: string;
+  priceCents: number;
+  seatsAvailable: number;
+  driverFirstName: string;
+  driverLastInitial: string | null;
+  driverIsVerified: boolean;
+};
+
+/**
+ * Prochains départs d'un corridor, lus dans la vue `available_trips`.
+ * Renvoie un tableau vide si la base n'est pas configurée ou si la requête
+ * échoue : une page SEO ne tombe jamais à cause d'un service.
+ */
+export async function getUpcomingTrips(
+  corridorSlug: string,
+  limit = 6,
+): Promise<UpcomingTrip[]> {
+  const supabase = getSupabase();
+  if (!supabase) return [];
+
+  const { data, error } = await supabase
+    .from("available_trips")
+    .select(
+      "id, departure_at, price_cents, seats_available, first_name, last_initial, is_id_verified",
+    )
+    .eq("corridor_slug", corridorSlug)
+    .order("departure_at", { ascending: true })
+    .limit(limit);
+
+  if (error || !data) return [];
+
+  return data.map((row) => ({
+    id: row.id as string,
+    departureAt: row.departure_at as string,
+    priceCents: Number(row.price_cents),
+    seatsAvailable: Number(row.seats_available),
+    driverFirstName: row.first_name as string,
+    driverLastInitial: (row.last_initial as string | null) ?? null,
+    driverIsVerified: Boolean(row.is_id_verified),
+  }));
+}

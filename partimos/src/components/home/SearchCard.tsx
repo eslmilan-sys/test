@@ -1,0 +1,253 @@
+"use client";
+
+import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { ALL_CITIES, CORRIDORS } from "@/lib/corridors";
+import { Button } from "@/components/ui/Button";
+import { Icon } from "@/components/ui/Icon";
+import { AvisameForm } from "@/components/AvisameForm";
+
+/** Les six prochains jours, libellés en espagnol du Panama. */
+function nextDays(count = 8) {
+  const out: { value: string; label: string }[] = [];
+  const today = new Date();
+  for (let i = 0; i < count; i++) {
+    const d = new Date(today);
+    d.setDate(today.getDate() + i);
+    const value = d.toISOString().slice(0, 10);
+    const label =
+      i === 0
+        ? "Hoy"
+        : i === 1
+          ? "Mañana"
+          : new Intl.DateTimeFormat("es-PA", {
+              weekday: "long",
+              day: "numeric",
+              month: "short",
+            }).format(d);
+    out.push({ value, label: label.charAt(0).toUpperCase() + label.slice(1) });
+  }
+  return out;
+}
+
+const FIELD_LABEL =
+  "block text-[10.5px] font-bold tracking-[0.11em] text-ink-500 uppercase";
+const FIELD_INPUT =
+  "w-full cursor-pointer appearance-none border-none bg-transparent py-px text-[16px] font-semibold text-ink-900 focus:outline-none";
+
+export function SearchCard() {
+  const router = useRouter();
+  const days = useMemo(() => nextDays(), []);
+
+  const [mode, setMode] = useState<"buscar" | "ofrecer">("buscar");
+  const [from, setFrom] = useState("panama-city");
+  const [to, setTo] = useState("chitre");
+  const [date, setDate] = useState(days[0].value);
+  const [seats, setSeats] = useState(1);
+  const [noRoute, setNoRoute] = useState(false);
+
+  const sameCity = from === to;
+
+  function handleSubmit(event: React.FormEvent) {
+    event.preventDefault();
+    if (sameCity) return;
+
+    if (mode === "ofrecer") {
+      router.push(`/publicar?desde=${from}&hacia=${to}`);
+      return;
+    }
+
+    const corridor = CORRIDORS.find(
+      (c) => c.origin.slug === from && c.destination.slug === to,
+    );
+
+    if (corridor) {
+      router.push(`/viajes/${corridor.slug}?fecha=${date}&puestos=${seats}`);
+      return;
+    }
+
+    // Aucun corridor ouvert : la recherche infructueuse est le signal le plus
+    // utile du produit. On ne renvoie pas une page vide, on collecte.
+    setNoRoute(true);
+  }
+
+  const fromCity = ALL_CITIES.find((c) => c.slug === from);
+  const toCity = ALL_CITIES.find((c) => c.slug === to);
+
+  return (
+    <div className="rounded-[22px] bg-white p-2.5 shadow-float">
+      <div className="px-3 pt-2.5 pb-2">
+        <div
+          role="group"
+          aria-label="¿Qué quieres hacer?"
+          className="flex rounded-xl bg-ink-50 p-0.5"
+        >
+          {(
+            [
+              ["buscar", "Busco puesto"],
+              ["ofrecer", "Ofrezco puestos"],
+            ] as const
+          ).map(([value, label]) => (
+            <button
+              key={value}
+              type="button"
+              aria-pressed={mode === value}
+              onClick={() => setMode(value)}
+              className={`flex-1 rounded-[9px] px-3 py-2.5 text-[13.5px] font-semibold whitespace-nowrap transition-colors ${
+                mode === value
+                  ? "bg-white text-ink-900 shadow-[0_1px_4px_rgb(14_42_53/0.12)]"
+                  : "text-ink-500 hover:text-ink-900"
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <form onSubmit={handleSubmit} noValidate>
+        <div className="flex items-center gap-3 rounded-[14px] px-3.5 py-3 transition-colors hover:bg-ink-50">
+          <span
+            aria-hidden
+            className="size-[19px] shrink-0 rounded-full border-[3px] border-accent"
+          />
+          <div className="min-w-0 flex-1">
+            <label htmlFor="desde" className={FIELD_LABEL}>
+              Desde
+            </label>
+            <select
+              id="desde"
+              value={from}
+              onChange={(e) => {
+                setFrom(e.target.value);
+                setNoRoute(false);
+              }}
+              className={FIELD_INPUT}
+            >
+              {ALL_CITIES.map((city) => (
+                <option key={city.slug} value={city.slug}>
+                  {city.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3 rounded-[14px] border-t border-ink-200 px-3.5 py-3 transition-colors hover:bg-ink-50">
+          <span
+            aria-hidden
+            className="size-[19px] shrink-0 rounded-[5px] border-[3px] border-brand-green-deep"
+          />
+          <div className="min-w-0 flex-1">
+            <label htmlFor="hacia" className={FIELD_LABEL}>
+              Hacia
+            </label>
+            <select
+              id="hacia"
+              value={to}
+              onChange={(e) => {
+                setTo(e.target.value);
+                setNoRoute(false);
+              }}
+              className={FIELD_INPUT}
+            >
+              {ALL_CITIES.map((city) => (
+                <option key={city.slug} value={city.slug}>
+                  {city.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <div className="flex">
+          <div className="flex flex-1 items-center gap-3 rounded-[14px] border-t border-ink-200 px-3.5 py-3 transition-colors hover:bg-ink-50">
+            <Icon
+              name="calendar"
+              className="size-[19px] shrink-0 text-ink-500"
+            />
+            <div className="min-w-0 flex-1">
+              <label htmlFor="fecha" className={FIELD_LABEL}>
+                Fecha
+              </label>
+              <select
+                id="fecha"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+                className={FIELD_INPUT}
+              >
+                {days.map((day) => (
+                  <option key={day.value} value={day.value}>
+                    {day.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="flex max-w-[132px] items-center gap-3 rounded-[14px] border-t border-l border-ink-200 px-3.5 py-3 transition-colors hover:bg-ink-50">
+            <div className="min-w-0 flex-1">
+              <label htmlFor="puestos" className={FIELD_LABEL}>
+                Puestos
+              </label>
+              <select
+                id="puestos"
+                value={seats}
+                onChange={(e) => setSeats(Number(e.target.value))}
+                className={FIELD_INPUT}
+              >
+                {[1, 2, 3, 4].map((n) => (
+                  <option key={n} value={n}>
+                    {n} {n === 1 ? "puesto" : "puestos"}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+        </div>
+
+        {sameCity && (
+          <p
+            role="alert"
+            className="mt-2 rounded-xl bg-danger-soft px-3.5 py-2.5 text-[13.5px] font-medium text-danger"
+          >
+            El origen y el destino no pueden ser el mismo.
+          </p>
+        )}
+
+        <Button
+          type="submit"
+          size="lg"
+          full
+          className="mt-2"
+          disabled={sameCity}
+        >
+          {mode === "buscar" ? "Buscar viaje" : "Publicar mi viaje"}
+        </Button>
+
+        <p className="px-1.5 pt-3 pb-1 text-center text-[12.5px] text-ink-500">
+          Buscar y reservar es <b className="text-ink-900">gratis</b>. Le pagas
+          directo a la persona.
+        </p>
+      </form>
+
+      {noRoute && fromCity && toCity && (
+        <div className="border-t border-ink-200 px-3.5 pt-4 pb-2">
+          <p className="mb-3 text-[14.5px] leading-relaxed text-ink-500">
+            Todavía no tenemos viajes publicados entre{" "}
+            <b className="text-ink-900">{fromCity.shortName}</b> y{" "}
+            <b className="text-ink-900">{toCity.shortName}</b>. Déjanos tu
+            número y te escribimos apenas alguien salga para allá.
+          </p>
+          <AvisameForm
+            originSlug={from}
+            destinationSlug={to}
+            requestedDate={date}
+            seats={seats}
+            source="home-search"
+          />
+        </div>
+      )}
+    </div>
+  );
+}

@@ -1,0 +1,51 @@
+import {
+  Section,
+  Eyebrow,
+  SectionTitle,
+  Lead,
+} from "@/components/site/Section";
+import { Calculadora } from "@/components/Calculadora";
+import { TrustCard } from "./Confianza";
+
+const DRIVER_POINTS = [
+  {
+    icon: "compass" as const,
+    title: "Tú pones la ruta",
+    body: "Marcas los puntos por donde ya vas a pasar. Si alguien propone otro sitio, tú decides si te queda de paso o no.",
+  },
+  {
+    icon: "cash" as const,
+    title: "Recibes el aporte completo",
+    body: "En efectivo o por Yappy, directo a ti. Partimos no descuenta comisión porque no participa en el pago.",
+  },
+  {
+    icon: "users" as const,
+    title: "Sabes quién se sube",
+    body: "Todos los pasajeros tienen cédula verificada, foto y calificaciones de viajes anteriores.",
+  },
+];
+
+export function Conductores() {
+  return (
+    <Section id="conductores" stop>
+      <Eyebrow>Para conductores</Eyebrow>
+      <SectionTitle>El viaje ya lo ibas a hacer</SectionTitle>
+      <Lead>
+        No ganas dinero manejando: recuperas parte de lo que ibas a gastar
+        igual. Mueve los controles y mira cuánto se comparte en tu ruta.
+      </Lead>
+
+      <div
+        id="calculadora"
+        className="mt-9 grid scroll-mt-24 gap-6.5 min-[900px]:grid-cols-[1.04fr_0.96fr] min-[900px]:items-start min-[900px]:gap-10"
+      >
+        <Calculadora />
+        <div className="grid gap-3.5">
+          {DRIVER_POINTS.map((point) => (
+            <TrustCard key={point.title} {...point} />
+          ))}
+        </div>
+      </div>
+    </Section>
+  );
+}
