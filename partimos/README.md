@@ -167,25 +167,36 @@ serveur : c'est ce qui rend le contenu indexable et garde le JS sous les
 
 ## Démonstration cliquable (GitHub Pages)
 
-La branche `gh-pages` contient un export HTML pur des 13 pages, généré par :
+En ligne : **https://eslmilan-sys.github.io/test/partimos/**
+
+Pages sert la racine de `main`, déjà occupée par le site DOL Method.
+Partimos vit donc dans son propre dossier — les deux cohabitent, la racine
+reste au site DOL.
+
+Pour régénérer et republier :
 
 ```bash
-BASE_PATH=/test NEXT_PUBLIC_SITE_URL=https://eslmilan-sys.github.io/test \
+BASE_PATH=/test/partimos \
+  NEXT_PUBLIC_SITE_URL=https://eslmilan-sys.github.io/test/partimos \
   npm run build:static
+# puis remplacer le dossier partimos/ à la racine de main par out/
 ```
 
-**Pour l'allumer** — une seule fois, dans le dépôt GitHub :
-Settings → Pages → Source : *Deploy from a branch* → branche `gh-pages`,
-dossier `/ (root)` → Save. Le site apparaît sous deux ou trois minutes à
-`https://eslmilan-sys.github.io/test/`.
+Deux pièges, réglés une fois pour toutes :
 
-Pour la mettre à jour ensuite : relancer la commande ci-dessus, puis copier
-le contenu de `out/` à la racine de la branche `gh-pages` et pousser.
+- **`.nojekyll` à la racine de `main`.** Sans lui, Jekyll ignore les dossiers
+  commençant par un underscore — donc tout `/_next/` — et le site sort sans
+  styles ni polices.
+- **`trailingSlash: true`.** Pages sert `/a/b/`, jamais `/a/b` : sans cette
+  option, chaque lien interne tomberait sur un 404.
 
 C'est une **démonstration**, pas le déploiement de production : sans serveur,
 il n'y a pas de route d'API, donc le formulaire de préinscription annonce
 qu'il s'agit d'un aperçu au lieu d'enregistrer le numéro. Le vrai déploiement
 se fait sur Vercel, où la route fonctionne.
+
+La branche `gh-pages` conserve un export équivalent servi à la racine, au cas
+où tu bascules un jour la source de Pages.
 
 ---
 
