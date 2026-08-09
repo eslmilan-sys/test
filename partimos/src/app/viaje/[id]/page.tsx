@@ -1,18 +1,12 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Container } from "@/components/site/Section";
 import { Icon } from "@/components/ui/Icon";
-import { BookingPanel } from "@/components/trip/BookingPanel";
+import { TripDetail } from "@/components/trip/TripDetail";
 import { getCorridor } from "@/lib/corridors";
-import { computePriceCap, formatDuration, formatUsd } from "@/lib/pricing";
-import {
-  demoTripIds,
-  formatDayLabel,
-  formatTime,
-  getTrip,
-  seatsLeft,
-} from "@/lib/trips";
+import { demoTripIds, getTrip } from "@/lib/trips";
 
 export const dynamicParams = false;
 
@@ -41,18 +35,6 @@ export default async function TripPage({ params }: Params) {
   if (!corridor) notFound();
 
   const date = trip.departureAt.slice(0, 10);
-  const left = seatsLeft(trip);
-  const cap = computePriceCap(
-    corridor.distanceKm,
-    corridor.tollCents,
-    trip.vehicle.category,
-    trip.seatsOffered,
-  );
-  const durationMin = Math.round(
-    (new Date(trip.arrivalAt).getTime() -
-      new Date(trip.departureAt).getTime()) /
-      60_000,
-  );
 
   return (
     <main id="contenido" className="bg-ink-50 pb-16">
@@ -70,44 +52,11 @@ export default async function TripPage({ params }: Params) {
           </Link>
         </nav>
 
-        <div className="grid gap-5 min-[900px]:grid-cols-[1.35fr_1fr] min-[900px]:items-start">
-          <div className="grid gap-5">
-            {/* --- Itinéraire --- */}
-            <section className="rounded-[20px] border border-ink-200 bg-white p-5 sm:p-6">
-              <p className="mb-1 text-[11.5px] font-bold tracking-[0.14em] text-ink-500 uppercase">
-                {formatDayLabel(date)}
-              </p>
-              <h1 className="mb-5 font-display text-[clamp(24px,4.6vw,32px)] leading-tight font-extrabold tracking-[-0.035em]">
-                {corridor.origin.shortName} → {corridor.destination.shortName}
-              </h1>
-
-              <ol className="relative">
-                <span
-                  aria-hidden
-                  className="absolute top-4 bottom-4 left-[62px] w-0.5 rounded-full bg-ink-200 sm:left-[70px]"
-                />
-                <Leg
-                  time={formatTime(trip.departureAt)}
-                  title={corridor.origin.name}
-                  detail={`Salida · ${trip.stops[0] ?? "punto por confirmar"}`}
-                  tone="start"
-                />
-                <li className="flex gap-4 py-1">
-                  <span className="w-[50px] shrink-0 sm:w-[58px]" />
-                  <span className="tnum py-2 text-[13px] text-ink-500">
-                    {formatDuration(durationMin)} de camino
-                  </span>
-                </li>
-                <Leg
-                  time={formatTime(trip.arrivalAt)}
-                  title={corridor.destination.name}
-                  detail="Llegada estimada"
-                  tone="end"
-                />
-              </ol>
-            </section>
-
-            {/* --- Conducteur --- */}
+        {/* Le segment réservé vient de l'URL, donc du client. Le repli montre
+            la structure de la page pendant l'hydratation plutôt qu'un vide qui
+            ferait sauter la mise en page. */}
+        <Suspense fallback={<DetailSkeleton />}>
+          <TripDetail trip={trip} corridor={corridor}>
             <section className="rounded-[20px] border border-ink-200 bg-white p-5 sm:p-6">
               <h2 className="mb-4 font-display text-[18px] font-bold">
                 Quién maneja
@@ -152,84 +101,26 @@ export default async function TripPage({ params }: Params) {
                 )}
               </ul>
             </section>
-
-            {/* --- Comment se calcule le montant --- */}
-            <section className="rounded-[20px] border border-ink-200 bg-white p-5 sm:p-6">
-              <h2 className="mb-4 font-display text-[18px] font-bold">
-                De dónde sale ese monto
-              </h2>
-              <dl className="text-[14.5px]">
-                <Row
-                  label={`${corridor.distanceKm} km de recorrido, más peajes`}
-                >
-                  {formatUsd(cap.costTotalCents)}
-                </Row>
-                <Row
-                  label={`Entre ${cap.occupants} ocupantes, con el conductor`}
-                >
-                  {formatUsd(cap.maxPriceCents)}
-                </Row>
-                <Row label="Tope de la plataforma" strong>
-                  {formatUsd(cap.maxPriceCents)}
-                </Row>
-                <Row label={`${trip.driver.firstName} pide`} strong>
-                  {formatUsd(trip.priceCents)}
-                </Row>
-              </dl>
-              <p className="mt-3 text-[13px] leading-relaxed text-ink-500">
-                {trip.driver.firstName} no gana plata con este viaje. El monto
-                cubre gasolina y peajes, y la app lo limita para que así sea.
-              </p>
-            </section>
-          </div>
-
-          <BookingPanel
-            tripId={trip.id}
-            driverName={trip.driver.firstName}
-            priceCents={trip.priceCents}
-            seatsLeft={left}
-            stops={trip.stops}
-            baseKm={corridor.distanceKm}
-            tollCents={corridor.tollCents}
-            category={trip.vehicle.category}
-            seatsOffered={trip.seatsOffered}
-            instantBooking={trip.instantBooking}
-          />
-        </div>
+          </TripDetail>
+        </Suspense>
       </Container>
     </main>
   );
 }
 
-function Leg({
-  time,
-  title,
-  detail,
-  tone,
-}: {
-  time: string;
-  title: string;
-  detail: string;
-  tone: "start" | "end";
-}) {
+function DetailSkeleton() {
   return (
-    <li className="flex gap-4">
-      <span className="tnum w-[50px] shrink-0 pt-0.5 text-right font-display text-[16px] font-bold sm:w-[58px]">
-        {time}
-      </span>
-      <span
-        aria-hidden
-        className={`relative z-[1] mt-1.5 size-3.5 shrink-0 rounded-full border-[3px] border-white ${
-          tone === "start" ? "bg-accent" : "bg-brand-green-deep"
-        }`}
-      />
-      <span className="min-w-0 flex-1 pb-1">
-        <span className="block font-display text-[16px] font-bold">
-          {title}
-        </span>
-        <span className="block text-[13.5px] text-ink-500">{detail}</span>
-      </span>
-    </li>
+    <div
+      aria-hidden
+      className="grid gap-5 min-[900px]:grid-cols-[1.35fr_1fr] min-[900px]:items-start"
+    >
+      <div className="grid gap-5">
+        <div className="h-[340px] rounded-[20px] border border-ink-200 bg-white" />
+        <div className="h-[220px] rounded-[20px] border border-ink-200 bg-white" />
+        <div className="h-[260px] rounded-[20px] border border-ink-200 bg-white" />
+      </div>
+      <div className="h-[520px] rounded-[20px] border border-ink-200 bg-white" />
+    </div>
   );
 }
 
@@ -245,24 +136,5 @@ function Badge({
       <Icon name={icon} className="size-4.5 shrink-0 text-ink-500" />
       {children}
     </li>
-  );
-}
-
-function Row({
-  label,
-  children,
-  strong = false,
-}: {
-  label: string;
-  children: React.ReactNode;
-  strong?: boolean;
-}) {
-  return (
-    <div
-      className={`flex justify-between gap-4 py-2 ${strong ? "border-t border-ink-200 font-semibold" : ""}`}
-    >
-      <dt className={strong ? "text-ink-900" : "text-ink-500"}>{label}</dt>
-      <dd className="tnum text-right whitespace-nowrap">{children}</dd>
-    </div>
   );
 }

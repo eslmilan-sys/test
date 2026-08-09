@@ -8,9 +8,10 @@ import { Icon } from "@/components/ui/Icon";
 import { CityCombobox } from "@/components/ui/CityCombobox";
 import { RouteMap } from "@/components/map/RouteMap";
 import { AvisameForm } from "@/components/AvisameForm";
+import { SEARCH_HORIZON_DAYS } from "@/lib/trips";
 
-/** Les huit prochains jours, libellés en espagnol du Panama. */
-function nextDays(count = 8) {
+/** L'horizon de recherche, libellé en espagnol du Panama. */
+function nextDays(count = SEARCH_HORIZON_DAYS) {
   const out: { value: string; label: string }[] = [];
   const today = new Date();
   for (let i = 0; i < count; i++) {

@@ -15,8 +15,21 @@
  * sans le dire serait un mensonge, pas une maquette.
  */
 
-import { CORRIDORS, getCorridor, type Corridor } from "./corridors";
-import { computePriceCap, type VehicleCategory } from "./pricing";
+import {
+  CORRIDORS,
+  corridorsServing,
+  getCorridor,
+  type Corridor,
+} from "./corridors.ts";
+import { computePriceCap, type VehicleCategory } from "./pricing.ts";
+import {
+  findSegment,
+  seatsFreeOnSegment,
+  segmentCap,
+  type SeatHold,
+  type Segment,
+  type Waypoint,
+} from "./segments.ts";
 
 export type Trip = {
   id: string;
@@ -25,8 +38,19 @@ export type Trip = {
   departureAt: string;
   arrivalAt: string;
   seatsOffered: number;
+  /** Sièges pris sur le tronçon le plus chargé — la borne du trajet entier. */
   seatsTaken: number;
   priceCents: number;
+  /** Écart entre le plafond et ce que le conducteur demande. Reporté tel quel
+   *  sur les segments, pour qu'un trajet à prix réduit le reste par morceaux. */
+  discountCents: number;
+  /** Villes où ce conducteur accepte de prendre ou de laisser quelqu'un.
+   *  Sous-ensemble ordonné des `waypoints` du corridor, extrémités comprises. */
+  servedStops: Waypoint[];
+  /** Réservations déjà posées, par intervalle d'arrêts. Une place vendue
+   *  jusqu'à Santiago se libère après Santiago : c'est un inventaire, pas un
+   *  compteur. */
+  holds: SeatHold[];
   driver: {
     firstName: string;
     lastInitial: string;
@@ -128,12 +152,68 @@ function hash(input: string): number {
   return Math.abs(h);
 }
 
+/**
+ * Les arrêts que CE conducteur déclare, parmi ceux du corridor.
+ *
+ * Tout le monde ne s'arrête pas partout : celui qui va à David d'une traite
+ * ne déclare rien, celui qui a le temps déclare Penonomé et Santiago. Le tirage
+ * est déterministe, un bit par ville intermédiaire — sinon la même page rendue
+ * deux fois donnerait deux itinéraires différents.
+ */
+function pickServedStops(corridor: Corridor, seed: number): Waypoint[] {
+  const inner = corridor.waypoints.slice(1, -1);
+  const kept = inner.filter((_, i) => ((seed >> i) & 1) === 1);
+  return [
+    corridor.waypoints[0],
+    ...kept,
+    corridor.waypoints[corridor.waypoints.length - 1],
+  ];
+}
+
+/**
+ * Les réservations déjà posées, en intervalles d'arrêts.
+ *
+ * Chacune occupe un seul siège sur une portion du trajet. Comme il y en a au
+ * plus `seatsOffered`, aucun tronçon ne peut être survendu, quel que soit le
+ * tirage — l'invariant tient par construction, pas par vérification après coup.
+ */
+function buildHolds(
+  stopCount: number,
+  seatsOffered: number,
+  seed: number,
+): SeatHold[] {
+  const legCount = stopCount - 1;
+  const count = (seed >> 3) % (seatsOffered + 1);
+
+  return Array.from({ length: count }, (_, k) => {
+    const h = hash(`hold|${seed}|${k}`);
+    const fromIndex = h % legCount;
+    const toIndex = fromIndex + 1 + ((h >> 7) % (legCount - fromIndex));
+    return { fromIndex, toIndex, seats: 1 };
+  });
+}
+
 function buildTrip(corridor: Corridor, date: string, index: number): Trip {
   const seed = hash(`${corridor.slug}|${date}|${index}`);
   const driver = DRIVERS[seed % DRIVERS.length];
   const vehicle = VEHICLES[(seed >> 3) % VEHICLES.length];
   const seatsOffered = 2 + ((seed >> 5) % 3);
-  const seatsTaken = (seed >> 8) % (seatsOffered + 1);
+
+  const servedStops = pickServedStops(
+    corridor,
+    hash(`paradas|${corridor.slug}|${date}|${index}`),
+  );
+  const holds = buildHolds(
+    servedStops.length,
+    seatsOffered,
+    hash(`reservas|${corridor.slug}|${date}|${index}`),
+  );
+  const seatsTaken =
+    seatsOffered -
+    seatsFreeOnSegment(seatsOffered, holds, {
+      fromIndex: 0,
+      toIndex: servedStops.length - 1,
+    });
 
   const hour = DEPARTURE_HOURS[(seed >> 11) % DEPARTURE_HOURS.length];
   const minute = [0, 15, 30, 45][(seed >> 14) % 4];
@@ -162,6 +242,9 @@ function buildTrip(corridor: Corridor, date: string, index: number): Trip {
     seatsOffered,
     seatsTaken,
     priceCents: Math.max(0, cap - discount),
+    discountCents: discount,
+    servedStops,
+    holds,
     driver: { ...driver, initial: driver.firstName.charAt(0) },
     vehicle,
     stops: corridor.pickupPoints.slice(0, 2 + ((seed >> 19) % 3)),
@@ -170,8 +253,15 @@ function buildTrip(corridor: Corridor, date: string, index: number): Trip {
   };
 }
 
-/** Trajets d'un corridor pour une date, triés par heure de départ. */
-export function getTripsFor(corridorSlug: string, date: string): Trip[] {
+/**
+ * Tous les trajets d'un corridor pour une date, sans filtre.
+ *
+ * Séparé de `getTripsFor` parce que la recherche par segment a besoin des
+ * trajets bruts : un trajet parti de Panamá il y a une heure n'est pas passé
+ * pour qui monte à Santiago dans quatre heures, et un trajet complet jusqu'à
+ * Penonomé peut être vide après.
+ */
+export function buildTripsFor(corridorSlug: string, date: string): Trip[] {
   const corridor = getCorridor(corridorSlug);
   if (!corridor) return [];
 
@@ -182,11 +272,16 @@ export function getTripsFor(corridorSlug: string, date: string): Trip[] {
   const busy = weekday === 5 || weekday === 0;
   const count = (corridor.isPriority ? 5 : 3) + (busy ? 2 : 0) + (seed % 2);
 
+  return Array.from({ length: count }, (_, i) => buildTrip(corridor, date, i));
+}
+
+/** Trajets d'un corridor pour une date, triés par heure de départ. */
+export function getTripsFor(corridorSlug: string, date: string): Trip[] {
   // Un départ déjà passé n'est pas un résultat : il fait croire que la
   // plateforme est vide alors qu'elle a des trajets plus tard dans la journée.
   const now = Date.now();
 
-  return Array.from({ length: count }, (_, i) => buildTrip(corridor, date, i))
+  return buildTripsFor(corridorSlug, date)
     .filter((trip) => trip.seatsOffered - trip.seatsTaken > 0)
     .filter((trip) => new Date(trip.departureAt).getTime() > now)
     .sort((a, b) => a.departureAt.localeCompare(b.departureAt));
@@ -201,8 +296,25 @@ export function getTrip(id: string): Trip | undefined {
   return buildTrip(corridor, date, Number(index));
 }
 
-/** Identifiants pré-générés, pour que l'export statique ait des pages. */
-export function demoTripIds(days = 3): string[] {
+/**
+ * Combien de jours la recherche propose. Les sélecteurs de date et la
+ * génération des pages lisent la MÊME constante : la faire diverger produit
+ * des résultats qui pointent vers des pages inexistantes, et c'est exactement
+ * ce qui arrivait avant les arrêts intermédiaires.
+ */
+export const SEARCH_HORIZON_DAYS = 10;
+
+/**
+ * Identifiants pré-générés, pour que l'export statique ait des pages.
+ *
+ * Aucun filtre ici, volontairement. Un trajet complet de bout en bout peut
+ * rester réservable sur un tronçon, et un trajet déjà parti de Panamá peut
+ * encore prendre quelqu'un à Santiago : dès qu'un trajet EXISTE, la recherche
+ * peut le montrer, donc sa page doit exister aussi. Deux jours de marge au-delà
+ * de l'horizon proposé absorbent le décalage entre la date de compilation et
+ * celle de la visite.
+ */
+export function demoTripIds(days = SEARCH_HORIZON_DAYS + 2): string[] {
   const ids: string[] = [];
   const today = new Date();
   for (let d = 0; d < days; d++) {
@@ -210,7 +322,7 @@ export function demoTripIds(days = 3): string[] {
     date.setDate(today.getDate() + d);
     const iso = date.toISOString().slice(0, 10);
     for (const corridor of CORRIDORS) {
-      ids.push(...getTripsFor(corridor.slug, iso).map((t) => t.id));
+      ids.push(...buildTripsFor(corridor.slug, iso).map((t) => t.id));
     }
   }
   return ids;
@@ -218,6 +330,114 @@ export function demoTripIds(days = 3): string[] {
 
 export function seatsLeft(trip: Trip): number {
   return trip.seatsOffered - trip.seatsTaken;
+}
+
+/* ────────────────────────────────────────────────────────────────────────────
+ * RECHERCHE PAR SEGMENT
+ *
+ * Un trajet publié Panamá → David qui déclare Penonomé et Santiago répond à
+ * six recherches, pas une. C'est le levier le plus fort dont dispose une place
+ * de marché qui démarre : l'offre ne change pas, la couverture est multipliée.
+ *
+ * Ce qu'un résultat doit porter en plus du trajet : où on monte, où on
+ * descend, à quelle heure, combien de places restent SUR CE SEGMENT, et
+ * combien on donne — le plafond des kilomètres réellement parcourus, jamais
+ * celui du trajet entier.
+ * ──────────────────────────────────────────────────────────────────────────── */
+
+export type TripMatch = {
+  trip: Trip;
+  segment: Segment;
+  /** Faux dès que le passager monte après le départ ou descend avant l'arrivée. */
+  isPartial: boolean;
+  priceCents: number;
+  seatsFree: number;
+  /** Heure au point de montée, pas au départ du conducteur. */
+  boardingAt: string;
+  /** Heure au point de descente, pas à l'arrivée du conducteur. */
+  droppingAt: string;
+};
+
+/**
+ * Heure de passage à un kilomètre donné du corridor.
+ *
+ * Interpolation linéaire sur la durée annoncée. Approximation assumée : la
+ * vitesse n'est pas constante sur la Panamericana. L'affichage doit donc rester
+ * une estimation, et le conducteur reste seul maître de son horaire (R4).
+ */
+function timeAtKm(trip: Trip, corridor: Corridor, km: number): string {
+  const fraction = corridor.distanceKm > 0 ? km / corridor.distanceKm : 0;
+  const minutes = Math.round(fraction * corridor.typicalDurationMin);
+  return new Date(
+    new Date(trip.departureAt).getTime() + minutes * 60_000,
+  ).toISOString();
+}
+
+/** Le résultat correspondant à un trajet pris sur un segment donné. */
+export function matchFor(trip: Trip, segment: Segment): TripMatch | null {
+  const corridor = getCorridor(trip.corridorSlug);
+  if (!corridor) return null;
+
+  const cap = segmentCap(segment, trip.vehicle.category, trip.seatsOffered);
+
+  return {
+    trip,
+    segment,
+    isPartial:
+      segment.fromIndex > 0 || segment.toIndex < trip.servedStops.length - 1,
+    // Le rabais que le conducteur consent sur le trajet entier le suit sur le
+    // segment. Le plafond n'est jamais dépassé : on ne fait que soustraire.
+    priceCents: Math.max(0, cap.maxPriceCents - trip.discountCents),
+    seatsFree: seatsFreeOnSegment(trip.seatsOffered, trip.holds, segment),
+    boardingAt: timeAtKm(trip, corridor, segment.from.km),
+    droppingAt: timeAtKm(trip, corridor, segment.to.km),
+  };
+}
+
+/** Le trajet vu de bout en bout — ce qu'affiche la page du trajet par défaut. */
+export function fullMatch(trip: Trip): TripMatch | null {
+  const segment = findSegment(
+    trip.servedStops,
+    trip.servedStops[0].citySlug,
+    trip.servedStops[trip.servedStops.length - 1].citySlug,
+  );
+  return segment ? matchFor(trip, segment) : null;
+}
+
+/**
+ * Tous les trajets d'une date qui peuvent emmener quelqu'un d'une ville à
+ * l'autre, directement ou en cours de route.
+ */
+export function searchTrips(
+  fromCitySlug: string,
+  toCitySlug: string,
+  date: string,
+  seats = 1,
+): TripMatch[] {
+  const now = Date.now();
+  const matches: TripMatch[] = [];
+
+  for (const corridor of corridorsServing(fromCitySlug, toCitySlug)) {
+    for (const trip of buildTripsFor(corridor.slug, date)) {
+      const segment = findSegment(trip.servedStops, fromCitySlug, toCitySlug);
+      if (!segment) continue;
+
+      const match = matchFor(trip, segment);
+      if (!match) continue;
+      if (match.seatsFree < seats) continue;
+      // C'est l'heure de MONTÉE qui décide, pas celle du départ.
+      if (new Date(match.boardingAt).getTime() <= now) continue;
+
+      matches.push(match);
+    }
+  }
+
+  return matches.sort((a, b) => a.boardingAt.localeCompare(b.boardingAt));
+}
+
+/** Combien de recherches distinctes une liste d'arrêts rend possibles. */
+export function servedPairCount(stopCount: number): number {
+  return (stopCount * (stopCount - 1)) / 2;
 }
 
 export function formatTime(iso: string): string {

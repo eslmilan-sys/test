@@ -7,7 +7,7 @@ import { CityCombobox } from "@/components/ui/CityCombobox";
 import { RouteMap } from "@/components/map/RouteMap";
 import { Button } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
-import { formatDayLabel } from "@/lib/trips";
+import { formatDayLabel, SEARCH_HORIZON_DAYS } from "@/lib/trips";
 
 /**
  * Résumé de recherche collant, ouvrant une feuille d'édition.
@@ -20,7 +20,7 @@ import { formatDayLabel } from "@/lib/trips";
 
 type Criteria = { from: string; to: string; date: string; seats: number };
 
-function nextDays(count = 10) {
+function nextDays(count = SEARCH_HORIZON_DAYS) {
   const out: { value: string; label: string }[] = [];
   const today = new Date();
   for (let i = 0; i < count; i++) {

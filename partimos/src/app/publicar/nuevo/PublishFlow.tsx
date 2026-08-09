@@ -17,7 +17,7 @@ import {
   PRICE_RULE,
   type VehicleCategory,
 } from "@/lib/pricing";
-import { formatDayLabel } from "@/lib/trips";
+import { formatDayLabel, servedPairCount } from "@/lib/trips";
 
 /**
  * PUBLICATION EN QUATRE ÉTAPES (§6 du brief).
@@ -55,6 +55,7 @@ export function PublishFlow() {
   const [to, setTo] = useState(preset?.destination.slug ?? "chitre");
   const [picking, setPicking] = useState<"origin" | "destination">("origin");
   const [stops, setStops] = useState<string[]>([]);
+  const [cityStops, setCityStops] = useState<string[]>([]);
   const [date, setDate] = useState(days[1].value);
   const [hour, setHour] = useState("06:00");
   const [seats, setSeats] = useState(3);
@@ -69,6 +70,11 @@ export function PublishFlow() {
     ? computePriceCap(corridor.distanceKm, corridor.tollCents, category, seats)
     : null;
   const price = priceCents ?? cap?.maxPriceCents ?? 0;
+
+  /** Villes traversées entre l'origine et la destination — les arrêts possibles. */
+  const innerStops = corridor ? corridor.waypoints.slice(1, -1) : [];
+  /** Combien de recherches distinctes les arrêts cochés rendent possibles. */
+  const pairCount = servedPairCount(2 + cityStops.length);
 
   const canGoNext = [
     Boolean(corridor),
@@ -93,6 +99,17 @@ export function PublishFlow() {
             {seats === 1 ? "puesto" : "puestos"} a {formatUsd(price)}. Te
             avisamos por WhatsApp en cuanto alguien pida un puesto.
           </p>
+          {cityStops.length > 0 && (
+            <p className="mb-6 rounded-[14px] bg-accent-soft px-4 py-3 text-[13.5px] leading-relaxed text-accent-ink">
+              Como paras en{" "}
+              {innerStops
+                .filter((s) => cityStops.includes(s.citySlug))
+                .map((s) => s.name)
+                .join(" y ")}
+              , tu viaje sale en {pairCount} búsquedas distintas y no solo en la
+              de {corridor.origin.shortName} → {corridor.destination.shortName}.
+            </p>
+          )}
           <div className="flex flex-wrap justify-center gap-3">
             <Link
               href="/cuenta"
@@ -163,6 +180,7 @@ export function PublishFlow() {
                       setPicking("origin");
                     }
                     setStops([]);
+                    setCityStops([]);
                   }}
                 />
               </div>
@@ -180,9 +198,95 @@ export function PublishFlow() {
           {step === 1 && corridor && (
             <>
               <h1 className="mb-1.5 font-display text-[24px] font-extrabold tracking-[-0.03em]">
-                ¿Por dónde puedes recoger?
+                ¿Dónde puedes parar?
               </h1>
               <p className="mb-5 text-[14.5px] leading-relaxed text-ink-500">
+                Tú decides el recorrido. Marca solo lo que ya te queda de paso.
+              </p>
+
+              {/* Villes de passage — le multiplicateur de couverture. Un
+                  conducteur qui déclare deux arrêts répond à six recherches au
+                  lieu d'une, sans changer une minute à son trajet. C'est
+                  l'argument à lui montrer, chiffré et en direct. */}
+              {innerStops.length > 0 && (
+                <section className="mb-6">
+                  <h2 className="mb-1 text-[11.5px] font-bold tracking-[0.11em] text-ink-500 uppercase">
+                    Ciudades donde puedes dejar a alguien
+                  </h2>
+                  <p className="mb-3 text-[13.5px] leading-relaxed text-ink-500">
+                    Pasas por estas ciudades de todas formas. Si aceptas parar,
+                    alguien puede bajarse ahí y aportar por esos kilómetros.
+                  </p>
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    {innerStops.map((stop) => {
+                      const active = cityStops.includes(stop.citySlug);
+                      return (
+                        <button
+                          key={stop.citySlug}
+                          type="button"
+                          aria-pressed={active}
+                          onClick={() =>
+                            setCityStops((s) =>
+                              active
+                                ? s.filter((c) => c !== stop.citySlug)
+                                : [...s, stop.citySlug],
+                            )
+                          }
+                          className={`flex items-center gap-3 rounded-[14px] border px-4 py-3 text-left transition-colors ${
+                            active
+                              ? "border-ink-900 bg-ink-50"
+                              : "border-ink-200 hover:border-accent"
+                          }`}
+                        >
+                          <span
+                            aria-hidden
+                            className={`flex size-5 shrink-0 items-center justify-center rounded-[6px] border-2 ${
+                              active
+                                ? "border-ink-900 bg-ink-900 text-white"
+                                : "border-ink-200"
+                            }`}
+                          >
+                            {active && <Icon name="check" className="size-3" />}
+                          </span>
+                          <span className="min-w-0">
+                            <span
+                              className={`block text-[15px] ${active ? "font-semibold" : ""}`}
+                            >
+                              {stop.name}
+                            </span>
+                            <span className="tnum block text-[12.5px] text-ink-500">
+                              km {stop.km} de tu ruta
+                            </span>
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <p
+                    className="mt-3 rounded-[12px] bg-accent-soft px-4 py-3 text-[13.5px] leading-relaxed text-accent-ink"
+                    aria-live="polite"
+                  >
+                    {pairCount === 1 ? (
+                      <>
+                        Tu viaje aparece en <b>1 búsqueda</b>. Marcando una
+                        parada aparecería en 3.
+                      </>
+                    ) : (
+                      <>
+                        Con {cityStops.length}{" "}
+                        {cityStops.length === 1 ? "parada" : "paradas"}, tu
+                        viaje aparece en <b>{pairCount} búsquedas distintas</b>.
+                        Mismo recorrido, misma hora.
+                      </>
+                    )}
+                  </p>
+                </section>
+              )}
+
+              <h2 className="mb-1 text-[11.5px] font-bold tracking-[0.11em] text-ink-500 uppercase">
+                Por dónde puedes recoger
+              </h2>
+              <p className="mb-3 text-[13.5px] leading-relaxed text-ink-500">
                 Marca los puntos por donde ya vas a pasar. Máximo{" "}
                 {PRICE_RULE.maxStops}, y ninguno en una terminal de buses.
               </p>

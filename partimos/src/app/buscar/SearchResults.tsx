@@ -9,8 +9,8 @@ import { TripCard } from "@/components/trip/TripCard";
 import { AvisameForm } from "@/components/AvisameForm";
 import { Icon } from "@/components/ui/Icon";
 import { ButtonLink } from "@/components/ui/Button";
-import { CORRIDORS, ALL_CITIES } from "@/lib/corridors";
-import { getTripsFor, formatDayLabel, seatsLeft } from "@/lib/trips";
+import { CORRIDORS, ALL_CITIES, corridorsServing } from "@/lib/corridors";
+import { searchTrips, formatDayLabel } from "@/lib/trips";
 import { isSupabaseConfigured } from "@/lib/supabase";
 
 /**
@@ -20,10 +20,16 @@ import { isSupabaseConfigured } from "@/lib/supabase";
  * trajet et on tombait sur une page d'article. Ici on choisit une personne,
  * une heure et un montant.
  *
+ * Depuis les arrêts intermédiaires, la recherche ne regarde plus seulement les
+ * corridors dont la paire demandée est l'origine et la destination : elle
+ * regarde tous ceux qui PASSENT par les deux villes dans le bon ordre. Une
+ * recherche Penonomé → Santiago, qui ne renvoyait rien, remplit maintenant une
+ * page avec l'offre qui existait déjà.
+ *
  * Trois cas, et aucun n'est une impasse :
  *   · des trajets → la liste ;
- *   · un corridor ouvert mais rien ce jour-là → les jours voisins ;
- *   · un corridor inexistant → collecte du signal de demande.
+ *   · une route ouverte mais rien ce jour-là → les jours voisins ;
+ *   · une route inexistante → collecte du signal de demande.
  */
 
 type SortKey = "hora" | "aporte" | "calificacion";
@@ -43,46 +49,71 @@ export function SearchResults() {
   const [sort, setSort] = useState<SortKey>("hora");
   const [onlyWomen, setOnlyWomen] = useState(false);
   const [onlyInstant, setOnlyInstant] = useState(false);
+  const [onlyDirect, setOnlyDirect] = useState(false);
 
-  const corridor = CORRIDORS.find(
-    (c) =>
-      c.origin.slug === criteria.from && c.destination.slug === criteria.to,
+  /** Les corridors qui traversent les deux villes, dans le bon sens. */
+  const serving = useMemo(
+    () => corridorsServing(criteria.from, criteria.to),
+    [criteria.from, criteria.to],
   );
 
-  const trips = useMemo(() => {
-    if (!corridor) return [];
-    return getTripsFor(corridor.slug, criteria.date).filter(
-      (trip) => seatsLeft(trip) >= criteria.seats,
-    );
-  }, [corridor, criteria.date, criteria.seats]);
+  /** Le corridor direct s'il existe, sinon le plus long qui passe par là :
+   *  c'est celui dont la page a le plus de chances d'être utile. */
+  const corridor = useMemo(
+    () =>
+      CORRIDORS.find(
+        (c) =>
+          c.origin.slug === criteria.from && c.destination.slug === criteria.to,
+      ) ?? serving[0],
+    [criteria.from, criteria.to, serving],
+  );
+
+  const matches = useMemo(
+    () =>
+      searchTrips(criteria.from, criteria.to, criteria.date, criteria.seats),
+    [criteria.from, criteria.to, criteria.date, criteria.seats],
+  );
+
+  const hasPartial = matches.some((m) => m.isPartial);
+  /** Le filtre « part vraiment d'ici » n'a de sens que s'il reste quelque
+   *  chose après. Le proposer quand tous les trajets sont de passage donnerait
+   *  un bouton qui vide la page — un filtre qui ne filtre rien d'utile. */
+  const canFilterDirect = hasPartial && matches.some((m) => !m.isPartial);
 
   const visible = useMemo(() => {
-    const filtered = trips.filter(
-      (trip) =>
-        (!onlyWomen || trip.womenOnly) && (!onlyInstant || trip.instantBooking),
+    const filtered = matches.filter(
+      ({ trip, isPartial }) =>
+        (!onlyWomen || trip.womenOnly) &&
+        (!onlyInstant || trip.instantBooking) &&
+        (!onlyDirect || !isPartial),
     );
     const sorted = [...filtered];
     if (sort === "aporte") sorted.sort((a, b) => a.priceCents - b.priceCents);
     if (sort === "calificacion")
-      sorted.sort((a, b) => b.driver.rating - a.driver.rating);
+      sorted.sort((a, b) => b.trip.driver.rating - a.trip.driver.rating);
     return sorted;
-  }, [trips, sort, onlyWomen, onlyInstant]);
+  }, [matches, sort, onlyWomen, onlyInstant, onlyDirect]);
 
   /** Jours voisins qui, eux, ont des trajets. */
   const nearbyDays = useMemo(() => {
-    if (!corridor) return [];
+    if (serving.length === 0) return [];
     return [-2, -1, 1, 2, 3]
       .map((offset) => {
         const d = new Date(`${criteria.date}T12:00:00`);
         d.setDate(d.getDate() + offset);
         const iso = d.toISOString().slice(0, 10);
         if (iso < today) return null;
-        const count = getTripsFor(corridor.slug, iso).length;
+        const count = searchTrips(
+          criteria.from,
+          criteria.to,
+          iso,
+          criteria.seats,
+        ).length;
         return count > 0 ? { date: iso, count } : null;
       })
       .filter((v): v is { date: string; count: number } => v !== null)
       .slice(0, 3);
-  }, [corridor, criteria.date, today]);
+  }, [serving, criteria.from, criteria.to, criteria.date, criteria.seats, today]);
 
   function apply(next: typeof criteria) {
     const q = new URLSearchParams({
@@ -119,13 +150,21 @@ export function SearchResults() {
         )}
 
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-          <h1 className="font-display text-[20px] font-bold tracking-[-0.02em]">
-            {corridor
-              ? `${visible.length} ${visible.length === 1 ? "viaje" : "viajes"} · ${formatDayLabel(criteria.date)}`
-              : "Sin resultados"}
-          </h1>
+          <div>
+            <h1 className="font-display text-[20px] font-bold tracking-[-0.02em]">
+              {serving.length > 0
+                ? `${visible.length} ${visible.length === 1 ? "viaje" : "viajes"} · ${formatDayLabel(criteria.date)}`
+                : "Sin resultados"}
+            </h1>
+            {hasPartial && (
+              <p className="mt-0.5 text-[13px] text-ink-500">
+                Incluye conductores que pasan por {toCity?.shortName} camino a
+                otro lado.
+              </p>
+            )}
+          </div>
 
-          {trips.length > 0 && (
+          {matches.length > 0 && (
             <label className="flex items-center gap-2 text-[13.5px] text-ink-500">
               Ordenar por
               <select
@@ -141,7 +180,7 @@ export function SearchResults() {
           )}
         </div>
 
-        {trips.length > 0 && (
+        {matches.length > 0 && (
           <div className="mb-5 flex flex-wrap gap-2">
             <Filter
               active={onlyInstant}
@@ -152,26 +191,34 @@ export function SearchResults() {
             <Filter active={onlyWomen} onClick={() => setOnlyWomen((v) => !v)}>
               Solo mujeres
             </Filter>
+            {canFilterDirect && (
+              <Filter
+                active={onlyDirect}
+                onClick={() => setOnlyDirect((v) => !v)}
+              >
+                Sale de {fromCity?.shortName}
+              </Filter>
+            )}
           </div>
         )}
 
         {visible.length > 0 ? (
           <ul className="grid gap-3">
-            {visible.map((trip) => (
-              <li key={trip.id}>
-                <TripCard trip={trip} />
+            {visible.map((match) => (
+              <li key={`${match.trip.id}-${match.segment.fromIndex}`}>
+                <TripCard match={match} />
               </li>
             ))}
           </ul>
         ) : (
           <div className="rounded-[20px] border border-ink-200 bg-white p-6">
             <h2 className="mb-2 font-display text-[19px] font-bold">
-              {corridor
-                ? "Nadie sale ese día por ahora"
+              {serving.length > 0
+                ? "Nadie pasa por ahí ese día"
                 : "Todavía no abrimos esa ruta"}
             </h2>
             <p className="mb-5 max-w-[54ch] text-[15px] leading-relaxed text-ink-500">
-              {corridor
+              {serving.length > 0
                 ? "Los viajes se publican sobre la marcha, casi siempre con dos o tres días de anticipación. Déjanos tu número y te escribimos apenas alguien publique."
                 : `Guardamos tu búsqueda de ${fromCity?.shortName} a ${toCity?.shortName}. Cuando varias personas piden la misma ruta, es la próxima que abrimos.`}
             </p>
@@ -212,9 +259,9 @@ export function SearchResults() {
               ¿Vas manejando por esta ruta?
             </h2>
             <p className="mb-4 max-w-[52ch] text-[14.5px] leading-relaxed text-ink-500">
-              Hay gente buscando {corridor.origin.shortName} →{" "}
-              {corridor.destination.shortName} justo ahora. Publicar toma menos
-              de un minuto.
+              Hay gente buscando {fromCity?.shortName} → {toCity?.shortName}{" "}
+              justo ahora. Si ese tramo te queda de paso, márcalo como parada al
+              publicar y tu viaje aparece también en esta búsqueda.
             </p>
             <ButtonLink href={`/publicar/nuevo?ruta=${corridor.slug}`}>
               Publicar mi viaje

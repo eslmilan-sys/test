@@ -42,6 +42,10 @@ export type Waypoint = {
   km: number;
   /** Péages cumulés depuis l'origine, en centimes. */
   tollCents: number;
+  /** Points de rendez-vous habituels DANS cette ville. Jamais un terminal de
+   *  bus. Sans eux, un passager qui monte en cours de route se verrait proposer
+   *  les points de la ville de départ, où il n'est pas. */
+  pickupPoints: string[];
 };
 
 export type Segment = {

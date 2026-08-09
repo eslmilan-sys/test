@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Icon } from "@/components/ui/Icon";
 import { formatUsd, formatDuration } from "@/lib/pricing";
 import { getCorridor } from "@/lib/corridors";
-import { formatTime, seatsLeft, type Trip } from "@/lib/trips";
+import { formatTime, type TripMatch } from "@/lib/trips";
 
 /**
  * Carte de trajet.
@@ -14,28 +14,45 @@ import { formatTime, seatsLeft, type Trip } from "@/lib/trips";
  *
  * Le prix est en gras à droite, aligné en chiffres tabulaires pour que les
  * montants se comparent verticalement d'une carte à l'autre.
+ *
+ * La carte affiche un SEGMENT, pas un trajet : les villes, les heures, le
+ * montant et les places sont ceux du bout de route que le passager demande.
+ * Quand le conducteur va plus loin ou vient de plus loin, on le dit en une
+ * ligne — c'est rassurant plutôt que déroutant, à condition de l'écrire.
  */
-export function TripCard({ trip }: { trip: Trip }) {
+export function TripCard({ match }: { match: TripMatch }) {
+  const { trip, segment } = match;
   const corridor = getCorridor(trip.corridorSlug);
   if (!corridor) return null;
 
-  const left = seatsLeft(trip);
   const durationMin = Math.round(
-    (new Date(trip.arrivalAt).getTime() -
-      new Date(trip.departureAt).getTime()) /
+    (new Date(match.droppingAt).getTime() -
+      new Date(match.boardingAt).getTime()) /
       60_000,
   );
 
+  const comesFrom = segment.fromIndex > 0;
+  const goesOn = segment.toIndex < trip.servedStops.length - 1;
+  const first = trip.servedStops[0];
+  const last = trip.servedStops[trip.servedStops.length - 1];
+
+  const context = [
+    comesFrom && `viene desde ${first.name}`,
+    goesOn && `sigue hasta ${last.name}`,
+  ]
+    .filter(Boolean)
+    .join(" y ");
+
   return (
     <Link
-      href={`/viaje/${trip.id}`}
+      href={`/viaje/${trip.id}?desde=${segment.from.citySlug}&hacia=${segment.to.citySlug}`}
       className="group block rounded-[18px] border border-ink-200 bg-white p-4 transition-[border-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:border-accent hover:shadow-card sm:p-5"
     >
       <div className="flex gap-4">
         {/* Échelle de temps */}
         <div className="flex shrink-0 flex-col items-center pt-1">
           <span className="tnum font-display text-[17px] font-bold">
-            {formatTime(trip.departureAt)}
+            {formatTime(match.boardingAt)}
           </span>
           <span
             aria-hidden
@@ -43,7 +60,7 @@ export function TripCard({ trip }: { trip: Trip }) {
             style={{ minHeight: 26 }}
           />
           <span className="tnum font-display text-[17px] font-bold">
-            {formatTime(trip.arrivalAt)}
+            {formatTime(match.droppingAt)}
           </span>
         </div>
 
@@ -51,23 +68,30 @@ export function TripCard({ trip }: { trip: Trip }) {
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
               <p className="truncate font-display text-[16px] font-bold tracking-[-0.015em]">
-                {corridor.origin.shortName}
+                {segment.from.name}
               </p>
               <p className="tnum mb-1.5 text-[12.5px] text-ink-500">
                 {formatDuration(durationMin)} de camino
               </p>
               <p className="truncate font-display text-[16px] font-bold tracking-[-0.015em]">
-                {corridor.destination.shortName}
+                {segment.to.name}
               </p>
             </div>
 
             <div className="shrink-0 text-right">
               <p className="tnum font-display text-[22px] font-extrabold tracking-[-0.03em]">
-                {formatUsd(trip.priceCents)}
+                {formatUsd(match.priceCents)}
               </p>
               <p className="text-[11.5px] text-ink-500">por puesto</p>
             </div>
           </div>
+
+          {context && (
+            <p className="mt-2.5 flex items-center gap-1.5 text-[12.5px] text-ink-500">
+              <Icon name="arrowRight" className="size-3.5 shrink-0" />
+              Este viaje {context}
+            </p>
+          )}
 
           <div className="mt-3.5 flex flex-wrap items-center gap-x-3 gap-y-2 border-t border-ink-200 pt-3.5">
             <span
@@ -93,8 +117,10 @@ export function TripCard({ trip }: { trip: Trip }) {
               )}
               {trip.womenOnly && <Chip>Solo mujeres</Chip>}
               {trip.instantBooking && <Chip>Reserva al instante</Chip>}
-              <Chip tone={left === 1 ? "urgent" : "plain"}>
-                {left === 1 ? "Queda 1 puesto" : `${left} puestos`}
+              <Chip tone={match.seatsFree === 1 ? "urgent" : "plain"}>
+                {match.seatsFree === 1
+                  ? "Queda 1 puesto"
+                  : `${match.seatsFree} puestos`}
               </Chip>
             </span>
           </div>

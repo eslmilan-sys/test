@@ -11,7 +11,8 @@
  * tiers pour rendre — c'est la règle du §10 du brief.
  */
 
-import { computePriceCap, type VehicleCategory } from "./pricing";
+import { computePriceCap, type VehicleCategory } from "./pricing.ts";
+import type { Waypoint } from "./segments.ts";
 
 export type City = {
   slug: string;
@@ -40,6 +41,10 @@ export type Corridor = {
   /** Deux ou trois phrases propres au corridor : c'est ce qui distingue la
    *  page d'un gabarit dupliqué aux yeux de Google comme des lecteurs. */
   intro: string;
+  /** Villes traversées, origine et destination comprises, dans l'ordre du
+   *  trajet. C'est le référentiel des arrêts intermédiaires : un conducteur
+   *  ne peut déclarer que des points qui sont VRAIMENT sur sa route. */
+  waypoints: Waypoint[];
 };
 
 export const CITIES = {
@@ -101,11 +106,98 @@ export const CITIES = {
   },
 } as const satisfies Record<string, City>;
 
+/**
+ * LA ROUTE, EN KILOMÈTRES CUMULÉS DEPUIS CIUDAD DE PANAMÁ
+ *
+ * Toutes ces villes sont sur la Panamericana, dans cet ordre. Les distances
+ * sont celles des corridors du §12 : Coronado 85, Penonomé 145, Santiago 250,
+ * David 440 — et l'embranchement d'Azuero à Divisa, qui mène à Chitré (250)
+ * puis Las Tablas (285). Les corridors ne sont donc pas six routes séparées :
+ * c'est un tronc commun avec une fourche, et c'est précisément ce qui permet
+ * de découper les trajets.
+ *
+ * Les péages sont eux aussi cumulés. Ils se paient tous dans les 85 premiers
+ * kilomètres (l'autopista vers La Chorrera) : au-delà de Coronado, un segment
+ * n'ajoute plus de péage, et le calcul du plafond doit le refléter — sinon on
+ * facturerait à un passager Penonomé → Santiago un péage qu'il ne franchit
+ * jamais.
+ */
 const PANAMA_PICKUPS = [
   "Costa del Este — Town Center",
   "Albrook — salida hacia el interior",
   "Vía Centenario — entrada a la Panamericana",
 ];
+
+const ROAD = {
+  "panama-city": {
+    km: 0,
+    tollCents: 0,
+    pickupPoints: PANAMA_PICKUPS,
+  },
+  coronado: {
+    km: 85,
+    tollCents: 200,
+    pickupPoints: [
+      "Coronado — entrada de la urbanización",
+      "El Rey de Coronado — estacionamiento",
+    ],
+  },
+  penonome: {
+    km: 145,
+    tollCents: 300,
+    pickupPoints: [
+      "Penonomé — entrada del pueblo",
+      "Penonomé — El Machetazo, sobre la vía",
+    ],
+  },
+  santiago: {
+    km: 250,
+    tollCents: 300,
+    pickupPoints: [
+      "Santiago — parada de descanso en la Panamericana",
+      "Santiago — entrada por la vía principal",
+    ],
+  },
+  david: {
+    km: 440,
+    tollCents: 300,
+    pickupPoints: [
+      "David — entrada por la Panamericana",
+      "David — Parque Cervantes",
+    ],
+  },
+  chitre: {
+    km: 250,
+    tollCents: 300,
+    pickupPoints: [
+      "Chitré — entrada por la vía de Divisa",
+      "Chitré — Parque Unión",
+    ],
+  },
+  "las-tablas": {
+    km: 285,
+    tollCents: 300,
+    pickupPoints: ["Las Tablas — entrada del pueblo"],
+  },
+} as const satisfies Record<
+  string,
+  { km: number; tollCents: number; pickupPoints: readonly string[] }
+>;
+
+/** Construit la liste ordonnée des points de passage d'un corridor. */
+function road(...slugs: (keyof typeof ROAD)[]): Waypoint[] {
+  return slugs.map((slug) => {
+    const city = Object.values(CITIES).find((c) => c.slug === slug)!;
+    const { km, tollCents, pickupPoints } = ROAD[slug];
+    return {
+      citySlug: slug,
+      name: city.shortName,
+      km,
+      tollCents,
+      pickupPoints: [...pickupPoints],
+    };
+  });
+}
 
 export const CORRIDORS: Corridor[] = [
   {
@@ -120,6 +212,7 @@ export const CORRIDORS: Corridor[] = [
     pickupPoints: [...PANAMA_PICKUPS, "Divisa — cruce hacia Azuero"],
     intro:
       "La ruta de Azuero por excelencia. Los viernes en la tarde y los domingos al mediodía es cuando más gente se mueve, sobre todo en temporada de festivales. La mayoría de los conductores sale por la Panamericana y toma el cruce de Divisa.",
+    waypoints: road("panama-city", "coronado", "penonome", "chitre"),
   },
   {
     slug: "panama-las-tablas",
@@ -133,6 +226,13 @@ export const CORRIDORS: Corridor[] = [
     pickupPoints: [...PANAMA_PICKUPS, "Chitré — si te queda de paso"],
     intro:
       "Media hora más allá de Chitré, por la misma carretera. Quien va a Las Tablas casi siempre puede dejarte antes en Chitré o en Guararé, así que vale la pena mirar los dos corredores cuando buscas puesto.",
+    waypoints: road(
+      "panama-city",
+      "coronado",
+      "penonome",
+      "chitre",
+      "las-tablas",
+    ),
   },
   {
     slug: "panama-coronado",
@@ -150,6 +250,7 @@ export const CORRIDORS: Corridor[] = [
     ],
     intro:
       "El corredor más corto y el más frecuente: mucha gente baja los viernes en la tarde y sube los domingos. Como el trayecto es de poco más de una hora, el aporte por puesto es pequeño y los conductores suelen tener horarios flexibles.",
+    waypoints: road("panama-city", "coronado"),
   },
   {
     slug: "panama-santiago",
@@ -163,6 +264,7 @@ export const CORRIDORS: Corridor[] = [
     pickupPoints: [...PANAMA_PICKUPS, "Aguadulce — parada en carretera"],
     intro:
       "Santiago es el punto medio del país: mucha gente que va a Chiriquí para ahí, y muchos veragüenses suben a Panamá entre semana por trámites. Es de los corredores donde más se consigue puesto en días laborables.",
+    waypoints: road("panama-city", "coronado", "penonome", "santiago"),
   },
   {
     slug: "panama-penonome",
@@ -176,6 +278,7 @@ export const CORRIDORS: Corridor[] = [
     pickupPoints: [...PANAMA_PICKUPS, "Penonomé — entrada del pueblo"],
     intro:
       "Dos horas de carretera y buena parte de los conductores que van a Chiriquí o a Veraguas pasan por aquí. Si no encuentras un viaje directo a Penonomé, mira también los que van más lejos: casi todos pueden dejarte en la entrada.",
+    waypoints: road("panama-city", "coronado", "penonome"),
   },
   {
     slug: "panama-david",
@@ -189,6 +292,7 @@ export const CORRIDORS: Corridor[] = [
     pickupPoints: [...PANAMA_PICKUPS, "Santiago — parada de descanso"],
     intro:
       "Seis horas y media de carretera, casi siempre con una parada en Santiago. Es el trayecto donde más se nota la diferencia con el bus nocturno: sales cuando el conductor sale, no cuando salga la flota.",
+    waypoints: road("panama-city", "coronado", "penonome", "santiago", "david"),
   },
 ];
 
@@ -230,3 +334,32 @@ export function corridorCap(
 }
 
 export const ALL_CITIES: City[] = Object.values(CITIES);
+
+/**
+ * Corridors qui traversent les deux villes, dans le bon sens.
+ *
+ * C'est la requête qui change tout : Penonomé → Santiago n'est le corridor de
+ * personne, mais trois corridors passent par les deux villes dans cet ordre.
+ * Une recherche qui ne regardait que `origin`/`destination` renvoyait une page
+ * vide alors que l'offre existait déjà.
+ */
+export function corridorsServing(
+  fromCitySlug: string,
+  toCitySlug: string,
+): Corridor[] {
+  return CORRIDORS.filter((corridor) => {
+    const from = corridor.waypoints.findIndex(
+      (w) => w.citySlug === fromCitySlug,
+    );
+    const to = corridor.waypoints.findIndex((w) => w.citySlug === toCitySlug);
+    return from !== -1 && to !== -1 && from < to;
+  });
+}
+
+/** Paires de villes desservies par au moins un corridor, arrêts compris. */
+export function isPairServed(
+  fromCitySlug: string,
+  toCitySlug: string,
+): boolean {
+  return corridorsServing(fromCitySlug, toCitySlug).length > 0;
+}

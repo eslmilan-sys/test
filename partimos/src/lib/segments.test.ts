@@ -15,13 +15,22 @@ import {
   type Waypoint,
 } from "./segments.ts";
 
-/** Panamá → David, avec ses quatre villes de passage réelles. */
+/** Panamá → David, avec ses quatre villes de passage réelles.
+ *  Les points de rendez-vous ne comptent pas ici : ces tests portent sur les
+ *  kilomètres et l'inventaire des sièges, pas sur l'affichage. */
+const stop = (
+  citySlug: string,
+  name: string,
+  km: number,
+  tollCents: number,
+): Waypoint => ({ citySlug, name, km, tollCents, pickupPoints: [] });
+
 const DAVID: Waypoint[] = [
-  { citySlug: "panama-city", name: "Ciudad de Panamá", km: 0, tollCents: 0 },
-  { citySlug: "coronado", name: "Coronado", km: 85, tollCents: 200 },
-  { citySlug: "penonome", name: "Penonomé", km: 145, tollCents: 300 },
-  { citySlug: "santiago", name: "Santiago", km: 250, tollCents: 300 },
-  { citySlug: "david", name: "David", km: 440, tollCents: 300 },
+  stop("panama-city", "Ciudad de Panamá", 0, 0),
+  stop("coronado", "Coronado", 85, 200),
+  stop("penonome", "Penonomé", 145, 300),
+  stop("santiago", "Santiago", 250, 300),
+  stop("david", "David", 440, 300),
 ];
 
 test("un trajet à cinq arrêts dessert dix paires de villes", () => {
