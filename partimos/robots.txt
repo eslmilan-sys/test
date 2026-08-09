@@ -1,0 +1,6 @@
+User-Agent: *
+Allow: /
+Disallow: /api/
+
+Host: https://eslmilan-sys.github.io/
+Sitemap: https://eslmilan-sys.github.io/sitemap.xml
