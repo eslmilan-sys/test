@@ -42,6 +42,8 @@ const result = spawnSync("npx", ["next", "build"], {
     ...process.env,
     STATIC_EXPORT: "1",
     NEXT_PUBLIC_STATIC_PREVIEW: "1",
+    // Lu par `asset()` pour préfixer les fichiers de public/.
+    NEXT_PUBLIC_BASE_PATH: process.env.BASE_PATH ?? "",
   },
 });
 
@@ -57,7 +59,10 @@ writeFileSync(join(root, "out/.nojekyll"), "");
 // doit atterrir sur une vraie page 404, pas sur le listing d'Apache.
 const notFound = join(root, "out/404.html");
 if (!existsSync(notFound)) {
-  writeFileSync(notFound, "<!doctype html><meta http-equiv=refresh content='0; url=./'>");
+  writeFileSync(
+    notFound,
+    "<!doctype html><meta http-equiv=refresh content='0; url=./'>",
+  );
 }
 
 console.log("\nExport statique prêt dans out/");

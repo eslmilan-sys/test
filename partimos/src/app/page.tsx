@@ -6,6 +6,7 @@ import { Confianza } from "@/components/home/Confianza";
 import { Rutas } from "@/components/home/Rutas";
 import { DriverCta } from "@/components/home/DriverCta";
 import { Faq, FaqJsonLd } from "@/components/home/Faq";
+import { Historias } from "@/components/home/Historias";
 import { StickyCta } from "@/components/StickyCta";
 import { GENERAL_FAQ } from "@/lib/content";
 import { canonical } from "@/lib/site";
@@ -23,6 +24,13 @@ export default function Home() {
             traverse toutes les sections, chacune marquée d'une parada. */}
         <div className="road">
           <Pasos />
+        </div>
+
+        {/* Le carrousel déborde volontairement du conteneur : il sort donc
+            du ruban, qui lui passait dessus et coupait la première carte. */}
+        <Historias />
+
+        <div className="road">
           <Pago />
           <Conductores />
           <Confianza />

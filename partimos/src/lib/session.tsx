@@ -23,10 +23,15 @@ import { isSupabaseConfigured } from "./supabase";
  */
 
 export type Session = {
-  phone: string;
+  /** Téléphone en E.164 ou adresse e-mail, selon le canal choisi. */
+  contact: string;
   firstName: string;
+  lastName: string;
+  /** Initiale affichée en public — jamais le nom complet (« Ana M. »). */
   lastInitial: string;
   isVerified: boolean;
+  /** Insigne employeur ou université, si l'utilisateur l'a connecté. */
+  affiliation: string | null;
   since: string;
 };
 
@@ -80,21 +85,26 @@ export function useSession() {
     }
   }, [raw]);
 
-  const signIn = useCallback((phone: string, firstName = "Tú") => {
-    const next: Session = {
-      phone,
-      firstName,
-      lastInitial: "",
-      isVerified: false,
-      since: new Date().toISOString(),
-    };
-    try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-    } catch {
-      // Sans stockage, la session ne survit pas au rechargement. Acceptable.
-    }
-    emit();
-  }, []);
+  const signIn = useCallback(
+    (contact: string, firstName = "Tú", lastName = "") => {
+      const next: Session = {
+        contact,
+        firstName,
+        lastName,
+        lastInitial: lastName.charAt(0).toUpperCase(),
+        isVerified: false,
+        affiliation: null,
+        since: new Date().toISOString(),
+      };
+      try {
+        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+      } catch {
+        // Sans stockage, la session ne survit pas au rechargement. Acceptable.
+      }
+      emit();
+    },
+    [],
+  );
 
   const signOut = useCallback(() => {
     try {

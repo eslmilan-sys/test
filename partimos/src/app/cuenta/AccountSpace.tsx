@@ -85,7 +85,7 @@ export function AccountSpace() {
           <h1 className="font-display text-[22px] font-extrabold tracking-[-0.03em]">
             Hola, {session.firstName}
           </h1>
-          <p className="tnum text-[13.5px] text-ink-500">{session.phone}</p>
+          <p className="tnum text-[13.5px] text-ink-500">{session.contact}</p>
         </div>
         <button
           onClick={signOut}
@@ -148,11 +148,20 @@ export function AccountSpace() {
               Mi perfil
             </h2>
             <dl className="grid gap-3">
-              <Field label="Nombre" value={session.firstName} />
               <Field
-                label="Celular"
-                value={session.phone}
-                note="No es público"
+                label="Nombre"
+                value={`${session.firstName} ${session.lastName}`.trim()}
+                note={`En público apareces como ${session.firstName} ${session.lastInitial}.`}
+              />
+              <Field
+                label="Contacto"
+                value={session.contact}
+                note="No es público hasta que tengas una reserva confirmada"
+              />
+              <Field
+                label="Trabajo o universidad"
+                value={session.affiliation ?? "Sin conectar"}
+                note="Da una insignia y un filtro de búsqueda, no privilegios"
               />
               <Field label="Ciudad" value="Sin definir" />
               <Field label="Sobre mí" value="Sin definir" />

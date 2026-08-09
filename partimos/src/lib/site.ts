@@ -12,3 +12,17 @@ export const SITE = {
 export function canonical(path = "/") {
   return new URL(path, SITE.url).toString();
 }
+
+/**
+ * Préfixe des fichiers servis depuis `public/`.
+ *
+ * `basePath` de Next réécrit les liens et les routes, mais PAS les `src` bruts
+ * d'une balise `<img>` ou d'un `<source>`. Sous une Page de projet GitHub, où
+ * le site vit sous /test/partimos, un `/img/foto.jpg` écrit tel quel renvoie
+ * un 404 — et une image absente ne se voit qu'une fois déployée.
+ */
+const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+
+export function asset(path: string) {
+  return `${BASE_PATH}${path}`;
+}

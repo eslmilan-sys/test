@@ -1,11 +1,21 @@
 import Link from "next/link";
-import {
-  Section,
-  Eyebrow,
-  SectionTitle,
-  Lead,
-} from "@/components/site/Section";
+import { Section, Eyebrow, SectionTitle } from "@/components/site/Section";
 import { Icon, type IconName } from "@/components/ui/Icon";
+import { Photo } from "@/components/ui/Photo";
+import { PHOTOS } from "@/lib/photos";
+
+/**
+ * CONFIANCE — grille asymétrique plutôt que quatre cartes identiques.
+ *
+ * Les quatre cartes de même taille, même bordure, même icône grise, se
+ * lisaient comme une liste de fonctionnalités : l'œil n'avait aucune raison
+ * de s'arrêter, et le message le plus important — on ne stocke pas la cédula —
+ * pesait autant que le reste.
+ *
+ * Ici une carte porte la photo et l'argument principal, les trois autres
+ * suivent en plus petit. La hiérarchie visuelle dit enfin quelque chose de
+ * vrai sur l'importance relative des quatre points.
+ */
 
 export const TRUST_ITEMS: { icon: IconName; title: string; body: string }[] = [
   {
@@ -53,19 +63,60 @@ export function TrustCard({
 }
 
 export function Confianza() {
+  const [lead, ...rest] = TRUST_ITEMS;
+
   return (
     <Section id="seguridad" stop stopRing="#F2F7F9" className="bg-ink-50">
       <Eyebrow>Confianza y seguridad</Eyebrow>
       <SectionTitle>Sabes con quién viajas antes de subirte</SectionTitle>
-      <Lead>
-        Cuatro horas de carretera con un desconocido es mucho tiempo. Por eso
-        aquí todo el mundo tiene nombre, cara e historial.
-      </Lead>
 
-      <div className="mt-9 grid gap-3.5 min-[680px]:grid-cols-2 min-[1000px]:grid-cols-4">
-        {TRUST_ITEMS.map((item) => (
-          <TrustCard key={item.title} {...item} />
-        ))}
+      <div className="mt-9 grid gap-3.5 min-[900px]:grid-cols-[1.15fr_1fr]">
+        {/* La carte maîtresse : photo, argument principal, et la seule chose
+            que les gens retiennent vraiment — ce qu'on ne garde PAS. */}
+        <article className="relative flex min-h-[380px] flex-col justify-end overflow-hidden rounded-[24px] bg-ink-900 p-7 text-white">
+          <Photo
+            photo={PHOTOS.carroLleno}
+            sizes="(min-width: 900px) 600px, 100vw"
+            fill
+          />
+          <span
+            aria-hidden
+            className="absolute inset-0 bg-[linear-gradient(180deg,rgb(8_32_42/0.25)_0%,rgb(8_32_42/0.7)_55%,rgb(8_32_42/0.95)_100%)]"
+          />
+          <div className="relative z-[2]">
+            <span className="mb-3 inline-flex items-center gap-2 rounded-full bg-white/12 px-3 py-1.5 text-[11.5px] font-bold tracking-[0.12em] uppercase backdrop-blur-sm">
+              <Icon name={lead.icon} className="size-3.5" />
+              {lead.title}
+            </span>
+            <h3 className="mb-2.5 max-w-[16ch] font-display text-[clamp(24px,3.6vw,32px)] leading-[1.08] font-extrabold tracking-[-0.03em]">
+              Cuatro horas de carretera con un desconocido es mucho tiempo.
+            </h3>
+            <p className="max-w-[42ch] text-[15px] leading-relaxed text-white/85">
+              {lead.body}
+            </p>
+          </div>
+        </article>
+
+        <div className="grid gap-3.5">
+          {rest.map((item) => (
+            <div
+              key={item.title}
+              className="flex items-start gap-4 rounded-[18px] border border-ink-200 bg-white p-5 transition-[border-color] hover:border-accent"
+            >
+              <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-ink-50 text-ink-900">
+                <Icon name={item.icon} className="size-5" />
+              </span>
+              <div className="min-w-0">
+                <h3 className="mb-1 font-display text-[16.5px] font-bold tracking-[-0.015em]">
+                  {item.title}
+                </h3>
+                <p className="text-[14px] leading-relaxed text-ink-500">
+                  {item.body}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
 
       <Link
