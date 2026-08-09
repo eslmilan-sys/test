@@ -165,6 +165,30 @@ serveur : c'est ce qui rend le contenu indexable et garde le JS sous les
 
 ---
 
+## Démonstration cliquable (GitHub Pages)
+
+La branche `gh-pages` contient un export HTML pur des 11 pages, généré par :
+
+```bash
+BASE_PATH=/test NEXT_PUBLIC_SITE_URL=https://eslmilan-sys.github.io/test \
+  npm run build:static
+```
+
+**Pour l'allumer** — une seule fois, dans le dépôt GitHub :
+Settings → Pages → Source : *Deploy from a branch* → branche `gh-pages`,
+dossier `/ (root)` → Save. Le site apparaît sous deux ou trois minutes à
+`https://eslmilan-sys.github.io/test/`.
+
+Pour la mettre à jour ensuite : relancer la commande ci-dessus, puis copier
+le contenu de `out/` à la racine de la branche `gh-pages` et pousser.
+
+C'est une **démonstration**, pas le déploiement de production : sans serveur,
+il n'y a pas de route d'API, donc le formulaire de préinscription annonce
+qu'il s'agit d'un aperçu au lieu d'enregistrer le numéro. Le vrai déploiement
+se fait sur Vercel, où la route fonctionne.
+
+---
+
 ## Ce qui reste — étapes ⛔ HUMAIN
 
 Aucune ne peut être faite depuis le code :
