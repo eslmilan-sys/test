@@ -8,6 +8,7 @@ const COLUMNS = [
     title: "Viajar",
     links: [
       { href: "/#buscar", label: "Buscar un viaje" },
+      { href: "/como-funciona", label: "Cómo se paga un viaje" },
       { href: "/viajes", label: "Todas las rutas" },
       { href: "/seguridad", label: "Seguridad" },
     ],

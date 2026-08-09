@@ -18,6 +18,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const pages: MetadataRoute.Sitemap = [
     { url: canonical("/"), changeFrequency: "daily", priority: 1 },
     { url: canonical("/viajes"), changeFrequency: "daily", priority: 0.9 },
+    {
+      url: canonical("/como-funciona"),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
     { url: canonical("/publicar"), changeFrequency: "weekly", priority: 0.8 },
     { url: canonical("/seguridad"), changeFrequency: "monthly", priority: 0.6 },
     { url: canonical("/ayuda"), changeFrequency: "monthly", priority: 0.6 },

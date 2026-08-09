@@ -74,17 +74,19 @@ export async function POST(request: Request) {
 
   const corridorSlug =
     CORRIDORS.find(
-      (c) => c.origin.slug === originSlug && c.destination.slug === destinationSlug,
+      (c) =>
+        c.origin.slug === originSlug && c.destination.slug === destinationSlug,
     )?.slug ?? null;
 
   const supabase = getServiceSupabase();
   if (!supabase) {
     // Le projet Supabase est une étape ⛔ HUMAIN. Tant qu'il n'existe pas, on
     // le dit franchement plutôt que de promettre une alerte qui ne partira pas.
-    console.warn(
-      "[demanda] Supabase non configuré — signal non enregistré",
-      { originSlug, destinationSlug, requestedDate },
-    );
+    console.warn("[demanda] Supabase non configuré — signal non enregistré", {
+      originSlug,
+      destinationSlug,
+      requestedDate,
+    });
     return NextResponse.json({ error: "storage_unavailable" }, { status: 503 });
   }
 
@@ -130,11 +132,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "storage_error" }, { status: 502 });
   }
 
-  const { error: waitlistError } = await supabase.from("waitlist_signals").insert({
-    demand_signal_id: signal.id,
-    phone,
-    locale: "es",
-  });
+  const { error: waitlistError } = await supabase
+    .from("waitlist_signals")
+    .insert({
+      demand_signal_id: signal.id,
+      phone,
+      locale: "es",
+    });
 
   if (waitlistError) {
     console.error("[demanda] insertion waitlist_signals", waitlistError);

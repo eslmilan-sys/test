@@ -5,6 +5,7 @@ import { Container, Eyebrow } from "@/components/site/Section";
 import { RutaCard } from "@/components/home/Rutas";
 import { FaqList, FaqJsonLd } from "@/components/home/Faq";
 import { AvisameForm } from "@/components/AvisameForm";
+import { PickupPicker } from "@/components/map/PickupPicker";
 import { ButtonLink } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
 import { StickyCta } from "@/components/StickyCta";
@@ -339,20 +340,11 @@ export default async function CorridorPage({ params }: Params) {
                     Los conductores de esta ruta suelen pasar por aquí. Máximo
                     cuatro paradas por viaje, y ninguna en una terminal.
                   </p>
-                  <ul className="grid gap-2.5">
-                    {corridor.pickupPoints.map((point) => (
-                      <li
-                        key={point}
-                        className="flex items-center gap-3 rounded-[15px] border border-ink-200 bg-white px-4.5 py-3.5"
-                      >
-                        <Icon
-                          name="pin"
-                          className="size-5 shrink-0 text-ink-500"
-                        />
-                        <span className="text-[15px] font-medium">{point}</span>
-                      </li>
-                    ))}
-                  </ul>
+                  <PickupPicker
+                    stops={corridor.pickupPoints}
+                    baseKm={corridor.distanceKm}
+                    tollCents={corridor.tollCents}
+                  />
 
                   {corridor.busPriceCents && (
                     <div className="mt-5 flex items-start gap-3.5 rounded-[18px] border border-ink-200 bg-white px-5 py-4.5">

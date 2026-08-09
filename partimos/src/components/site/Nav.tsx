@@ -1,14 +1,15 @@
 import Link from "next/link";
 import { ButtonLink } from "@/components/ui/Button";
 import { Logo } from "./Logo";
+import { MobileMenu } from "./MobileMenu";
+import { AuthDialog } from "./AuthDialog";
+import { PRIMARY_LINKS } from "./navigation";
 
-const LINKS = [
-  { href: "/#como", label: "Cómo funciona" },
-  { href: "/#pago", label: "El pago" },
-  { href: "/publicar", label: "Para conductores" },
-  { href: "/viajes", label: "Rutas" },
-];
-
+/**
+ * Les entrées visibles nomment des DESTINATIONS, pas des sections de la page
+ * d'accueil. « Cómo funciona » qui renvoie à une ancre plus bas ne dit pas
+ * qu'il existe d'autres pages — c'était le fond de la critique.
+ */
 export function Nav() {
   return (
     <header className="sticky top-0 z-50 border-b border-ink-200 bg-white">
@@ -18,8 +19,8 @@ export function Nav() {
       >
         <Logo gradientId="brand-nav" />
 
-        <ul className="ml-2 hidden gap-6 text-[14.5px] font-medium text-ink-500 min-[900px]:flex">
-          {LINKS.map((link) => (
+        <ul className="ml-3 hidden gap-6 text-[14.5px] font-medium text-ink-500 min-[900px]:flex">
+          {PRIMARY_LINKS.map((link) => (
             <li key={link.href}>
               <Link
                 href={link.href}
@@ -32,15 +33,17 @@ export function Nav() {
         </ul>
 
         <div className="ml-auto flex items-center gap-2.5">
-          <Link
-            href="/ayuda"
-            className="hidden py-1.5 text-[14.5px] font-semibold transition-colors hover:text-accent-ink min-[900px]:block"
-          >
-            Ayuda
-          </Link>
+          <AuthDialog
+            trigger={
+              <button className="hidden py-1.5 text-[14.5px] font-semibold transition-colors hover:text-accent-ink min-[900px]:block">
+                Entrar
+              </button>
+            }
+          />
           <ButtonLink href="/#buscar" size="sm">
             Buscar viaje
           </ButtonLink>
+          <MobileMenu />
         </div>
       </nav>
     </header>

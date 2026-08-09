@@ -36,8 +36,7 @@ export function Hero() {
               {/* L'espace explicite avant le retour à la ligne : sans lui, le
                   texte extrait du H1 — celui que lisent les moteurs et les
                   lecteurs d'écran — donne « vapara allá ». */}
-              Alguien ya va{" "}
-              <br />
+              Alguien ya va <br />
               <em className="brand-gradient-text not-italic">para allá.</em>
             </h1>
             <p className="max-w-[42ch] text-[16.5px] leading-relaxed text-ink-300 md:text-[17.5px]">

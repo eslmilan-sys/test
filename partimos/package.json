@@ -11,7 +11,9 @@
     "build:static": "node scripts/build-static.mjs"
   },
   "dependencies": {
+    "@radix-ui/react-dialog": "^1.1.23",
     "@supabase/supabase-js": "^2.112.2",
+    "cmdk": "^1.1.1",
     "next": "16.3.0",
     "react": "19.2.8",
     "react-dom": "19.2.8"

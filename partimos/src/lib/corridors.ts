@@ -19,6 +19,10 @@ export type City = {
   /** Nom court pour les fils d'Ariane et les cartes. */
   shortName: string;
   province: string;
+  /** Coordonnées réelles, reprises de l'amorçage de schema.sql. Elles
+   *  positionnent les villes sur la carte schématique. */
+  lat: number;
+  lng: number;
 };
 
 export type Corridor = {
@@ -44,42 +48,56 @@ export const CITIES = {
     name: "Ciudad de Panamá",
     shortName: "Panamá",
     province: "Panamá",
+    lat: 8.9824,
+    lng: -79.5199,
   },
   chitre: {
     slug: "chitre",
     name: "Chitré",
     shortName: "Chitré",
     province: "Herrera",
+    lat: 7.9614,
+    lng: -80.4297,
   },
   lasTablas: {
     slug: "las-tablas",
     name: "Las Tablas",
     shortName: "Las Tablas",
     province: "Los Santos",
+    lat: 7.7667,
+    lng: -80.2833,
   },
   david: {
     slug: "david",
     name: "David",
     shortName: "David",
     province: "Chiriquí",
+    lat: 8.4333,
+    lng: -82.4333,
   },
   santiago: {
     slug: "santiago",
     name: "Santiago",
     shortName: "Santiago",
     province: "Veraguas",
+    lat: 8.1,
+    lng: -80.9833,
   },
   penonome: {
     slug: "penonome",
     name: "Penonomé",
     shortName: "Penonomé",
     province: "Coclé",
+    lat: 8.5194,
+    lng: -80.3572,
   },
   coronado: {
     slug: "coronado",
     name: "Coronado",
     shortName: "Coronado",
     province: "Panamá Oeste",
+    lat: 8.5333,
+    lng: -79.95,
   },
 } as const satisfies Record<string, City>;
 

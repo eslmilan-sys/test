@@ -5,9 +5,11 @@ import { useRouter } from "next/navigation";
 import { ALL_CITIES, CORRIDORS } from "@/lib/corridors";
 import { Button } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
+import { CityCombobox } from "@/components/ui/CityCombobox";
+import { RouteMap } from "@/components/map/RouteMap";
 import { AvisameForm } from "@/components/AvisameForm";
 
-/** Les six prochains jours, libellés en espagnol du Panama. */
+/** Les huit prochains jours, libellés en espagnol du Panama. */
 function nextDays(count = 8) {
   const out: { value: string; label: string }[] = [];
   const today = new Date();
@@ -45,12 +47,28 @@ export function SearchCard() {
   const [date, setDate] = useState(days[0].value);
   const [seats, setSeats] = useState(1);
   const [noRoute, setNoRoute] = useState(false);
+  const [showMap, setShowMap] = useState(false);
+  // Sur la carte, le premier clic renseigne l'origine, le suivant la
+  // destination. Alterner évite un sélecteur « je choisis quoi » de plus.
+  const [picking, setPicking] = useState<"origin" | "destination">("origin");
 
   const sameCity = from === to;
 
+  function pickOnMap(slug: string) {
+    setNoRoute(false);
+    if (picking === "origin") {
+      setFrom(slug);
+      if (slug === to) setTo("");
+      setPicking("destination");
+    } else {
+      setTo(slug);
+      setPicking("origin");
+    }
+  }
+
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
-    if (sameCity) return;
+    if (sameCity || !from || !to) return;
 
     if (mode === "ofrecer") {
       router.push(`/publicar?desde=${from}&hacia=${to}`);
@@ -106,62 +124,34 @@ export function SearchCard() {
       </div>
 
       <form onSubmit={handleSubmit} noValidate>
-        <div className="flex items-center gap-3 rounded-[14px] px-3.5 py-3 transition-colors hover:bg-ink-50">
-          <span
-            aria-hidden
-            className="size-[19px] shrink-0 rounded-full border-[3px] border-accent"
+        <CityCombobox
+          id="desde"
+          label="Desde"
+          value={from}
+          exclude={to}
+          tone="origin"
+          onChange={(slug) => {
+            setFrom(slug);
+            setNoRoute(false);
+          }}
+        />
+
+        <div className="border-t border-ink-200">
+          <CityCombobox
+            id="hacia"
+            label="Hacia"
+            value={to}
+            exclude={from}
+            tone="destination"
+            onChange={(slug) => {
+              setTo(slug);
+              setNoRoute(false);
+            }}
           />
-          <div className="min-w-0 flex-1">
-            <label htmlFor="desde" className={FIELD_LABEL}>
-              Desde
-            </label>
-            <select
-              id="desde"
-              value={from}
-              onChange={(e) => {
-                setFrom(e.target.value);
-                setNoRoute(false);
-              }}
-              className={FIELD_INPUT}
-            >
-              {ALL_CITIES.map((city) => (
-                <option key={city.slug} value={city.slug}>
-                  {city.name}
-                </option>
-              ))}
-            </select>
-          </div>
         </div>
 
-        <div className="flex items-center gap-3 rounded-[14px] border-t border-ink-200 px-3.5 py-3 transition-colors hover:bg-ink-50">
-          <span
-            aria-hidden
-            className="size-[19px] shrink-0 rounded-[5px] border-[3px] border-brand-green-deep"
-          />
-          <div className="min-w-0 flex-1">
-            <label htmlFor="hacia" className={FIELD_LABEL}>
-              Hacia
-            </label>
-            <select
-              id="hacia"
-              value={to}
-              onChange={(e) => {
-                setTo(e.target.value);
-                setNoRoute(false);
-              }}
-              className={FIELD_INPUT}
-            >
-              {ALL_CITIES.map((city) => (
-                <option key={city.slug} value={city.slug}>
-                  {city.name}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        <div className="flex">
-          <div className="flex flex-1 items-center gap-3 rounded-[14px] border-t border-ink-200 px-3.5 py-3 transition-colors hover:bg-ink-50">
+        <div className="flex border-t border-ink-200">
+          <div className="flex flex-1 items-center gap-3 rounded-[14px] px-3.5 py-3 transition-colors hover:bg-ink-50">
             <Icon
               name="calendar"
               className="size-[19px] shrink-0 text-ink-500"
@@ -185,7 +175,7 @@ export function SearchCard() {
             </div>
           </div>
 
-          <div className="flex max-w-[132px] items-center gap-3 rounded-[14px] border-t border-l border-ink-200 px-3.5 py-3 transition-colors hover:bg-ink-50">
+          <div className="flex max-w-[132px] items-center gap-3 rounded-[14px] border-l border-ink-200 px-3.5 py-3 transition-colors hover:bg-ink-50">
             <div className="min-w-0 flex-1">
               <label htmlFor="puestos" className={FIELD_LABEL}>
                 Puestos
@@ -206,6 +196,27 @@ export function SearchCard() {
           </div>
         </div>
 
+        <button
+          type="button"
+          onClick={() => setShowMap((v) => !v)}
+          aria-expanded={showMap}
+          className="mt-1.5 flex w-full items-center justify-center gap-2 rounded-[12px] py-2.5 text-[13.5px] font-semibold text-accent-ink transition-colors hover:bg-ink-50"
+        >
+          <Icon name="pin" className="size-4" />
+          {showMap ? "Ocultar el mapa" : "Escoger en el mapa"}
+        </button>
+
+        {showMap && (
+          <div className="mt-1 rounded-[16px] border border-ink-200 bg-ink-50/60 p-3">
+            <RouteMap
+              originSlug={from}
+              destinationSlug={to}
+              picking={picking}
+              onPick={pickOnMap}
+            />
+          </div>
+        )}
+
         {sameCity && (
           <p
             role="alert"
@@ -220,7 +231,7 @@ export function SearchCard() {
           size="lg"
           full
           className="mt-2"
-          disabled={sameCity}
+          disabled={sameCity || !from || !to}
         >
           {mode === "buscar" ? "Buscar viaje" : "Publicar mi viaje"}
         </Button>
