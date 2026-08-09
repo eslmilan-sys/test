@@ -1,4 +1,4 @@
-:HL["/_next/static/chunks/1qiiithd7meuz.css","style"]
-:HL["/_next/static/media/017d9bea37084d9b-s.p.41rroleoq1br7.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
-:HL["/_next/static/media/f06bf9da926bae75-s.p.2874ccu1_u7jf.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
-0:{"tree":{"name":"","param":null,"prefetchHints":4112,"slots":{"children":{"name":"viaje","param":null,"prefetchHints":4160,"slots":{"children":{"name":"id","param":{"type":"d","key":"panama-santiago-2026-08-09-3","siblings":[]},"prefetchHints":4192,"slots":{"children":{"name":"__PAGE__","param":null,"prefetchHints":4256,"slots":null}}}}}}},"staleTime":300,"buildId":"CSQvvngz_NCQaACAOjAqQ"}
+:HL["/_next/static/chunks/22os-wyrr21m0.css","style"]
+:HL["/_next/static/media/21ca8f3f56c22ca2-s.p.1cp9-4nby68jc.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
+:HL["/_next/static/media/ee9d8ff0751135e3-s.p.12ukhzf-lem3a.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
+0:{"tree":{"name":"","param":null,"prefetchHints":4112,"slots":{"children":{"name":"viaje","param":null,"prefetchHints":4160,"slots":{"children":{"name":"id","param":{"type":"d","key":"panama-santiago-2026-08-09-3","siblings":[]},"prefetchHints":4192,"slots":{"children":{"name":"__PAGE__","param":null,"prefetchHints":4256,"slots":null}}}}}}},"staleTime":300,"buildId":"HGViPBjXWhF9OpVBBRGW_"}
