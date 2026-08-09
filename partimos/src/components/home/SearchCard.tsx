@@ -125,6 +125,36 @@ export function SearchCard() {
         </div>
       </div>
 
+      <div className="flex items-center justify-between gap-3 px-3 pb-2">
+        <div
+          role="group"
+          aria-label="Cómo escoger las ciudades"
+          className="flex gap-1"
+        >
+          {(
+            [
+              [false, "Escribir", "search"],
+              [true, "Mapa", "pin"],
+            ] as const
+          ).map(([value, label, icon]) => (
+            <button
+              key={label}
+              type="button"
+              aria-pressed={showMap === value}
+              onClick={() => setShowMap(value)}
+              className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[13px] font-semibold transition-colors ${
+                showMap === value
+                  ? "bg-ink-900 text-white"
+                  : "text-ink-500 hover:bg-ink-50"
+              }`}
+            >
+              <Icon name={icon} className="size-3.5" />
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
+
       <form onSubmit={handleSubmit} noValidate>
         <CityCombobox
           id="desde"
@@ -198,18 +228,12 @@ export function SearchCard() {
           </div>
         </div>
 
-        <button
-          type="button"
-          onClick={() => setShowMap((v) => !v)}
-          aria-expanded={showMap}
-          className="mt-1.5 flex w-full items-center justify-center gap-2 rounded-[12px] py-2.5 text-[13.5px] font-semibold text-accent-ink transition-colors hover:bg-ink-50"
-        >
-          <Icon name="pin" className="size-4" />
-          {showMap ? "Ocultar el mapa" : "Escoger en el mapa"}
-        </button>
-
+        {/* La carte n'est pas un extra caché derrière un lien : c'est l'autre
+            façon de renseigner les deux mêmes champs. Elle mérite donc une
+            place égale, et elle montre d'un coup d'œil ce que couvre la
+            plateforme — ce que sept lignes de liste ne diront jamais. */}
         {showMap && (
-          <div className="mt-1 rounded-[16px] border border-ink-200 bg-ink-50/60 p-3">
+          <div className="mt-2 rounded-[18px] border border-ink-200 bg-ink-50/70 p-3">
             <RouteMap
               originSlug={from}
               destinationSlug={to}

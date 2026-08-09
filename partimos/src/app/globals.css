@@ -218,7 +218,10 @@
     .road::after {
       content: "";
       position: absolute;
-      top: -16px;
+      /* Commence exactement où commencent les sections. À -16 px, le ruban
+         remontait dans le hero sombre et s'y lisait comme une barre parasite
+         plutôt que comme une route qui entre dans la page. */
+      top: 0;
       bottom: -16px;
       z-index: 1;
       pointer-events: none;

@@ -14,8 +14,15 @@ import type { ComponentProps, ReactNode } from "react";
 type Variant = "primary" | "secondary" | "onDark";
 type Size = "sm" | "md" | "lg";
 
+/**
+ * `inline-flex` est posé ici, donc passer `hidden` par `className` NE MARCHE
+ * PAS : les deux utilitaires visent `display`, et c'est l'ordre de la feuille
+ * de style qui tranche, pas l'ordre des classes. Pour masquer un bouton selon
+ * la taille d'écran, envelopper l'appel dans un élément qui porte la règle.
+ * `whitespace-nowrap` garantit qu'un libellé ne passe jamais sur deux lignes.
+ */
 const BASE =
-  "inline-flex items-center justify-center gap-2 font-display font-bold tracking-[-0.01em] " +
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap font-display font-bold tracking-[-0.01em] " +
   "rounded-[14px] transition-[transform,background-color,border-color,box-shadow] duration-150 " +
   "active:translate-y-0 disabled:opacity-50 disabled:pointer-events-none select-none";
 
