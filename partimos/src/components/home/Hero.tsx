@@ -19,7 +19,7 @@ const PROOF: { icon: IconName; title: string; detail: string }[] = [
 
 export function Hero() {
   return (
-    <div className="relative overflow-hidden bg-ink-900 text-white">
+    <div className="relative overflow-hidden bg-plate-900 text-white">
       {/* Un seul halo, très dilué. Il y en avait deux, qui se croisaient au
           milieu et rendaient le fond sale au lieu de profond. */}
       <div
@@ -30,20 +30,20 @@ export function Hero() {
       <div className="relative z-[2] mx-auto w-full max-w-[1120px] px-5 pt-10 md:pt-16">
         <div className="grid gap-10 min-[960px]:grid-cols-[1.02fr_0.98fr] min-[960px]:items-start min-[960px]:gap-x-16 min-[960px]:gap-y-8">
           <div className="min-[960px]:col-start-1 min-[960px]:row-start-1">
-            <p className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/6 px-3.5 py-1.5 text-[12.5px] font-medium text-ink-300">
+            <p className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/6 px-3.5 py-1.5 text-[12.5px] font-medium text-plate-300">
               <span
                 aria-hidden
-                className="size-1.5 animate-pulse rounded-full bg-brand-green"
+                className="size-1.5 animate-pulse rounded-full bg-ochre-400"
               />
               34 viajes publicados para este viernes
             </p>
 
             <h1 className="mb-5 text-[clamp(40px,8.6vw,72px)] leading-[0.96] font-extrabold tracking-[-0.048em]">
               Alguien ya va <br />
-              <em className="brand-gradient-text not-italic">para allá.</em>
+              <em className="cote not-italic">para allá.</em>
             </h1>
 
-            <p className="max-w-[40ch] text-[17px] leading-[1.5] text-ink-300 md:text-[19px]">
+            <p className="max-w-[40ch] text-[17px] leading-[1.5] text-plate-300 md:text-[19px]">
               El viernes hay alguien saliendo a tu pueblo con puestos vacíos.
               Solo falta que se enteren.
             </p>
@@ -59,11 +59,14 @@ export function Hero() {
                   index > 1 ? "border-t border-white/10" : "",
                 ].join(" ")}
               >
-                <Icon name={item.icon} className="mb-2.5 size-5 text-ink-400" />
-                <b className="block font-display text-[15.5px] leading-tight font-bold tracking-[-0.02em] md:text-[17px]">
+                <Icon
+                  name={item.icon}
+                  className="mb-2.5 size-5 text-plate-400"
+                />
+                <b className="block text-[15.5px] leading-tight font-bold tracking-[-0.02em] md:text-[17px]">
                   {item.title}
                 </b>
-                <span className="mt-1 block text-[13px] text-ink-400">
+                <span className="mt-1 block text-[13px] text-plate-400">
                   {item.detail}
                 </span>
               </li>

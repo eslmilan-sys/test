@@ -46,20 +46,20 @@ export function TripCard({ match }: { match: TripMatch }) {
   return (
     <Link
       href={`/viaje/${trip.id}?desde=${segment.from.citySlug}&hacia=${segment.to.citySlug}`}
-      className="group block rounded-[18px] border border-ink-200 bg-white p-4 transition-[border-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:border-accent hover:shadow-card sm:p-5"
+      className="group block border border-plate-200 bg-white p-4 transition-[border-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:border-ochre-500 sm:p-5"
     >
       <div className="flex gap-4">
         {/* Échelle de temps */}
         <div className="flex shrink-0 flex-col items-center pt-1">
-          <span className="tnum font-display text-[17px] font-bold">
+          <span className="cote text-[17px] font-bold">
             {formatTime(match.boardingAt)}
           </span>
           <span
             aria-hidden
-            className="my-1 w-0.5 flex-1 rounded-full bg-ink-200"
+            className="my-1 w-0.5 flex-1 rounded-full bg-plate-200"
             style={{ minHeight: 26 }}
           />
-          <span className="tnum font-display text-[17px] font-bold">
+          <span className="cote text-[17px] font-bold">
             {formatTime(match.droppingAt)}
           </span>
         </div>
@@ -67,36 +67,36 @@ export function TripCard({ match }: { match: TripMatch }) {
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
-              <p className="truncate font-display text-[16px] font-bold tracking-[-0.015em]">
+              <p className="truncate text-[16px] font-bold tracking-[-0.015em]">
                 {segment.from.name}
               </p>
-              <p className="tnum mb-1.5 text-[12.5px] text-ink-500">
+              <p className="cote mb-1.5 text-[12.5px] text-plate-600">
                 {formatDuration(durationMin)} de camino
               </p>
-              <p className="truncate font-display text-[16px] font-bold tracking-[-0.015em]">
+              <p className="truncate text-[16px] font-bold tracking-[-0.015em]">
                 {segment.to.name}
               </p>
             </div>
 
             <div className="shrink-0 text-right">
-              <p className="tnum font-display text-[22px] font-extrabold tracking-[-0.03em]">
+              <p className="cote text-[22px] font-extrabold tracking-[-0.03em]">
                 {formatUsd(match.priceCents)}
               </p>
-              <p className="text-[11.5px] text-ink-500">por puesto</p>
+              <p className="text-[11.5px] text-plate-600">por puesto</p>
             </div>
           </div>
 
           {context && (
-            <p className="mt-2.5 flex items-center gap-1.5 text-[12.5px] text-ink-500">
+            <p className="mt-2.5 flex items-center gap-1.5 text-[12.5px] text-plate-600">
               <Icon name="arrowRight" className="size-3.5 shrink-0" />
               Este viaje {context}
             </p>
           )}
 
-          <div className="mt-3.5 flex flex-wrap items-center gap-x-3 gap-y-2 border-t border-ink-200 pt-3.5">
+          <div className="mt-3.5 flex flex-wrap items-center gap-x-3 gap-y-2 border-t border-plate-200 pt-3.5">
             <span
               aria-hidden
-              className="brand-gradient flex size-8 shrink-0 items-center justify-center rounded-full font-display text-[13px] font-bold text-white"
+              className="bg-plate-800 flex size-8 shrink-0 items-center justify-center rounded-full text-[13px] font-bold text-white"
             >
               {trip.driver.initial}
             </span>
@@ -104,7 +104,7 @@ export function TripCard({ match }: { match: TripMatch }) {
               <span className="block truncate text-[14.5px] font-semibold">
                 {trip.driver.firstName} {trip.driver.lastInitial}.
               </span>
-              <span className="tnum flex items-center gap-1 text-[12.5px] text-ink-500">
+              <span className="cote flex items-center gap-1 text-[12.5px] text-plate-600">
                 <Icon name="star" className="size-3.5" />
                 {trip.driver.rating.toFixed(1)} · {trip.driver.ridesCount}{" "}
                 viajes
@@ -137,16 +137,19 @@ function Chip({
   children: React.ReactNode;
   tone?: "plain" | "brand" | "urgent";
 }) {
+  // Des étiquettes CERNÉES, pas des pastilles pleines : c'est la convention
+  // d'une planche, et ça règle au passage le contraste — l'ocre foncé sur son
+  // propre fond pâle tombait à 3,8:1, sous le seuil AA.
   const styles = {
-    plain: "bg-ink-50 text-ink-600",
-    brand: "bg-accent-soft text-accent-ink",
+    plain: "border-plate-300 text-plate-600",
+    brand: "border-ochre-500 text-ochre-700",
     // Le seul état qui mérite d'être signalé par une couleur : il change
     // la décision (réserver maintenant ou pas).
-    urgent: "bg-danger-soft text-danger",
+    urgent: "border-danger text-danger",
   } as const;
   return (
     <span
-      className={`rounded-full px-2.5 py-1 text-[11.5px] font-semibold whitespace-nowrap ${styles[tone]}`}
+      className={`border px-2 py-0.5 text-[11.5px] font-semibold whitespace-nowrap ${styles[tone]}`}
     >
       {children}
     </span>

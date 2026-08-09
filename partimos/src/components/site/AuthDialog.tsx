@@ -124,14 +124,14 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
     <Dialog.Root onOpenChange={(open) => !open && reset()}>
       <Dialog.Trigger asChild>{trigger}</Dialog.Trigger>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-[110] bg-ink-950/55 motion-safe:animate-[fade-in_0.18s_ease-out]" />
-        <Dialog.Content className="fixed top-1/2 left-1/2 z-[120] max-h-[92vh] w-[calc(100vw-28px)] max-w-[440px] -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-[26px] bg-white p-6 shadow-float motion-safe:animate-[sheet-in_0.22s_cubic-bezier(0.2,0.9,0.3,1)]">
+        <Dialog.Overlay className="fixed inset-0 z-[110] bg-plate-950/55 motion-safe:animate-[fade-in_0.18s_ease-out]" />
+        <Dialog.Content className="fixed top-1/2 left-1/2 z-[120] max-h-[92vh] w-[calc(100vw-28px)] max-w-[440px] -translate-x-1/2 -translate-y-1/2 overflow-y-auto bg-white p-6 shadow-float motion-safe:animate-[sheet-in_0.22s_cubic-bezier(0.2,0.9,0.3,1)]">
           <div className="mb-5 flex items-start justify-between gap-4">
             <div>
-              <Dialog.Title className="font-display text-[24px] font-extrabold tracking-[-0.035em]">
+              <Dialog.Title className="text-[24px] font-extrabold tracking-[-0.035em]">
                 {step === "code" ? "Escribe tu código" : "Entrar a Partimos"}
               </Dialog.Title>
-              <Dialog.Description className="mt-1 text-[14.5px] leading-relaxed text-ink-500">
+              <Dialog.Description className="mt-1 text-[14.5px] leading-relaxed text-plate-600">
                 {step === "code"
                   ? `Te mandamos un código de seis dígitos a ${contact}.`
                   : "Sin contraseña. Te mandamos un código y listo."}
@@ -139,7 +139,7 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
             </div>
             <Dialog.Close
               aria-label="Cerrar"
-              className="-mt-1 -mr-1 flex size-9 shrink-0 items-center justify-center rounded-full text-ink-500 transition-colors hover:bg-ink-50 hover:text-ink-900"
+              className="-mt-1 -mr-1 flex size-9 shrink-0 items-center justify-center rounded-full text-plate-600 transition-colors hover:bg-plate-50 hover:text-plate-900"
             >
               <Icon name="cross" className="size-4.5" />
             </Dialog.Close>
@@ -147,9 +147,9 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
 
           {step === "done" ? (
             <>
-              <div className="rounded-[16px] bg-ink-50 px-5 py-4">
-                <p className="text-[14.5px] leading-relaxed text-ink-500">
-                  <b className="font-semibold text-ink-900">
+              <div className="bg-plate-50 px-5 py-4">
+                <p className="text-[14.5px] leading-relaxed text-plate-600">
+                  <b className="font-semibold text-plate-900">
                     Modo demostración.
                   </b>{" "}
                   Todavía no sale ningún código. Al continuar abrimos una sesión
@@ -166,7 +166,7 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
                       lastName.trim(),
                     )
                   }
-                  className="mt-4 w-full rounded-[14px] bg-ink-900 px-5 py-3.5 font-display text-[16px] font-bold text-white transition-colors hover:bg-ink-800"
+                  className="mt-4 w-full bg-plate-900 px-5 py-3.5 text-[16px] font-bold text-white transition-colors hover:bg-plate-800"
                 >
                   Continuar como {firstName.trim() || "invitado"}
                 </button>
@@ -199,7 +199,7 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
               <div
                 role="group"
                 aria-label="Cómo te mandamos el código"
-                className="mt-1 flex rounded-xl bg-ink-50 p-0.5"
+                className="mt-1 flex bg-plate-50 p-0.5"
               >
                 {(
                   [
@@ -215,11 +215,7 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
                       setChannel(value);
                       setError("");
                     }}
-                    className={`flex-1 rounded-[9px] px-3 py-2 text-[14px] font-semibold transition-colors ${
-                      channel === value
-                        ? "bg-white text-ink-900 shadow-[0_1px_4px_rgb(14_42_53/0.12)]"
-                        : "text-ink-500 hover:text-ink-900"
-                    }`}
+                    className={`flex-1 px-3 py-2 text-[14px] font-semibold transition-colors ${channel === value ? "bg-white text-plate-900 shadow-[0_1px_4px_rgb(14_42_53/0.12)]" : "text-plate-600 hover:text-plate-900"}`}
                   >
                     {label}
                   </button>
@@ -229,8 +225,8 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
               {channel === "phone" ? (
                 <label htmlFor={`${id}-phone`} className="block">
                   <span className="sr-only">Tu celular</span>
-                  <span className="flex items-center gap-2.5 rounded-[14px] border border-ink-200 px-3.5 py-3 focus-within:border-accent">
-                    <span className="tnum shrink-0 text-[16px] font-semibold text-ink-500">
+                  <span className="flex items-center gap-2.5 border border-plate-200 px-3.5 py-3 focus-within:border-ochre-500">
+                    <span className="cote shrink-0 text-[16px] font-semibold text-plate-600">
                       +507
                     </span>
                     <input
@@ -241,7 +237,7 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
                       placeholder="6123-4567"
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
-                      className="tnum w-full border-none bg-transparent text-[16px] font-semibold focus:outline-none"
+                      className="cote w-full border-none bg-transparent text-[16px] font-semibold focus:outline-none"
                     />
                   </span>
                 </label>
@@ -262,18 +258,18 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
                 {busy ? "Mandando…" : "Mandarme el código"}
               </Button>
 
-              <p className="text-center text-[12px] leading-relaxed text-ink-500">
+              <p className="text-center text-[12px] leading-relaxed text-plate-600">
                 Al continuar aceptas los{" "}
                 <a
                   href="/terminos"
-                  className="font-semibold text-accent-ink hover:underline"
+                  className="font-semibold text-ochre-600 hover:underline"
                 >
                   términos de uso
                 </a>{" "}
                 y el{" "}
                 <a
                   href="/privacidad"
-                  className="font-semibold text-accent-ink hover:underline"
+                  className="font-semibold text-ochre-600 hover:underline"
                 >
                   aviso de privacidad
                 </a>
@@ -294,7 +290,7 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
                 placeholder="······"
                 value={code}
                 onChange={(e) => setCode(e.target.value)}
-                className="tnum rounded-[14px] border border-ink-200 px-3.5 py-3 text-center text-[24px] font-bold tracking-[0.4em] focus:border-accent focus:outline-none"
+                className="cote border border-plate-200 px-3.5 py-3 text-center text-[24px] font-bold tracking-[0.4em] focus:border-ochre-500 focus:outline-none"
               />
               <Button type="submit" size="lg" full disabled={busy}>
                 {busy ? "Verificando…" : "Entrar"}
@@ -302,7 +298,7 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
               <button
                 type="button"
                 onClick={() => setStep("identity")}
-                className="text-[13.5px] font-semibold text-accent-ink hover:underline"
+                className="text-[13.5px] font-semibold text-ochre-600 hover:underline"
               >
                 Cambiar mis datos
               </button>
@@ -319,11 +315,11 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
           )}
 
           {step === "identity" && (
-            <div className="mt-5 border-t border-ink-200 pt-4">
-              <p className="mb-2 text-[13px] font-semibold text-ink-900">
+            <div className="mt-5 border-t border-plate-200 pt-4">
+              <p className="mb-2 text-[13px] font-semibold text-plate-900">
                 Después, si quieres
               </p>
-              <ul className="grid gap-2 text-[13px] leading-relaxed text-ink-500">
+              <ul className="grid gap-2 text-[13px] leading-relaxed text-plate-600">
                 <li className="flex items-start gap-2.5">
                   <Icon name="id" className="mt-0.5 size-4 shrink-0" />
                   Verificar tu cédula — hace falta para reservar y publicar
@@ -369,7 +365,7 @@ function Field({
         className={
           hideLabel
             ? "sr-only"
-            : "mb-1 block text-[11.5px] font-bold tracking-[0.11em] text-ink-500 uppercase"
+            : "mb-1 block text-[11.5px] font-bold tracking-[0.11em] text-plate-600 uppercase"
         }
       >
         {label}
@@ -382,7 +378,7 @@ function Field({
         autoComplete={autoComplete}
         placeholder={placeholder}
         autoFocus={autoFocus}
-        className="w-full rounded-[14px] border border-ink-200 px-3.5 py-3 text-[16px] font-semibold focus:border-accent focus:outline-none"
+        className="w-full border border-plate-200 px-3.5 py-3 text-[16px] font-semibold focus:border-ochre-500 focus:outline-none"
       />
     </label>
   );

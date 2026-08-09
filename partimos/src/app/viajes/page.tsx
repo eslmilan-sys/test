@@ -19,12 +19,12 @@ export default function RutasPage() {
   return (
     <>
       <main id="contenido">
-        <div className="bg-ink-900 pt-10 pb-11 text-white">
+        <div className="bg-plate-900 pt-10 pb-11 text-white">
           <Container>
             <h1 className="mb-4 max-w-[16ch] text-[clamp(32px,6.4vw,50px)] leading-[1.03] font-extrabold tracking-[-0.04em]">
               Las rutas que se mueven
             </h1>
-            <p className="max-w-[54ch] text-[16.5px] leading-relaxed text-ink-300">
+            <p className="max-w-[54ch] text-[16.5px] leading-relaxed text-plate-300">
               Cada ruta tiene su página con los puntos de recogida habituales,
               el tope de aporte y quién sale en los próximos días.
             </p>
@@ -33,27 +33,25 @@ export default function RutasPage() {
 
         <div className="py-12 md:py-16">
           <Container>
-            <h2 className="mb-4 font-display text-xl font-bold">
-              Las más frecuentes
-            </h2>
+            <h2 className="mb-4 text-xl font-bold">Las más frecuentes</h2>
             <div className="mb-11 grid gap-2.5 min-[640px]:grid-cols-2 min-[980px]:grid-cols-3">
               {priority.map((corridor) => (
                 <RutaCard key={corridor.slug} slug={corridor.slug} />
               ))}
             </div>
 
-            <h2 className="mb-4 font-display text-xl font-bold">Otras rutas</h2>
+            <h2 className="mb-4 text-xl font-bold">Otras rutas</h2>
             <div className="grid gap-2.5 min-[640px]:grid-cols-2 min-[980px]:grid-cols-3">
               {rest.map((corridor) => (
                 <RutaCard key={corridor.slug} slug={corridor.slug} />
               ))}
             </div>
 
-            <div className="mt-11 rounded-[24px] bg-ink-50 px-7 py-9">
+            <div className="mt-11 bg-plate-50 px-7 py-9">
               <h2 className="mb-3 max-w-[24ch] text-[clamp(22px,3.4vw,30px)] font-extrabold">
                 ¿No está tu ruta?
               </h2>
-              <p className="mb-6 max-w-[52ch] text-[15.5px] leading-relaxed text-ink-500">
+              <p className="mb-6 max-w-[52ch] text-[15.5px] leading-relaxed text-plate-600">
                 Busca tu origen y tu destino en el buscador: si todavía no hay
                 nadie, guardamos la búsqueda y le avisamos a los conductores de
                 esa zona. Así es como se abre un corredor nuevo.

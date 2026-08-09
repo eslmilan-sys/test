@@ -106,12 +106,12 @@ export default function ComoFuncionaPage() {
   return (
     <>
       <main id="contenido">
-        <div className="bg-ink-900 pt-10 pb-11 text-white">
+        <div className="bg-plate-900 pt-10 pb-11 text-white">
           <Container>
             <h1 className="mb-4 max-w-[18ch] text-[clamp(32px,6.4vw,50px)] leading-[1.03] font-extrabold tracking-[-0.04em]">
               Pagas una sola vez, y no es en la app
             </h1>
-            <p className="max-w-[56ch] text-[16.5px] leading-relaxed text-ink-300">
+            <p className="max-w-[56ch] text-[16.5px] leading-relaxed text-plate-300">
               Buscar es gratis. Reservar es gratis. El dinero cambia de manos
               una vez, el día del viaje, entre tú y el conductor. Aquí está todo
               el recorrido.
@@ -124,7 +124,7 @@ export default function ComoFuncionaPage() {
             <ol className="relative">
               <span
                 aria-hidden
-                className="absolute top-6 bottom-6 left-[19px] w-0.5 rounded-full bg-ink-200 md:left-[23px]"
+                className="absolute top-6 bottom-6 left-[19px] w-0.5 rounded-full bg-plate-200 md:left-[23px]"
               />
               {STEPS.map((step, index) => {
                 const paying = step.money.startsWith("Aquí");
@@ -135,34 +135,26 @@ export default function ComoFuncionaPage() {
                   >
                     <span
                       aria-hidden
-                      className={`relative z-[1] flex size-10 shrink-0 items-center justify-center rounded-full border-4 border-white md:size-12 ${
-                        paying
-                          ? "bg-ink-900 text-white"
-                          : "bg-ink-50 text-ink-900"
-                      }`}
+                      className={`relative z-[1] flex size-10 shrink-0 items-center justify-center rounded-full border-4 border-white md:size-12 ${paying ? "bg-plate-900 text-white" : "bg-plate-50 text-plate-900"}`}
                     >
                       <Icon name={step.icon} className="size-5" />
                     </span>
 
                     <div className="min-w-0 flex-1 pt-1">
                       <p className="mb-1 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[11.5px] font-bold tracking-[0.13em] uppercase">
-                        <span className="text-ink-500">
+                        <span className="text-plate-600">
                           {index + 1} · {step.when}
                         </span>
                         <span
-                          className={`rounded-full px-2.5 py-1 ${
-                            paying
-                              ? "bg-ink-900 text-white"
-                              : "bg-ink-50 text-ink-500"
-                          }`}
+                          className={`rounded-full px-2.5 py-1 ${paying ? "bg-plate-900 text-white" : "bg-plate-50 text-plate-600"}`}
                         >
                           {step.money}
                         </span>
                       </p>
-                      <h2 className="mb-1.5 font-display text-[20px] font-bold tracking-[-0.02em]">
+                      <h2 className="mb-1.5 text-[20px] font-bold tracking-[-0.02em]">
                         {step.title}
                       </h2>
-                      <p className="max-w-[58ch] text-[15.5px] leading-relaxed text-ink-500">
+                      <p className="max-w-[58ch] text-[15.5px] leading-relaxed text-plate-600">
                         {step.body}
                       </p>
                     </div>
@@ -173,7 +165,7 @@ export default function ComoFuncionaPage() {
           </Container>
         </section>
 
-        <section className="bg-ink-50 py-12 md:py-16">
+        <section className="bg-plate-50 py-12 md:py-16">
           <Container>
             <div className="grid gap-8 min-[900px]:grid-cols-2 min-[900px]:gap-12">
               <div>
@@ -189,7 +181,7 @@ export default function ComoFuncionaPage() {
                   ].map((item) => (
                     <li
                       key={item}
-                      className="flex items-center gap-3 rounded-[14px] border border-ink-200 bg-white px-4 py-3"
+                      className="flex items-center gap-3 border border-plate-200 bg-white px-4 py-3"
                     >
                       <Icon
                         name="cross"
@@ -199,7 +191,7 @@ export default function ComoFuncionaPage() {
                     </li>
                   ))}
                 </ul>
-                <p className="mt-4 max-w-[46ch] text-[13.5px] leading-relaxed text-ink-500">
+                <p className="mt-4 max-w-[46ch] text-[13.5px] leading-relaxed text-plate-600">
                   Si alguna página te pide una tarjeta a nombre de Partimos, no
                   es nuestra. No tenemos ni pasarela de pago ni datos bancarios
                   que guardar.
@@ -210,12 +202,12 @@ export default function ComoFuncionaPage() {
                 <h2 className="mb-4 max-w-[20ch] text-[clamp(24px,4vw,34px)] font-extrabold">
                   Cuánto se aporta, y por qué ese monto
                 </h2>
-                <div className="max-w-[50ch] space-y-4 text-[15.5px] leading-relaxed text-ink-500">
+                <div className="max-w-[50ch] space-y-4 text-[15.5px] leading-relaxed text-plate-600">
                   <p>
                     El costo real del recorrido — gasolina, peajes y desgaste,
                     más un margen del 10 % por los desvíos de recogida — se
                     divide entre todos los ocupantes del carro,{" "}
-                    <b className="font-semibold text-ink-900">
+                    <b className="font-semibold text-plate-900">
                       incluido el conductor
                     </b>
                     .

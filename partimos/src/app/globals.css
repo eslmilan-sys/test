@@ -1,85 +1,129 @@
 @import "tailwindcss";
 
 /* =====================================================================
-   PARTIMOS — SYSTÈME DE DESIGN
+   PARTIMOS — « LA LÁMINA »
    ---------------------------------------------------------------------
-   Discipline chromatique (volontairement plus stricte que la maquette) :
+   Le monde visuel est la planche d'ingénierie du Canal de Panamá. Pas le
+   cliché du bleu de calque, pas le vélin beige : les matières SATURÉES de
+   ce monde-là — le vert-limon profond du lac Gatún, l'ocre-rouge de la
+   terre excavée de la Culebra.
 
-   1. UNE rampe neutre froide dérivée de l'asphalte porte ~90 % de l'UI.
-   2. UN seul accent : le bleu. Liens, focus, états actifs, illustrations.
-      Deux jetons : --accent (surfaces / fonds sombres, contraste 5.7:1 sur
-      l'asphalte) et --accent-ink (texte sur blanc, contraste 5.6:1).
-   3. Le VERT n'est plus une couleur d'information : il ne veut pas dire
-      « validé », il veut dire « Partimos ». Réservé à la marque —
-      logo, points d'arrêt du ruban, dégradé. Jamais un libellé, jamais
-      un état, jamais une icône fonctionnelle.
-   4. Le CORAIL est réservé aux erreurs et aux avertissements. Nulle part
-      ailleurs.
-   5. Le DÉGRADÉ apparaît trois fois au maximum par page : la marque,
-      le chiffre du calculateur, l'avatar. Jamais en fond, jamais sur du
-      texte long, jamais sur un bouton (l'action principale est de l'encre,
-      pas de la couleur — c'est plus lisible et moins bruyant).
+   Ce que ce monde apporte au produit, et pourquoi il a été choisi :
+   une planche d'ingénieur existe pour rendre une QUANTITÉ VÉRIFIABLE. Sa
+   grammaire entière — stations, lignes de cote, cartouche, légende — sert
+   à prouver un nombre. C'est exactement le mécanisme de Partimos : le
+   plafond n'est pas une promesse, c'est une mesure.
+
+   Les quatre règles du système :
+
+   1. DEUX REGISTRES, une seule grammaire.
+      `.plate` = la planche de présentation, fond vert profond : les
+      surfaces qui convainquent (accueil, corridors).
+      Défaut = le tirage de travail, fond clair : les surfaces qui font
+      travailler (recherche, trajet, publication). L'expression ne doit
+      jamais gêner la tâche.
+
+   2. PAS DE RAYON. Une planche a des angles vifs et des filets. Les
+      cartes arrondies de la version précédente étaient le gabarit de la
+      catégorie ; elles disparaissent. Seul le pin du logo reste rond,
+      c'est un engagement de marque.
+
+   3. PAS D'OMBRE POUR SIMULER LA PROFONDEUR. La hiérarchie se fait au
+      filet et au fond teinté, comme sur une planche. Une seule ombre
+      subsiste, pour ce qui flotte réellement au-dessus de la page.
+
+   4. L'OCRE EST UNE CLÉ, PAS UNE DÉCORATION. Il ne marque que deux
+      choses : l'action principale, et la quantité mesurée dont on parle.
+      Partout ailleurs, du vert de planche.
+
+   Contrastes vérifiés au calcul, pas à l'œil (rapports sur le fond de
+   chaque registre) : texte principal 12,3:1 sur planche et 13,7:1 sur
+   tirage ; texte secondaire 7,0:1 et 6,3:1 ; clé ocre 5,0:1 et 5,3:1.
+   `plate-500` ne passe qu'en grand : il est réservé aux filets et aux
+   grands chiffres, jamais au texte courant.
    ===================================================================== */
 
 @theme {
-  /* ---- Rampe neutre (asphalte désaturé) ---- */
-  --color-ink-950: #08202a;
-  --color-ink-900: #0e2a35; /* asfalto — fonds sombres, texte principal */
-  --color-ink-800: #17414f;
-  --color-ink-700: #2b5566;
-  --color-ink-600: #3c6070;
-  --color-ink-500: #4f6c78; /* texte secondaire — 5.7:1 sur blanc */
-  --color-ink-400: #7f9aa6; /* texte secondaire sur fond sombre */
-  --color-ink-300: #a8bcc5;
-  --color-ink-200: #dce9ee; /* bordures */
-  --color-ink-100: #e9f1f4;
-  --color-ink-50: #f2f7f9; /* niebla — fonds clairs */
+  /* ---- Le vert du Gatún : porte 30 à 60 % de la surface ---- */
+  --color-plate-950: #041916;
+  --color-plate-900: #0a2b25; /* fond de la planche de présentation */
+  --color-plate-800: #103a32;
+  --color-plate-700: #174d42;
+  --color-plate-600: #1f6455; /* texte secondaire sur tirage — 6,3:1 */
+  --color-plate-500: #2d8271; /* filets et grands chiffres UNIQUEMENT */
+  --color-plate-400: #6a9c90; /* lignes de cote sur planche — 4,9:1 */
+  --color-plate-300: #94b8ae; /* texte secondaire sur planche — 7,0:1 */
+  --color-plate-200: #b9d2ca;
+  --color-plate-100: #dcebe6; /* texte principal sur planche — 12,3:1 */
+  --color-plate-50: #eef5f2; /* fond du tirage de travail */
 
-  /* ---- Accent unique ---- */
-  --color-accent: #20a8f8; /* fonds sombres, remplissages, focus */
-  --color-accent-ink: #0a6dab; /* texte et icônes sur blanc — 5.6:1 */
-  --color-accent-soft: #e3f3fe;
+  /* ---- L'ocre de la Culebra : la clé ---- */
+  --color-ochre-700: #8a3a12;
+  --color-ochre-600: #a8480f; /* clé sur tirage clair — 5,3:1 */
+  --color-ochre-500: #c85a1c;
+  --color-ochre-400: #e5762e; /* clé sur planche sombre — 5,0:1 */
+  --color-ochre-300: #f09a5e;
+  --color-ochre-200: #f7c7a3;
 
-  /* ---- Marque (jamais informatif) ---- */
-  --color-brand-green: #a0d838;
-  --color-brand-green-deep: #6fa82b;
+  /* ---- Le jaune des portes d'écluse : avertissement seul ---- */
+  --color-signal: #f2b705;
+  --color-signal-deep: #8a6300;
 
-  /* ---- Erreur uniquement ----
-     Assombri par rapport au corail de la maquette : à #d64a3d, le texte
-     tombait à 3,7:1 sur le fond corail pâle et à 4,3:1 sur blanc, sous le
-     seuil AA. Ici : 5,8:1 sur le fond pâle, 6,6:1 sur blanc. */
-  --color-danger: #a5372c;
-  --color-danger-soft: #fdecea;
+  /* ---- Rouge d'oxyde : l'erreur, et rien d'autre ----
+     Tenu à distance de l'ocre pour qu'un refus ne se confonde jamais avec une
+     clé. 6,9:1 sur le tirage clair, 5,4:1 sur son propre fond pâle. */
+  --color-danger: #9a1f16;
+  --color-danger-soft: #fbe9e6;
 
-  /* ---- Typographie ---- */
-  --font-display: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif;
-  --font-sans: var(--font-instrument), ui-sans-serif, system-ui, sans-serif;
+  /* ---- Typographie ----
+     Archivo porte un axe de largeur 62–125. C'est le lettrage de planche :
+     une seule famille, dilatée pour les titres et les cartouches, normale
+     pour le texte. C'est la discipline du dessin technique — un seul
+     alphabet, décliné en largeur et en corps, jamais en fantaisie.
 
-  /* ---- Rayons : 13–15 px, le logo est rond ---- */
-  --radius-lg: 14px;
-  --radius-xl: 18px;
-  --radius-2xl: 24px;
+     Martian Mono ne sert QUE là où il y a une mesure : kilomètres, cotes,
+     montants, stations, heures. Le mono n'est pas ici un costume
+     « technique » : c'est la fonte des quantités, et rien d'autre n'y
+     touche. */
+  --font-plate: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+  --font-cote: var(--font-martian), ui-monospace, monospace;
 
-  /* ---- Ombres douces, jamais dures ---- */
-  --shadow-card: 0 1px 2px rgb(14 42 53 / 0.04), 0 8px 24px -12px rgb(14 42 53 / 0.18);
-  --shadow-lift: 0 2px 4px rgb(14 42 53 / 0.05), 0 18px 40px -18px rgb(14 42 53 / 0.28);
-  --shadow-float: 0 24px 60px -24px rgb(8 32 42 / 0.55);
+  /* ---- Angles vifs ---- */
+  --radius-lg: 0px;
+  --radius-xl: 0px;
+  --radius-2xl: 2px;
 
-  /* ---- Tracé de la route sélectionnée sur la carte ---- */
-  @keyframes draw {
+  /* ---- Une seule ombre : ce qui flotte vraiment ---- */
+  --shadow-float: 0 18px 48px -20px rgb(4 25 22 / 0.55);
+
+  /* ---- Le geste : la ligne de cote qui se résout ----
+     Les lignes d'attache tombent, les flèches se rejoignent, le chiffre se
+     pose. Sortie exponentielle, depuis un état déjà visible : si
+     l'animation ne joue pas, la cote est simplement là. */
+  @keyframes cote-in {
     from {
-      stroke-dashoffset: 1000;
+      clip-path: inset(0 50% 0 50%);
     }
     to {
-      stroke-dashoffset: 0;
+      clip-path: inset(0 0 0 0);
     }
   }
 
-  /* ---- Entrée des panneaux (menu, connexion) ---- */
+  @keyframes cote-figure {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
   @keyframes sheet-in {
     from {
       opacity: 0;
-      transform: translateY(12px) scale(0.98);
+      transform: translateY(10px);
     }
     to {
       opacity: 1;
@@ -105,7 +149,6 @@
     }
   }
 
-  /* ---- Défilement du bandeau « publicados hoy » ---- */
   @keyframes strip {
     from {
       transform: translateX(0);
@@ -118,17 +161,10 @@
 
 @layer base {
   :root {
-    --gradient-brand: linear-gradient(118deg, #20a8f8 0%, #a0d838 100%);
-    --rail-gutter: 0px;
     color-scheme: light;
-  }
-
-  /* Le décalage du contenu et l'apparition du ruban partagent le même seuil :
-     un contenu décalé sans ruban donnerait une marge gauche inexpliquée. */
-  @media (min-width: 1160px) {
-    :root {
-      --rail-gutter: 60px;
-    }
+    /* Le pas de la trame : toute la mise en page en est un multiple. Sur
+       une planche, rien ne flotte entre deux graduations. */
+    --grid-step: 8px;
   }
 
   * {
@@ -137,16 +173,15 @@
 
   html {
     scroll-behavior: smooth;
-    /* la nav collante ne doit pas recouvrir la cible d'une ancre */
-    scroll-padding-top: 84px;
+    scroll-padding-top: 88px;
   }
 
   body {
-    background: #fff;
-    color: var(--color-ink-900);
-    font-family: var(--font-sans);
+    background: var(--color-plate-50);
+    color: var(--color-plate-950);
+    font-family: var(--font-plate);
     font-size: 16.5px;
-    line-height: 1.55;
+    line-height: 1.5;
     -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
   }
@@ -155,8 +190,13 @@
   h2,
   h3,
   h4 {
-    font-family: var(--font-display);
-    letter-spacing: -0.03em;
+    font-family: var(--font-plate);
+    /* Le lettrage de planche est DILATÉ, pas resserré. C'est le contraire
+       du réflexe typographique habituel des interfaces, et c'est ce qui
+       rend l'ensemble reconnaissable au premier coup d'œil. */
+    font-stretch: 112%;
+    font-weight: 700;
+    letter-spacing: -0.005em;
     text-wrap: balance;
   }
 
@@ -164,24 +204,75 @@
     text-wrap: pretty;
   }
 
-  /* Tous les montants et distances s'alignent verticalement. */
-  .tnum {
+  /* Toute quantité mesurée. Le chiffre tabulaire n'est pas une option
+     esthétique : sans lui, deux montants ne se comparent pas d'une ligne
+     à l'autre. */
+  .cote {
+    font-family: var(--font-cote);
     font-variant-numeric: tabular-nums;
     font-feature-settings: "tnum";
+    letter-spacing: -0.03em;
+  }
+
+  /* ---- Les surfaces que le navigateur dessine à notre place ----
+     Sélection, curseur de saisie, barre de défilement, anneau de focus,
+     décalage de soulignement. Laissées par défaut, elles appartiennent au
+     système d'exploitation et à aucun système de design. */
+
+  ::selection {
+    background: var(--color-ochre-400);
+    color: var(--color-plate-950);
   }
 
   :focus-visible {
-    outline: 3px solid var(--color-accent);
-    outline-offset: 3px;
-    border-radius: 6px;
+    outline: 2px solid var(--color-ochre-600);
+    outline-offset: 2px;
   }
 
-  ::selection {
-    background: var(--color-accent-soft);
-    color: var(--color-ink-900);
+  .plate :focus-visible {
+    outline-color: var(--color-ochre-400);
   }
 
-  /* Champs de formulaire : la remise à zéro évite les styles OS incohérents. */
+  a {
+    text-underline-offset: 0.22em;
+    text-decoration-thickness: from-font;
+  }
+
+  input,
+  select,
+  textarea {
+    caret-color: var(--color-ochre-600);
+  }
+
+  .plate input,
+  .plate select,
+  .plate textarea {
+    caret-color: var(--color-ochre-400);
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-plate-300) transparent;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-plate-300);
+    border: 3px solid var(--color-plate-50);
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-plate-500);
+  }
+
   input,
   select,
   textarea,
@@ -192,95 +283,80 @@
 }
 
 @layer components {
-  /* ---- Marque : le seul endroit où le dégradé porte du texte ---- */
-  .brand-gradient-text {
-    background: var(--gradient-brand);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
+  /* ---- Le registre « planche de présentation » ---- */
+  .plate {
+    background: var(--color-plate-900);
+    color: var(--color-plate-100);
   }
 
-  .brand-gradient {
-    background: var(--gradient-brand);
-  }
-
-  /* ---- Le ruban d'asphalte : signature visuelle ----
-     Une seule route continue traverse la page, alignée sur la gouttière
-     gauche du conteneur. Chaque section est une « parada ».
-     Purement décoratif : masqué au clavier, au lecteur d'écran et sous
-     1160 px, où l'espace horizontal ne le permet pas. */
-  .road {
-    position: relative;
-  }
-
-  @media (min-width: 1160px) {
-    .road::before,
-    .road::after {
-      content: "";
-      position: absolute;
-      /* Commence exactement où commencent les sections. À -16 px, le ruban
-         remontait dans le hero sombre et s'y lisait comme une barre parasite
-         plutôt que comme une route qui entre dans la page. */
-      top: 0;
-      bottom: -16px;
-      z-index: 1;
-      pointer-events: none;
-    }
-
-    /* Filet de sécurité : si le conteneur venait à s'élargir, `max()` empêche
-       le ruban de sortir de l'écran quand `50% - 560px` devient négatif. */
-    .road::before {
-      left: max(20px, calc(50% - 560px + 26px));
-      width: 20px;
-      background: var(--color-ink-900);
-      border-radius: 10px;
-    }
-
-    .road::after {
-      left: max(29px, calc(50% - 560px + 35px));
-      width: 2px;
-      border-radius: 1px;
-      background: repeating-linear-gradient(
-        180deg,
-        #f5d95c 0 18px,
-        transparent 18px 44px
+  /* ---- La trame de fond de la planche ----
+     Un quadrillage de calque, à 5 % d'opacité. Il n'est pas décoratif : il
+     donne l'échelle et rend visible que les éléments sont posés sur une
+     grille, pas flottants. */
+  .grid-field {
+    background-image:
+      linear-gradient(
+        to right,
+        color-mix(in oklab, var(--color-plate-400) 26%, transparent) 1px,
+        transparent 1px
+      ),
+      linear-gradient(
+        to bottom,
+        color-mix(in oklab, var(--color-plate-400) 26%, transparent) 1px,
+        transparent 1px
       );
+    background-size: 48px 48px;
+  }
+
+  /* ---- Hachure : l'état « occupé » ----
+     Sur une planche, une zone hachurée est une zone prise. C'est le même
+     signe pour un tronçon complet et pour un siège vendu — l'inventaire
+     par tronçon a enfin une écriture. */
+  .hatch {
+    background-image: repeating-linear-gradient(
+      45deg,
+      color-mix(in oklab, currentColor 34%, transparent) 0 1.5px,
+      transparent 1.5px 7px
+    );
+  }
+
+  /* ---- Le cartouche ----
+     Le rectangle en bas à droite d'une planche : numéro, échelle, date,
+     dessiné par, révisions. Rigide, encadré, tabulaire. C'est lui qui
+     porte le détail de l'aporte et les métadonnées d'un trajet. */
+  .cartouche {
+    border: 1.5px solid currentColor;
+  }
+
+  .cartouche > * + * {
+    border-top: 1px solid color-mix(in oklab, currentColor 40%, transparent);
+  }
+
+  /* ---- Le geste signature : la cote qui se résout ----
+     Une seule respiration animée sur la page. Le trait s'ouvre depuis son
+     centre, puis le chiffre se pose. Depuis un état déjà visible : sans
+     animation, la cote est là, entière. */
+  @media (prefers-reduced-motion: no-preference) {
+    .cote-rule {
+      animation: cote-in 520ms cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    .cote-figure {
+      animation: cote-figure 380ms 160ms cubic-bezier(0.16, 1, 0.3, 1) both;
     }
   }
 
-  /* ---- Le marquage au sol défile quand on descend la page ----
-     Animation pilotée par le scroll, native : pas une image de JavaScript,
-     pas un écouteur d'événement, pas une ligne de bundle. Le déplacement est
-     un multiple exact de la période du motif (44 px), donc la boucle est
-     invisible. Là où `scroll()` n'existe pas, le marquage reste simplement
-     fixe — c'est la même page, sans le mouvement. */
-  @supports (animation-timeline: scroll()) {
-    @media (prefers-reduced-motion: no-preference) {
-      .road::after {
-        animation: road-scroll linear;
-        animation-timeline: scroll(root block);
-      }
-    }
-  }
-
-  @keyframes road-scroll {
-    to {
-      background-position-y: -1320px;
-    }
-  }
-
-  /* ---- Apparition des sections à l'entrée dans le champ ----
-     Même principe : `view()` remplace l'IntersectionObserver que la plupart
-     des sites embarquent pour ça. Un élément déjà visible au chargement se
-     trouve au-delà de sa plage d'animation, donc il s'affiche net d'emblée —
-     aucun contenu ne reste invisible si la fonctionnalité manque ou si
-     l'utilisateur a demandé moins d'animations. */
+  /* ---- Apparition à l'entrée dans le champ ----
+     Piloté par le scroll, nativement : pas d'IntersectionObserver, pas une
+     ligne de bundle. Un élément déjà visible au chargement est au-delà de
+     sa plage, donc net d'emblée — aucun contenu ne disparaît si la
+     fonctionnalité manque. */
   @supports (animation-timeline: view()) {
     @media (prefers-reduced-motion: no-preference) {
       .reveal {
         animation: reveal-in linear both;
         animation-timeline: view();
-        animation-range: entry 8% cover 26%;
+        animation-range: entry 8% cover 24%;
       }
     }
   }
@@ -288,32 +364,11 @@
   @keyframes reveal-in {
     from {
       opacity: 0;
-      transform: translateY(14px);
+      transform: translateY(10px);
     }
     to {
       opacity: 1;
       transform: none;
-    }
-  }
-
-  /* Le point d'arrêt vert — usage « marque », pas « validé ». */
-  .parada::before {
-    content: "";
-    position: absolute;
-    left: 7px;
-    top: 12px;
-    width: 18px;
-    height: 18px;
-    border-radius: 999px;
-    background: var(--color-brand-green);
-    border: 4px solid var(--stop-ring, #fff);
-    z-index: 2;
-    display: none;
-  }
-
-  @media (min-width: 1160px) {
-    .parada::before {
-      display: block;
     }
   }
 }
@@ -332,9 +387,8 @@
     scroll-behavior: auto !important;
   }
 
-  /* Les animations liées au scroll n'ont pas de durée : les écraser à
-     0,001 ms ne les arrête pas. On coupe la timeline elle-même. */
-  .road::after,
+  /* Les animations de scroll n'ont pas de durée : les écraser ne les
+     arrête pas. On coupe la timeline elle-même. */
   .reveal {
     animation-timeline: none !important;
     animation-name: none !important;

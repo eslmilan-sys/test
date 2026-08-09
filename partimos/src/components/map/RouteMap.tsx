@@ -67,7 +67,7 @@ export function RouteMap({
               d={linkPath(link.from, link.to)}
               stroke="currentColor"
               strokeWidth={link.isPriority ? 3 : 2}
-              className="text-ink-200"
+              className="text-plate-200"
               strokeDasharray={link.isPriority ? undefined : "6 8"}
             />
           ))}
@@ -94,11 +94,7 @@ export function RouteMap({
                 x={anchorEnd ? city.x - 18 : city.x + 18}
                 y={city.y + 5}
                 textAnchor={anchorEnd ? "end" : "start"}
-                className={`pointer-events-none text-[19px] ${
-                  selected
-                    ? "fill-ink-900 font-bold"
-                    : "fill-ink-500 font-medium"
-                }`}
+                className={`pointer-events-none text-[19px] ${selected ? "fill-plate-900 font-bold" : "fill-plate-600 font-medium"}`}
               >
                 {city.shortName}
               </text>
@@ -109,10 +105,10 @@ export function RouteMap({
                 r={selected ? 11 : 7}
                 className={
                   isOrigin
-                    ? "fill-accent"
+                    ? "fill-ochre-500"
                     : isDestination
-                      ? "fill-brand-green-deep"
-                      : "fill-ink-300"
+                      ? "fill-plate-500"
+                      : "fill-plate-300"
                 }
               />
               {selected && (
@@ -123,7 +119,7 @@ export function RouteMap({
                   fill="none"
                   strokeWidth={2}
                   className={
-                    isOrigin ? "stroke-accent/40" : "stroke-brand-green-deep/40"
+                    isOrigin ? "stroke-ochre-500/40" : "stroke-plate-500/40"
                   }
                 />
               )}
@@ -161,12 +157,12 @@ export function RouteMap({
         })}
       </svg>
 
-      <p className="mt-2 text-center text-[12.5px] text-ink-500">
+      <p className="mt-2 text-center text-[12.5px] text-plate-600">
         {picking === "origin" ? "Toca tu punto de salida" : "Toca a dónde vas"}
         {origin && destination && (
           <>
             {" · "}
-            <b className="font-semibold text-ink-900">
+            <b className="font-semibold text-plate-900">
               {origin.shortName} → {destination.shortName}
             </b>
           </>

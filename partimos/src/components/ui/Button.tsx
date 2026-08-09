@@ -21,24 +21,34 @@ type Size = "sm" | "md" | "lg";
  * la taille d'écran, envelopper l'appel dans un élément qui porte la règle.
  * `whitespace-nowrap` garantit qu'un libellé ne passe jamais sur deux lignes.
  */
+/**
+ * Les boutons appartiennent au monde de la planche : angles vifs, bordure
+ * franche, aucune ombre portée. Un bouton flottant à coins arrondis dans une
+ * interface qui n'a plus un seul rayon serait le composant d'origine resté
+ * en place — c'est exactement ce que cette refonte remplace.
+ *
+ * L'ocre porte l'action principale, et rien d'autre : c'est la clé de lecture
+ * du système. La bordure de 2 px est ce qui donne la présence que l'ombre
+ * donnait avant.
+ */
 const BASE =
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap font-display font-bold tracking-[-0.01em] " +
-  "rounded-[14px] transition-[transform,background-color,border-color,box-shadow] duration-150 " +
-  "active:translate-y-0 disabled:opacity-50 disabled:pointer-events-none select-none";
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap font-bold " +
+  "border-2 transition-[background-color,border-color,color] duration-150 " +
+  "disabled:opacity-50 disabled:pointer-events-none select-none";
 
 const VARIANTS: Record<Variant, string> = {
   primary:
-    "bg-ink-900 text-white shadow-[0_6px_18px_-8px_rgb(14_42_53/0.55)] hover:bg-ink-800 hover:-translate-y-px",
+    "bg-ochre-400 border-ochre-400 text-plate-950 hover:bg-ochre-300 hover:border-ochre-300",
   secondary:
-    "bg-white text-ink-900 border-[1.5px] border-ink-200 hover:border-accent hover:text-accent-ink",
+    "bg-transparent border-plate-300 text-plate-900 hover:border-ochre-500 hover:text-ochre-700",
   onDark:
-    "bg-white text-ink-900 shadow-[0_8px_24px_-10px_rgb(0_0_0/0.6)] hover:bg-ink-50 hover:-translate-y-px",
+    "bg-ochre-400 border-ochre-400 text-plate-950 hover:bg-ochre-300 hover:border-ochre-300",
 };
 
 const SIZES: Record<Size, string> = {
-  sm: "px-4 py-2.5 text-[14.5px] rounded-[11px]",
-  md: "px-5.5 py-3.5 text-[16px]",
-  lg: "px-7 py-4 text-[17px]",
+  sm: "px-4 py-2 text-[14.5px]",
+  md: "px-5.5 py-3 text-[16px]",
+  lg: "px-7 py-3.5 text-[17px]",
 };
 
 type BaseProps = {
@@ -71,6 +81,7 @@ export function Button({
   return (
     <button
       className={classes({ variant, size, full, className, children })}
+      style={{ fontStretch: "112%" }}
       {...rest}
     >
       {children}
@@ -91,6 +102,7 @@ export function ButtonLink({
     <Link
       href={href}
       className={classes({ variant, size, full, className, children })}
+      style={{ fontStretch: "112%" }}
       {...rest}
     >
       {children}

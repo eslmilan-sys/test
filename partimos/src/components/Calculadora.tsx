@@ -43,12 +43,12 @@ export function Calculadora({
 
   return (
     <div
-      className={`rounded-[24px] border border-ink-200 bg-white ${compact ? "p-5" : "p-6.5"} shadow-lift`}
+      className={`border border-plate-200 bg-white ${compact ? "p-5" : "p-6.5"}`}
     >
-      <h3 className="mb-1.5 font-display text-xl font-bold tracking-[-0.02em]">
+      <h3 className="mb-1.5 text-xl font-bold tracking-[-0.02em]">
         ¿Cuánto pueden aportar?
       </h3>
-      <p className="mb-5 text-[13.5px] text-ink-500">
+      <p className="mb-5 text-[13.5px] text-plate-600">
         El tope se calcula solo. No se puede pasar de ahí.
       </p>
 
@@ -56,11 +56,11 @@ export function Calculadora({
         <div className="mb-2.5 flex items-baseline justify-between">
           <label
             htmlFor="calc-km"
-            className="text-[12.5px] font-bold tracking-[0.09em] text-ink-500 uppercase"
+            className="text-[12.5px] font-bold tracking-[0.09em] text-plate-600 uppercase"
           >
             Distancia
           </label>
-          <b className="tnum font-display text-[17px] font-bold">{km} km</b>
+          <b className="cote text-[17px] font-bold">{km} km</b>
         </div>
         <input
           id="calc-km"
@@ -70,16 +70,16 @@ export function Calculadora({
           step={5}
           value={km}
           onChange={(e) => setKm(Number(e.target.value))}
-          className="h-1.5 w-full cursor-pointer appearance-none rounded-full bg-ink-200 [&::-moz-range-thumb]:size-6 [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-4 [&::-moz-range-thumb]:border-accent [&::-moz-range-thumb]:bg-white [&::-webkit-slider-thumb]:size-6 [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-4 [&::-webkit-slider-thumb]:border-accent [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:shadow-[0_2px_8px_rgb(14_42_53/0.22)]"
+          className="h-1.5 w-full cursor-pointer appearance-none rounded-full bg-plate-200 [&::-moz-range-thumb]:size-6 [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-4 [&::-moz-range-thumb]:border-ochre-500 [&::-moz-range-thumb]:bg-white [&::-webkit-slider-thumb]:size-6 [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-4 [&::-webkit-slider-thumb]:border-ochre-500 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:shadow-[0_2px_8px_rgb(14_42_53/0.22)]"
         />
       </div>
 
       <fieldset className="mb-5">
         <div className="mb-2.5 flex items-baseline justify-between">
-          <legend className="text-[12.5px] font-bold tracking-[0.09em] text-ink-500 uppercase">
+          <legend className="text-[12.5px] font-bold tracking-[0.09em] text-plate-600 uppercase">
             Puestos que ofreces
           </legend>
-          <b className="tnum font-display text-[17px] font-bold">{seats}</b>
+          <b className="cote text-[17px] font-bold">{seats}</b>
         </div>
         <div className="flex flex-wrap gap-1.5">
           {[1, 2, 3, 4].map((n) => (
@@ -97,7 +97,7 @@ export function Calculadora({
       </fieldset>
 
       <fieldset className="mb-5">
-        <legend className="mb-2.5 text-[12.5px] font-bold tracking-[0.09em] text-ink-500 uppercase">
+        <legend className="mb-2.5 text-[12.5px] font-bold tracking-[0.09em] text-plate-600 uppercase">
           Tu carro
         </legend>
         <div className="flex flex-wrap gap-1.5">
@@ -115,15 +115,15 @@ export function Calculadora({
         </div>
       </fieldset>
 
-      <div className="rounded-[18px] bg-ink-50 p-5" aria-live="polite">
-        <div className="mb-3.5 border-b border-dashed border-ink-200 pb-4 text-center">
-          <p className="text-[11.5px] font-bold tracking-[0.13em] text-ink-500 uppercase">
+      <div className="bg-plate-50 p-5" aria-live="polite">
+        <div className="mb-3.5 border-b border-dashed border-plate-200 pb-4 text-center">
+          <p className="text-[11.5px] font-bold tracking-[0.13em] text-plate-600 uppercase">
             Tope por puesto
           </p>
-          <p className="brand-gradient-text tnum font-display text-5xl leading-tight font-extrabold tracking-[-0.045em]">
+          <p className="cote cote text-5xl leading-tight font-extrabold tracking-[-0.045em]">
             {formatUsd(result.maxPriceCents)}
           </p>
-          <p className="text-[13px] text-ink-500">
+          <p className="text-[13px] text-plate-600">
             Puedes pedir menos, nunca más
           </p>
         </div>
@@ -144,10 +144,10 @@ export function Calculadora({
         </dl>
       </div>
 
-      <p className="mt-4 border-t border-ink-200 pt-3.5 text-[13px] leading-relaxed text-ink-500">
+      <p className="mt-4 border-t border-plate-200 pt-3.5 text-[13px] leading-relaxed text-plate-600">
         Incluye gasolina, peajes y desgaste, más un margen del 10 % por los
         desvíos de recogida.{" "}
-        <b className="font-semibold text-ink-900">
+        <b className="font-semibold text-plate-900">
           Aunque llenes el carro, siempre pones parte del viaje
         </b>{" "}
         — por eso esto es compartir gastos y no cobrar un pasaje.
@@ -160,8 +160,8 @@ function pillClass(active: boolean) {
   return [
     "rounded-[11px] border-[1.5px] px-4 py-2.5 text-[14.5px] font-semibold transition-colors",
     active
-      ? "border-ink-900 bg-ink-900 text-white"
-      : "border-ink-200 text-ink-500 hover:border-accent hover:text-accent-ink",
+      ? "border-plate-900 bg-plate-900 text-white"
+      : "border-plate-200 text-plate-600 hover:border-accent hover:text-accent-ink",
   ].join(" ");
 }
 
@@ -176,9 +176,9 @@ function Row({
 }) {
   return (
     <div className="flex justify-between gap-3 py-1.5">
-      <dt className="text-ink-500">{label}</dt>
+      <dt className="text-plate-600">{label}</dt>
       <dd
-        className={`tnum text-right font-semibold ${emphasis ? "text-ink-900" : ""}`}
+        className={`cote text-right font-semibold ${emphasis ? "text-plate-900" : ""}`}
       >
         {children}
       </dd>

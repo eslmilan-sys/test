@@ -102,7 +102,7 @@ export default function PrivacidadPage() {
         escribiendo a{" "}
         <a
           href="mailto:privacidad@partimos.com"
-          className="font-semibold text-accent-ink hover:underline"
+          className="font-semibold text-ochre-600 hover:underline"
         >
           privacidad@partimos.com
         </a>

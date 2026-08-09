@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 export default function CuentaPage() {
   return (
-    <main id="contenido" className="bg-ink-50 pb-16">
+    <main id="contenido" className="bg-plate-50 pb-16">
       <AccountSpace />
     </main>
   );

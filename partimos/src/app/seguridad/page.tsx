@@ -43,12 +43,12 @@ export default function SeguridadPage() {
   return (
     <>
       <main id="contenido">
-        <div className="bg-ink-900 pt-10 pb-11 text-white">
+        <div className="bg-plate-900 pt-10 pb-11 text-white">
           <Container>
             <h1 className="mb-4 max-w-[18ch] text-[clamp(32px,6.4vw,50px)] leading-[1.03] font-extrabold tracking-[-0.04em]">
               Sabes con quién viajas antes de subirte
             </h1>
-            <p className="max-w-[56ch] text-[16.5px] leading-relaxed text-ink-300">
+            <p className="max-w-[56ch] text-[16.5px] leading-relaxed text-plate-300">
               La carretera se hace larga con un desconocido. Esto es lo que
               hacemos para que no lo sea — y lo que deliberadamente no
               guardamos.
@@ -70,7 +70,7 @@ export default function SeguridadPage() {
             </Container>
           </section>
 
-          <section className="bg-ink-50 py-12 md:py-16">
+          <section className="bg-plate-50 py-12 md:py-16">
             <Container>
               <h2 className="mb-8 max-w-[20ch] text-[clamp(24px,4vw,34px)] font-extrabold">
                 En detalle
@@ -78,10 +78,10 @@ export default function SeguridadPage() {
               <div className="grid gap-x-10 gap-y-8 min-[860px]:grid-cols-2">
                 {DETAILS.map((item) => (
                   <div key={item.title}>
-                    <h3 className="mb-2 font-display text-[18px] font-bold tracking-[-0.02em]">
+                    <h3 className="mb-2 text-[18px] font-bold tracking-[-0.02em]">
                       {item.title}
                     </h3>
-                    <p className="max-w-[52ch] text-[15px] leading-relaxed text-ink-500">
+                    <p className="max-w-[52ch] text-[15px] leading-relaxed text-plate-600">
                       {item.body}
                     </p>
                   </div>
@@ -92,16 +92,16 @@ export default function SeguridadPage() {
 
           <section className="py-12 md:py-16">
             <Container>
-              <div className="flex max-w-[720px] items-start gap-4 rounded-[20px] border border-ink-200 px-6 py-5.5">
+              <div className="flex max-w-[720px] items-start gap-4 border border-plate-200 px-6 py-5.5">
                 <Icon
                   name="shield"
-                  className="mt-0.5 size-6 shrink-0 text-ink-500"
+                  className="mt-0.5 size-6 shrink-0 text-plate-600"
                 />
                 <div>
-                  <h2 className="mb-2 font-display text-[18px] font-bold">
+                  <h2 className="mb-2 text-[18px] font-bold">
                     Lo que no hacemos
                   </h2>
-                  <p className="text-[15px] leading-relaxed text-ink-500">
+                  <p className="text-[15px] leading-relaxed text-plate-600">
                     No guardamos imágenes de cédula ni números de documento. No
                     pedimos tarjeta de crédito, porque no manejamos pagos. No
                     vendemos datos. Y no usamos tu número para publicidad: solo

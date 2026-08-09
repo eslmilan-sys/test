@@ -36,9 +36,7 @@ export function StickyCta({ watch = "#buscar" }: { watch?: string }) {
 
   return (
     <div
-      className={`fixed inset-x-0 bottom-0 z-40 flex gap-2.5 border-t border-ink-200 bg-white px-4 pt-2.5 pb-[calc(0.625rem+env(safe-area-inset-bottom))] transition-transform duration-300 min-[900px]:hidden ${
-        visible ? "translate-y-0" : "translate-y-[120%]"
-      }`}
+      className={`fixed inset-x-0 bottom-0 z-40 flex gap-2.5 border-t border-plate-200 bg-white px-4 pt-2.5 pb-[calc(0.625rem+env(safe-area-inset-bottom))] transition-transform duration-300 min-[900px]:hidden ${visible ? "translate-y-0" : "translate-y-[120%]"}`}
       // `inert` retire la barre repliée de la navigation clavier ET de l'arbre
       // d'accessibilité en une seule déclaration. `aria-hidden` seul ne suffit
       // pas : les liens resteraient focalisables, donc atteignables au clavier

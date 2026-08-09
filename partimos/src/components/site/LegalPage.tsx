@@ -20,15 +20,15 @@ export function LegalPage({
   return (
     <>
       <main id="contenido">
-        <div className="bg-ink-900 pt-10 pb-11 text-white">
+        <div className="bg-plate-900 pt-10 pb-11 text-white">
           <Container>
             <h1 className="mb-4 max-w-[18ch] text-[clamp(30px,5.6vw,44px)] leading-[1.05] font-extrabold tracking-[-0.04em]">
               {title}
             </h1>
-            <p className="max-w-[56ch] text-[16px] leading-relaxed text-ink-300">
+            <p className="max-w-[56ch] text-[16px] leading-relaxed text-plate-300">
               {intro}
             </p>
-            <p className="mt-5 text-[12.5px] tracking-wide text-ink-400 uppercase">
+            <p className="mt-5 text-[12.5px] tracking-wide text-plate-400 uppercase">
               Última actualización: {updatedAt}
             </p>
           </Container>
@@ -36,7 +36,7 @@ export function LegalPage({
 
         <div className="py-12 md:py-16">
           <Container>
-            <div className="max-w-[68ch] [&_h2]:mt-9 [&_h2]:mb-3 [&_h2]:font-display [&_h2]:text-[20px] [&_h2]:font-bold [&_h2]:first:mt-0 [&_li]:mb-1.5 [&_p]:mb-4 [&_p]:text-[15.5px] [&_p]:leading-relaxed [&_p]:text-ink-500 [&_ul]:mb-4 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:text-[15.5px] [&_ul]:leading-relaxed [&_ul]:text-ink-500">
+            <div className="max-w-[68ch] [&_h2]:mt-9 [&_h2]:mb-3 [&_h2]: [&_h2]:text-[20px] [&_h2]:font-bold [&_h2]:first:mt-0 [&_li]:mb-1.5 [&_p]:mb-4 [&_p]:text-[15.5px] [&_p]:leading-relaxed [&_p]:text-plate-600 [&_ul]:mb-4 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:text-[15.5px] [&_ul]:leading-relaxed [&_ul]:text-plate-600">
               {children}
             </div>
           </Container>
@@ -54,9 +54,9 @@ export function LegalPage({
  */
 export function PendingLegalReview() {
   return (
-    <div className="mb-8 rounded-[16px] border border-ink-200 bg-ink-50 px-5 py-4">
-      <p className="text-[14px] leading-relaxed text-ink-500">
-        <b className="font-semibold text-ink-900">
+    <div className="mb-8 border border-plate-200 bg-plate-50 px-5 py-4">
+      <p className="text-[14px] leading-relaxed text-plate-600">
+        <b className="font-semibold text-plate-900">
           Borrador pendiente de revisión.
         </b>{" "}
         Este texto describe fielmente cómo funciona la plataforma, pero todavía

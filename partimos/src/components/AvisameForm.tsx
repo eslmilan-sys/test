@@ -98,13 +98,11 @@ export function AvisameForm({
     return (
       <p
         role="status"
-        className={`flex items-start gap-2.5 rounded-[14px] px-4 py-3.5 text-[14.5px] leading-relaxed ${
-          onDark ? "bg-white/8 text-ink-200" : "bg-ink-50 text-ink-500"
-        }`}
+        className={`flex items-start gap-2.5 px-4 py-3.5 text-[14.5px] leading-relaxed ${onDark ? "bg-white/8 text-plate-200" : "bg-plate-50 text-plate-600"}`}
       >
         <Icon
           name="check"
-          className={`mt-0.5 size-[18px] shrink-0 ${onDark ? "text-white" : "text-ink-900"}`}
+          className={`mt-0.5 size-[18px] shrink-0 ${onDark ? "text-white" : "text-plate-900"}`}
         />
         <span>
           Listo. Te escribimos por WhatsApp apenas alguien publique este viaje.
@@ -122,15 +120,11 @@ export function AvisameForm({
             Tu número de celular
           </label>
           <div
-            className={`flex items-center gap-2.5 rounded-[14px] border px-3.5 py-3 ${
-              onDark
-                ? "border-white/15 bg-white/6 focus-within:border-accent"
-                : "border-ink-200 bg-white focus-within:border-accent"
-            }`}
+            className={`flex items-center gap-2.5 border px-3.5 py-3 ${onDark ? "border-white/15 bg-white/6 focus-within:border-ochre-500" : "border-plate-200 bg-white focus-within:border-ochre-500"}`}
           >
             <Icon
               name="phone"
-              className={`size-[18px] shrink-0 ${onDark ? "text-ink-300" : "text-ink-500"}`}
+              className={`size-[18px] shrink-0 ${onDark ? "text-plate-300" : "text-plate-600"}`}
             />
             <input
               id={id}
@@ -145,11 +139,7 @@ export function AvisameForm({
               }}
               aria-invalid={state === "error"}
               aria-describedby={state === "error" ? `${id}-error` : undefined}
-              className={`tnum w-full border-none bg-transparent text-[16px] font-semibold focus:outline-none ${
-                onDark
-                  ? "text-white placeholder:text-ink-400/70"
-                  : "text-ink-900 placeholder:text-ink-300"
-              }`}
+              className={`cote w-full border-none bg-transparent text-[16px] font-semibold focus:outline-none ${onDark ? "text-white placeholder:text-plate-400/70" : "text-plate-900 placeholder:text-plate-300"}`}
             />
           </div>
         </div>
@@ -173,7 +163,7 @@ export function AvisameForm({
       )}
 
       <p
-        className={`text-[12.5px] leading-relaxed ${onDark ? "text-ink-300" : "text-ink-500"}`}
+        className={`text-[12.5px] leading-relaxed ${onDark ? "text-plate-300" : "text-plate-600"}`}
       >
         Solo lo usamos para avisarte de este viaje. Nada de publicidad.
       </p>

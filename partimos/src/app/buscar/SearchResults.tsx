@@ -113,7 +113,14 @@ export function SearchResults() {
       })
       .filter((v): v is { date: string; count: number } => v !== null)
       .slice(0, 3);
-  }, [serving, criteria.from, criteria.to, criteria.date, criteria.seats, today]);
+  }, [
+    serving,
+    criteria.from,
+    criteria.to,
+    criteria.date,
+    criteria.seats,
+    today,
+  ]);
 
   function apply(next: typeof criteria) {
     const q = new URLSearchParams({
@@ -130,7 +137,7 @@ export function SearchResults() {
 
   return (
     <>
-      <div className="sticky top-[57px] z-30 border-b border-ink-200 bg-white/97 py-3">
+      <div className="sticky top-[57px] z-30 border-b border-plate-200 bg-white/97 py-3">
         <Container>
           <SearchSummary criteria={criteria} onApply={apply} />
         </Container>
@@ -138,10 +145,10 @@ export function SearchResults() {
 
       <Container className="pt-6">
         {!isSupabaseConfigured && (
-          <p className="mb-4 flex items-start gap-2.5 rounded-[14px] border border-ink-200 bg-white px-4 py-3 text-[13px] leading-relaxed text-ink-500">
+          <p className="mb-4 flex items-start gap-2.5 border border-plate-200 bg-white px-4 py-3 text-[13px] leading-relaxed text-plate-600">
             <Icon name="bell" className="mt-0.5 size-4 shrink-0" />
             <span>
-              <b className="font-semibold text-ink-900">Viajes de ejemplo.</b>{" "}
+              <b className="font-semibold text-plate-900">Viajes de ejemplo.</b>{" "}
               La base de datos todavía no está conectada, así que estos
               conductores son de muestra. Todo lo demás —el cálculo del aporte,
               las reglas, los desvíos— funciona de verdad.
@@ -151,13 +158,13 @@ export function SearchResults() {
 
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h1 className="font-display text-[20px] font-bold tracking-[-0.02em]">
+            <h1 className="text-[20px] font-bold tracking-[-0.02em]">
               {serving.length > 0
                 ? `${visible.length} ${visible.length === 1 ? "viaje" : "viajes"} · ${formatDayLabel(criteria.date)}`
                 : "Sin resultados"}
             </h1>
             {hasPartial && (
-              <p className="mt-0.5 text-[13px] text-ink-500">
+              <p className="mt-0.5 text-[13px] text-plate-600">
                 Incluye conductores que pasan por {toCity?.shortName} camino a
                 otro lado.
               </p>
@@ -165,12 +172,12 @@ export function SearchResults() {
           </div>
 
           {matches.length > 0 && (
-            <label className="flex items-center gap-2 text-[13.5px] text-ink-500">
+            <label className="flex items-center gap-2 text-[13.5px] text-plate-600">
               Ordenar por
               <select
                 value={sort}
                 onChange={(e) => setSort(e.target.value as SortKey)}
-                className="cursor-pointer rounded-[10px] border border-ink-200 bg-white px-2.5 py-1.5 font-semibold text-ink-900 focus:border-accent focus:outline-none"
+                className="cursor-pointer border border-plate-200 bg-white px-2.5 py-1.5 font-semibold text-plate-900 focus:border-ochre-500 focus:outline-none"
               >
                 <option value="hora">Hora de salida</option>
                 <option value="aporte">Aporte más bajo</option>
@@ -211,13 +218,13 @@ export function SearchResults() {
             ))}
           </ul>
         ) : (
-          <div className="rounded-[20px] border border-ink-200 bg-white p-6">
-            <h2 className="mb-2 font-display text-[19px] font-bold">
+          <div className="border border-plate-200 bg-white p-6">
+            <h2 className="mb-2 text-[19px] font-bold">
               {serving.length > 0
                 ? "Nadie pasa por ahí ese día"
                 : "Todavía no abrimos esa ruta"}
             </h2>
-            <p className="mb-5 max-w-[54ch] text-[15px] leading-relaxed text-ink-500">
+            <p className="mb-5 max-w-[54ch] text-[15px] leading-relaxed text-plate-600">
               {serving.length > 0
                 ? "Los viajes se publican sobre la marcha, casi siempre con dos o tres días de anticipación. Déjanos tu número y te escribimos apenas alguien publique."
                 : `Guardamos tu búsqueda de ${fromCity?.shortName} a ${toCity?.shortName}. Cuando varias personas piden la misma ruta, es la próxima que abrimos.`}
@@ -225,7 +232,7 @@ export function SearchResults() {
 
             {nearbyDays.length > 0 && (
               <div className="mb-5">
-                <p className="mb-2 text-[13px] font-semibold text-ink-900">
+                <p className="mb-2 text-[13px] font-semibold text-plate-900">
                   Sí hay viajes estos días:
                 </p>
                 <div className="flex flex-wrap gap-2">
@@ -233,7 +240,7 @@ export function SearchResults() {
                     <button
                       key={day.date}
                       onClick={() => apply({ ...criteria, date: day.date })}
-                      className="rounded-[12px] border border-ink-200 px-3.5 py-2 text-[13.5px] font-semibold transition-colors hover:border-accent hover:text-accent-ink"
+                      className="border border-plate-200 px-3.5 py-2 text-[13.5px] font-semibold transition-colors hover:border-ochre-500 hover:text-ochre-600"
                     >
                       {formatDayLabel(day.date)} · {day.count}
                     </button>
@@ -254,11 +261,11 @@ export function SearchResults() {
         )}
 
         {corridor && (
-          <div className="mt-8 rounded-[20px] border border-ink-200 bg-white p-5">
-            <h2 className="mb-1.5 font-display text-[17px] font-bold">
+          <div className="mt-8 border border-plate-200 bg-white p-5">
+            <h2 className="mb-1.5 text-[17px] font-bold">
               ¿Vas manejando por esta ruta?
             </h2>
-            <p className="mb-4 max-w-[52ch] text-[14.5px] leading-relaxed text-ink-500">
+            <p className="mb-4 max-w-[52ch] text-[14.5px] leading-relaxed text-plate-600">
               Hay gente buscando {fromCity?.shortName} → {toCity?.shortName}{" "}
               justo ahora. Si ese tramo te queda de paso, márcalo como parada al
               publicar y tu viaje aparece también en esta búsqueda.
@@ -270,11 +277,11 @@ export function SearchResults() {
         )}
 
         {corridor && (
-          <p className="mt-6 text-center text-[13.5px] text-ink-500">
+          <p className="mt-6 text-center text-[13.5px] text-plate-600">
             ¿Quieres saber más de esta ruta?{" "}
             <Link
               href={`/viajes/${corridor.slug}`}
-              className="font-semibold text-accent-ink hover:underline"
+              className="font-semibold text-ochre-600 hover:underline"
             >
               Puntos de recogida, tiempos y cómo se calcula el aporte
             </Link>
@@ -299,11 +306,7 @@ function Filter({
       type="button"
       aria-pressed={active}
       onClick={onClick}
-      className={`rounded-full border-[1.5px] px-3.5 py-2 text-[13.5px] font-semibold transition-colors ${
-        active
-          ? "border-ink-900 bg-ink-900 text-white"
-          : "border-ink-200 bg-white text-ink-500 hover:border-accent hover:text-accent-ink"
-      }`}
+      className={`rounded-full border-[1.5px] px-3.5 py-2 text-[13.5px] font-semibold transition-colors ${active ? "border-plate-900 bg-plate-900 text-white" : "border-plate-200 bg-white text-plate-600 hover:border-ochre-500 hover:text-ochre-600"}`}
     >
       {children}
     </button>

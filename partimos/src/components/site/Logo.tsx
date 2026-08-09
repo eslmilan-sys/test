@@ -1,44 +1,53 @@
 import Link from "next/link";
 
 /**
- * La marque : goutte + point de rendez-vous. C'est le seul endroit de
- * l'interface où le dégradé porte systématiquement du sens.
+ * La marque : goutte + point de rendez-vous.
  *
- * `gradientId` doit être unique par instance : deux `<linearGradient>` de
- * même id dans un document et le navigateur n'en applique qu'un.
+ * La FORME est un engagement : le pin ne change pas. Sa couleur, elle, suivait
+ * l'ancienne palette bleu-vert et n'engageait rien — elle passe donc à la clé
+ * du monde, l'ocre de la Culebra, comme tout ce qui marque une action ou un
+ * point choisi. C'est le seul objet rond d'une interface qui n'a plus aucun
+ * rayon ailleurs, et c'est ce qui le fait lire comme une marque plutôt que
+ * comme un composant.
+ *
+ * Le mot-symbole est en Archivo dilaté, jamais en mono : le monospace de ce
+ * système est la fonte des quantités mesurées, et « Partimos » n'en est pas
+ * une.
  */
 export function LogoMark({
-  className = "h-[31px] w-[26px]",
-  gradientId = "partimos-brand",
-  dotColor = "#fff",
+  className = "h-[30px] w-[25px]",
+  tone = "key",
+  dotColor,
 }: {
   className?: string;
-  gradientId?: string;
+  /** `key` sur fond sombre ou clair ; `ink` pour les surfaces monochromes. */
+  tone?: "key" | "ink";
   dotColor?: string;
 }) {
+  const fill =
+    tone === "key" ? "var(--color-ochre-400)" : "var(--color-plate-900)";
   return (
     <svg viewBox="0 0 100 120" className={className} aria-hidden="true">
-      <defs>
-        <linearGradient id={gradientId} x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#20A8F8" />
-          <stop offset="1" stopColor="#A0D838" />
-        </linearGradient>
-      </defs>
       <path
         d="M50 3C26 3 7 22 7 46c0 32 43 71 43 71s43-39 43-71C93 22 74 3 50 3z"
-        fill={`url(#${gradientId})`}
+        fill={fill}
       />
-      <circle cx="50" cy="43" r="15" fill={dotColor} />
+      <circle
+        cx="50"
+        cy="43"
+        r="15"
+        fill={dotColor ?? "var(--color-plate-900)"}
+      />
     </svg>
   );
 }
 
 export function Logo({
-  gradientId,
+  tone,
   dotColor,
   className = "",
 }: {
-  gradientId?: string;
+  tone?: "key" | "ink";
   dotColor?: string;
   className?: string;
 }) {
@@ -48,8 +57,11 @@ export function Logo({
       className={`flex shrink-0 items-center gap-2.5 ${className}`}
       aria-label="Partimos — inicio"
     >
-      <LogoMark gradientId={gradientId} dotColor={dotColor} />
-      <span className="brand-gradient-text font-display text-[21px] font-extrabold tracking-[-0.03em]">
+      <LogoMark tone={tone} dotColor={dotColor} />
+      <span
+        className="text-[21px] font-extrabold"
+        style={{ fontStretch: "112%" }}
+      >
         Partimos
       </span>
     </Link>

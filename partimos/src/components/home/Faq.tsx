@@ -1,4 +1,4 @@
-import { Section, Eyebrow, SectionTitle } from "@/components/site/Section";
+import { Section, SectionTitle } from "@/components/site/Section";
 import type { Faq as FaqItem } from "@/lib/content";
 
 /**
@@ -13,16 +13,16 @@ export function FaqList({ items }: { items: FaqItem[] }) {
         <details
           key={item.q}
           open={index === 0}
-          className="group border-b border-ink-200"
+          className="group border-b border-plate-200"
         >
-          <summary className="relative cursor-pointer list-none py-5 pr-10 font-display text-[17px] font-bold tracking-[-0.015em] [&::-webkit-details-marker]:hidden">
+          <summary className="relative cursor-pointer list-none py-5 pr-10 text-[17px] font-bold tracking-[-0.015em] [&::-webkit-details-marker]:hidden">
             {item.q}
             <span
               aria-hidden
-              className="absolute top-1/2 right-2 size-2.5 -translate-y-[70%] rotate-45 border-r-[2.5px] border-b-[2.5px] border-accent transition-transform duration-200 group-open:-translate-y-[30%] group-open:rotate-225"
+              className="absolute top-1/2 right-2 size-2.5 -translate-y-[70%] rotate-45 border-r-[2.5px] border-b-[2.5px] border-ochre-500 transition-transform duration-200 group-open:-translate-y-[30%] group-open:rotate-225"
             />
           </summary>
-          <p className="max-w-[66ch] pr-3 pb-5.5 text-[15.5px] leading-relaxed text-ink-500">
+          <p className="max-w-[66ch] pr-3 pb-5.5 text-[15.5px] leading-relaxed text-plate-600">
             {item.a}
           </p>
         </details>
@@ -34,7 +34,6 @@ export function FaqList({ items }: { items: FaqItem[] }) {
 export function Faq({ items }: { items: FaqItem[] }) {
   return (
     <Section id="faq" stop className="pt-5 md:pt-5">
-      <Eyebrow>Preguntas</Eyebrow>
       <SectionTitle>Lo que todo el mundo pregunta</SectionTitle>
       <FaqList items={items} />
     </Section>
