@@ -11,8 +11,21 @@ plugin installé sur un compte, qui ne suit pas le projet.
 | `ui-ux-pro-max` | [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) | Base de données interrogeable : 84 styles, 192 palettes, 74 paires typographiques, 98 règles d'UX, 25 types de graphiques. |
 | `refactoring-ui` | [wondelai/skills](https://github.com/wondelai/skills) | Les principes de *Refactoring UI* — hiérarchie, espacement, couleur, profondeur. Markdown pur. |
 | `web-design-engineer` | [ConardLi/garden-skills](https://github.com/ConardLi/garden-skills) | Ingénierie de pages web : structure, rythme, mise en œuvre. |
+| 14 compétences de méthode | [obra/superpowers](https://github.com/obra/superpowers) (MIT) | Discipline d'ingénierie : `brainstorming`, `systematic-debugging`, `test-driven-development`, `verification-before-completion`, `writing-plans`, revue de code. |
 
-## Deux choses à savoir
+## Trois choses à savoir
+
+**`using-superpowers` porte un mandat de comportement très ferme** : elle exige
+d'invoquer une compétence avant *toute* réponse, y compris une simple question
+de clarification. C'est puissant pour un travail long et structuré, cérémonieux
+pour un échange rapide. Si les réponses deviennent lourdes, c'est ce dossier-là
+qu'il faut supprimer — les treize autres de la collection restent utiles seules.
+
+**`.claude/skills/` est exclu du lint** (`eslint.config.mjs`). Ce sont des
+dépôts tiers vendus tels quels : les passer sous les règles de ce projet
+produisait neuf erreurs sur du code qu'on ne modifie pas, et aurait fait échouer
+une CI pour rien. Rien dans `src/` ne les importe.
+
 
 **`impeccable` embarque des scripts Node** (~17 000 lignes) : chargement de
 contexte, détecteur de défauts, serveur d'édition en direct, hooks. Ils sont

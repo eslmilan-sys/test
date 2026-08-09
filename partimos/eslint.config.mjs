@@ -12,6 +12,12 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Compétences tierces vendues depuis leurs dépôts d'origine. Les linter
+    // avec les règles de ce projet n'a aucun sens : on ne les modifie pas, et
+    // leurs 9 erreurs feraient échouer une CI sur du code qui n'est pas le
+    // nôtre. Elles ne font pas partie de l'application non plus — rien dans
+    // src/ ne les importe.
+    ".claude/skills/**",
   ]),
 ]);
 
