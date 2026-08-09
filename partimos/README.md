@@ -167,7 +167,7 @@ serveur : c'est ce qui rend le contenu indexable et garde le JS sous les
 
 ## Démonstration cliquable (GitHub Pages)
 
-La branche `gh-pages` contient un export HTML pur des 11 pages, généré par :
+La branche `gh-pages` contient un export HTML pur des 13 pages, généré par :
 
 ```bash
 BASE_PATH=/test NEXT_PUBLIC_SITE_URL=https://eslmilan-sys.github.io/test \
