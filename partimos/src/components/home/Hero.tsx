@@ -33,7 +33,10 @@ export function Hero() {
               34 viajes publicados para este viernes
             </p>
             <h1 className="mb-3.5 text-[clamp(36px,7.8vw,68px)] leading-[0.98] font-extrabold tracking-[-0.045em]">
-              Alguien ya va
+              {/* L'espace explicite avant le retour à la ligne : sans lui, le
+                  texte extrait du H1 — celui que lisent les moteurs et les
+                  lecteurs d'écran — donne « vapara allá ». */}
+              Alguien ya va{" "}
               <br />
               <em className="brand-gradient-text not-italic">para allá.</em>
             </h1>
