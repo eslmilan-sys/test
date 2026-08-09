@@ -84,7 +84,7 @@ export function Footer() {
               <li key={corridor.slug}>
                 <Link
                   href={`/viajes/${corridor.slug}`}
-                  className="text-[13.5px] transition-colors hover:text-white"
+                  className="block py-1 text-[13.5px] transition-colors hover:text-white"
                 >
                   {corridor.origin.shortName} → {corridor.destination.shortName}
                 </Link>

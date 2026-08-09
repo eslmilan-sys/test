@@ -10,17 +10,17 @@ const PASOS: { icon: IconName; title: string; body: string }[] = [
   {
     icon: "search",
     title: "Busca tu ruta",
-    body: "Ves quién sale, a qué hora y por dónde pasa. Cada conductor marca los puntos donde puede recoger sin desviarse.",
+    body: "Ves quién sale, a qué hora y por dónde pasa. Cada conductor marca los puntos donde puede recoger sin desviarse de su camino.",
   },
   {
     icon: "chat",
     title: "Reserva y coordinen",
-    body: "Reservar es gratis. Al confirmar te damos el número del conductor para que afinen el punto exacto por chat o llamada.",
+    body: "Reservar no cuesta nada. Al confirmar te aparece el número del conductor, y entre ustedes afinan la hora y la esquina exacta.",
   },
   {
     icon: "car",
     title: "Viaja y aporta",
-    body: "Le pagas a la persona el día del viaje, en efectivo o por Yappy. Al final se califican los dos.",
+    body: "Le pagas a la persona el día del viaje, en efectivo o por Yappy. Al bajarte se califican los dos.",
   },
 ];
 
@@ -30,8 +30,8 @@ export function Pasos() {
       <Eyebrow>Cómo funciona</Eyebrow>
       <SectionTitle>Tres pasos y ya vas en camino</SectionTitle>
       <Lead>
-        Partimos conecta a quien maneja con quien necesita ir al mismo sitio.
-        Nada más, nada menos.
+        Alguien ya hizo el plan de manejar. Tú te sumas al carro y ponen los
+        gastos entre los dos.
       </Lead>
 
       <ol className="mt-9 grid gap-3.5 min-[760px]:grid-cols-3 min-[760px]:gap-4.5">

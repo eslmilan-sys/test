@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Export statique pour GitHub Pages (régénéré par npm run build:static)
+/out
+/.api-parked

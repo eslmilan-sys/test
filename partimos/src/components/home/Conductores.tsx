@@ -31,8 +31,8 @@ export function Conductores() {
       <Eyebrow>Para conductores</Eyebrow>
       <SectionTitle>El viaje ya lo ibas a hacer</SectionTitle>
       <Lead>
-        No ganas dinero manejando: recuperas parte de lo que ibas a gastar
-        igual. Mueve los controles y mira cuánto se comparte en tu ruta.
+        La gasolina te cuesta lo mismo vayas solo o con tres personas atrás. Lo
+        único que cambia es entre cuántos se reparte. Mueve los controles.
       </Lead>
 
       <div

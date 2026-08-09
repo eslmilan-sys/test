@@ -2,6 +2,11 @@ import type { MetadataRoute } from "next";
 import { CORRIDORS } from "@/lib/corridors";
 import { canonical } from "@/lib/site";
 
+// Fichier entièrement dérivé du référentiel : rien à recalculer à la
+// demande. `force-static` le dit explicitement, ce qu'exige aussi l'export
+// statique de la démonstration.
+export const dynamic = "force-static";
+
 /**
  * Une seule URL par contenu. Les pages corridor portent la priorité la plus
  * haute après l'accueil : ce sont elles qui capturent les recherches du type

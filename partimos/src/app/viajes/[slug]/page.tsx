@@ -155,13 +155,13 @@ export default async function CorridorPage({ params }: Params) {
             >
               <ol className="flex flex-wrap items-center gap-1.5">
                 <li>
-                  <Link href="/" className="hover:text-white">
+                  <Link href="/" className="block py-1 hover:text-white">
                     Inicio
                   </Link>
                 </li>
                 <li aria-hidden>/</li>
                 <li>
-                  <Link href="/viajes" className="hover:text-white">
+                  <Link href="/viajes" className="block py-1 hover:text-white">
                     Rutas
                   </Link>
                 </li>

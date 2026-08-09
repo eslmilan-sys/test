@@ -1,11 +1,14 @@
-import Link from "next/link";
-
 /**
  * Bandeau des viajes publiés — preuve de vie de la plateforme.
  *
- * Le défilement est décoratif : la liste est dupliquée pour boucler sans
- * saut, et le second jeu est masqué aux lecteurs d'écran. L'animation
- * s'arrête au survol et disparaît sous `prefers-reduced-motion`.
+ * Les cartes sont volontairement NON cliquables. Une cible qui défile en
+ * continu se rate au doigt : au survol l'animation se met en pause, mais sur
+ * un écran tactile il n'y a pas de survol, et la carte se dérobe sous le
+ * pouce. Le bandeau montre qu'il se passe quelque chose ; la section « Rutas »
+ * juste en dessous est là pour cliquer.
+ *
+ * La liste est dupliquée pour boucler sans saut, et le second jeu est masqué
+ * aux lecteurs d'écran. L'animation disparaît sous `prefers-reduced-motion`.
  */
 
 const TRIPS = [
@@ -61,11 +64,9 @@ function Card({
   clone?: boolean;
 }) {
   return (
-    <Link
-      href={`/viajes/${trip.slug}`}
+    <li
       aria-hidden={clone}
-      tabIndex={clone ? -1 : undefined}
-      className="flex shrink-0 items-center gap-2.5 rounded-[14px] border border-white/12 bg-white/6 px-3.5 py-2.5 whitespace-nowrap transition-colors hover:border-white/25 hover:bg-white/10"
+      className="flex shrink-0 items-center gap-2.5 rounded-[14px] border border-white/12 bg-white/6 px-3.5 py-2.5 whitespace-nowrap"
     >
       <span
         aria-hidden
@@ -82,7 +83,7 @@ function Card({
       <span className="tnum ml-1 font-display text-base font-bold text-white">
         {trip.price}
       </span>
-    </Link>
+    </li>
   );
 }
 
@@ -99,14 +100,14 @@ export function LiveStrip() {
         />
         Publicados hoy
       </p>
-      <div className="flex w-max animate-[strip_42s_linear_infinite] gap-2.5 group-hover:[animation-play-state:paused]">
+      <ul className="flex w-max animate-[strip_42s_linear_infinite] gap-2.5 group-hover:[animation-play-state:paused]">
         {TRIPS.map((trip) => (
           <Card key={trip.slug} trip={trip} />
         ))}
         {TRIPS.map((trip) => (
           <Card key={`${trip.slug}-clone`} trip={trip} clone />
         ))}
-      </div>
+      </ul>
     </div>
   );
 }

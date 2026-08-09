@@ -50,8 +50,8 @@ export function Rutas() {
       <Eyebrow>Rutas</Eyebrow>
       <SectionTitle>Las rutas que más se mueven</SectionTitle>
       <Lead>
-        Cada ruta tiene su página con horarios, puntos de recogida y lo que
-        suele aportarse.
+        Cada ruta tiene su página: quién sale esta semana, por dónde recogen y
+        hasta cuánto se puede aportar.
       </Lead>
 
       <div className="mt-8 grid gap-2.5 min-[640px]:grid-cols-2 min-[980px]:grid-cols-3">

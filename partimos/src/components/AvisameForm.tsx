@@ -26,6 +26,12 @@ type Props = {
 
 type State = "idle" | "sending" | "done" | "error";
 
+/**
+ * L'export statique n'a pas de route d'API. Le formulaire le dit au lieu de
+ * poster dans le vide et d'afficher une erreur technique.
+ */
+const IS_STATIC_PREVIEW = process.env.NEXT_PUBLIC_STATIC_PREVIEW === "1";
+
 export function AvisameForm({
   originSlug,
   destinationSlug,
@@ -51,6 +57,14 @@ export function AvisameForm({
     if (digits.length < 7 || digits.length > 13) {
       setState("error");
       setMessage("Escribe un número de celular válido, por ejemplo 6123-4567.");
+      return;
+    }
+
+    if (IS_STATIC_PREVIEW) {
+      setState("error");
+      setMessage(
+        "Esta es una vista previa: el número no se guarda todavía. En la versión publicada, aquí te confirmamos el aviso.",
+      );
       return;
     }
 

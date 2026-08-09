@@ -23,7 +23,7 @@ export function Nav() {
             <li key={link.href}>
               <Link
                 href={link.href}
-                className="transition-colors hover:text-ink-900"
+                className="block py-1.5 transition-colors hover:text-ink-900"
               >
                 {link.label}
               </Link>
@@ -34,7 +34,7 @@ export function Nav() {
         <div className="ml-auto flex items-center gap-2.5">
           <Link
             href="/ayuda"
-            className="hidden text-[14.5px] font-semibold transition-colors hover:text-accent-ink min-[900px]:block"
+            className="hidden py-1.5 text-[14.5px] font-semibold transition-colors hover:text-accent-ink min-[900px]:block"
           >
             Ayuda
           </Link>

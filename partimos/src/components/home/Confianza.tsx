@@ -58,8 +58,8 @@ export function Confianza() {
       <Eyebrow>Confianza y seguridad</Eyebrow>
       <SectionTitle>Sabes con quién viajas antes de subirte</SectionTitle>
       <Lead>
-        La carretera se hace larga con un desconocido. Por eso todo el mundo
-        aquí tiene nombre, cara y respaldo.
+        Cuatro horas de carretera con un desconocido es mucho tiempo. Por eso
+        aquí todo el mundo tiene nombre, cara e historial.
       </Lead>
 
       <div className="mt-9 grid gap-3.5 min-[680px]:grid-cols-2 min-[1000px]:grid-cols-4">

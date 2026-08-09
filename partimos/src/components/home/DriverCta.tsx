@@ -16,9 +16,9 @@ export function DriverCta() {
                 ¿Bajas al interior este viernes?
               </h2>
               <p className="mb-6 text-[16.5px] leading-relaxed text-ink-500">
-                Publica tu viaje en menos de un minuto. Los puestos vacíos no le
-                sirven a nadie — y la gasolina cuesta lo mismo vayas solo o
-                acompañado.
+                Publicar toma menos de un minuto. Tres puestos vacíos en la
+                Panamericana no le sirven a nadie — y hay gente buscando ese
+                mismo viaje ahora mismo.
               </p>
               <div className="flex flex-wrap gap-3">
                 <ButtonLink href="/publicar" size="lg">

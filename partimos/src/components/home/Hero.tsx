@@ -2,10 +2,10 @@ import { SearchCard } from "./SearchCard";
 import { LiveStrip } from "./LiveStrip";
 
 const PROOF = [
-  { title: "Te recogen cerca", detail: "De tu barrio, no de una terminal" },
-  { title: "Gente verificada", detail: "Cédula y celular confirmados" },
-  { title: "Le pagas a la persona", detail: "Efectivo o Yappy, sin tarjeta" },
-  { title: "Reservar es gratis", detail: "Partimos no cobra comisión" },
+  { title: "Salen de tu barrio", detail: "No de una terminal a las 4 a.m." },
+  { title: "Sabes quién maneja", detail: "Cédula y celular verificados" },
+  { title: "Le pagas a la persona", detail: "Efectivo o Yappy, nunca tarjeta" },
+  { title: "Reservar no cuesta", detail: "Partimos no cobra comisión" },
 ];
 
 export function Hero() {
@@ -38,8 +38,8 @@ export function Hero() {
               <em className="brand-gradient-text not-italic">para allá.</em>
             </h1>
             <p className="max-w-[42ch] text-[16.5px] leading-relaxed text-ink-300 md:text-[17.5px]">
-              Encuentra quién sale a tu pueblo este fin de semana. Sin
-              terminales, sin esperas.
+              El viernes hay alguien saliendo a tu pueblo con puestos vacíos.
+              Solo falta que se enteren.
             </p>
           </div>
 

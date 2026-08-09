@@ -23,8 +23,8 @@ export function Pago() {
         Le pagas a la persona, no a una app
       </SectionTitle>
       <Lead tone="dark">
-        Partimos no cobra, no retiene y no toca tu plata en ningún momento. El
-        aporte va directo de tu mano a la del conductor.
+        No hay carrito, no hay checkout, no hay plata retenida. El aporte va de
+        tu mano a la del conductor, el día del viaje.
       </Lead>
 
       <div className="mt-9 grid items-stretch gap-3.5 min-[860px]:grid-cols-[1fr_210px_1fr] min-[860px]:gap-0">
@@ -34,7 +34,7 @@ export function Pago() {
           </span>
           <h3 className="mb-1.5 font-display text-lg font-bold">Pasajero</h3>
           <p className="text-sm text-ink-300">
-            Reservas tu puesto en la app. No pagas nada ahí.
+            Apartas tu puesto en la app. Ahí no pagas nada.
           </p>
         </div>
 
@@ -45,9 +45,23 @@ export function Pago() {
           <span className="text-center text-[11.5px] font-bold tracking-[0.11em] text-brand-green uppercase">
             Efectivo o Yappy
           </span>
-          <span className="flex w-full items-center justify-center max-[859px]:h-13 max-[859px]:flex-col max-[859px]:w-auto">
-            <i className="h-[3px] flex-1 rounded-sm bg-[repeating-linear-gradient(90deg,var(--color-brand-green)_0_10px,transparent_10px_20px)] max-[859px]:h-full max-[859px]:w-[3px] max-[859px]:flex-none max-[859px]:bg-[repeating-linear-gradient(180deg,var(--color-brand-green)_0_10px,transparent_10px_20px)]" />
-            <i className="size-0 shrink-0 border-y-[6px] border-l-[9px] border-y-transparent border-l-brand-green max-[859px]:border-x-[6px] max-[859px]:border-y-0 max-[859px]:border-t-[9px] max-[859px]:border-x-transparent max-[859px]:border-t-brand-green max-[859px]:border-l-0" />
+          {/* Le trait s'étire, la pointe non.
+              La version précédente construisait la pointe avec quatre bordures
+              CSS puis en redéfinissait six au point de rupture : les règles
+              s'annulaient et la flèche mobile sortait déformée. Ici le trait
+              est un dégradé qui s'étire tout seul, et la pointe est un carré
+              SVG — un carré se pivote sans jamais se déformer. */}
+          <span className="flex w-full items-center justify-center gap-0 max-[859px]:h-20 max-[859px]:w-auto max-[859px]:flex-col">
+            {/* Pas de `self-stretch` : en colonne, l'axe transversal devient
+                l'horizontale et le trait se décalerait de sa pointe. */}
+            <i className="h-[3px] flex-1 rounded-sm bg-[repeating-linear-gradient(90deg,var(--color-brand-green)_0_10px,transparent_10px_20px)] max-[859px]:w-[3px] max-[859px]:flex-1 max-[859px]:bg-[repeating-linear-gradient(180deg,var(--color-brand-green)_0_10px,transparent_10px_20px)]" />
+            <svg
+              viewBox="0 0 12 12"
+              className="size-3 shrink-0 text-brand-green max-[859px]:rotate-90"
+              aria-hidden="true"
+            >
+              <path d="M2 0.5 L10 6 L2 11.5 Z" fill="currentColor" />
+            </svg>
           </span>
         </div>
 
@@ -57,7 +71,7 @@ export function Pago() {
           </span>
           <h3 className="mb-1.5 font-display text-lg font-bold">Conductor</h3>
           <p className="text-sm text-ink-300">
-            Recibe el aporte completo. Sin comisiones, sin descuentos.
+            Recibe el aporte completo. Nadie le descuenta nada.
           </p>
         </div>
       </div>

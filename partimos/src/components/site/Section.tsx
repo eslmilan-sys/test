@@ -34,6 +34,9 @@ type SectionProps = {
   className?: string;
   /** Décale le contenu pour laisser passer le ruban sur grand écran. */
   inset?: boolean;
+  /** Apparition à l'entrée dans le champ. À couper au-dessus de la ligne de
+   *  flottaison, où il n'y a rien à révéler. */
+  reveal?: boolean;
 };
 
 export function Section({
@@ -43,6 +46,7 @@ export function Section({
   stopRing = "#fff",
   className = "",
   inset = true,
+  reveal = true,
 }: SectionProps) {
   return (
     <section id={id} className={`relative py-16 md:py-[76px] ${className}`}>
@@ -52,6 +56,7 @@ export function Section({
             "relative z-[2]",
             stop && "parada",
             inset && "pl-[var(--rail-gutter)]",
+            reveal && "reveal",
           ]
             .filter(Boolean)
             .join(" ")}
