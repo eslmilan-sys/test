@@ -71,7 +71,7 @@ export function SearchCard() {
     if (sameCity || !from || !to) return;
 
     if (mode === "ofrecer") {
-      router.push(`/publicar?desde=${from}&hacia=${to}`);
+      router.push(`/publicar/nuevo?desde=${from}&hacia=${to}`);
       return;
     }
 
@@ -80,7 +80,9 @@ export function SearchCard() {
     );
 
     if (corridor) {
-      router.push(`/viajes/${corridor.slug}?fecha=${date}&puestos=${seats}`);
+      router.push(
+        `/buscar?desde=${from}&hacia=${to}&fecha=${date}&puestos=${seats}`,
+      );
       return;
     }
 

@@ -44,8 +44,11 @@
   --color-brand-green: #a0d838;
   --color-brand-green-deep: #6fa82b;
 
-  /* ---- Erreur uniquement ---- */
-  --color-danger: #d64a3d;
+  /* ---- Erreur uniquement ----
+     Assombri par rapport au corail de la maquette : à #d64a3d, le texte
+     tombait à 3,7:1 sur le fond corail pâle et à 4,3:1 sur blanc, sous le
+     seuil AA. Ici : 5,8:1 sur le fond pâle, 6,6:1 sur blanc. */
+  --color-danger: #a5372c;
   --color-danger-soft: #fdecea;
 
   /* ---- Typographie ---- */

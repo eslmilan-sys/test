@@ -7,7 +7,7 @@ const COLUMNS = [
   {
     title: "Viajar",
     links: [
-      { href: "/#buscar", label: "Buscar un viaje" },
+      { href: "/buscar", label: "Buscar un viaje" },
       { href: "/como-funciona", label: "Cómo se paga un viaje" },
       { href: "/viajes", label: "Todas las rutas" },
       { href: "/seguridad", label: "Seguridad" },
@@ -16,7 +16,8 @@ const COLUMNS = [
   {
     title: "Manejar",
     links: [
-      { href: "/publicar", label: "Publicar un viaje" },
+      { href: "/publicar/nuevo", label: "Publicar un viaje" },
+      { href: "/publicar", label: "Cómo funciona para conductores" },
       { href: "/publicar#calculadora", label: "Calcular el aporte" },
       { href: "/ayuda", label: "Preguntas frecuentes" },
     ],
@@ -24,6 +25,7 @@ const COLUMNS = [
   {
     title: "Partimos",
     links: [
+      { href: "/cuenta", label: "Mi cuenta" },
       { href: "/ayuda#contacto", label: "Contacto" },
       { href: "/terminos", label: "Términos de uso" },
       { href: "/privacidad", label: "Aviso de privacidad" },

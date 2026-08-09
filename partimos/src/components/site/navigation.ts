@@ -26,9 +26,9 @@ export const NAV_SECTIONS: NavSection[] = [
     title: "Viajar",
     links: [
       {
-        href: "/#buscar",
+        href: "/buscar",
         label: "Buscar un viaje",
-        hint: "Escoge origen y destino en el mapa",
+        hint: "Quién sale hoy, a qué hora y por cuánto",
         icon: "search",
       },
       {
@@ -55,10 +55,16 @@ export const NAV_SECTIONS: NavSection[] = [
     title: "Manejar",
     links: [
       {
-        href: "/publicar",
+        href: "/publicar/nuevo",
         label: "Publicar mi viaje",
-        hint: "Los puestos vacíos no le sirven a nadie",
+        hint: "Cuatro pasos, menos de un minuto",
         icon: "car",
+      },
+      {
+        href: "/publicar",
+        label: "Cómo funciona para conductores",
+        hint: "Por qué hay un tope y de dónde sale",
+        icon: "compass",
       },
       {
         href: "/publicar#calculadora",
@@ -71,6 +77,12 @@ export const NAV_SECTIONS: NavSection[] = [
   {
     title: "Partimos",
     links: [
+      {
+        href: "/cuenta",
+        label: "Mi cuenta",
+        hint: "Tus viajes, tu perfil, tu verificación",
+        icon: "users",
+      },
       {
         href: "/ayuda",
         label: "Ayuda",
@@ -95,8 +107,8 @@ export const NAV_SECTIONS: NavSection[] = [
 
 /** Les quatre entrées visibles en permanence sur grand écran. */
 export const PRIMARY_LINKS = [
+  { href: "/buscar", label: "Buscar" },
   { href: "/viajes", label: "Rutas" },
   { href: "/como-funciona", label: "Cómo se paga" },
-  { href: "/publicar", label: "Publicar un viaje" },
   { href: "/seguridad", label: "Seguridad" },
 ];

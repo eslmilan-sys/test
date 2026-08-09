@@ -1,0 +1,118 @@
+"use client";
+
+import { useCallback, useMemo, useSyncExternalStore } from "react";
+import { isSupabaseConfigured } from "./supabase";
+
+/**
+ * SESSION
+ *
+ * Deux modes, un seul contrat pour les composants.
+ *
+ * · Supabase configuré : la vraie session, OTP par SMS (§3 du brief).
+ * · Sinon : une session de DÉMONSTRATION en `localStorage`, pour que l'espace
+ *   compte, la réservation et la publication soient explorables.
+ *
+ * Le mode démonstration est annoncé partout où il change ce que voit
+ * l'utilisateur. Simuler une connexion sans le dire ferait croire qu'un compte
+ * existe, et la première déception d'un produit se paie très cher.
+ *
+ * `localStorage` est une source de vérité EXTÉRIEURE à React : on la lit avec
+ * `useSyncExternalStore` plutôt qu'avec un effet qui appellerait `setState`.
+ * L'effet produirait un rendu de plus à chaque montage, et surtout React ne
+ * garantirait pas la cohérence entre deux composants abonnés.
+ */
+
+export type Session = {
+  phone: string;
+  firstName: string;
+  lastInitial: string;
+  isVerified: boolean;
+  since: string;
+};
+
+const STORAGE_KEY = "partimos.demo-session";
+const EVENT = "partimos:session";
+
+const listeners = new Set<() => void>();
+
+function emit() {
+  listeners.forEach((listener) => listener());
+}
+
+function subscribe(listener: () => void) {
+  listeners.add(listener);
+  // `storage` couvre les autres onglets ; l'événement maison couvre celui-ci.
+  window.addEventListener("storage", listener);
+  window.addEventListener(EVENT, listener);
+  return () => {
+    listeners.delete(listener);
+    window.removeEventListener("storage", listener);
+    window.removeEventListener(EVENT, listener);
+  };
+}
+
+/** Le snapshot est la chaîne brute : deux lectures identiques doivent rendre
+ *  la MÊME référence, sinon React reboucle indéfiniment. */
+function getSnapshot(): string | null {
+  try {
+    return window.localStorage.getItem(STORAGE_KEY);
+  } catch {
+    // Stockage refusé (navigation privée stricte) : on reste déconnecté.
+    return null;
+  }
+}
+
+/** Sur le serveur, personne n'est connecté — et le rendu doit correspondre
+ *  au premier rendu client, sinon l'hydratation échoue. */
+function getServerSnapshot(): string | null {
+  return null;
+}
+
+export function useSession() {
+  const raw = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+
+  const session = useMemo<Session | null>(() => {
+    if (!raw) return null;
+    try {
+      return JSON.parse(raw) as Session;
+    } catch {
+      return null;
+    }
+  }, [raw]);
+
+  const signIn = useCallback((phone: string, firstName = "Tú") => {
+    const next: Session = {
+      phone,
+      firstName,
+      lastInitial: "",
+      isVerified: false,
+      since: new Date().toISOString(),
+    };
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+    } catch {
+      // Sans stockage, la session ne survit pas au rechargement. Acceptable.
+    }
+    emit();
+  }, []);
+
+  const signOut = useCallback(() => {
+    try {
+      window.localStorage.removeItem(STORAGE_KEY);
+    } catch {
+      // rien à nettoyer
+    }
+    emit();
+  }, []);
+
+  // Pas de drapeau « prêt » : il vaudrait false sur le serveur et true dans
+  // le navigateur, ce qui casserait l'hydratation. Le premier rendu est celui
+  // d'un visiteur déconnecté, et React le corrige dès la lecture du stockage.
+  return { session, isDemo: !isSupabaseConfigured, signIn, signOut };
+}
+
+/** Conservé pour que l'arbre reste explicite : la session n'a pas d'état
+ *  React propre, mais le fournisseur documente où elle est disponible. */
+export function SessionProvider({ children }: { children: React.ReactNode }) {
+  return <>{children}</>;
+}

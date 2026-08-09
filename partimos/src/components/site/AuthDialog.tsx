@@ -5,6 +5,7 @@ import * as Dialog from "@radix-ui/react-dialog";
 import { Button } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
 import { getSupabase, isSupabaseConfigured } from "@/lib/supabase";
+import { useSession } from "@/lib/session";
 
 /**
  * Connexion par code SMS — pas de mot de passe (§3 du brief).
@@ -26,6 +27,7 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
   const [code, setCode] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const { signIn } = useSession();
 
   function reset() {
     setStep("phone");
@@ -43,6 +45,9 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
     }
     setError("");
 
+    // Sans Supabase, on ouvre une session de démonstration : c'est ce qui
+    // rend l'espace compte, la réservation et la publication explorables.
+    // Chaque écran concerné le dit — on ne laisse pas croire à un vrai compte.
     if (!isSupabaseConfigured) {
       setStep("sent");
       return;
@@ -117,13 +122,19 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
           {step === "sent" ? (
             <div className="rounded-[16px] bg-ink-50 px-5 py-4">
               <p className="text-[14.5px] leading-relaxed text-ink-500">
-                <b className="font-semibold text-ink-900">
-                  Las cuentas todavía no están abiertas.
-                </b>{" "}
-                Estamos midiendo en qué rutas hay más gente esperando antes de
-                abrir el registro. Puedes buscar viajes y calcular tu aporte sin
-                cuenta.
+                <b className="font-semibold text-ink-900">Modo demostración.</b>{" "}
+                No hay SMS todavía. Al continuar abrimos una sesión que vive
+                solo en tu navegador, para que recorras la reserva, la
+                publicación y tu cuenta como serán de verdad.
               </p>
+              <Dialog.Close asChild>
+                <button
+                  onClick={() => signIn(`+507 ${phone.replace(/\D/g, "")}`)}
+                  className="mt-3 w-full rounded-[14px] bg-ink-900 px-5 py-3 font-display text-[15px] font-bold text-white transition-colors hover:bg-ink-800"
+                >
+                  Continuar
+                </button>
+              </Dialog.Close>
             </div>
           ) : step === "phone" ? (
             <form

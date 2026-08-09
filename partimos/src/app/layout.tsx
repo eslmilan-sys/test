@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque, Instrument_Sans } from "next/font/google";
 import { Nav } from "@/components/site/Nav";
 import { Footer } from "@/components/site/Footer";
+import { SessionProvider } from "@/lib/session";
 import { SITE, canonical } from "@/lib/site";
 import "./globals.css";
 
@@ -83,9 +84,11 @@ export default function RootLayout({
         >
           Saltar al contenido
         </a>
-        <Nav />
-        {children}
-        <Footer />
+        <SessionProvider>
+          <Nav />
+          {children}
+          <Footer />
+        </SessionProvider>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

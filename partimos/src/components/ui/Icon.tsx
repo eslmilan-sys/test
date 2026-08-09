@@ -98,6 +98,7 @@ const PATHS = {
     </>
   ),
   check: <path d="M4.5 12.5l4.8 4.8L19.5 7" />,
+  plus: <path d="M12 5v14M5 12h14" />,
   cross: <path d="M6 6l12 12M18 6L6 18" />,
   arrowRight: <path d="M4 12h15m-5.5-5.5L19 12l-5.5 5.5" />,
   bus: (
