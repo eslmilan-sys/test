@@ -702,10 +702,14 @@
         rgb(245 158 11 / 0.1) 44%,
         transparent 72%
       ),
-      /* Le froid qui lui répond, presque invisible pris isolément. */
+      /* Le froid qui répond à la lumière n'est plus un bleu générique : c'est
+         LE bleu du quartier de nuit (#17384C), très dilué. Le premier écran
+         annonce ainsi la couleur des sections sombres au lieu de vivre dans
+         sa propre palette — c'est ce qui fait tenir la page comme UN décor,
+         l'aube en haut, la nuit au milieu, le même ciel. */
         radial-gradient(
           120% 90% at -10% 108%,
-          rgb(59 130 246 / 0.09),
+          rgb(23 56 76 / 0.14),
           transparent 62%
         );
     background-repeat: no-repeat;
@@ -744,6 +748,69 @@
         transparent 60%
       ),
       linear-gradient(172deg, #17384c 0%, #0e2534 46%, #0a1b26 100%);
+  }
+
+  /* ---- LES PISTES SE REMPLISSENT QUAND ON ARRIVE DESSUS ----
+     Pilotées par le défilement natif (`view()`), pas par un script : la
+     révélation est un `clip-path` qui s'ouvre de gauche à droite — les tirets
+     restent nets, rien ne s'étire — et le disque d'arrivée se pose à la fin.
+     Là où `view()` n'existe pas, ou si l'utilisateur refuse le mouvement, les
+     pistes sont simplement pleines : même page, sans le geste. C'est aussi ce
+     qui garde le fichier autonome (sans script) intact. */
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      /* `cover`, pas `entry` : pour un élément de 16 px, la plage `entry` ne
+         dure que sa propre hauteur de défilement — l'animation finissait en
+         16 px, invisible. `cover` mesure la traversée de l'écran entier : le
+         remplissage occupe le premier tiers de la montée, le disque se pose
+         juste après. */
+      .ruta-trait {
+        animation: pista-llena linear both;
+        animation-timeline: view();
+        animation-range: cover 4% cover 32%;
+      }
+
+      .pista-llegada {
+        animation: llegada-pop linear both;
+        animation-timeline: view();
+        animation-range: cover 24% cover 40%;
+      }
+    }
+  }
+
+  @keyframes pista-llena {
+    from {
+      clip-path: inset(0 100% 0 0);
+    }
+    to {
+      clip-path: inset(0 0 0 0);
+    }
+  }
+
+  @keyframes llegada-pop {
+    from {
+      scale: 0;
+    }
+    to {
+      scale: 1;
+    }
+  }
+
+  /* ---- L'APORTE CIRCULE ----
+     Sur le plateau de paiement, les tirets du trait Tú ──▸ A dérivent
+     lentement vers le conducteur : le geste que la section raconte — l'argent
+     va de ta main à la sienne — devient visible sans un mot. Une période de
+     motif par 1,6 s : on doit le sentir, pas le regarder. */
+  @media (prefers-reduced-motion: no-preference) {
+    .flujo-aporte {
+      animation: flujo 1.6s linear infinite;
+    }
+  }
+
+  @keyframes flujo {
+    to {
+      background-position-x: 20px;
+    }
   }
 
   /* Le tracé des corridors. Un dégradé donne la DIRECTION — l'ambre s'assombrit

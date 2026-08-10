@@ -41,7 +41,7 @@ export function Pago() {
           {/* Le trait s'étire, la pointe non : un carré SVG pivoté ne se
               déforme jamais, contrairement à une pointe en bordures CSS. */}
           <span aria-hidden className="flex items-center">
-            <i className="h-[3px] flex-1 rounded-sm bg-[repeating-linear-gradient(90deg,var(--color-action)_0_10px,transparent_10px_20px)]" />
+            <i className="flujo-aporte h-[3px] flex-1 rounded-sm bg-[repeating-linear-gradient(90deg,var(--color-action)_0_10px,transparent_10px_20px)]" />
             <svg
               viewBox="0 0 12 12"
               className="size-3 shrink-0 text-action"

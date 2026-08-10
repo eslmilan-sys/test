@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   AVERAGE_TOLL_CENTS,
   computePriceCap,
@@ -8,6 +8,56 @@ import {
   VEHICLE_LABELS,
   type VehicleCategory,
 } from "@/lib/pricing";
+
+/**
+ * Un montant qui ROULE vers sa nouvelle valeur au lieu de sauter.
+ *
+ * C'est le seul endroit du site où un chiffre change sous les doigts de
+ * l'utilisateur : le voir courir de $17.50 à $23.30 dit « ceci est un
+ * calcul », là où un saut sec dit « ceci est un autre écran ». 240 ms en
+ * décélération — assez pour être vu, trop court pour être attendu.
+ *
+ * Trois garde-fous :
+ *   · `prefers-reduced-motion` → la valeur s'affiche directement ;
+ *   · le premier rendu ne roule pas — rien de plus agaçant qu'une page qui
+ *     compte toute seule à l'arrivée ;
+ *   · l'animation vit dans un `requestAnimationFrame` annulé à chaque
+ *     changement : deux coups de curseur rapides ne se battent pas.
+ */
+function useMontoRodante(targetCents: number): number {
+  /* Hors animation, la valeur affichée EST la cible — aucun état à
+     synchroniser, donc pas de `setState` dans le corps de l'effet (la règle
+     React a raison : c'est comme ça qu'on fabrique des rendus en cascade).
+     L'état n'existe que pendant les 240 ms du roulement, alimenté par les
+     ticks du `requestAnimationFrame`, puis retombe à `null`. */
+  const [rolling, setRolling] = useState<number | null>(null);
+  const prev = useRef(targetCents);
+
+  useEffect(() => {
+    const from = prev.current;
+    prev.current = targetCents;
+    if (from === targetCents) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    let raf = 0;
+    const start = performance.now();
+    const DURATION = 240;
+    const tick = (now: number) => {
+      const t = Math.min(1, (now - start) / DURATION);
+      if (t >= 1) {
+        setRolling(null);
+        return;
+      }
+      const eased = 1 - (1 - t) ** 3;
+      setRolling(Math.round(from + (targetCents - from) * eased));
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [targetCents]);
+
+  return rolling ?? targetCents;
+}
 
 /**
  * Calculateur d'aporte — Formule A.
@@ -40,6 +90,11 @@ export function Calculadora({
     () => computePriceCap(km, tollCents, category, seats),
     [km, tollCents, category, seats],
   );
+
+  const tope = useMontoRodante(result.maxPriceCents);
+  const costo = useMontoRodante(result.costTotalCents);
+  const recupera = useMontoRodante(result.recoveredCents);
+  const pone = useMontoRodante(result.driverShareCents);
 
   return (
     <div
@@ -121,7 +176,7 @@ export function Calculadora({
             Tope por puesto
           </p>
           <p className="tnum font-display text-5xl leading-tight font-extrabold tracking-[-0.045em] text-action-deep">
-            {formatUsd(result.maxPriceCents)}
+            {formatUsd(tope)}
           </p>
           <p className="text-[13px] text-ink-500">
             Puedes pedir menos, nunca más
@@ -129,17 +184,13 @@ export function Calculadora({
         </div>
 
         <dl className="text-sm">
-          <Row label="Costo estimado del viaje">
-            {formatUsd(result.costTotalCents)}
-          </Row>
+          <Row label="Costo estimado del viaje">{formatUsd(costo)}</Row>
           <Row label="Se divide entre">
             {result.occupants} ocupantes (tú incluido)
           </Row>
-          <Row label="Recuperas con todo lleno">
-            {formatUsd(result.recoveredCents)}
-          </Row>
+          <Row label="Recuperas con todo lleno">{formatUsd(recupera)}</Row>
           <Row label="Sigues poniendo de tu bolsillo" emphasis>
-            {formatUsd(result.driverShareCents)}
+            {formatUsd(pone)}
           </Row>
         </dl>
       </div>

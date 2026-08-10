@@ -39,7 +39,11 @@ import { Icon, type IconName } from "@/components/ui/Icon";
  * nulle part — alors que c'est la vraie différence vécue.
  */
 const PROOF: { icon: IconName; title: string; detail: string }[] = [
-  { icon: "pin", title: "Te recogen cerca", detail: "No en una terminal" },
+  {
+    icon: "pin",
+    title: "Te recogen donde te sirve",
+    detail: "Escoges el punto al reservar",
+  },
   {
     icon: "car",
     title: "Vas sentado y con espacio",

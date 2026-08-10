@@ -97,7 +97,7 @@ export function Corredores() {
                       />
                       <i className="absolute top-1/2 left-0 size-[11px] -translate-y-1/2 rounded-full border-[2.5px] border-ink-900 bg-ink-50" />
                       <i
-                        className="absolute top-1/2 size-[13px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-action-deep shadow-[0_0_0_3px_var(--color-ink-50),0_2px_6px_rgb(180_83_9/0.35)] transition-transform duration-300 group-hover:scale-115"
+                        className="pista-llegada absolute top-1/2 size-[13px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-action-deep shadow-[0_0_0_3px_var(--color-ink-50),0_2px_6px_rgb(180_83_9/0.35)] transition-transform duration-300 group-hover:scale-115"
                         style={{ left: `${pct}%` }}
                       />
                     </span>
