@@ -102,7 +102,8 @@ export function Footer() {
             {LEGAL_FOOTER}
           </p>
           <span className="text-[12.5px] whitespace-nowrap">
-            © {new Date().getFullYear()} Partimos · Panamá
+            © {new Date().getFullYear()} Partimos — hecho para las carreteras de
+            Panamá
           </span>
         </div>
       </div>

@@ -8,13 +8,14 @@ import { canonical } from "@/lib/site";
 export const metadata: Metadata = {
   title: "Todas las rutas de carro compartido en Panamá",
   description:
-    "Panamá al interior: Chitré, Las Tablas, David, Santiago, Penonomé y Coronado. Distancias, tiempos de camino y el aporte máximo por puesto en cada ruta.",
+    "De Panamá al interior y de vuelta: Chitré, Las Tablas, David, Santiago, Penonomé y Coronado. Distancias, tiempos y el aporte máximo por puesto en cada sentido.",
   alternates: { canonical: canonical("/viajes") },
 };
 
 export default function RutasPage() {
-  const priority = CORRIDORS.filter((c) => c.isPriority);
-  const rest = CORRIDORS.filter((c) => !c.isPriority);
+  const priority = CORRIDORS.filter((c) => c.isPriority && !c.isReturn);
+  const rest = CORRIDORS.filter((c) => !c.isPriority && !c.isReturn);
+  const returns = CORRIDORS.filter((c) => c.isReturn);
 
   return (
     <>
@@ -43,8 +44,17 @@ export default function RutasPage() {
             </div>
 
             <h2 className="mb-4 font-display text-xl font-bold">Otras rutas</h2>
-            <div className="grid gap-2.5 min-[640px]:grid-cols-2 min-[980px]:grid-cols-3">
+            <div className="mb-11 grid gap-2.5 min-[640px]:grid-cols-2 min-[980px]:grid-cols-3">
               {rest.map((corridor) => (
+                <RutaCard key={corridor.slug} slug={corridor.slug} />
+              ))}
+            </div>
+
+            <h2 className="mb-4 font-display text-xl font-bold">
+              De vuelta a la ciudad
+            </h2>
+            <div className="grid gap-2.5 min-[640px]:grid-cols-2 min-[980px]:grid-cols-3">
+              {returns.map((corridor) => (
                 <RutaCard key={corridor.slug} slug={corridor.slug} />
               ))}
             </div>

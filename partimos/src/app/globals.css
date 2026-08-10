@@ -725,20 +725,10 @@
      calculés contre le composite le PLUS clair (base #17384C + lueur ambre) :
      blanc 10,3:1, night-200 6,6:1, ambre #F59E0B 4,8:1.
 
-     `.noche-alto` est le HAUT du quartier (Historias) : son dégradé se
-     termine sur la valeur exacte où celui de `.noche` commence (#17384C).
-     Les deux sections se raccordent sans couture et se lisent comme UN seul
-     quartier de nuit, pas deux sections peintes chacune de leur côté. */
-  .noche-alto {
-    background-color: var(--color-night-800);
-    background-image:
-      radial-gradient(
-        70% 60% at 92% 0%,
-        rgb(245 158 11 / 0.09),
-        transparent 60%
-      ),
-      linear-gradient(178deg, #0e2431 0%, #133043 68%, #17384c 100%);
-  }
+     Le quartier (Historias + Pago) est UNE toile : un seul élément porte ce
+     fond, parce que deux dégradés voisins ne tombent jamais exactement sur
+     le même pixel sur toute la largeur — la couture se voyait, le client
+     l'a vue. */
 
   .noche {
     background-color: var(--color-night-900);

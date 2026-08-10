@@ -101,15 +101,12 @@ export function Historias() {
   }
 
   return (
-    /* LA SECTION EST BRUNE, LES CARTES SONT EN VERRE.
-       Demandé par le client, et le choix tient debout : le verre a besoin
-       d'un dégradé sous lui pour exister, et `noche` en est un. Les cartes
-       éditoriales sans photo deviennent des vitres posées sur ce fond — même
-       matière que le plateau de paiement juste en dessous, donc les deux
-       zones sombres se lisent comme UN quartier du site, pas deux sections
-       peintes chacune dans son coin. Les cartes à photo, elles, restent des
-       photos : une image floutée derrière une vitre n'est plus une image. */
-    <section className="noche-alto py-16 text-white md:py-[76px]">
+    /* Le fond de nuit vit sur le PARENT (une seule toile avec Pago — deux
+       dégradés voisins font une couture, un seul ne peut pas). Les cartes
+       éditoriales sans photo sont des vitres posées dessus ; les cartes à
+       photo restent des photos — une image floutée derrière une vitre n'est
+       plus une image. */
+    <section className="py-16 text-white md:py-[76px]">
       <Container>
         <div className="mb-7 flex items-end justify-between gap-6">
           <h2 className="max-w-[16ch] text-[clamp(28px,5.2vw,44px)] leading-[1.05] font-extrabold">

@@ -67,9 +67,49 @@ test("une paire desservie n'est pas forcément un corridor", () => {
   assert.ok(serving.length >= 2, "au moins Santiago et David passent par là");
 });
 
-test("on ne remonte jamais un corridor à contresens", () => {
-  assert.deepEqual(corridorsServing("santiago", "penonome"), []);
-  assert.deepEqual(corridorsServing("david", "panama-city"), []);
+test("un corridor donné ne se parcourt que dans son sens de marche", () => {
+  // La paire inverse est désormais SERVIE — par les corridors de retour, qui
+  // sont des corridors à part entière. Ce qui reste interdit : qu'un même
+  // corridor serve les deux sens. Personne ne recule sur la Panamericana.
+  for (const corridor of corridorsServing("santiago", "penonome")) {
+    assert.ok(corridor.isReturn, `${corridor.slug} servirait à contresens`);
+  }
+  for (const corridor of corridorsServing("david", "panama-city")) {
+    assert.ok(corridor.isReturn, `${corridor.slug} servirait à contresens`);
+  }
+  assert.ok(corridorsServing("david", "panama-city").length >= 1);
+});
+
+test("chaque retour est le miroir exact de son aller", () => {
+  // Même distance, mêmes péages totaux, villes inverses, et des cumuls
+  // recalculés depuis la nouvelle origine. Si un cumul est faux, le prix
+  // d'un segment de retour est faux — et R1 tombe sur tout le corridor.
+  const returns = CORRIDORS.filter((c) => c.isReturn);
+  assert.equal(returns.length, CORRIDORS.length / 2);
+
+  for (const back of returns) {
+    const out = CORRIDORS.find(
+      (c) =>
+        !c.isReturn &&
+        c.origin.slug === back.destination.slug &&
+        c.destination.slug === back.origin.slug,
+    )!;
+    assert.ok(out, `${back.slug} : aller introuvable`);
+    assert.equal(back.distanceKm, out.distanceKm, back.slug);
+    assert.equal(back.tollCents, out.tollCents, back.slug);
+    assert.notEqual(back.intro, out.intro, "l'éditorial ne se duplique pas");
+
+    const mirrored = [...out.waypoints].reverse();
+    for (let i = 0; i < mirrored.length; i++) {
+      assert.equal(back.waypoints[i].citySlug, mirrored[i].citySlug);
+      assert.equal(back.waypoints[i].km, out.distanceKm - mirrored[i].km);
+      assert.equal(
+        back.waypoints[i].tollCents,
+        out.tollCents - mirrored[i].tollCents,
+        `${back.slug} : les péages de retour tombent en FIN de trajet`,
+      );
+    }
+  }
 });
 
 test("le prix d'un segment ne dépasse jamais celui du trajet entier", () => {

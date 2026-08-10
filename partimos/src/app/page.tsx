@@ -26,12 +26,23 @@ export default function Home() {
           <Pasos />
         </div>
 
-        {/* Le carrousel déborde volontairement du conteneur : il sort donc
-            du ruban, qui lui passait dessus et coupait la première carte. */}
-        <Historias />
+        {/* LE QUARTIER DE NUIT EST UNE SEULE TOILE.
+            Historias et Pago partagent UN élément porteur du dégradé : deux
+            sections peintes chacune de leur côté se raccordaient sur une
+            couture visible — deux dégradés ne tombent jamais exactement sur
+            le même pixel sur toute la largeur. Un seul fond ne peut pas se
+            désaccorder avec lui-même.
+
+            Le carrousel reste hors du ruban d'asphalte, qui lui passait
+            dessus et coupait la première carte ; le ruban reprend à Pago. */}
+        <div className="noche text-white">
+          <Historias />
+          <div className="road">
+            <Pago />
+          </div>
+        </div>
 
         <div className="road">
-          <Pago />
           <Conductores />
           <Confianza />
           <Corredores />

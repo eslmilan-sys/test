@@ -13,8 +13,10 @@ ignore est inapplicable.
 ## 1. Le produit
 
 **Partimos** met en relation des particuliers qui partagent les frais d'un
-trajet interurbain au Panama. Six corridors ouverts entre Ciudad de Panamá et
-l'intérieur du pays : Coronado, Penonomé, Santiago, Chitré, Las Tablas, David.
+trajet interurbain au Panama. Six corridors entre Ciudad de Panamá et
+l'intérieur — Coronado, Penonomé, Santiago, Chitré, Las Tablas, David — et
+chacun a son retour : douze pages de route, une par sens, car on descend le
+vendredi et on remonte le dimanche.
 
 **Le public.** Des gens qui descendent à l'intérieur le vendredi après-midi et
 remontent le dimanche midi. Aujourd'hui ils prennent le bus depuis le terminal

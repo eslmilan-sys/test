@@ -13,9 +13,9 @@ import { formatDuration, formatUsd } from "@/lib/pricing";
  * Passer en cartes aurait ramené la grille de cartes identiques, déjà
  * rejetée deux fois. Deux constats ont donné la forme :
  *
- *   1. Les six corridors partent TOUS de Ciudad de Panamá. L'écrire six fois
- *      était du bruit ; on l'écrit une fois en tête et chaque ligne n'a plus
- *      qu'une destination à porter.
+ *   1. La liste montre les six ALLERS — chaque retour a sa page, dite une
+ *      fois en tête. Douze lignes où six suffisent seraient du bruit, et
+ *      chaque ligne n'a qu'une destination à porter.
  *   2. Ce qu'on compare ici, c'est une distance et un aporte. Une piste de
  *      largeur FIXE, remplie proportionnellement, se compare d'un coup d'œil —
  *      un trait de longueur variable, lui, laissait une demi-ligne morte
@@ -27,7 +27,9 @@ import { formatDuration, formatUsd } from "@/lib/pricing";
  * Répété, il devient une signature.
  */
 export function Corredores() {
-  const rows = [...CORRIDORS].sort((a, b) => a.distanceKm - b.distanceKm);
+  const rows = CORRIDORS.filter((c) => !c.isReturn).sort(
+    (a, b) => a.distanceKm - b.distanceKm,
+  );
   const maxKm = Math.max(...rows.map((c) => c.distanceKm));
 
   return (
@@ -41,9 +43,10 @@ export function Corredores() {
               Las seis rutas abiertas
             </h2>
             <p className="mt-3 text-[15.5px] leading-relaxed text-ink-500">
-              Todas salen de Ciudad de Panamá. El tope se calcula con un carro
-              estándar y tres puestos — con menos puestos sube, porque hay menos
-              gente entre quien repartir el mismo costo.
+              Conectan Ciudad de Panamá con el interior, y cada una tiene su
+              vuelta con página propia. El tope se calcula con un carro estándar
+              y tres puestos — con menos puestos sube, porque hay menos gente
+              entre quien repartir el mismo costo.
             </p>
           </div>
 

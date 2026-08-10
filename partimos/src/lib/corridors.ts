@@ -34,6 +34,11 @@ export type Corridor = {
   tollCents: number;
   typicalDurationMin: number;
   isPriority: boolean;
+  /** Sens du trajet. La demande existe dans les deux sens — on descend le
+   *  vendredi, on remonte le dimanche — donc chaque corridor a son retour,
+   *  page à part entière avec son propre contenu. `isReturn` sert aux vues
+   *  qui listent : montrer douze lignes où six suffisent serait du bruit. */
+  isReturn?: boolean;
   /** Points de prise en charge habituels. Jamais un terminal (§10). */
   pickupPoints: string[];
   /** Deux ou trois phrases propres au corridor : c'est ce qui distingue la
@@ -288,6 +293,75 @@ export const CORRIDORS: Corridor[] = [
   },
 ];
 
+/**
+ * LES RETOURS — un point A vers un point B, pas seulement depuis Panamá.
+ *
+ * Le client l'a dit simplement : « les gens rentrent à la ville aussi ». On
+ * descend le vendredi, on remonte le dimanche — la moitié de la demande est
+ * dans l'autre sens, et elle n'avait aucune page.
+ *
+ * Chaque retour est DÉRIVÉ de son aller : mêmes villes, même distance, mêmes
+ * péages totaux, points de passage inversés avec les cumuls recalculés depuis
+ * la nouvelle origine (km' = total − km, péages' = total − péages — les
+ * péages se paient tous près de Panamá, donc en montant ils tombent sur la
+ * FIN du trajet, et le calcul des segments doit le savoir).
+ *
+ * Seul l'éditorial est écrit à la main : une page générée qui répète l'aller
+ * mot pour mot serait du contenu dupliqué, pour Google comme pour le lecteur.
+ */
+const RETURN_EDITORIAL: Record<string, { intro: string; pickup: string[] }> = {
+  "panama-chitre": {
+    intro:
+      "El domingo de vuelta es el viaje más compartido de Azuero: casi todos los que bajaron el viernes suben entre el mediodía y la noche. Busca temprano — los puestos de la tarde del domingo son los primeros en llenarse.",
+    pickup: [...ROAD.chitre.pickupPoints, "Divisa — cruce de la Panamericana"],
+  },
+  "panama-las-tablas": {
+    intro:
+      "De Las Tablas a la capital casi todos pasan por Guararé y Chitré, así que un carro que sale de Las Tablas suele poder recogerte en el camino. El domingo sube más gente que cualquier otro día de la semana.",
+    pickup: [...ROAD["las-tablas"].pickupPoints, "Chitré — de paso por la vía"],
+  },
+  "panama-coronado": {
+    intro:
+      "La subida del domingo desde la playa. Poco más de una hora de camino, aporte pequeño, y muchos carros que regresan a la ciudad con puestos vacíos después del fin de semana.",
+    pickup: [...ROAD.coronado.pickupPoints],
+  },
+  "panama-santiago": {
+    intro:
+      "Muchos veragüenses suben a la capital entre semana por trámites o trabajo. Es de las rutas donde más fácil se consigue puesto un lunes en la mañana, y casi todos los carros que vienen de Chiriquí pasan por aquí.",
+    pickup: [...ROAD.santiago.pickupPoints, "Aguadulce — parada en carretera"],
+  },
+  "panama-penonome": {
+    intro:
+      "Quien sube de Veraguas o de Chiriquí pasa por Penonomé, así que además de los carros que salen del pueblo puedes montarte en uno que ya viene en camino. La entrada del pueblo es el punto de siempre.",
+    pickup: [...ROAD.penonome.pickupPoints],
+  },
+  "panama-david": {
+    intro:
+      "La subida larga: seis horas y media, casi siempre con parada en Santiago. Muchos conductores salen de madrugada para llegar a la capital a mediodía — mira también los viajes que salen la tarde anterior.",
+    pickup: [...ROAD.david.pickupPoints, "Santiago — parada de descanso"],
+  },
+};
+
+const RETURN_CORRIDORS: Corridor[] = CORRIDORS.map((outbound) => {
+  const editorial = RETURN_EDITORIAL[outbound.slug];
+  return {
+    ...outbound,
+    slug: `${outbound.slug.replace(/^panama-/, "")}-panama`,
+    origin: outbound.destination,
+    destination: outbound.origin,
+    isReturn: true,
+    pickupPoints: editorial.pickup,
+    intro: editorial.intro,
+    waypoints: [...outbound.waypoints].reverse().map((w) => ({
+      ...w,
+      km: outbound.distanceKm - w.km,
+      tollCents: outbound.tollCents - w.tollCents,
+    })),
+  };
+});
+
+CORRIDORS.push(...RETURN_CORRIDORS);
+
 export function getCorridor(slug: string): Corridor | undefined {
   return CORRIDORS.find((c) => c.slug === slug);
 }
@@ -301,9 +375,17 @@ export function getReverseCorridor(corridor: Corridor): Corridor | undefined {
   );
 }
 
-/** Corridors qui partagent une ville — le maillage interne des pages SEO. */
+/** Corridors qui partagent une ville — le maillage interne des pages SEO.
+ *  Même sens de marche que la page courante, et jamais son propre retour :
+ *  celui-ci a déjà son lien dédié dans la FAQ de la page. */
 export function getRelatedCorridors(corridor: Corridor, limit = 3): Corridor[] {
-  return CORRIDORS.filter((c) => c.slug !== corridor.slug)
+  const reverse = getReverseCorridor(corridor);
+  return CORRIDORS.filter(
+    (c) =>
+      c.slug !== corridor.slug &&
+      c.slug !== reverse?.slug &&
+      Boolean(c.isReturn) === Boolean(corridor.isReturn),
+  )
     .sort((a, b) => Number(b.isPriority) - Number(a.isPriority))
     .slice(0, limit);
 }

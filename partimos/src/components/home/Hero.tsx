@@ -79,9 +79,9 @@ export function Hero() {
             </h1>
 
             <p className="enter enter-2 max-w-[44ch] text-[17px] leading-[1.5] font-light text-ink-600 md:text-[19px]">
-              Partimos junta a quien maneja al interior con quien va para el
-              mismo lado. Buscas tu ruta, reservas sin pagar nada y haces el
-              camino sentado, con una sola parada: la tuya.
+              Partimos junta a quien maneja con quien va para el mismo lado — de
+              bajada al interior o de vuelta a la ciudad. Reservas sin pagar
+              nada y haces el camino sentado, con una sola parada: la tuya.
             </p>
           </div>
 

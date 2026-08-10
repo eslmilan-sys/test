@@ -8,7 +8,7 @@ import { PayMarks } from "@/components/ui/PayMark";
  */
 export function Pago() {
   return (
-    <Section id="pago" stop stopRing="#2F4346" className="noche text-white">
+    <Section id="pago" stop stopRing="#102735" className="text-white">
       <SectionTitle className="max-w-[18ch]">
         Le pagas a la persona, no a una app
       </SectionTitle>
