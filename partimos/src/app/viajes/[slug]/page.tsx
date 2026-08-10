@@ -88,7 +88,7 @@ function corridorFaq(corridor: Corridor): Faq[] {
     },
     {
       q: `¿Por qué ir en carro y no de otra forma?`,
-      a: `Porque el viaje se te hace corto. Vas sentado desde que te montas, con tu maleta atrás, aire acondicionado y una sola parada: la tuya. Sales a la hora que acordaron entre ustedes, te recogen cerca y te bajas cerca de donde vas.`,
+      a: `Porque el viaje se te hace corto. Vas sentado desde que te montas, con tu maleta atrás, aire acondicionado y una sola parada: la tuya. Cada viaje sale a la hora que su conductor publicó: escoges el que te calce, te recogen cerca y te bajas cerca de donde vas.`,
     },
     {
       q: `¿Y para volver de ${corridor.destination.shortName}?`,

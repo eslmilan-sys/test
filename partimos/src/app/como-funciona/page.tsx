@@ -60,7 +60,7 @@ const STEPS: Step[] = [
     icon: "phone",
     when: "Antes del viaje",
     title: "Coordinan por chat o llamada",
-    body: "Con el número afinan la hora y la esquina exacta, y acuerdan cómo le vas a pagar: efectivo o Yappy. Partimos no participa en esa conversación.",
+    body: "Con el número afinan la esquina exacta del encuentro y acuerdan cómo le vas a pagar: efectivo o Yappy. La hora de salida es la que el conductor publicó. Partimos no participa en esa conversación.",
     money: "No pagas nada",
   },
   {

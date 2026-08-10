@@ -118,8 +118,9 @@ export function Corredores() {
 
           <p className="mt-6 max-w-[62ch] border-t border-ink-200 pt-5 text-[13.5px] leading-relaxed text-ink-500">
             Vas sentado desde el primer minuto, con tu maleta atrás y una sola
-            parada: la tuya. Sales a la hora que pactaron entre ustedes — y el
-            aporte no cambia ni por la fecha ni por la demanda.
+            parada: la tuya. Cada viaje sale a la hora que puso su conductor al
+            publicarlo — tú escoges el que te calce, y el aporte no cambia ni
+            por la fecha ni por la demanda.
           </p>
         </div>
       </Container>
