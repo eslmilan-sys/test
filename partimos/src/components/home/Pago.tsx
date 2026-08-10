@@ -1,8 +1,4 @@
-import {
-  Section,
-  SectionTitle,
-  Lead,
-} from "@/components/site/Section";
+import { Section, SectionTitle, Lead } from "@/components/site/Section";
 import { Icon } from "@/components/ui/Icon";
 import { PayMarks } from "@/components/ui/PayMark";
 
@@ -26,75 +22,51 @@ export function Pago() {
         tu mano a la del conductor, el día del viaje.
       </Lead>
 
-      {/* Partimos, HORS du chemin de l'argent.
-          C'est l'argument juridique et commercial du produit, et il était
-          jusqu'ici écrit en toutes lettres dans un paragraphe. Un schéma le
-          montre en une seconde : la plateforme est branchée au-dessus, et son
-          trait s'arrête sur une croix avant d'atteindre la ligne des fonds. */}
-      <div aria-hidden className="mt-10 flex flex-col items-center">
-        <span className="inline-flex items-center gap-2 rounded-full border-[1.5px] border-dashed border-white/30 px-4 py-2 text-[13px] font-bold text-ink-300">
-          Partimos
-        </span>
-        <span className="h-6 w-0.5 bg-[repeating-linear-gradient(180deg,rgb(255_255_255/0.3)_0_5px,transparent_5px_10px)]" />
-        <span className="flex size-6 items-center justify-center rounded-full border-2 border-white/30 text-ink-300">
-          <Icon name="cross" className="size-3" />
-        </span>
-        <span className="mt-1 text-[11.5px] font-semibold tracking-[0.1em] text-ink-400 uppercase">
-          No toca la plata
-        </span>
-      </div>
-
-      <div className="mt-4 grid items-stretch gap-3.5 min-[860px]:grid-cols-[1fr_210px_1fr] min-[860px]:gap-0">
-        <div className="rounded-[20px] border border-white/14 bg-white/6 p-6 text-center">
-          <span className="mx-auto mb-3.5 flex size-14 items-center justify-center rounded-full bg-action font-display text-[21px] font-bold text-ink-900">
+      {/* UN SEUL BLOC, PAS TROIS.
+          La version précédente empilait une carte « Pasajero », une flèche
+          verticale de 80 px et une carte « Conductor », puis les moyens de
+          paiement dessous : trois blocs pour une seule idée, et sur téléphone
+          la flèche mangeait à elle seule un quart d'écran. Ici le geste tient
+          en une ligne — de ta main à la sienne — et ce qui circule dessus est
+          posé juste en dessous. Le trait est ambre comme partout ailleurs sur
+          le site : le vert de marque ne sert qu'au logo. */}
+      <div className="mt-8 rounded-[20px] border border-white/14 bg-white/6 px-5 py-6 sm:px-7">
+        <div className="grid grid-cols-[auto_1fr_auto] items-center gap-x-3 sm:gap-x-5">
+          <span className="flex size-12 items-center justify-center rounded-full bg-action font-display text-[18px] font-bold text-ink-900">
             Tú
           </span>
-          <h3 className="mb-1.5 font-display text-lg font-bold">Pasajero</h3>
-          <p className="text-sm text-ink-300">
-            Apartas tu puesto en la app. Ahí no pagas nada.
-          </p>
-        </div>
-
-        <div
-          aria-hidden
-          className="flex flex-col items-center justify-center gap-2.5 px-2.5 py-3.5"
-        >
-          <span className="text-center text-[11.5px] font-bold tracking-[0.11em] text-brand-green uppercase">
-            Efectivo o Yappy
-          </span>
-          {/* Le trait s'étire, la pointe non.
-              La version précédente construisait la pointe avec quatre bordures
-              CSS puis en redéfinissait six au point de rupture : les règles
-              s'annulaient et la flèche mobile sortait déformée. Ici le trait
-              est un dégradé qui s'étire tout seul, et la pointe est un carré
-              SVG — un carré se pivote sans jamais se déformer. */}
-          <span className="flex w-full items-center justify-center gap-0 max-[859px]:h-20 max-[859px]:w-auto max-[859px]:flex-col">
-            {/* Pas de `self-stretch` : en colonne, l'axe transversal devient
-                l'horizontale et le trait se décalerait de sa pointe. */}
-            <i className="h-[3px] flex-1 rounded-sm bg-[repeating-linear-gradient(90deg,var(--color-brand-green)_0_10px,transparent_10px_20px)] max-[859px]:w-[3px] max-[859px]:flex-1 max-[859px]:bg-[repeating-linear-gradient(180deg,var(--color-brand-green)_0_10px,transparent_10px_20px)]" />
+          {/* Le trait s'étire, la pointe non : un carré SVG pivoté ne se
+              déforme jamais, contrairement à une pointe en bordures CSS. */}
+          <span aria-hidden className="flex items-center">
+            <i className="h-[3px] flex-1 rounded-sm bg-[repeating-linear-gradient(90deg,var(--color-action)_0_10px,transparent_10px_20px)]" />
             <svg
               viewBox="0 0 12 12"
-              className="size-3 shrink-0 text-brand-green max-[859px]:rotate-90"
+              className="size-3 shrink-0 text-action"
               aria-hidden="true"
             >
               <path d="M2 0.5 L10 6 L2 11.5 Z" fill="currentColor" />
             </svg>
           </span>
-        </div>
-
-        <div className="rounded-[20px] border border-white/14 bg-white/6 p-6 text-center">
-          <span className="mx-auto mb-3.5 flex size-14 items-center justify-center rounded-full bg-action font-display text-[21px] font-bold text-ink-900">
+          <span className="flex size-12 items-center justify-center rounded-full bg-action font-display text-[18px] font-bold text-ink-900">
             A
           </span>
-          <h3 className="mb-1.5 font-display text-lg font-bold">Conductor</h3>
-          <p className="text-sm text-ink-300">
-            Recibe el aporte completo. Nadie le descuenta nada.
+        </div>
+
+        {/* Ce qui circule sur le trait, posé sur le trait. */}
+        <div className="mt-5">
+          <PayMarks />
+        </div>
+
+        <div className="mt-5 grid gap-2 text-[14px] leading-snug text-ink-300 sm:grid-cols-2 sm:gap-7">
+          <p>
+            <b className="font-display font-bold text-white">Pasajero</b> —
+            apartas tu puesto en la app. Ahí no pagas nada.
+          </p>
+          <p className="sm:text-right">
+            <b className="font-display font-bold text-white">Conductor</b> —
+            recibe el aporte completo. Nadie le descuenta nada.
           </p>
         </div>
-      </div>
-
-      <div className="mt-3.5">
-        <PayMarks />
       </div>
 
       {/* Deux encarts, deux registres : ce qui se passe / ce qui ne se passe

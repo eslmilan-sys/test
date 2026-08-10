@@ -28,7 +28,7 @@ import { Icon, type IconName } from "@/components/ui/Icon";
  *    ce qui est le test.
  */
 const PROOF: { icon: IconName; title: string; detail: string }[] = [
-  { icon: "pin", title: "Salen de tu barrio", detail: "No de una terminal" },
+  { icon: "pin", title: "Te recogen cerca", detail: "No en una terminal" },
   { icon: "id", title: "Sabes quién maneja", detail: "Cédula verificada" },
   { icon: "cash", title: "Pagas en el carro", detail: "Efectivo o Yappy" },
   { icon: "check", title: "Reservar es gratis", detail: "Sin comisión" },
@@ -48,14 +48,16 @@ export function Hero() {
               Salidas todos los días, a toda hora
             </p>
 
-            <h1 className="enter enter-2 mb-5 text-[clamp(40px,8.6vw,72px)] leading-[0.96] font-extrabold tracking-[-0.048em]">
-              Alguien ya va <br />
-              <em className="text-action-deep not-italic">para allá.</em>
+            <h1 className="enter enter-2 mb-5 text-[clamp(36px,7.4vw,62px)] leading-[0.98] font-extrabold tracking-[-0.045em]">
+              Viaja con{" "}
+              <em className="text-action-deep not-italic">quien ya va</em>{" "}
+              para allá.
             </h1>
 
-            <p className="enter enter-2 max-w-[40ch] text-[17px] leading-[1.45] font-light text-ink-600 md:text-[20px]">
-              Todos los días sale gente hacia el interior con puestos vacíos.
-              Solo falta que se enteren.
+            <p className="enter enter-2 max-w-[44ch] text-[17px] leading-[1.5] font-light text-ink-600 md:text-[19px]">
+              Partimos junta a quien maneja al interior con quien va para el
+              mismo lado. Buscas tu ruta, reservas sin pagar nada, y el aporte
+              se lo das al conductor el día del viaje.
             </p>
           </div>
 

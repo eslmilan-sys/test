@@ -375,26 +375,51 @@
     }
   }
 
-  /* ---- Le ciel du hero, en CLAIR ----
-     Une bande sombre en haut de page est ce qu'il y a de moins gai : elle
-     ferme la page au lieu de l'ouvrir. Ici, trois couches de lumière sur le
-     crème — un soleil ambre en haut à droite, un reflet bleu en bas à gauche,
-     et un grain très fin par-dessus. On lit « beau temps », pas « logiciel ».
+  /* ---- LE FOND DU PREMIER ÉCRAN ----
+     Trois essais pour arriver là. Une tache radiale seule est le fond par
+     défaut de toute page générée. Des rayures diagonales marquées font papier
+     peint et écrasent le contenu.
 
-     Le grain est un SVG en ligne : aucune requête réseau, aucun octet d'image. */
+     Ce qui reste : une lumière chaude très large qui monte vers le coin haut
+     droit, sans bord visible, et UNE ligne de route qui entre dans la page en
+     bas. Le motif ne se répète pas — il se pose une fois, comme une signature.
+     Le reste du travail d'identité est porté par le contenu : le tracé des
+     trois étapes et celui des six corridors. */
   .sky {
     background-color: var(--color-ink-50);
     background-image:
+      /* La lumière du matin, très étalée pour n'avoir aucun bord. */
       radial-gradient(
-        ellipse 70% 62% at 88% -6%,
-        rgb(245 158 11 / 0.42),
-        transparent 60%
-      ),
-      radial-gradient(
-        ellipse 66% 60% at 4% 104%,
-        rgb(59 130 246 / 0.2),
-        transparent 62%
+        150% 100% at 92% -20%,
+        rgb(245 158 11 / 0.3),
+        rgb(245 158 11 / 0.08) 46%,
+        transparent 74%
       );
+    background-repeat: no-repeat;
+  }
+
+  /* Le trait du bas est en pointillés : c'est un marquage au sol, pas une
+     bordure. `mask` plutôt qu'un dégradé répété, pour que les tirets restent
+     nets à toutes les largeurs. */
+  .sky::before {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    bottom: 0;
+    height: 3px;
+    background: var(--color-action);
+    -webkit-mask-image: repeating-linear-gradient(
+      90deg,
+      #000 0 22px,
+      transparent 22px 44px
+    );
+    mask-image: repeating-linear-gradient(
+      90deg,
+      #000 0 22px,
+      transparent 22px 44px
+    );
+    opacity: 0.55;
+    pointer-events: none;
   }
 
   .grain::after {
@@ -402,7 +427,7 @@
     position: absolute;
     inset: 0;
     pointer-events: none;
-    opacity: 0.2;
+    opacity: 0.14;
     mix-blend-mode: multiply;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
   }

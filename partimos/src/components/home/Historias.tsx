@@ -131,7 +131,7 @@ export function Historias() {
         {STORIES.map((story, index) => (
           <li
             key={story.title}
-            className="w-[min(78vw,340px)] shrink-0 snap-start"
+            className="w-[min(64vw,268px)] shrink-0 snap-start"
             aria-label={`${index + 1} de ${STORIES.length}`}
           >
             <Card story={story} />
@@ -148,7 +148,7 @@ function Card({ story }: { story: Story }) {
   return (
     <Link
       href={story.href}
-      className="group relative flex aspect-[3/4] flex-col justify-end overflow-hidden rounded-[24px] bg-ink-900 p-6 text-white transition-transform duration-300 hover:-translate-y-1"
+      className="group relative flex aspect-[4/5] flex-col justify-end overflow-hidden rounded-[24px] bg-ink-900 p-6 text-white transition-transform duration-300 hover:-translate-y-1"
     >
       {photo && (
         <>
