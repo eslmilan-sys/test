@@ -176,10 +176,10 @@
     color-scheme: light;
 
     /* ---- LA BARRE FLOTTANTE ----
-       Une seule source pour sa hauteur et pour la place qu'elle réserve. La
-       barre est `fixed` : sans réservoir, le premier titre de chaque page
-       passerait dessous. */
-    --nav-h: 3.5rem;
+       Une seule source pour sa hauteur et pour la place qu'elle occupe.
+       4rem et non 3.5 : c'est la respiration de la référence validée par le
+       client — le logo et les liens ont de l'air au-dessus et en dessous. */
+    --nav-h: 4rem;
     --nav-gap: 0.75rem;
     --nav-space: calc(var(--nav-h) + var(--nav-gap) * 2);
 
@@ -396,7 +396,7 @@
 
   @keyframes nav-serre {
     to {
-      height: 3rem;
+      height: 3.25rem;
       margin-top: -0.25rem;
       border-radius: 999px;
     }
@@ -679,6 +679,21 @@
 
      Le texte ne repose jamais sur le dégradé seul — les contrastes sont
      calculés contre la valeur la PLUS claire de la base (#332C24). */
+  /* Le HAUT du quartier sombre (Historias). Son dégradé se termine sur la
+     valeur exacte où celui de `.noche` commence (#332C24) : les deux sections
+     se raccordent sans couture et se lisent comme UN seul quartier de nuit,
+     pas deux sections peintes chacune de leur côté. */
+  .noche-alto {
+    background-color: #2a241d;
+    background-image:
+      radial-gradient(
+        70% 60% at 92% 0%,
+        rgb(245 158 11 / 0.1),
+        transparent 60%
+      ),
+      linear-gradient(178deg, #241f19 0%, #2e2820 68%, #332c24 100%);
+  }
+
   .noche {
     background-color: #221e18;
     background-image:

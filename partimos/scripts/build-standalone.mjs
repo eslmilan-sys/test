@@ -9,7 +9,8 @@ import path from "node:path";
 
 const OUT = new URL("../out", import.meta.url).pathname;
 const BASE = "/test/partimos";
-const DEST = new URL("../standalone/partimos-home-exact.html", import.meta.url).pathname;
+const DEST = new URL("../standalone/partimos-home-exact.html", import.meta.url)
+  .pathname;
 
 const MIME = {
   ".woff2": "font/woff2",
@@ -31,21 +32,26 @@ const MIME = {
 function onDisk(url, from = null) {
   const clean = url.split("?")[0].split("#")[0];
   let p;
-  if (clean.startsWith(BASE + "/")) p = path.join(OUT, clean.slice(BASE.length));
-  else if (from && !/^[a-z]+:|^\/\//i.test(clean)) p = path.resolve(from, clean);
+  if (clean.startsWith(BASE + "/"))
+    p = path.join(OUT, clean.slice(BASE.length));
+  else if (from && !/^[a-z]+:|^\/\//i.test(clean))
+    p = path.resolve(from, clean);
   else return null;
   return fs.existsSync(p) && fs.statSync(p).isFile() ? p : null;
 }
 
 function dataUri(file) {
-  const mime = MIME[path.extname(file).toLowerCase()] ?? "application/octet-stream";
+  const mime =
+    MIME[path.extname(file).toLowerCase()] ?? "application/octet-stream";
   return `data:${mime};base64,${fs.readFileSync(file).toString("base64")}`;
 }
 
 let html = fs.readFileSync(path.join(OUT, "index.html"), "utf8");
 
 /* ---- 1. Les feuilles de style, avec leurs polices dedans ---- */
-const cssHrefs = [...html.matchAll(/<link[^>]+rel="stylesheet"[^>]*href="([^"]+)"[^>]*>/g)];
+const cssHrefs = [
+  ...html.matchAll(/<link[^>]+rel="stylesheet"[^>]*href="([^"]+)"[^>]*>/g),
+];
 let inlined = 0;
 for (const [tag, href] of cssHrefs) {
   const file = onDisk(href);
@@ -95,15 +101,27 @@ const scripts = (html.match(/<script/g) ?? []).length;
 html = html.replace(/<script[\s\S]*?<\/script>/g, "");
 html = html.replace(/<link[^>]+rel="preload"[^>]*as="script"[^>]*>/g, "");
 
+/* La barre d'action basse est pilotée par un IntersectionObserver : elle
+   n'apparaît qu'une fois le premier écran passé. Sans script, son état de
+   départ est « repliée » — donc invisible pour toujours, et le lecteur du
+   fichier croit qu'elle n'existe pas (c'est arrivé). On la fige DÉPLOYÉE :
+   c'est l'état dans lequel elle passe 95 % de la page. */
+html = html
+  .replace(/translate-y-\[calc\(100%\+1\.5rem\)\]/g, "translate-y-0")
+  .replace(/ inert=""/g, "");
+
 /* ---- 3. Les images et les icônes ---- */
 let images = 0;
-html = html.replace(/(src|href|content)="(\/test\/partimos\/[^"]+)"/g, (m, attr, url) => {
-  if (/\.(css|js|txt|html?)$/i.test(url.split("?")[0])) return m;
-  const f = onDisk(url);
-  if (!f) return m;
-  images++;
-  return `${attr}="${dataUri(f)}"`;
-});
+html = html.replace(
+  /(src|href|content)="(\/test\/partimos\/[^"]+)"/g,
+  (m, attr, url) => {
+    if (/\.(css|js|txt|html?)$/i.test(url.split("?")[0])) return m;
+    const f = onDisk(url);
+    if (!f) return m;
+    images++;
+    return `${attr}="${dataUri(f)}"`;
+  },
+);
 // srcSet de next/image
 html = html.replace(/srcSet="([^"]+)"|srcset="([^"]+)"/g, (m, a, b) => {
   const list = (a ?? b).split(",").map((part) => {
@@ -116,7 +134,11 @@ html = html.replace(/srcSet="([^"]+)"|srcset="([^"]+)"/g, (m, a, b) => {
 });
 
 /* ---- 4. Ce qui resterait externe : on le signale plutôt que le cacher ---- */
-const leftovers = [...html.matchAll(/(?:src|href)="(https?:\/\/[^"]+|\/test\/partimos\/[^"]+)"/g)]
+const leftovers = [
+  ...html.matchAll(
+    /(?:src|href)="(https?:\/\/[^"]+|\/test\/partimos\/[^"]+)"/g,
+  ),
+]
   .map((m) => m[1])
   .filter((u) => !u.startsWith("data:"));
 
@@ -126,5 +148,7 @@ fs.writeFileSync(DEST, html);
 console.log(`feuilles inlinées : ${inlined}`);
 console.log(`scripts retirés   : ${scripts}`);
 console.log(`ressources inlinées : ${images}`);
-console.log(`références externes restantes : ${leftovers.length ? leftovers.slice(0, 6) : "aucune"}`);
+console.log(
+  `références externes restantes : ${leftovers.length ? leftovers.slice(0, 6) : "aucune"}`,
+);
 console.log(`${DEST} — ${(fs.statSync(DEST).size / 1024).toFixed(0)} Ko`);

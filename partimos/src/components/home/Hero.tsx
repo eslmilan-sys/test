@@ -64,7 +64,7 @@ export function Hero() {
       <div className="relative z-[2] mx-auto w-full max-w-[1120px] px-5 pt-14 md:pt-24">
         <div className="flex flex-col min-[960px]:grid min-[960px]:grid-cols-[1.02fr_0.98fr] min-[960px]:items-start min-[960px]:gap-x-16 min-[960px]:gap-y-8">
           <div className="order-1 min-[960px]:col-start-1 min-[960px]:row-start-1">
-            <p className="enter enter-1 mb-5 inline-flex items-center gap-2 rounded-full border border-ink-200 bg-white/70 px-3.5 py-1.5 text-[12.5px] font-semibold text-ink-600">
+            <p className="glass enter enter-1 mb-5 inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-[12.5px] font-semibold text-ink-600">
               <span
                 aria-hidden
                 className="size-1.5 animate-pulse rounded-full bg-brand-green-deep"
@@ -98,7 +98,7 @@ export function Hero() {
               <li
                 key={item.title}
                 className={[
-                  "py-5",
+                  "py-6",
                   index % 2 === 0 ? "border-r border-ink-200 pr-5" : "pl-5",
                   index > 1 ? "border-t border-ink-200" : "",
                 ].join(" ")}

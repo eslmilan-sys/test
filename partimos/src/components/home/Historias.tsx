@@ -101,7 +101,15 @@ export function Historias() {
   }
 
   return (
-    <section className="py-16 md:py-[76px]">
+    /* LA SECTION EST BRUNE, LES CARTES SONT EN VERRE.
+       Demandé par le client, et le choix tient debout : le verre a besoin
+       d'un dégradé sous lui pour exister, et `noche` en est un. Les cartes
+       éditoriales sans photo deviennent des vitres posées sur ce fond — même
+       matière que le plateau de paiement juste en dessous, donc les deux
+       zones sombres se lisent comme UN quartier du site, pas deux sections
+       peintes chacune dans son coin. Les cartes à photo, elles, restent des
+       photos : une image floutée derrière une vitre n'est plus une image. */
+    <section className="noche-alto py-16 text-white md:py-[76px]">
       <Container>
         <div className="mb-7 flex items-end justify-between gap-6">
           <h2 className="max-w-[16ch] text-[clamp(28px,5.2vw,44px)] leading-[1.05] font-extrabold">
@@ -130,9 +138,13 @@ export function Historias() {
            première carte à sa place au repos, puis la deuxième venait se
            coller au bord de l'écran dès le premier glissement. Il faut dire
            séparément au défilement où commence la marge. */
+        /* 24 px et non 20 : la première carte doit respirer par rapport au
+           bord de l'écran, pas s'aligner pile sur la gouttière du texte —
+           un objet à fond plein paraît plus près du bord qu'un paragraphe
+           à la même distance, parce que son bord à lui est visible. */
         style={{
-          paddingInline: "max(20px, calc((100vw - 1120px) / 2))",
-          scrollPaddingInline: "max(20px, calc((100vw - 1120px) / 2))",
+          paddingInline: "max(24px, calc((100vw - 1120px) / 2))",
+          scrollPaddingInline: "max(24px, calc((100vw - 1120px) / 2))",
         }}
       >
         {STORIES.map((story, index) => (
@@ -155,7 +167,9 @@ function Card({ story }: { story: Story }) {
   return (
     <Link
       href={story.href}
-      className="group relative flex aspect-[4/5] flex-col justify-end overflow-hidden rounded-[24px] bg-ink-900 p-6 text-white transition-transform duration-300 hover:-translate-y-1"
+      className={`group relative flex aspect-[4/5] flex-col justify-end overflow-hidden rounded-[24px] p-6 text-white transition-transform duration-300 hover:-translate-y-1 ${
+        photo ? "bg-ink-900" : "glass-noche border border-white/12"
+      }`}
     >
       {photo && (
         <>
@@ -174,12 +188,8 @@ function Card({ story }: { story: Story }) {
         </>
       )}
 
-      {story.tone === "gradient" && (
-        <span
-          aria-hidden
-          className="absolute inset-0 bg-ink-900 opacity-90"
-        />
-      )}
+      {/* Plus d'aplat pour les cartes sans photo : le verre suffit, l'aplat
+          par-dessus annulerait justement sa transparence. */}
 
       <span className="relative z-[2]">
         <span className="mb-2 block text-[11.5px] font-bold tracking-[0.14em] text-white/70 uppercase">
@@ -214,7 +224,7 @@ function Arrow({
       onClick={onClick}
       disabled={disabled}
       aria-label={direction === "prev" ? "Anterior" : "Siguiente"}
-      className="flex size-11 items-center justify-center rounded-full bg-ink-50 text-ink-900 transition-colors hover:bg-ink-100 disabled:opacity-35"
+      className="glass-noche flex size-11 items-center justify-center rounded-full text-white transition-colors hover:bg-white/20 disabled:opacity-35"
     >
       <Icon
         name="arrowRight"

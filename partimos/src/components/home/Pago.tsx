@@ -8,12 +8,7 @@ import { PayMarks } from "@/components/ui/PayMark";
  */
 export function Pago() {
   return (
-    <Section
-      id="pago"
-      stop
-      stopRing="#221E18"
-      className="noche text-white"
-    >
+    <Section id="pago" stop stopRing="#221E18" className="noche text-white">
       <SectionTitle className="max-w-[18ch]">
         Le pagas a la persona, no a una app
       </SectionTitle>
@@ -100,7 +95,10 @@ export function Pago() {
           </div>
         </div>
 
-        <div className="flex items-start gap-3.5 rounded-[18px] border border-danger/30 bg-danger/10 px-5.5 py-5">
+        {/* Verre aussi, mais la teinte danger reste : l'utilitaire `bg-*`
+            gagne sur la couleur de fond de `.glass-noche` (couche utilities
+            après base), le flou et le liseré, eux, s'appliquent. */}
+        <div className="glass-noche flex items-start gap-3.5 rounded-[18px] border border-danger/30 bg-danger/10 px-5.5 py-5">
           <span className="flex size-8 shrink-0 items-center justify-center rounded-[10px] bg-danger/20 text-[#FF9C90]">
             <Icon name="cross" className="size-4" />
           </span>

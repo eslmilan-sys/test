@@ -32,12 +32,11 @@ import { PRIMARY_LINKS } from "./navigation";
  * passer dessous. Deux précautions vont avec, et ce sont elles qu'on voit
  * casser partout où ce geste est copié sans réfléchir :
  *
- *   · LA HAUTEUR EST RÉSERVÉE. La barre est `fixed`, donc elle est sortie du
- *     flux : sans réservoir, le premier titre de chaque page passerait
- *     dessous. Le réservoir est rendu ici, une fois, et vaut pour toutes les
- *     pages — pas un `padding-top` recopié page par page qu'on oublierait sur
- *     la septième. Sa hauteur ne bouge PAS quand la barre se contracte, sinon
- *     le contenu sauterait au premier pixel de défilement.
+ *   · ELLE RESTE DANS LE FLUX (`sticky`). Sa place est donc réservée par
+ *     elle-même, pour toutes les pages — pas un `padding-top` recopié page
+ *     par page qu'on oublierait sur la septième. Et cette place ne bouge PAS
+ *     quand la barre se contracte au défilement, sinon le contenu sauterait
+ *     au premier pixel.
  *
  *   · LE FOND TIENT LE CONTRASTE SUR N'IMPORTE QUOI. La barre survole le
  *     premier écran clair, mais aussi la section de paiement, qui est sombre.
@@ -49,10 +48,16 @@ import { PRIMARY_LINKS } from "./navigation";
 export function Nav() {
   return (
     <>
-      <header className="pointer-events-none fixed inset-x-0 top-0 z-50 px-3 pt-[var(--nav-gap)]">
+      {/* `sticky`, PAS `fixed`. Les deux tiennent dans un navigateur — mais le
+          fichier autonome se regarde aussi dans des lecteurs embarqués (l'app
+          claude.ai sur téléphone, des visionneuses WebView) qui font défiler
+          un conteneur EXTERNE : un `fixed` ne s'y accroche jamais et la barre
+          part avec la page. C'est le bug remonté par le client. `sticky`
+          reste dans le flux, donc plus besoin de réservoir de hauteur. */}
+      <header className="pointer-events-none sticky top-0 z-50 px-3 pt-[var(--nav-gap)] pb-[var(--nav-gap)]">
         <nav
           aria-label="Principal"
-          className="glass nav-pill pointer-events-auto mx-auto flex h-[var(--nav-h)] max-w-[1120px] items-center gap-4 rounded-[20px] px-4 sm:px-5"
+          className="glass nav-pill pointer-events-auto mx-auto flex h-[var(--nav-h)] max-w-[1120px] items-center gap-4 rounded-[22px] px-4 sm:px-6"
         >
           <Logo gradientId="brand-nav" />
 
@@ -91,10 +96,6 @@ export function Nav() {
           </div>
         </nav>
       </header>
-
-      {/* Le réservoir. Décoratif et sans contenu : il ne dit rien à un lecteur
-          d'écran, il occupe juste la place que la barre a quittée. */}
-      <div aria-hidden className="h-[var(--nav-space)]" />
     </>
   );
 }
