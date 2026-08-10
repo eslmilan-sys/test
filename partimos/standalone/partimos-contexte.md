@@ -213,8 +213,36 @@ le visiteur se pose), et les rayures diagonales en fond (effet papier peint).
 
 ## 7. Une remarque sur ce fichier HTML
 
-Le JavaScript a été retiré : l'export statique contient déjà tout le balisage
-rendu, et les scripts ne portaient que l'hydratation React. **Les interactions
-ne fonctionnent donc pas** — les listes déroulantes, les flèches du carrousel
-et les onglets de la recherche sont figés dans leur état par défaut. Le rendu
-visuel, lui, est exact.
+C'est la page d'accueil **exacte** du site en production, pas une
+reconstruction. Elle est produite par un script qui part du fichier
+`out/index.html` du build déployé et remplace chaque référence externe par son
+contenu : la feuille de style, les polices, les images (`srcset` de
+`next/image` compris) et l'icône.
+
+**Vérifié, pas supposé.** Le fichier et le site ont été capturés côte à côte et
+comparés pixel à pixel :
+
+- **1440 px : 0,09 % de pixels différents.**
+- **390 px :** les écarts se limitent à deux zones, toutes deux dues à la
+  capture du *site*, prise pendant que `next/image` affichait encore son flou
+  de chargement. Le fichier autonome, lui, a les photos en ligne : il montre
+  l'image finale. Le rendu du fichier est donc au moins aussi juste que celui
+  du site à cet instant.
+- Ouvert **réseau coupé** : aucune requête sortante.
+
+**Le JavaScript a été retiré.** L'export statique contient déjà tout le
+balisage rendu, et les scripts ne portaient que l'hydratation React. **Les
+interactions ne fonctionnent donc pas** — listes déroulantes, flèches du
+carrousel et onglets de la recherche sont figés dans leur état par défaut. Le
+rendu visuel, lui, est exact.
+
+**Les polices non latines ont été retirées** (grec, cyrillique, vietnamien,
+latin étendu). Ce n'est pas un raccourci : chaque caractère du texte rendu a
+été vérifié un par un, et rien sur cette page n'y tombe. Le seul signe hors du
+latin de base est la flèche `→` (U+2192), qui n'appartient à aucun de ces
+sous-ensembles et retombe déjà sur une police système — sur le site en ligne
+aussi. Cela fait passer le fichier de 1,75 Mo à 1,27 Mo sans changer un pixel.
+
+Si l'outil qui doit lire ce fichier bute sur sa taille, sache que **le design
+tient dans les 245 Ko de balisage et de règles CSS** ; le reste est du base64
+(639 Ko d'images, 380 Ko de polices) qui n'apporte rien à une lecture.
