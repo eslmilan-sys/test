@@ -50,7 +50,7 @@ export function Photo({
 
   return (
     <div
-      className={`overflow-hidden bg-plate-100 ${fill ? "absolute inset-0 size-full" : "relative"} ${className}`}
+      className={`overflow-hidden bg-ink-100 ${fill ? "absolute inset-0 size-full" : "relative"} ${className}`}
       style={{
         ...(fill ? {} : { aspectRatio: photo.aspect }),
         backgroundImage: `url(data:image/webp;base64,${photo.blur})`,

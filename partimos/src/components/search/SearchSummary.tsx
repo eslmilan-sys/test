@@ -56,34 +56,34 @@ export function SearchSummary({
         setOpen(next);
       }}
     >
-      <Dialog.Trigger className="flex w-full items-center gap-3 border-[1.5px] border-ochre-500 bg-white px-4 py-3 text-left transition-colors hover:bg-plate-50">
-        <Icon name="search" className="size-5 shrink-0 text-plate-600" />
+      <Dialog.Trigger className="flex w-full items-center gap-3 rounded-[16px] border-[1.5px] border-accent bg-white px-4 py-3 text-left transition-colors hover:bg-ink-50">
+        <Icon name="search" className="size-5 shrink-0 text-ink-500" />
         <span className="min-w-0 flex-1">
-          <span className="block truncate text-[16px] font-bold tracking-[-0.02em]">
+          <span className="block truncate font-display text-[16px] font-bold tracking-[-0.02em]">
             {from?.shortName} → {to?.shortName}
           </span>
-          <span className="block truncate text-[13px] text-plate-600">
+          <span className="block truncate text-[13px] text-ink-500">
             {formatDayLabel(criteria.date)} ·{" "}
             {criteria.seats === 1
               ? "1 pasajero"
               : `${criteria.seats} pasajeros`}
           </span>
         </span>
-        <span className="shrink-0 text-[13px] font-semibold text-ochre-600">
+        <span className="shrink-0 text-[13px] font-semibold text-accent-ink">
           Cambiar
         </span>
       </Dialog.Trigger>
 
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-[110] bg-plate-950/55 motion-safe:animate-[fade-in_0.18s_ease-out]" />
-        <Dialog.Content className="fixed inset-x-0 bottom-0 z-[120] max-h-[92vh] overflow-y-auto rounded-t-[26px] bg-white p-5 shadow-float motion-safe:animate-[sheet-in_0.24s_cubic-bezier(0.2,0.9,0.3,1)] sm:inset-x-auto sm:top-1/2 sm:left-1/2 sm:bottom-auto sm:w-[min(480px,92vw)] sm:-translate-x-1/2 sm:-translate-y-1/2 sm:">
+        <Dialog.Overlay className="fixed inset-0 z-[110] bg-ink-950/55 motion-safe:animate-[fade-in_0.18s_ease-out]" />
+        <Dialog.Content className="fixed inset-x-0 bottom-0 z-[120] max-h-[92vh] overflow-y-auto rounded-t-[26px] bg-white p-5 shadow-float motion-safe:animate-[sheet-in_0.24s_cubic-bezier(0.2,0.9,0.3,1)] sm:inset-x-auto sm:top-1/2 sm:left-1/2 sm:bottom-auto sm:w-[min(480px,92vw)] sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-[26px]">
           <div className="mb-4 flex items-start justify-between gap-4">
-            <Dialog.Title className="text-[24px] font-extrabold tracking-[-0.035em]">
+            <Dialog.Title className="font-display text-[24px] font-extrabold tracking-[-0.035em]">
               ¿A dónde vas?
             </Dialog.Title>
             <Dialog.Close
               aria-label="Cerrar"
-              className="-mt-1 -mr-1 flex size-9 shrink-0 items-center justify-center rounded-full text-plate-600 transition-colors hover:bg-plate-50 hover:text-plate-900"
+              className="-mt-1 -mr-1 flex size-9 shrink-0 items-center justify-center rounded-full text-ink-500 transition-colors hover:bg-ink-50 hover:text-ink-900"
             >
               <Icon name="cross" className="size-4.5" />
             </Dialog.Close>
@@ -92,7 +92,7 @@ export function SearchSummary({
             Cambia el origen, el destino, la fecha o el número de pasajeros.
           </Dialog.Description>
 
-          <div className="border border-plate-200">
+          <div className="rounded-[18px] border border-ink-200">
             <CityCombobox
               id="sheet-desde"
               label="Desde"
@@ -101,7 +101,7 @@ export function SearchSummary({
               tone="origin"
               onChange={(slug) => setDraft((d) => ({ ...d, from: slug }))}
             />
-            <div className="border-t border-plate-200">
+            <div className="border-t border-ink-200">
               <CityCombobox
                 id="sheet-hacia"
                 label="Hacia"
@@ -111,14 +111,14 @@ export function SearchSummary({
                 onChange={(slug) => setDraft((d) => ({ ...d, to: slug }))}
               />
             </div>
-            <div className="flex border-t border-plate-200">
+            <div className="flex border-t border-ink-200">
               <label className="flex flex-1 items-center gap-3 px-3.5 py-3">
                 <Icon
                   name="calendar"
-                  className="size-[19px] shrink-0 text-plate-600"
+                  className="size-[19px] shrink-0 text-ink-500"
                 />
                 <span className="min-w-0 flex-1">
-                  <span className="block text-[10.5px] font-bold tracking-[0.11em] text-plate-600 uppercase">
+                  <span className="block text-[10.5px] font-bold tracking-[0.11em] text-ink-500 uppercase">
                     Fecha
                   </span>
                   <select
@@ -136,9 +136,9 @@ export function SearchSummary({
                   </select>
                 </span>
               </label>
-              <label className="flex max-w-[140px] items-center gap-3 border-l border-plate-200 px-3.5 py-3">
+              <label className="flex max-w-[140px] items-center gap-3 border-l border-ink-200 px-3.5 py-3">
                 <span className="min-w-0 flex-1">
-                  <span className="block text-[10.5px] font-bold tracking-[0.11em] text-plate-600 uppercase">
+                  <span className="block text-[10.5px] font-bold tracking-[0.11em] text-ink-500 uppercase">
                     Pasajeros
                   </span>
                   <select
@@ -159,7 +159,7 @@ export function SearchSummary({
             </div>
           </div>
 
-          <div className="mt-3 border border-plate-200 bg-plate-50/60 p-3">
+          <div className="mt-3 rounded-[18px] border border-ink-200 bg-ink-50/60 p-3">
             <RouteMap
               originSlug={draft.from}
               destinationSlug={draft.to}

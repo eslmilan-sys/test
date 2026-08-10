@@ -1,10 +1,12 @@
-import { Lamina } from "@/components/home/Lamina";
-import { LiveStrip } from "@/components/home/LiveStrip";
-import { Corredores } from "@/components/home/Corredores";
+import { Hero } from "@/components/home/Hero";
+import { Pasos } from "@/components/home/Pasos";
 import { Pago } from "@/components/home/Pago";
-import { Historias } from "@/components/home/Historias";
+import { Conductores } from "@/components/home/Conductores";
+import { Confianza } from "@/components/home/Confianza";
+import { Corredores } from "@/components/home/Corredores";
 import { DriverCta } from "@/components/home/DriverCta";
 import { Faq, FaqJsonLd } from "@/components/home/Faq";
+import { Historias } from "@/components/home/Historias";
 import { StickyCta } from "@/components/StickyCta";
 import { GENERAL_FAQ } from "@/lib/content";
 import { canonical } from "@/lib/site";
@@ -13,36 +15,29 @@ export const metadata = {
   alternates: { canonical: canonical("/") },
 };
 
-/**
- * ARCHITECTURE DE L'ACCUEIL
- *
- * Le canal principal est le SEO, et le SEO amène le PASSAGER : l'intention de
- * recherche « pasaje Panamá David » existe déjà, celle du conducteur n'existe
- * pas. L'accueil sert donc le passager d'abord, et convertit le conducteur à
- * travers la demande qu'il voit — pas dans une porte parallèle qui dilue le
- * message et le maillage.
- *
- * Sept sections sont devenues six, et la grille de quatre cartes a disparu :
- *
- *   1. LA PLANCHE      le tracé coté ; la recherche se fait dessus
- *   2. LE BANDEAU      ce qui vient d'être publié, en défilement continu
- *   3. LES CORRIDORS   un tableau comparable, pas six cartes identiques
- *   4. LE PAIEMENT     hors plateforme, dit sans détour
- *   5. LES HISTOIRES   le registre éditorial, pour ce qui se raconte
- *   6. PUBLIER         la conversion conducteur, nourrie par la demande
- *   7. LES QUESTIONS   ce qui bloque vraiment avant de réserver
- */
 export default function Home() {
   return (
     <>
       <main id="contenido">
-        <Lamina />
-        <LiveStrip />
-        <Corredores />
-        <Pago />
+        <Hero />
+        {/* `road` porte le ruban d'asphalte : une seule route continue qui
+            traverse toutes les sections, chacune marquée d'une parada. */}
+        <div className="road">
+          <Pasos />
+        </div>
+
+        {/* Le carrousel déborde volontairement du conteneur : il sort donc
+            du ruban, qui lui passait dessus et coupait la première carte. */}
         <Historias />
-        <DriverCta />
-        <Faq items={GENERAL_FAQ} />
+
+        <div className="road">
+          <Pago />
+          <Conductores />
+          <Confianza />
+          <Corredores />
+          <DriverCta />
+          <Faq items={GENERAL_FAQ} />
+        </div>
       </main>
       <StickyCta />
       <FaqJsonLd items={GENERAL_FAQ} />

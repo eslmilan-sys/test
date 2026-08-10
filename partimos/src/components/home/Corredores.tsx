@@ -22,13 +22,13 @@ export function Corredores() {
   const rows = [...CORRIDORS].sort((a, b) => a.distanceKm - b.distanceKm);
 
   return (
-    <section className="border-b border-plate-200 py-14 sm:py-20">
+    <section className="border-t border-ink-200 py-14 sm:py-20">
       <Container>
         <div className="mb-8 max-w-[54ch]">
-          <h2 className="text-[clamp(26px,3.6vw,36px)] leading-tight">
+          <h2 className="font-display text-[clamp(28px,4.2vw,40px)] leading-[1.08] font-extrabold tracking-[-0.03em]">
             Las seis rutas abiertas
           </h2>
-          <p className="mt-3 text-[15.5px] leading-relaxed text-plate-600">
+          <p className="mt-3 text-[15.5px] leading-relaxed text-ink-500">
             El tope está calculado con un carro estándar y tres puestos. Menos
             puestos suben el tope, porque hay menos gente entre quien repartir
             el mismo costo.
@@ -40,34 +40,34 @@ export function Corredores() {
         <div className="-mx-5 overflow-x-auto px-5">
           <table className="w-full min-w-[680px] border-collapse text-left">
             <thead>
-              <tr className="border-y border-plate-300">
+              <tr className="border-y border-ink-200">
                 <th
                   scope="col"
-                  className="py-2.5 pr-4 text-[11px] font-bold tracking-[0.14em] text-plate-600 uppercase"
+                  className="py-2.5 pr-4 text-[11px] font-bold tracking-[0.14em] text-ink-500 uppercase"
                 >
                   Ruta
                 </th>
                 <th
                   scope="col"
-                  className="py-2.5 pr-4 text-right text-[11px] font-bold tracking-[0.14em] text-plate-600 uppercase"
+                  className="py-2.5 pr-4 text-right text-[11px] font-bold tracking-[0.14em] text-ink-500 uppercase"
                 >
                   Distancia
                 </th>
                 <th
                   scope="col"
-                  className="py-2.5 pr-4 text-right text-[11px] font-bold tracking-[0.14em] text-plate-600 uppercase"
+                  className="py-2.5 pr-4 text-right text-[11px] font-bold tracking-[0.14em] text-ink-500 uppercase"
                 >
                   En carretera
                 </th>
                 <th
                   scope="col"
-                  className="py-2.5 pr-4 text-right text-[11px] font-bold tracking-[0.14em] text-plate-600 uppercase"
+                  className="py-2.5 pr-4 text-right text-[11px] font-bold tracking-[0.14em] text-ink-500 uppercase"
                 >
                   Aporte máx.
                 </th>
                 <th
                   scope="col"
-                  className="py-2.5 text-right text-[11px] font-bold tracking-[0.14em] text-plate-600 uppercase"
+                  className="py-2.5 text-right text-[11px] font-bold tracking-[0.14em] text-ink-500 uppercase"
                 >
                   Bus, de referencia
                 </th>
@@ -79,32 +79,31 @@ export function Corredores() {
                 return (
                   <tr
                     key={corridor.slug}
-                    className="border-b border-plate-200 transition-colors hover:bg-plate-100"
+                    className="border-b border-ink-200 transition-colors hover:bg-ink-50"
                   >
                     <th scope="row" className="py-3 pr-4 font-normal">
                       <Link
                         href={`/viajes/${corridor.slug}`}
-                        className="group inline-flex items-center gap-2 text-[16px] font-bold decoration-ochre-500 hover:underline"
-                        style={{ fontStretch: "112%" }}
+                        className="group inline-flex items-center gap-2 font-display text-[16.5px] font-bold decoration-action decoration-2 underline-offset-4 hover:underline"
                       >
                         {corridor.origin.shortName}
                         <Icon
                           name="arrowRight"
-                          className="size-3.5 text-plate-500"
+                          className="size-3.5 text-ink-400"
                         />
                         {corridor.destination.shortName}
                       </Link>
                     </th>
-                    <td className="cote py-3 pr-4 text-right text-[14px] text-plate-600">
+                    <td className="tnum py-3 pr-4 text-right text-[14px] text-ink-500">
                       {corridor.distanceKm} km
                     </td>
-                    <td className="cote py-3 pr-4 text-right text-[14px] text-plate-600">
+                    <td className="tnum py-3 pr-4 text-right text-[14px] text-ink-500">
                       {formatDuration(corridor.typicalDurationMin)}
                     </td>
-                    <td className="cote py-3 pr-4 text-right text-[15px] font-bold text-ochre-600">
+                    <td className="tnum py-3 pr-4 text-right text-[15px] font-bold text-action-ink">
                       {formatUsd(cap.maxPriceCents)}
                     </td>
-                    <td className="cote py-3 text-right text-[14px] text-plate-600">
+                    <td className="tnum py-3 text-right text-[14px] text-ink-500">
                       {corridor.busPriceCents
                         ? formatUsd(corridor.busPriceCents)
                         : "—"}
@@ -116,10 +115,10 @@ export function Corredores() {
           </table>
         </div>
 
-        <p className="mt-4 text-[13px] leading-relaxed text-plate-600">
+        <p className="mt-4 text-[13px] leading-relaxed text-ink-500">
           El bus está ahí para que compares, no porque fijemos precio con él.
-          Casi siempre el bus sale más barato: lo que cambia es que sales
-          cuando el conductor sale, y te deja donde vas, no en la terminal.
+          Casi siempre el bus sale más barato: lo que cambia es que sales cuando
+          el conductor sale, y te deja donde vas, no en la terminal.
         </p>
       </Container>
     </section>

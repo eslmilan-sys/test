@@ -24,6 +24,7 @@ import { PHOTOS } from "@/lib/photos";
  */
 
 type Story = {
+  eyebrow: string;
   title: string;
   body: string;
   href: string;
@@ -34,6 +35,7 @@ type Story = {
 
 const STORIES: Story[] = [
   {
+    eyebrow: "La ruta",
     title: "El viernes de Azuero",
     body: "Entre las 4 y las 7 de la tarde sale más gente hacia Chitré que en todo el resto de la semana. Así se llena un carro.",
     href: "/viajes/panama-chitre",
@@ -41,12 +43,14 @@ const STORIES: Story[] = [
     tone: "photo",
   },
   {
+    eyebrow: "El aporte",
     title: "Por qué nadie gana plata",
     body: "El costo se divide entre los ocupantes, y el conductor cuenta como uno más. Esa suma es todo el modelo.",
     href: "/como-funciona",
     tone: "ink",
   },
   {
+    eyebrow: "La ciudad",
     title: "Salir de Panamá sin terminal",
     body: "Costa del Este, Albrook, Vía Centenario. Tres salidas por donde los conductores ya pasan, sin dar una vuelta de más.",
     href: "/viajes",
@@ -54,6 +58,7 @@ const STORIES: Story[] = [
     tone: "photo",
   },
   {
+    eyebrow: "La confianza",
     title: "Cuatro horas con un desconocido",
     body: "Cédula verificada, calificaciones de ida y vuelta, modo solo mujeres y ubicación en vivo con quien tú quieras.",
     href: "/seguridad",
@@ -143,7 +148,7 @@ function Card({ story }: { story: Story }) {
   return (
     <Link
       href={story.href}
-      className="group relative flex aspect-[3/4] flex-col justify-end overflow-hidden bg-plate-900 p-6 text-white transition-transform duration-300 hover:-translate-y-1"
+      className="group relative flex aspect-[3/4] flex-col justify-end overflow-hidden rounded-[24px] bg-ink-900 p-6 text-white transition-transform duration-300 hover:-translate-y-1"
     >
       {photo && (
         <>
@@ -165,18 +170,21 @@ function Card({ story }: { story: Story }) {
       {story.tone === "gradient" && (
         <span
           aria-hidden
-          className="bg-plate-800 absolute inset-0 opacity-90"
+          className="brand-gradient absolute inset-0 opacity-90"
         />
       )}
 
       <span className="relative z-[2]">
-        <span className="mb-2 block text-[23px] leading-[1.1] font-extrabold tracking-[-0.03em]">
+        <span className="mb-2 block text-[11.5px] font-bold tracking-[0.14em] text-white/70 uppercase">
+          {story.eyebrow}
+        </span>
+        <span className="mb-2 block font-display text-[23px] leading-[1.1] font-extrabold tracking-[-0.03em]">
           {story.title}
         </span>
         <span className="block text-[14px] leading-relaxed text-white/80">
           {story.body}
         </span>
-        <span className="mt-4 inline-flex size-9 items-center justify-center rounded-full bg-white/15 backdrop-blur-sm transition-colors group-hover:bg-white group-hover:text-plate-900">
+        <span className="mt-4 inline-flex size-9 items-center justify-center rounded-full bg-white/15 backdrop-blur-sm transition-colors group-hover:bg-white group-hover:text-ink-900">
           <Icon name="arrowRight" className="size-4.5" />
         </span>
       </span>
@@ -199,7 +207,7 @@ function Arrow({
       onClick={onClick}
       disabled={disabled}
       aria-label={direction === "prev" ? "Anterior" : "Siguiente"}
-      className="flex size-11 items-center justify-center rounded-full bg-plate-50 text-plate-900 transition-colors hover:bg-plate-100 disabled:opacity-35"
+      className="flex size-11 items-center justify-center rounded-full bg-ink-50 text-ink-900 transition-colors hover:bg-ink-100 disabled:opacity-35"
     >
       <Icon
         name="arrowRight"

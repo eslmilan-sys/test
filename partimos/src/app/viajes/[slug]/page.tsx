@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Container } from "@/components/site/Section";
+import { Container, Eyebrow } from "@/components/site/Section";
 import { RutaCard } from "@/components/home/Rutas";
 import { FaqList, FaqJsonLd } from "@/components/home/Faq";
 import { AvisameForm } from "@/components/AvisameForm";
@@ -148,11 +148,11 @@ export default async function CorridorPage({ params }: Params) {
     <>
       {/* ---------- En-tête ---------- */}
       <main id="contenido">
-        <div id="ruta-hero" className="bg-plate-900 pt-8 pb-11 text-white">
+        <div id="ruta-hero" className="bg-ink-900 pt-8 pb-11 text-white">
           <Container>
             <nav
               aria-label="Ruta de navegación"
-              className="mb-5 text-[13px] text-plate-400"
+              className="mb-5 text-[13px] text-ink-400"
             >
               <ol className="flex flex-wrap items-center gap-1.5">
                 <li>
@@ -167,20 +167,20 @@ export default async function CorridorPage({ params }: Params) {
                   </Link>
                 </li>
                 <li aria-hidden>/</li>
-                <li aria-current="page" className="text-plate-300">
+                <li aria-current="page" className="text-ink-300">
                   {corridor.origin.shortName} → {corridor.destination.shortName}
                 </li>
               </ol>
             </nav>
 
-            <p className="mb-3 text-[11.5px] font-bold tracking-[0.16em] text-plate-400 uppercase">
+            <p className="mb-3 text-[11.5px] font-bold tracking-[0.16em] text-ink-400 uppercase">
               {corridor.origin.province} → {corridor.destination.province}
             </p>
             <h1 className="mb-4 max-w-[18ch] text-[clamp(32px,6.4vw,54px)] leading-[1.02] font-extrabold tracking-[-0.04em]">
               Carro compartido {corridor.origin.shortName} →{" "}
               {corridor.destination.shortName}
             </h1>
-            <p className="max-w-[58ch] text-[16.5px] leading-relaxed text-plate-300">
+            <p className="max-w-[58ch] text-[16.5px] leading-relaxed text-ink-300">
               {corridor.intro}
             </p>
 
@@ -212,6 +212,7 @@ export default async function CorridorPage({ params }: Params) {
           {/* ---------- Prochains départs ---------- */}
           <section className="py-12 md:py-16">
             <Container>
+              <Eyebrow>Próximas salidas</Eyebrow>
               <h2 className="mb-6 text-[clamp(24px,4vw,34px)] font-extrabold">
                 {trips.length > 0
                   ? "Quién sale para allá"
@@ -223,22 +224,22 @@ export default async function CorridorPage({ params }: Params) {
                   {trips.map((trip) => (
                     <li
                       key={trip.id}
-                      className="flex items-center gap-3.5 border border-plate-200 px-4.5 py-4"
+                      className="flex items-center gap-3.5 rounded-[15px] border border-ink-200 px-4.5 py-4"
                     >
                       <span
                         aria-hidden
-                        className="bg-plate-800 flex size-10 shrink-0 items-center justify-center rounded-full font-bold text-white"
+                        className="brand-gradient flex size-10 shrink-0 items-center justify-center rounded-full font-display font-bold text-white"
                       >
                         {trip.driverFirstName.charAt(0)}
                       </span>
                       <span className="min-w-0 flex-1">
-                        <b className="block text-[15.5px] font-bold">
+                        <b className="block font-display text-[15.5px] font-bold">
                           {trip.driverFirstName}{" "}
                           {trip.driverLastInitial
                             ? `${trip.driverLastInitial}.`
                             : ""}
                         </b>
-                        <span className="cote text-[12.5px] text-plate-600">
+                        <span className="tnum text-[12.5px] text-ink-500">
                           {new Intl.DateTimeFormat("es-PA", {
                             weekday: "short",
                             day: "numeric",
@@ -252,15 +253,15 @@ export default async function CorridorPage({ params }: Params) {
                             : `${trip.seatsAvailable} puestos`}
                         </span>
                       </span>
-                      <b className="cote shrink-0 text-base font-bold">
+                      <b className="tnum shrink-0 font-display text-base font-bold">
                         {formatUsd(trip.priceCents, { compact: true })}
                       </b>
                     </li>
                   ))}
                 </ul>
               ) : (
-                <div className="max-w-[560px] border border-plate-200 bg-plate-50 p-6">
-                  <p className="mb-4 text-[15.5px] leading-relaxed text-plate-600">
+                <div className="max-w-[560px] rounded-[20px] border border-ink-200 bg-ink-50 p-6">
+                  <p className="mb-4 text-[15.5px] leading-relaxed text-ink-500">
                     Nadie ha publicado esta ruta todavía. Déjanos tu número: le
                     avisamos a los conductores que hacen{" "}
                     {corridor.origin.shortName} →{" "}
@@ -280,21 +281,22 @@ export default async function CorridorPage({ params }: Params) {
           </section>
 
           {/* ---------- Prix + points de prise en charge ---------- */}
-          <section className="bg-plate-50 py-12 md:py-16">
+          <section className="bg-ink-50 py-12 md:py-16">
             <Container>
               <div className="grid gap-9 min-[900px]:grid-cols-2 min-[900px]:gap-12">
                 <div>
+                  <Eyebrow>El aporte</Eyebrow>
                   <h2 className="mb-4 text-[clamp(24px,4vw,34px)] font-extrabold">
                     Cómo se calcula el tope
                   </h2>
-                  <p className="mb-6 max-w-[46ch] text-[15.5px] leading-relaxed text-plate-600">
+                  <p className="mb-6 max-w-[46ch] text-[15.5px] leading-relaxed text-ink-500">
                     El costo real del recorrido se reparte entre todos los
                     ocupantes del carro, incluido el conductor. Nadie gana
                     plata: el conductor recupera una parte de lo que iba a
                     gastar igual.
                   </p>
 
-                  <dl className="border border-plate-200 bg-white p-5 text-[14.5px]">
+                  <dl className="rounded-[18px] border border-ink-200 bg-white p-5 text-[14.5px]">
                     <CalcRow label={`${corridor.distanceKm} km × $0.25/km`}>
                       {formatUsd(Math.round(corridor.distanceKm * 25))}
                     </CalcRow>
@@ -321,7 +323,7 @@ export default async function CorridorPage({ params }: Params) {
                     </CalcRow>
                   </dl>
 
-                  <p className="mt-4 text-[13px] leading-relaxed text-plate-600">
+                  <p className="mt-4 text-[13px] leading-relaxed text-ink-500">
                     El «+1» del divisor es el conductor. Por eso, aunque lleve
                     el carro lleno, siempre termina poniendo parte del viaje de
                     su bolsillo — y por eso esto es compartir gastos y no cobrar
@@ -330,10 +332,11 @@ export default async function CorridorPage({ params }: Params) {
                 </div>
 
                 <div>
+                  <Eyebrow>Dónde te recogen</Eyebrow>
                   <h2 className="mb-4 text-[clamp(24px,4vw,34px)] font-extrabold">
                     Puntos habituales
                   </h2>
-                  <p className="mb-6 max-w-[46ch] text-[15.5px] leading-relaxed text-plate-600">
+                  <p className="mb-6 max-w-[46ch] text-[15.5px] leading-relaxed text-ink-500">
                     Los conductores de esta ruta suelen pasar por aquí. Máximo
                     cuatro paradas por viaje, y ninguna en una terminal.
                   </p>
@@ -344,18 +347,18 @@ export default async function CorridorPage({ params }: Params) {
                   />
 
                   {corridor.busPriceCents && (
-                    <div className="mt-5 flex items-start gap-3.5 border border-plate-200 bg-white px-5 py-4.5">
+                    <div className="mt-5 flex items-start gap-3.5 rounded-[18px] border border-ink-200 bg-white px-5 py-4.5">
                       <Icon
                         name="bus"
-                        className="mt-0.5 size-5 shrink-0 text-plate-600"
+                        className="mt-0.5 size-5 shrink-0 text-ink-500"
                       />
-                      <p className="text-[14px] leading-relaxed text-plate-600">
-                        <b className="font-semibold text-plate-900">
+                      <p className="text-[14px] leading-relaxed text-ink-500">
+                        <b className="font-semibold text-ink-900">
                           Comparado con el bus
                         </b>
                         <br />
                         El bus cuesta alrededor de{" "}
-                        <span className="cote">
+                        <span className="tnum">
                           {formatUsd(corridor.busPriceCents, { compact: true })}
                         </span>
                         , sale de terminal y para en el camino. Aquí sales a la
@@ -371,6 +374,7 @@ export default async function CorridorPage({ params }: Params) {
           {/* ---------- FAQ locale ---------- */}
           <section className="py-12 md:py-16">
             <Container>
+              <Eyebrow>Preguntas sobre esta ruta</Eyebrow>
               <h2 className="text-[clamp(24px,4vw,34px)] font-extrabold">
                 {corridor.origin.shortName} → {corridor.destination.shortName},
                 en corto
@@ -382,18 +386,20 @@ export default async function CorridorPage({ params }: Params) {
           {/* ---------- Maillage interne ---------- */}
           <section className="pb-16">
             <Container>
-              <h2 className="mb-5 text-xl font-bold">Otras rutas</h2>
+              <h2 className="mb-5 font-display text-xl font-bold">
+                Otras rutas
+              </h2>
               <div className="grid gap-2.5 min-[640px]:grid-cols-2 min-[980px]:grid-cols-3">
                 {related.map((item) => (
                   <RutaCard key={item.slug} slug={item.slug} />
                 ))}
               </div>
               {reverse && (
-                <p className="mt-5 text-[15px] text-plate-600">
+                <p className="mt-5 text-[15px] text-ink-500">
                   ¿Buscas el regreso?{" "}
                   <Link
                     href={`/viajes/${reverse.slug}`}
-                    className="font-semibold text-ochre-600 hover:underline"
+                    className="font-semibold text-accent-ink hover:underline"
                   >
                     {reverse.origin.shortName} → {reverse.destination.shortName}
                   </Link>
@@ -434,11 +440,13 @@ function Stat({
 }) {
   return (
     <div>
-      <dt className="text-[11.5px] font-bold tracking-[0.11em] text-plate-400 uppercase">
+      <dt className="text-[11.5px] font-bold tracking-[0.11em] text-ink-400 uppercase">
         {label}
       </dt>
-      <dd className="cote text-[22px] font-bold tracking-[-0.02em]">{value}</dd>
-      {hint && <dd className="text-[12px] text-plate-400">{hint}</dd>}
+      <dd className="tnum font-display text-[22px] font-bold tracking-[-0.02em]">
+        {value}
+      </dd>
+      {hint && <dd className="text-[12px] text-ink-400">{hint}</dd>}
     </div>
   );
 }
@@ -454,10 +462,10 @@ function CalcRow({
 }) {
   return (
     <div
-      className={`flex justify-between gap-4 py-2 ${strong ? "border-t border-plate-200 font-semibold" : ""}`}
+      className={`flex justify-between gap-4 py-2 ${strong ? "border-t border-ink-200 font-semibold" : ""}`}
     >
-      <dt className={strong ? "text-plate-900" : "text-plate-600"}>{label}</dt>
-      <dd className="cote text-right whitespace-nowrap">{children}</dd>
+      <dt className={strong ? "text-ink-900" : "text-ink-500"}>{label}</dt>
+      <dd className="tnum text-right whitespace-nowrap">{children}</dd>
     </div>
   );
 }

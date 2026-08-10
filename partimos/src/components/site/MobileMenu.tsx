@@ -20,7 +20,7 @@ export function MobileMenu() {
     <Dialog.Root>
       <Dialog.Trigger
         aria-label="Abrir el menú"
-        className="flex size-10 items-center justify-center border-[1.5px] border-plate-600 text-plate-100 transition-colors hover:border-ochre-400 hover:text-ochre-300 min-[900px]:hidden"
+        className="flex size-10 items-center justify-center rounded-[11px] border-[1.5px] border-ink-200 text-ink-900 transition-colors hover:border-accent min-[900px]:hidden"
       >
         <svg
           viewBox="0 0 24 24"
@@ -36,13 +36,15 @@ export function MobileMenu() {
       </Dialog.Trigger>
 
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-[110] bg-plate-950/55 motion-safe:animate-[fade-in_0.18s_ease-out]" />
-        <Dialog.Content className="fixed inset-y-0 right-0 z-[120] flex w-[min(360px,88vw)] flex-col bg-plate-50 shadow-float motion-safe:animate-[drawer-in_0.24s_cubic-bezier(0.2,0.9,0.3,1)]">
-          <div className="flex items-center justify-between border-b border-plate-200 px-5 py-3.5">
-            <Dialog.Title className="text-[17px] font-bold">Menú</Dialog.Title>
+        <Dialog.Overlay className="fixed inset-0 z-[110] bg-ink-950/55 motion-safe:animate-[fade-in_0.18s_ease-out]" />
+        <Dialog.Content className="fixed inset-y-0 right-0 z-[120] flex w-[min(360px,88vw)] flex-col bg-white shadow-float motion-safe:animate-[drawer-in_0.24s_cubic-bezier(0.2,0.9,0.3,1)]">
+          <div className="flex items-center justify-between border-b border-ink-200 px-5 py-3.5">
+            <Dialog.Title className="font-display text-[17px] font-bold">
+              Menú
+            </Dialog.Title>
             <Dialog.Close
               aria-label="Cerrar el menú"
-              className="flex size-9 items-center justify-center rounded-full text-plate-600 transition-colors hover:bg-plate-50 hover:text-plate-900"
+              className="flex size-9 items-center justify-center rounded-full text-ink-500 transition-colors hover:bg-ink-50 hover:text-ink-900"
             >
               <Icon name="cross" className="size-4.5" />
             </Dialog.Close>
@@ -54,7 +56,7 @@ export function MobileMenu() {
           >
             {NAV_SECTIONS.map((section) => (
               <div key={section.title} className="mb-6 last:mb-0">
-                <h3 className="mb-2 text-[11.5px] font-bold tracking-[0.14em] text-plate-600 uppercase">
+                <h3 className="mb-2 text-[11.5px] font-bold tracking-[0.14em] text-ink-500 uppercase">
                   {section.title}
                 </h3>
                 <ul>
@@ -63,17 +65,17 @@ export function MobileMenu() {
                       <Dialog.Close asChild>
                         <Link
                           href={link.href}
-                          className="flex items-start gap-3 px-2.5 py-2.5 transition-colors hover:bg-plate-50"
+                          className="flex items-start gap-3 rounded-[12px] px-2.5 py-2.5 transition-colors hover:bg-ink-50"
                         >
                           <Icon
                             name={link.icon}
-                            className="mt-0.5 size-5 shrink-0 text-plate-600"
+                            className="mt-0.5 size-5 shrink-0 text-ink-500"
                           />
                           <span>
-                            <span className="block text-[15.5px] font-bold">
+                            <span className="block font-display text-[15.5px] font-bold">
                               {link.label}
                             </span>
-                            <span className="block text-[13px] leading-snug text-plate-600">
+                            <span className="block text-[13px] leading-snug text-ink-500">
                               {link.hint}
                             </span>
                           </span>
@@ -86,13 +88,13 @@ export function MobileMenu() {
             ))}
           </nav>
 
-          <div className="flex flex-col gap-2.5 border-t border-plate-200 px-5 py-4">
+          <div className="flex flex-col gap-2.5 border-t border-ink-200 px-5 py-4">
             <ButtonLink href="/#buscar" full>
               Buscar viaje
             </ButtonLink>
             <AuthDialog
               trigger={
-                <button className="w-full border-[1.5px] border-plate-200 px-5 py-3 text-[15px] font-bold transition-colors hover:border-ochre-500 hover:text-ochre-600">
+                <button className="w-full rounded-[14px] border-[1.5px] border-ink-200 px-5 py-3 font-display text-[15px] font-bold transition-colors hover:border-accent hover:text-accent-ink">
                   Entrar
                 </button>
               }

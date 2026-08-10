@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Section, SectionTitle } from "@/components/site/Section";
+import { Section, Eyebrow, SectionTitle } from "@/components/site/Section";
 import { Icon, type IconName } from "@/components/ui/Icon";
 import { Photo } from "@/components/ui/Photo";
 import { PHOTOS } from "@/lib/photos";
@@ -50,14 +50,14 @@ export function TrustCard({
   body: string;
 }) {
   return (
-    <div className="border border-plate-200 bg-white p-5.5 transition-[border-color,transform] duration-200 hover:-translate-y-0.5 hover:border-ochre-500">
-      <span className="mb-3.5 flex size-10.5 items-center justify-center bg-plate-50 text-plate-900">
+    <div className="rounded-[18px] border border-ink-200 bg-white p-5.5 transition-[border-color,transform] duration-200 hover:-translate-y-0.5 hover:border-accent">
+      <span className="mb-3.5 flex size-10.5 items-center justify-center rounded-xl bg-ink-50 text-ink-900">
         <Icon name={icon} className="size-5.5" />
       </span>
-      <h3 className="mb-1.5 text-[16.5px] font-bold tracking-[-0.015em]">
+      <h3 className="mb-1.5 font-display text-[16.5px] font-bold tracking-[-0.015em]">
         {title}
       </h3>
-      <p className="text-sm leading-relaxed text-plate-600">{body}</p>
+      <p className="text-sm leading-relaxed text-ink-500">{body}</p>
     </div>
   );
 }
@@ -66,13 +66,14 @@ export function Confianza() {
   const [lead, ...rest] = TRUST_ITEMS;
 
   return (
-    <Section id="seguridad" stop stopRing="#F2F7F9" className="bg-plate-50">
+    <Section id="seguridad" stop stopRing="#F2F7F9" className="bg-ink-50">
+      <Eyebrow>Confianza y seguridad</Eyebrow>
       <SectionTitle>Sabes con quién viajas antes de subirte</SectionTitle>
 
       <div className="mt-9 grid gap-3.5 min-[900px]:grid-cols-[1.15fr_1fr]">
         {/* La carte maîtresse : photo, argument principal, et la seule chose
             que les gens retiennent vraiment — ce qu'on ne garde PAS. */}
-        <article className="relative flex min-h-[380px] flex-col justify-end overflow-hidden bg-plate-900 p-7 text-white">
+        <article className="relative flex min-h-[380px] flex-col justify-end overflow-hidden rounded-[24px] bg-ink-900 p-7 text-white">
           <Photo
             photo={PHOTOS.carroLleno}
             sizes="(min-width: 900px) 600px, 100vw"
@@ -87,7 +88,7 @@ export function Confianza() {
               <Icon name={lead.icon} className="size-3.5" />
               {lead.title}
             </span>
-            <h3 className="mb-2.5 max-w-[16ch] text-[clamp(24px,3.6vw,32px)] leading-[1.08] font-extrabold tracking-[-0.03em]">
+            <h3 className="mb-2.5 max-w-[16ch] font-display text-[clamp(24px,3.6vw,32px)] leading-[1.08] font-extrabold tracking-[-0.03em]">
               Cuatro horas de carretera con un desconocido es mucho tiempo.
             </h3>
             <p className="max-w-[42ch] text-[15px] leading-relaxed text-white/85">
@@ -100,16 +101,16 @@ export function Confianza() {
           {rest.map((item) => (
             <div
               key={item.title}
-              className="flex items-start gap-4 border border-plate-200 bg-white p-5 transition-[border-color] hover:border-ochre-500"
+              className="flex items-start gap-4 rounded-[18px] border border-ink-200 bg-white p-5 transition-[border-color] hover:border-accent"
             >
-              <span className="flex size-10 shrink-0 items-center justify-center bg-plate-50 text-plate-900">
+              <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-ink-50 text-ink-900">
                 <Icon name={item.icon} className="size-5" />
               </span>
               <div className="min-w-0">
-                <h3 className="mb-1 text-[16.5px] font-bold tracking-[-0.015em]">
+                <h3 className="mb-1 font-display text-[16.5px] font-bold tracking-[-0.015em]">
                   {item.title}
                 </h3>
-                <p className="text-[14px] leading-relaxed text-plate-600">
+                <p className="text-[14px] leading-relaxed text-ink-500">
                   {item.body}
                 </p>
               </div>
@@ -120,7 +121,7 @@ export function Confianza() {
 
       <Link
         href="/seguridad"
-        className="mt-6 inline-flex items-center gap-2 font-semibold text-ochre-600 hover:underline"
+        className="mt-6 inline-flex items-center gap-2 font-semibold text-accent-ink hover:underline"
       >
         Cómo cuidamos cada viaje
         <Icon name="arrowRight" className="size-4.5" />

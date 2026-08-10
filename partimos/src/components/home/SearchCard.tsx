@@ -34,9 +34,9 @@ function nextDays(count = SEARCH_HORIZON_DAYS) {
 }
 
 const FIELD_LABEL =
-  "block text-[10.5px] font-bold tracking-[0.11em] text-plate-600 uppercase";
+  "block text-[10.5px] font-bold tracking-[0.11em] text-ink-500 uppercase";
 const FIELD_INPUT =
-  "w-full cursor-pointer appearance-none border-none bg-transparent py-px text-[16px] font-semibold text-plate-900 focus:outline-none";
+  "w-full cursor-pointer appearance-none border-none bg-transparent py-px text-[16px] font-semibold text-ink-900 focus:outline-none";
 
 export function SearchCard() {
   const router = useRouter();
@@ -96,12 +96,12 @@ export function SearchCard() {
   const toCity = ALL_CITIES.find((c) => c.slug === to);
 
   return (
-    <div className="bg-white p-2.5 shadow-float">
+    <div className="rounded-[22px] bg-white p-2.5 shadow-float">
       <div className="px-3 pt-2.5 pb-2">
         <div
           role="group"
           aria-label="¿Qué quieres hacer?"
-          className="flex bg-plate-50 p-0.5"
+          className="flex rounded-xl bg-ink-50 p-0.5"
         >
           {(
             [
@@ -114,7 +114,11 @@ export function SearchCard() {
               type="button"
               aria-pressed={mode === value}
               onClick={() => setMode(value)}
-              className={`flex-1 px-3 py-2.5 text-[13.5px] font-semibold whitespace-nowrap transition-colors ${mode === value ? "bg-white text-plate-900 shadow-[0_1px_4px_rgb(14_42_53/0.12)]" : "text-plate-600 hover:text-plate-900"}`}
+              className={`flex-1 rounded-[9px] px-3 py-2.5 text-[13.5px] font-semibold whitespace-nowrap transition-colors ${
+                mode === value
+                  ? "bg-white text-ink-900 shadow-[0_1px_4px_rgb(14_42_53/0.12)]"
+                  : "text-ink-500 hover:text-ink-900"
+              }`}
             >
               {label}
             </button>
@@ -139,7 +143,11 @@ export function SearchCard() {
               type="button"
               aria-pressed={showMap === value}
               onClick={() => setShowMap(value)}
-              className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[13px] font-semibold transition-colors ${showMap === value ? "bg-plate-900 text-white" : "text-plate-600 hover:bg-plate-50"}`}
+              className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[13px] font-semibold transition-colors ${
+                showMap === value
+                  ? "bg-ink-900 text-white"
+                  : "text-ink-500 hover:bg-ink-50"
+              }`}
             >
               <Icon name={icon} className="size-3.5" />
               {label}
@@ -161,7 +169,7 @@ export function SearchCard() {
           }}
         />
 
-        <div className="border-t border-plate-200">
+        <div className="border-t border-ink-200">
           <CityCombobox
             id="hacia"
             label="Hacia"
@@ -175,11 +183,11 @@ export function SearchCard() {
           />
         </div>
 
-        <div className="flex border-t border-plate-200">
-          <div className="flex flex-1 items-center gap-3 px-3.5 py-3 transition-colors hover:bg-plate-50">
+        <div className="flex border-t border-ink-200">
+          <div className="flex flex-1 items-center gap-3 rounded-[14px] px-3.5 py-3 transition-colors hover:bg-ink-50">
             <Icon
               name="calendar"
-              className="size-[19px] shrink-0 text-plate-600"
+              className="size-[19px] shrink-0 text-ink-500"
             />
             <div className="min-w-0 flex-1">
               <label htmlFor="fecha" className={FIELD_LABEL}>
@@ -200,7 +208,7 @@ export function SearchCard() {
             </div>
           </div>
 
-          <div className="flex max-w-[132px] items-center gap-3 border-l border-plate-200 px-3.5 py-3 transition-colors hover:bg-plate-50">
+          <div className="flex max-w-[132px] items-center gap-3 rounded-[14px] border-l border-ink-200 px-3.5 py-3 transition-colors hover:bg-ink-50">
             <div className="min-w-0 flex-1">
               <label htmlFor="puestos" className={FIELD_LABEL}>
                 Puestos
@@ -226,7 +234,7 @@ export function SearchCard() {
             place égale, et elle montre d'un coup d'œil ce que couvre la
             plateforme — ce que sept lignes de liste ne diront jamais. */}
         {showMap && (
-          <div className="mt-2 border border-plate-200 bg-plate-50/70 p-3">
+          <div className="mt-2 rounded-[18px] border border-ink-200 bg-ink-50/70 p-3">
             <RouteMap
               originSlug={from}
               destinationSlug={to}
@@ -239,7 +247,7 @@ export function SearchCard() {
         {sameCity && (
           <p
             role="alert"
-            className="mt-2 bg-danger-soft px-3.5 py-2.5 text-[13.5px] font-medium text-danger"
+            className="mt-2 rounded-xl bg-danger-soft px-3.5 py-2.5 text-[13.5px] font-medium text-danger"
           >
             El origen y el destino no pueden ser el mismo.
           </p>
@@ -255,18 +263,18 @@ export function SearchCard() {
           {mode === "buscar" ? "Buscar viaje" : "Publicar mi viaje"}
         </Button>
 
-        <p className="px-1.5 pt-3 pb-1 text-center text-[12.5px] text-plate-600">
-          Buscar y reservar es <b className="text-plate-900">gratis</b>. Le
-          pagas directo a la persona.
+        <p className="px-1.5 pt-3 pb-1 text-center text-[12.5px] text-ink-500">
+          Buscar y reservar es <b className="text-ink-900">gratis</b>. Le pagas
+          directo a la persona.
         </p>
       </form>
 
       {noRoute && fromCity && toCity && (
-        <div className="border-t border-plate-200 px-3.5 pt-4 pb-2">
-          <p className="mb-3 text-[14.5px] leading-relaxed text-plate-600">
+        <div className="border-t border-ink-200 px-3.5 pt-4 pb-2">
+          <p className="mb-3 text-[14.5px] leading-relaxed text-ink-500">
             Todavía no tenemos viajes publicados entre{" "}
-            <b className="text-plate-900">{fromCity.shortName}</b> y{" "}
-            <b className="text-plate-900">{toCity.shortName}</b>. Déjanos tu
+            <b className="text-ink-900">{fromCity.shortName}</b> y{" "}
+            <b className="text-ink-900">{toCity.shortName}</b>. Déjanos tu
             número y te escribimos apenas alguien salga para allá.
           </p>
           <AvisameForm

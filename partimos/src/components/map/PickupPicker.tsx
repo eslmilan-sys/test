@@ -49,11 +49,11 @@ export function PickupPicker({
   const quote = quoteDetour(baseKm, tollCents, extraKm, category, seats);
 
   return (
-    <div className="border border-plate-200 bg-white p-5">
-      <h3 className="mb-1.5 text-[18px] font-bold tracking-[-0.02em]">
+    <div className="rounded-[20px] border border-ink-200 bg-white p-5">
+      <h3 className="mb-1.5 font-display text-[18px] font-bold tracking-[-0.02em]">
         ¿Dónde te recogemos?
       </h3>
-      <p className="mb-4 text-[13.5px] leading-relaxed text-plate-600">
+      <p className="mb-4 text-[13.5px] leading-relaxed text-ink-500">
         Estos son los puntos por donde el conductor ya va a pasar. Máximo cuatro
         por viaje, ninguno en terminal.
       </p>
@@ -63,7 +63,7 @@ export function PickupPicker({
             route, les arrêts sont des paradas. */}
         <span
           aria-hidden
-          className="absolute top-3 bottom-3 left-[11px] w-0.5 rounded-full bg-plate-200"
+          className="absolute top-3 bottom-3 left-[11px] w-0.5 rounded-full bg-ink-200"
         />
         {[...stops, "Propongo mi punto"].map((stop, index) => {
           const active = selected === index;
@@ -74,20 +74,28 @@ export function PickupPicker({
                 type="button"
                 aria-pressed={active}
                 onClick={() => setSelected(index)}
-                className={`flex w-full items-start gap-3.5 py-2.5 pr-3 pl-0 text-left transition-colors ${active ? "bg-plate-50" : "hover:bg-plate-50/60"}`}
+                className={`flex w-full items-start gap-3.5 rounded-[12px] py-2.5 pr-3 pl-0 text-left transition-colors ${
+                  active ? "bg-ink-50" : "hover:bg-ink-50/60"
+                }`}
               >
                 <span
                   aria-hidden
-                  className={`relative z-[1] mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full border-4 border-white ${active ? (proposal ? "bg-ochre-500" : "bg-ochre-400") : "bg-plate-300"}`}
+                  className={`relative z-[1] mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full border-4 border-white ${
+                    active
+                      ? proposal
+                        ? "bg-accent"
+                        : "bg-brand-green"
+                      : "bg-ink-300"
+                  }`}
                 />
                 <span className="min-w-0 flex-1">
                   <span
-                    className={`block text-[15px] ${active ? "font-semibold" : "font-medium text-plate-600"}`}
+                    className={`block text-[15px] ${active ? "font-semibold" : "font-medium text-ink-600"}`}
                   >
                     {stop}
                   </span>
                   {proposal && (
-                    <span className="block text-[13px] leading-snug text-plate-600">
+                    <span className="block text-[13px] leading-snug text-ink-500">
                       El conductor decide si le queda de paso
                     </span>
                   )}
@@ -99,10 +107,10 @@ export function PickupPicker({
       </ol>
 
       {isCustom ? (
-        <div className="bg-plate-50 p-4">
+        <div className="rounded-[16px] bg-ink-50 p-4">
           <label
             htmlFor="pickup-custom"
-            className="mb-1.5 block text-[11.5px] font-bold tracking-[0.11em] text-plate-600 uppercase"
+            className="mb-1.5 block text-[11.5px] font-bold tracking-[0.11em] text-ink-500 uppercase"
           >
             Tu punto
           </label>
@@ -112,17 +120,17 @@ export function PickupPicker({
             value={custom}
             onChange={(e) => setCustom(e.target.value)}
             placeholder="Ej. Vía Israel, frente al parque"
-            className="mb-4 w-full border border-plate-200 bg-white px-3.5 py-2.5 text-[15px] font-medium focus:border-ochre-500 focus:outline-none"
+            className="mb-4 w-full rounded-[12px] border border-ink-200 bg-white px-3.5 py-2.5 text-[15px] font-medium focus:border-accent focus:outline-none"
           />
 
           <div className="mb-1.5 flex items-baseline justify-between">
             <label
               htmlFor="pickup-km"
-              className="text-[11.5px] font-bold tracking-[0.11em] text-plate-600 uppercase"
+              className="text-[11.5px] font-bold tracking-[0.11em] text-ink-500 uppercase"
             >
               Cuánto se desvía
             </label>
-            <b className="cote text-[16px] font-bold">
+            <b className="tnum font-display text-[16px] font-bold">
               +{extraKm.toFixed(1)} km
             </b>
           </div>
@@ -134,38 +142,38 @@ export function PickupPicker({
             step={0.5}
             value={extraKm}
             onChange={(e) => setExtraKm(Number(e.target.value))}
-            className="h-1.5 w-full cursor-pointer appearance-none rounded-full bg-plate-200 [&::-moz-range-thumb]:size-6 [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-4 [&::-moz-range-thumb]:border-ochre-500 [&::-moz-range-thumb]:bg-white [&::-webkit-slider-thumb]:size-6 [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-4 [&::-webkit-slider-thumb]:border-ochre-500 [&::-webkit-slider-thumb]:bg-white"
+            className="h-1.5 w-full cursor-pointer appearance-none rounded-full bg-ink-200 [&::-moz-range-thumb]:size-6 [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-4 [&::-moz-range-thumb]:border-accent [&::-moz-range-thumb]:bg-white [&::-webkit-slider-thumb]:size-6 [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-4 [&::-webkit-slider-thumb]:border-accent [&::-webkit-slider-thumb]:bg-white"
           />
 
           <div
-            className="mt-4 border-t border-plate-200 pt-3.5"
+            className="mt-4 border-t border-ink-200 pt-3.5"
             aria-live="polite"
           >
             {quote.accepted ? (
               <>
                 <dl className="text-[14px]">
                   <div className="flex justify-between gap-3 py-1">
-                    <dt className="text-plate-600">Aporte de la ruta</dt>
-                    <dd className="cote font-semibold">
+                    <dt className="text-ink-500">Aporte de la ruta</dt>
+                    <dd className="tnum font-semibold">
                       {formatUsd(quote.baseCents)}
                     </dd>
                   </div>
                   <div className="flex justify-between gap-3 py-1">
-                    <dt className="text-plate-600">
+                    <dt className="text-ink-500">
                       Tu desvío suma {extraKm.toFixed(1)} km al recorrido
                     </dt>
-                    <dd className="cote font-semibold">
+                    <dd className="tnum font-semibold">
                       +{formatUsd(quote.extraCents)}
                     </dd>
                   </div>
-                  <div className="flex justify-between gap-3 border-t border-plate-200 py-2">
+                  <div className="flex justify-between gap-3 border-t border-ink-200 py-2">
                     <dt className="font-semibold">Tu aporte</dt>
-                    <dd className="cote text-[17px] font-bold">
+                    <dd className="tnum font-display text-[17px] font-bold">
                       {formatUsd(quote.requesterCents)}
                     </dd>
                   </div>
                 </dl>
-                <p className="mt-2 text-[12.5px] leading-relaxed text-plate-600">
+                <p className="mt-2 text-[12.5px] leading-relaxed text-ink-500">
                   No es un cargo por recogerte: es el costo de los kilómetros de
                   más, y lo pone quien los pidió. Los demás pasajeros siguen
                   aportando {formatUsd(quote.baseCents)}, y el conductor no
@@ -181,17 +189,17 @@ export function PickupPicker({
           </div>
         </div>
       ) : (
-        <p className="bg-plate-50 px-4 py-3.5 text-[14px] leading-relaxed text-plate-600">
+        <p className="rounded-[16px] bg-ink-50 px-4 py-3.5 text-[14px] leading-relaxed text-ink-500">
           Este punto está en el camino del conductor, así que no cambia nada:
           aportas{" "}
-          <b className="cote font-semibold text-plate-900">
+          <b className="tnum font-semibold text-ink-900">
             {formatUsd(quote.baseCents)}
           </b>
           , igual que los demás.
         </p>
       )}
 
-      <p className="mt-3.5 text-[12px] leading-relaxed text-plate-600">
+      <p className="mt-3.5 text-[12px] leading-relaxed text-ink-500">
         Un desvío se rechaza si pasa del {DETOUR_LIMITS.maxExtraKmPct} % del
         kilometraje o de {DETOUR_LIMITS.maxExtraMinutes} minutos. Si la hora de
         llegada se mueve más de {DETOUR_LIMITS.notifyPassengersAfterMinutes}{" "}

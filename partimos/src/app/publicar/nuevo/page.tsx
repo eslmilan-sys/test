@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 
 export default function NuevoViajePage() {
   return (
-    <main id="contenido" className="bg-plate-50 pb-16">
+    <main id="contenido" className="bg-ink-50 pb-16">
       <Suspense fallback={<div className="min-h-[70vh]" />}>
         <PublishFlow />
       </Suspense>

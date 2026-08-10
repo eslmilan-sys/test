@@ -1,6 +1,7 @@
 import Link from "next/link";
 import {
   Section,
+  Eyebrow,
   SectionTitle,
   Lead,
 } from "@/components/site/Section";
@@ -16,28 +17,28 @@ export function RutaCard({ slug }: { slug: string }) {
   return (
     <Link
       href={`/viajes/${corridor.slug}`}
-      className="group flex items-center gap-3.5 border border-plate-200 px-4.5 py-4 transition-colors hover:border-ochre-500 hover:bg-plate-50"
+      className="group flex items-center gap-3.5 rounded-[15px] border border-ink-200 px-4.5 py-4 transition-colors hover:border-accent hover:bg-ink-50"
     >
       <span className="min-w-0 flex-1">
-        <b className="block text-[15.5px] font-bold tracking-[-0.015em]">
+        <b className="block font-display text-[15.5px] font-bold tracking-[-0.015em]">
           {corridor.origin.shortName} → {corridor.destination.shortName}
         </b>
-        <span className="cote text-[12.5px] text-plate-600">
+        <span className="tnum text-[12.5px] text-ink-500">
           {corridor.distanceKm} km ·{" "}
           {formatDuration(corridor.typicalDurationMin)}
         </span>
       </span>
       <span className="shrink-0 text-right">
-        <b className="cote block text-base font-bold">
+        <b className="tnum block font-display text-base font-bold">
           {formatUsd(cap.maxPriceCents, { compact: true })}
         </b>
-        <span className="block text-[10.5px] tracking-wide text-plate-600 uppercase">
+        <span className="block text-[10.5px] tracking-wide text-ink-500 uppercase">
           Tope
         </span>
       </span>
       <Icon
         name="arrowRight"
-        className="size-4.5 shrink-0 text-plate-300 transition-colors group-hover:text-ochre-600"
+        className="size-4.5 shrink-0 text-ink-300 transition-colors group-hover:text-accent-ink"
       />
     </Link>
   );
@@ -46,6 +47,7 @@ export function RutaCard({ slug }: { slug: string }) {
 export function Rutas() {
   return (
     <Section id="rutas" stop>
+      <Eyebrow>Rutas</Eyebrow>
       <SectionTitle>Las rutas que más se mueven</SectionTitle>
       <Lead>
         Cada ruta tiene su página: quién sale esta semana, por dónde recogen y
@@ -60,7 +62,7 @@ export function Rutas() {
 
       <Link
         href="/viajes"
-        className="mt-6 inline-flex items-center gap-2 font-semibold text-ochre-600 hover:underline"
+        className="mt-6 inline-flex items-center gap-2 font-semibold text-accent-ink hover:underline"
       >
         Ver todas las rutas
         <Icon name="arrowRight" className="size-4.5" />

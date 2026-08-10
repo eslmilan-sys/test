@@ -21,34 +21,39 @@ type Size = "sm" | "md" | "lg";
  * la taille d'écran, envelopper l'appel dans un élément qui porte la règle.
  * `whitespace-nowrap` garantit qu'un libellé ne passe jamais sur deux lignes.
  */
-/**
- * Les boutons appartiennent au monde de la planche : angles vifs, bordure
- * franche, aucune ombre portée. Un bouton flottant à coins arrondis dans une
- * interface qui n'a plus un seul rayon serait le composant d'origine resté
- * en place — c'est exactement ce que cette refonte remplace.
- *
- * L'ocre porte l'action principale, et rien d'autre : c'est la clé de lecture
- * du système. La bordure de 2 px est ce qui donne la présence que l'ombre
- * donnait avant.
- */
 const BASE =
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap font-bold " +
-  "border-2 transition-[background-color,border-color,color] duration-150 " +
-  "disabled:opacity-50 disabled:pointer-events-none select-none";
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap font-display font-bold tracking-[-0.01em] " +
+  "rounded-[14px] transition-[transform,background-color,border-color,box-shadow] duration-150 " +
+  "active:translate-y-0 disabled:opacity-50 disabled:pointer-events-none select-none";
 
+/**
+ * L'action principale est ORANGE, pas encre.
+ *
+ * C'est le changement qui apporte le plus de chaleur à l'ensemble : un
+ * bouton bleu marine sur une page bleue est correct et froid, et rien
+ * n'attire l'œil. L'orange est la seule couleur chaude du système, il ne
+ * sert qu'à ça, donc il ne peut être confondu avec rien d'autre.
+ *
+ * Le ton est #C2410C et non l'orange vif : à 3,6:1, du texte blanc sur
+ * l'orange vif tombe sous AA. Le survol, lui, peut monter en luminosité.
+ *
+ * `active:scale-[0.97]` : la réponse tactile recommandée par la base de
+ * règles. Sur mobile il n'y a pas de survol — sans réponse au doigt, un
+ * bouton donne l'impression de n'avoir rien fait.
+ */
 const VARIANTS: Record<Variant, string> = {
   primary:
-    "bg-ochre-400 border-ochre-400 text-plate-950 hover:bg-ochre-300 hover:border-ochre-300",
+    "bg-action text-white shadow-[0_8px_20px_-8px_rgb(194_65_12/0.5)] hover:bg-action-bright hover:-translate-y-px active:scale-[0.97]",
   secondary:
-    "bg-transparent border-plate-300 text-plate-900 hover:border-ochre-500 hover:text-ochre-700",
+    "bg-white text-ink-900 border-[1.5px] border-ink-200 hover:border-accent hover:text-accent-ink active:scale-[0.97]",
   onDark:
-    "bg-ochre-400 border-ochre-400 text-plate-950 hover:bg-ochre-300 hover:border-ochre-300",
+    "bg-white text-ink-900 shadow-[0_10px_26px_-10px_rgb(0_0_0/0.55)] hover:bg-ink-50 hover:-translate-y-px active:scale-[0.97]",
 };
 
 const SIZES: Record<Size, string> = {
-  sm: "px-4 py-2 text-[14.5px]",
-  md: "px-5.5 py-3 text-[16px]",
-  lg: "px-7 py-3.5 text-[17px]",
+  sm: "px-4 py-2.5 text-[14.5px] rounded-[11px]",
+  md: "px-5.5 py-3.5 text-[16px]",
+  lg: "px-7 py-4 text-[17px]",
 };
 
 type BaseProps = {
@@ -81,7 +86,6 @@ export function Button({
   return (
     <button
       className={classes({ variant, size, full, className, children })}
-      style={{ fontStretch: "112%" }}
       {...rest}
     >
       {children}
@@ -102,7 +106,6 @@ export function ButtonLink({
     <Link
       href={href}
       className={classes({ variant, size, full, className, children })}
-      style={{ fontStretch: "112%" }}
       {...rest}
     >
       {children}

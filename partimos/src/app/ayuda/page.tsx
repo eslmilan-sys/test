@@ -15,12 +15,12 @@ export default function AyudaPage() {
   return (
     <>
       <main id="contenido">
-        <div className="bg-plate-900 pt-10 pb-11 text-white">
+        <div className="bg-ink-900 pt-10 pb-11 text-white">
           <Container>
             <h1 className="mb-4 max-w-[16ch] text-[clamp(32px,6.4vw,50px)] leading-[1.03] font-extrabold tracking-[-0.04em]">
               Lo que todo el mundo pregunta
             </h1>
-            <p className="max-w-[54ch] text-[16.5px] leading-relaxed text-plate-300">
+            <p className="max-w-[54ch] text-[16.5px] leading-relaxed text-ink-300">
               Y si falta algo, escríbenos: contestamos personas, no un
               formulario.
             </p>
@@ -33,14 +33,16 @@ export default function AyudaPage() {
 
             <div
               id="contacto"
-              className="mt-12 max-w-[640px] scroll-mt-24 bg-plate-50 px-6 py-6"
+              className="mt-12 max-w-[640px] scroll-mt-24 rounded-[20px] bg-ink-50 px-6 py-6"
             >
-              <h2 className="mb-2.5 text-xl font-bold">Contacto</h2>
-              <p className="text-[15px] leading-relaxed text-plate-600">
+              <h2 className="mb-2.5 font-display text-xl font-bold">
+                Contacto
+              </h2>
+              <p className="text-[15px] leading-relaxed text-ink-500">
                 Escríbenos a{" "}
                 <a
                   href="mailto:hola@partimos.com"
-                  className="font-semibold text-ochre-600 hover:underline"
+                  className="font-semibold text-accent-ink hover:underline"
                 >
                   hola@partimos.com
                 </a>

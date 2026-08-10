@@ -157,10 +157,7 @@ test("les arrêts déclarés sont un sous-ensemble ordonné du corridor", () => 
         const at = corridor.waypoints.findIndex(
           (w) => w.citySlug === stop.citySlug,
         );
-        assert.ok(
-          at > cursor,
-          `${corridor.slug} : ${stop.citySlug} hors route`,
-        );
+        assert.ok(at > cursor, `${corridor.slug} : ${stop.citySlug} hors route`);
         cursor = at;
       }
     }

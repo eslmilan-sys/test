@@ -9,12 +9,6 @@
  *
  * La liste est dupliquée pour boucler sans saut, et le second jeu est masqué
  * aux lecteurs d'écran. L'animation disparaît sous `prefers-reduced-motion`.
- *
- * Le bandeau reste dans le registre de la PLANCHE, en continuité du premier
- * écran : il était écrit pour un fond sombre (bordures et texte blancs), et
- * le poser sur le tirage clair faisait tomber six libellés sous le contraste
- * AA. Deux bandes sombres qui se suivent donnent aussi le bon rythme avant que
- * la page ne bascule en tirage de travail.
  */
 
 const TRIPS = [
@@ -72,21 +66,21 @@ function Card({
   return (
     <li
       aria-hidden={clone}
-      className="flex shrink-0 items-center gap-2.5 border border-plate-600 px-3.5 py-2.5 whitespace-nowrap"
+      className="flex shrink-0 items-center gap-2.5 rounded-[14px] border border-white/12 bg-white/6 px-3.5 py-2.5 whitespace-nowrap"
     >
       <span
         aria-hidden
-        className="flex size-7.5 shrink-0 items-center justify-center border border-ochre-400 text-[12.5px] font-bold text-ochre-300"
+        className="brand-gradient flex size-7.5 shrink-0 items-center justify-center rounded-full font-display text-[12.5px] font-bold text-white"
       >
         {trip.initial}
       </span>
       <span>
-        <span className="block text-[13px] font-semibold text-plate-100">
+        <span className="block text-[13px] font-semibold text-white">
           {trip.route}
         </span>
-        <span className="block text-[11.5px] text-plate-300">{trip.when}</span>
+        <span className="block text-[11.5px] text-ink-300">{trip.when}</span>
       </span>
-      <span className="cote ml-1 text-base font-bold text-ochre-300">
+      <span className="tnum ml-1 font-display text-base font-bold text-white">
         {trip.price}
       </span>
     </li>
@@ -96,13 +90,13 @@ function Card({
 export function LiveStrip() {
   return (
     <div
-      className="plate group overflow-hidden border-b-2 border-plate-700 px-5 pt-5 pb-7 [mask-image:linear-gradient(90deg,transparent,#000_4%,#000_96%,transparent)]"
+      className="group mt-8 overflow-hidden border-t border-white/12 pt-4 pb-7.5 [mask-image:linear-gradient(90deg,transparent,#000_6%,#000_94%,transparent)]"
       aria-label="Viajes publicados recientemente"
     >
-      <p className="mb-3.5 flex items-center gap-2 text-[11.5px] font-bold tracking-[0.14em] text-plate-200 uppercase">
+      <p className="mb-3.5 flex items-center gap-2 text-[11.5px] font-bold tracking-[0.14em] text-ink-300 uppercase">
         <span
           aria-hidden
-          className="size-1.5 animate-pulse rounded-full bg-ochre-400"
+          className="size-1.5 animate-pulse rounded-full bg-brand-green"
         />
         Publicados hoy
       </p>

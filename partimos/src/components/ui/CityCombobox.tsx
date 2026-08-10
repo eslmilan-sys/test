@@ -61,15 +61,19 @@ export function CityCombobox({
 
   return (
     <div className="relative">
-      <div className="flex items-center gap-3 px-3.5 py-3 transition-colors hover:bg-plate-50">
+      <div className="flex items-center gap-3 rounded-[14px] px-3.5 py-3 transition-colors hover:bg-ink-50">
         <span
           aria-hidden
-          className={`size-[19px] shrink-0 border-[3px] ${tone === "origin" ? "rounded-full border-ochre-500" : " border-plate-500"}`}
+          className={`size-[19px] shrink-0 border-[3px] ${
+            tone === "origin"
+              ? "rounded-full border-accent"
+              : "rounded-[5px] border-brand-green-deep"
+          }`}
         />
         <div className="min-w-0 flex-1">
           <label
             htmlFor={id}
-            className="block text-[10.5px] font-bold tracking-[0.11em] text-plate-600 uppercase"
+            className="block text-[10.5px] font-bold tracking-[0.11em] text-ink-500 uppercase"
           >
             {label}
           </label>
@@ -92,12 +96,12 @@ export function CityCombobox({
             onKeyDown={(e) => {
               if (e.key === "Escape") setOpen(false);
             }}
-            className="w-full border-none bg-transparent py-px text-[16px] font-semibold text-plate-900 placeholder:font-medium placeholder:text-plate-300 focus:outline-none"
+            className="w-full border-none bg-transparent py-px text-[16px] font-semibold text-ink-900 placeholder:font-medium placeholder:text-ink-300 focus:outline-none"
           />
         </div>
         <Icon
           name="search"
-          className={`size-4 shrink-0 text-plate-300 transition-opacity ${open ? "opacity-100" : "opacity-0"}`}
+          className={`size-4 shrink-0 text-ink-300 transition-opacity ${open ? "opacity-100" : "opacity-0"}`}
         />
       </div>
 
@@ -105,11 +109,11 @@ export function CityCombobox({
         <Command
           id={`${id}-list`}
           shouldFilter={false}
-          className="absolute inset-x-0 top-full z-30 mt-1 overflow-hidden border border-plate-200 bg-white"
+          className="absolute inset-x-0 top-full z-30 mt-1 overflow-hidden rounded-[14px] border border-ink-200 bg-white shadow-lift"
         >
           <Command.List className="max-h-64 overflow-y-auto p-1.5">
             {results.length === 0 && (
-              <Command.Empty className="px-3 py-3 text-[14px] text-plate-600">
+              <Command.Empty className="px-3 py-3 text-[14px] text-ink-500">
                 Todavía no llegamos a esa ciudad. Escríbela igual y te avisamos
                 cuando abramos la ruta.
               </Command.Empty>
@@ -123,10 +127,10 @@ export function CityCombobox({
                   onChange(city.slug);
                   setOpen(false);
                 }}
-                className="flex cursor-pointer items-baseline justify-between gap-3 px-3 py-2.5 text-[15px] data-[selected=true]:bg-plate-50"
+                className="flex cursor-pointer items-baseline justify-between gap-3 rounded-[10px] px-3 py-2.5 text-[15px] data-[selected=true]:bg-ink-50"
               >
                 <span className="font-semibold">{city.name}</span>
-                <span className="text-[12.5px] text-plate-600">
+                <span className="text-[12.5px] text-ink-500">
                   {city.province}
                 </span>
               </Command.Item>

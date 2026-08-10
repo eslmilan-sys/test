@@ -41,12 +41,12 @@ export default function PublicarPage() {
   return (
     <>
       <main id="contenido">
-        <div className="bg-plate-900 pt-10 pb-11 text-white">
+        <div className="bg-ink-900 pt-10 pb-11 text-white">
           <Container>
             <h1 className="mb-4 max-w-[16ch] text-[clamp(32px,6.4vw,52px)] leading-[1.02] font-extrabold tracking-[-0.04em]">
               El viaje ya lo ibas a hacer
             </h1>
-            <p className="max-w-[54ch] text-[16.5px] leading-relaxed text-plate-300">
+            <p className="max-w-[54ch] text-[16.5px] leading-relaxed text-ink-300">
               No ganas dinero manejando: recuperas parte de lo que ibas a gastar
               igual. La gasolina cuesta lo mismo vayas solo o acompañado.
             </p>
@@ -68,21 +68,21 @@ export default function PublicarPage() {
                 {STEPS.map((step, index) => (
                   <li
                     key={step.title}
-                    className="relative overflow-hidden border border-plate-200 p-5.5"
+                    className="relative overflow-hidden rounded-[18px] border border-ink-200 p-5.5"
                   >
                     <span
                       aria-hidden
-                      className="absolute top-3 right-4 text-[40px] leading-none font-extrabold text-transparent [-webkit-text-stroke:2px_var(--color-ink-200)]"
+                      className="absolute top-3 right-4 font-display text-[40px] leading-none font-extrabold text-transparent [-webkit-text-stroke:2px_var(--color-ink-200)]"
                     >
                       {index + 1}
                     </span>
-                    <span className="mb-3.5 flex size-10.5 items-center justify-center bg-plate-50 text-plate-900">
+                    <span className="mb-3.5 flex size-10.5 items-center justify-center rounded-xl bg-ink-50 text-ink-900">
                       <Icon name={step.icon} className="size-5.5" />
                     </span>
-                    <h3 className="mb-1.5 text-[16.5px] font-bold">
+                    <h3 className="mb-1.5 font-display text-[16.5px] font-bold">
                       {step.title}
                     </h3>
-                    <p className="text-sm leading-relaxed text-plate-600">
+                    <p className="text-sm leading-relaxed text-ink-500">
                       {step.body}
                     </p>
                   </li>
@@ -93,7 +93,7 @@ export default function PublicarPage() {
 
           <section
             id="calculadora"
-            className="scroll-mt-24 bg-plate-50 py-12 md:py-16"
+            className="scroll-mt-24 bg-ink-50 py-12 md:py-16"
           >
             <Container>
               <div className="grid gap-9 min-[900px]:grid-cols-[1.04fr_0.96fr] min-[900px]:items-start min-[900px]:gap-12">
@@ -102,7 +102,7 @@ export default function PublicarPage() {
                   <h2 className="mb-4 max-w-[20ch] text-[clamp(24px,4vw,34px)] font-extrabold">
                     Por qué hay un tope
                   </h2>
-                  <div className="max-w-[50ch] space-y-4 text-[15.5px] leading-relaxed text-plate-600">
+                  <div className="max-w-[50ch] space-y-4 text-[15.5px] leading-relaxed text-ink-500">
                     <p>
                       Compartir los gastos de un viaje que ya ibas a hacer es
                       una cosa. Cobrar un pasaje es otra, y para eso hace falta
@@ -111,7 +111,7 @@ export default function PublicarPage() {
                     <p>
                       La diferencia se sostiene en un detalle del cálculo: el
                       costo del recorrido se divide entre{" "}
-                      <b className="font-semibold text-plate-900">
+                      <b className="font-semibold text-ink-900">
                         los puestos que ofreces más uno
                       </b>
                       . Ese «uno» eres tú. Por eso, aunque lleves el carro
@@ -124,9 +124,9 @@ export default function PublicarPage() {
                     </p>
                   </div>
 
-                  <div className="mt-6 border border-plate-200 bg-white px-5 py-4.5">
-                    <p className="text-[14px] leading-relaxed text-plate-600">
-                      <b className="font-semibold text-plate-900">
+                  <div className="mt-6 rounded-[18px] border border-ink-200 bg-white px-5 py-4.5">
+                    <p className="text-[14px] leading-relaxed text-ink-500">
+                      <b className="font-semibold text-ink-900">
                         Si alguien te pide un desvío
                       </b>
                       <br />
@@ -143,7 +143,7 @@ export default function PublicarPage() {
 
           <section className="py-12 md:py-16">
             <Container>
-              <h2 className="mb-5 text-xl font-bold">
+              <h2 className="mb-5 font-display text-xl font-bold">
                 Rutas con gente esperando
               </h2>
               <div className="grid gap-2.5 min-[640px]:grid-cols-2 min-[980px]:grid-cols-3">

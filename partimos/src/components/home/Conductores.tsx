@@ -1,5 +1,6 @@
 import {
   Section,
+  Eyebrow,
   SectionTitle,
   Lead,
 } from "@/components/site/Section";
@@ -27,6 +28,7 @@ const DRIVER_POINTS = [
 export function Conductores() {
   return (
     <Section id="conductores" stop>
+      <Eyebrow>Para conductores</Eyebrow>
       <SectionTitle>El viaje ya lo ibas a hacer</SectionTitle>
       <Lead>
         La gasolina te cuesta lo mismo vayas solo o con tres personas atrás. Lo

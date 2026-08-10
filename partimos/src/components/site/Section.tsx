@@ -73,10 +73,25 @@ export function Section({
   );
 }
 
-/* Le sur-titre de section a été retiré du système, pas seulement de ses
-   appels : le titre porte son propre poids, et un libellé en capitales
-   au-dessus de lui n'ajoute qu'une ligne à lire avant la vraie. Laisser le
-   composant en place aurait garanti son retour au premier ajout de section. */
+/** Sur-titre de section. Neutre : il informe, il ne décore pas. */
+export function Eyebrow({
+  children,
+  tone = "light",
+}: {
+  children: ReactNode;
+  tone?: Tone;
+}) {
+  return (
+    <p
+      className={`mb-3 flex items-center gap-2.5 text-[11.5px] font-bold tracking-[0.16em] uppercase ${
+        tone === "dark" ? "text-ink-300" : "text-ink-500"
+      }`}
+    >
+      <span aria-hidden className="h-0.5 w-5.5 rounded-full bg-brand-green" />
+      {children}
+    </p>
+  );
+}
 
 export function SectionTitle({
   children,
@@ -105,7 +120,9 @@ export function Lead({
 }) {
   return (
     <p
-      className={`max-w-[54ch] text-[17px] leading-relaxed ${tone === "dark" ? "text-plate-300" : "text-plate-600"} ${className}`}
+      className={`max-w-[54ch] text-[17px] leading-relaxed ${
+        tone === "dark" ? "text-ink-300" : "text-ink-500"
+      } ${className}`}
     >
       {children}
     </p>

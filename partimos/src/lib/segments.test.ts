@@ -78,16 +78,8 @@ test("R1 — le conducteur paie encore sa part sur CHAQUE segment", () => {
 });
 
 test("un segment coûte moins que le trajet complet qui le contient", () => {
-  const partiel = segmentCap(
-    findSegment(DAVID, "panama-city", "santiago")!,
-    "standard",
-    3,
-  );
-  const complet = segmentCap(
-    findSegment(DAVID, "panama-city", "david")!,
-    "standard",
-    3,
-  );
+  const partiel = segmentCap(findSegment(DAVID, "panama-city", "santiago")!, "standard", 3);
+  const complet = segmentCap(findSegment(DAVID, "panama-city", "david")!, "standard", 3);
   assert.ok(
     partiel.maxPriceCents < complet.maxPriceCents,
     "descendre à mi-chemin devrait coûter moins cher",
@@ -97,17 +89,9 @@ test("un segment coûte moins que le trajet complet qui le contient", () => {
 test("la somme de deux segments consécutifs ne dépasse pas le trajet entier", () => {
   // Sinon on facturerait plus cher un trajet découpé que le même trajet
   // d'une traite, ce qui serait un tarif déguisé.
-  const a = segmentCap(
-    findSegment(DAVID, "panama-city", "santiago")!,
-    "standard",
-    3,
-  );
+  const a = segmentCap(findSegment(DAVID, "panama-city", "santiago")!, "standard", 3);
   const b = segmentCap(findSegment(DAVID, "santiago", "david")!, "standard", 3);
-  const entier = segmentCap(
-    findSegment(DAVID, "panama-city", "david")!,
-    "standard",
-    3,
-  );
+  const entier = segmentCap(findSegment(DAVID, "panama-city", "david")!, "standard", 3);
   assert.ok(
     a.maxPriceCents + b.maxPriceCents <= entier.maxPriceCents + 100,
     "découper le trajet ne doit pas le rendre plus cher",
@@ -116,7 +100,9 @@ test("la somme de deux segments consécutifs ne dépasse pas le trajet entier", 
 
 test("une place se libère au point de descente", () => {
   // Deux passagers montent à Panamá et descendent à Santiago (indices 0 → 3).
-  const holds: SeatHold[] = [{ fromIndex: 0, toIndex: 3, seats: 2 }];
+  const holds: SeatHold[] = [
+    { fromIndex: 0, toIndex: 3, seats: 2 },
+  ];
 
   const avant = findSegment(DAVID, "panama-city", "santiago")!;
   assert.equal(seatsTakenOnSegment(holds, avant), 2);

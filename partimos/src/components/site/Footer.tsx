@@ -35,7 +35,7 @@ const COLUMNS = [
 
 export function Footer() {
   return (
-    <footer className="mt-5 bg-plate-900 pt-13 pb-8 text-plate-400">
+    <footer className="mt-5 bg-ink-900 pt-13 pb-8 text-ink-400">
       <div className="mx-auto w-full max-w-[1120px] px-5">
         <div className="mb-9 grid gap-8 md:grid-cols-[1.6fr_1fr_1fr_1fr]">
           <div>
@@ -44,8 +44,8 @@ export function Footer() {
               className="flex items-center gap-2.5"
               aria-label="Partimos — inicio"
             >
-              <LogoMark />
-              <span className="cote text-[22px] font-extrabold tracking-[-0.03em]">
+              <LogoMark gradientId="brand-footer" dotColor="#0E2A35" />
+              <span className="brand-gradient-text font-display text-[22px] font-extrabold tracking-[-0.03em]">
                 Partimos
               </span>
             </Link>
@@ -57,7 +57,7 @@ export function Footer() {
 
           {COLUMNS.map((col) => (
             <div key={col.title}>
-              <h2 className="mb-3.5 text-sm font-bold text-white">
+              <h2 className="mb-3.5 font-display text-sm font-bold text-white">
                 {col.title}
               </h2>
               <ul>
@@ -79,7 +79,9 @@ export function Footer() {
         {/* Maillage interne : chaque page pointe vers tous les corridors.
             C'est ce qui fait remonter les pages SEO les unes les autres. */}
         <nav aria-label="Rutas" className="mb-8 border-t border-white/10 pt-7">
-          <h2 className="mb-3 text-sm font-bold text-white">Rutas populares</h2>
+          <h2 className="mb-3 font-display text-sm font-bold text-white">
+            Rutas populares
+          </h2>
           <ul className="flex flex-wrap gap-x-5 gap-y-1.5">
             {CORRIDORS.map((corridor) => (
               <li key={corridor.slug}>
@@ -96,7 +98,7 @@ export function Footer() {
 
         {/* Mention légale obligatoire sur toutes les pages (§8 du brief). */}
         <div className="flex flex-wrap items-start justify-between gap-5 border-t border-white/12 pt-6">
-          <p className="max-w-[70ch] text-[12.5px] leading-relaxed text-plate-400">
+          <p className="max-w-[70ch] text-[12.5px] leading-relaxed text-ink-400">
             {LEGAL_FOOTER}
           </p>
           <span className="text-[12.5px] whitespace-nowrap">
