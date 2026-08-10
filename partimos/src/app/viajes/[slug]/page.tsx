@@ -87,10 +87,8 @@ function corridorFaq(corridor: Corridor): Faq[] {
       a: `En los puntos por donde el conductor ya va a pasar: ${corridor.pickupPoints.slice(0, 3).join(", ")}. Cada viaje tiene máximo cuatro paradas y ninguna es una terminal de buses. Si ninguna te sirve, puedes proponer la tuya y el conductor te dice si le queda de paso.`,
     },
     {
-      q: `¿Es más barato que el bus?`,
-      a: corridor.busPriceCents
-        ? `El bus a ${corridor.destination.shortName} cuesta alrededor de ${formatUsd(corridor.busPriceCents, { compact: true })}. Compartir carro suele costar algo más, pero sales a la hora que se acomoda al conductor, te recogen cerca de tu casa y llegas directo, sin paradas de terminal.`
-        : `Depende del día. Lo que cambia de verdad es el horario y el punto de recogida: sales cuando sale el conductor y te deja cerca de donde vas.`,
+      q: `¿Por qué ir en carro y no de otra forma?`,
+      a: `Porque el viaje se te hace corto. Vas sentado desde que te montas, con tu maleta atrás, aire acondicionado y una sola parada: la tuya. Sales a la hora que acordaron con el conductor, no a la que salga el próximo, y llegas cerca de donde vas.`,
     },
     {
       q: `¿Y para volver de ${corridor.destination.shortName}?`,
@@ -196,13 +194,9 @@ export default async function CorridorPage({ params }: Params) {
                 hint="Carro estándar, 3 puestos"
               />
               <Stat
-                label="Referencia bus"
-                value={
-                  corridor.busPriceCents
-                    ? formatUsd(corridor.busPriceCents, { compact: true })
-                    : "—"
-                }
-                hint="Solo como comparación"
+                label="Paradas"
+                value="1"
+                hint="La tuya. Sin transbordos"
               />
             </dl>
           </Container>
@@ -346,26 +340,20 @@ export default async function CorridorPage({ params }: Params) {
                     tollCents={corridor.tollCents}
                   />
 
-                  {corridor.busPriceCents && (
-                    <div className="mt-5 flex items-start gap-3.5 rounded-[18px] border border-ink-200 bg-white px-5 py-4.5">
-                      <Icon
-                        name="bus"
-                        className="mt-0.5 size-5 shrink-0 text-ink-500"
-                      />
-                      <p className="text-[14px] leading-relaxed text-ink-500">
-                        <b className="font-semibold text-ink-900">
-                          Comparado con el bus
-                        </b>
-                        <br />
-                        El bus cuesta alrededor de{" "}
-                        <span className="tnum">
-                          {formatUsd(corridor.busPriceCents, { compact: true })}
-                        </span>
-                        , sale de terminal y para en el camino. Aquí sales a la
-                        hora del conductor y te recogen cerca de tu casa.
-                      </p>
-                    </div>
-                  )}
+                  <div className="mt-5 flex items-start gap-3.5 rounded-[18px] border border-ink-200 bg-white px-5 py-4.5">
+                    <Icon
+                      name="car"
+                      className="mt-0.5 size-5 shrink-0 text-action-ink"
+                    />
+                    <p className="text-[14px] leading-relaxed text-ink-500">
+                      <b className="font-semibold text-ink-900">
+                        Te recogen y te dejan
+                      </b>
+                      <br />
+                      Sin cargar la maleta hasta una terminal ni esperar de pie.
+                      Te montas donde acordaron y te bajas cerca de donde vas.
+                    </p>
+                  </div>
                 </div>
               </div>
             </Container>

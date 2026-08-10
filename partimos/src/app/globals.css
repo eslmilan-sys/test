@@ -3,13 +3,21 @@
 /* =====================================================================
    PARTIMOS — « SOL »
    ---------------------------------------------------------------------
-   Le soleil du Panama. Ambre et bleu profond sur un fond crème.
+   Le soleil du Panama. Ambre et bleu profond sur un fond presque blanc.
 
    Trois décisions qui portent tout le reste :
 
-   1. LE FOND EST CRÈME, PAS BLANC. #FFFBEB. La page est chaude dès le
-      premier pixel, avant même qu'un élément soit dessiné. C'est le geste
-      le moins cher et le plus efficace pour rendre une interface gaie.
+   1. LE FOND EST UN BLANC À PEINE TIÉDI, #FCFCFA — et non plus le crème
+      #FFFBEB. Le crème teintait TOUT : chaque carte blanche y prenait un
+      halo jaune, chaque photo virait au sépia, et l'ambre s'y noyait au
+      lieu d'y trancher. La chaleur ne se met plus dans le fond de page,
+      elle se met LÀ OÙ ELLE TRAVAILLE : la lumière du premier écran, le
+      bouton, le tracé, la section sombre. Le reste respire en blanc.
+
+      Conséquence sur la rampe : les gris cessent d'être des beiges. Un
+      #E7DDC9 posé sur du blanc se lit comme une tache jaune, pas comme une
+      bordure. La rampe garde juste ce qu'il faut de chaud (les valeurs
+      sombres restent brunes) pour ne pas devenir clinique.
 
    2. L'ACTION EST AMBRE AVEC DU TEXTE ENCRE, pas blanc. #26221C sur
       #F59E0B donne 7,4:1 — le bouton devient l'élément le PLUS lisible de
@@ -20,28 +28,39 @@
    3. LE BLEU EST LA COULEUR DE LECTURE. Liens, focus, icônes. Il porte la
       confiance pendant que l'ambre porte l'envie.
 
-   AUCUN DÉGRADÉ. L'emphase se fait à la graisse et à la taille — un texte
-   en dégradé est plus dur à lire et se démode plus vite qu'un texte gras.
+   AUCUN DÉGRADÉ SUR DU TEXTE. L'emphase se fait à la graisse et à la
+   taille — un texte en dégradé est plus dur à lire et se démode plus vite
+   qu'un texte gras. Sur une SURFACE, en revanche, un dégradé très sourd
+   donne à une grande zone sombre la profondeur qu'un aplat n'a pas ; c'est
+   le seul endroit où on s'y autorise.
 
    Le VERT reste la marque et rien d'autre. Le ROUGE reste l'erreur.
 
-   Contrastes vérifiés au calcul : texte principal 15,3:1 sur le crème,
+   Contrastes vérifiés au calcul : texte principal 15,4:1 sur le fond,
    secondaire 6,0:1, lien bleu 6,5:1, encre sur bouton ambre 7,4:1.
    ===================================================================== */
 
 @theme {
-  /* ---- Rampe neutre chaude ---- */
-  --color-ink-950: #1a1611;
-  --color-ink-900: #26221c; /* texte principal — 15,3:1 sur le crème */
+  /* ---- Rampe neutre : brune dans l'ombre, neutre dans la lumière ----
+     Les valeurs sombres gardent leur brun — c'est ce qui empêche la section
+     sombre de virer au gris d'interface. Les valeurs claires, elles, sont
+     désaturées : sur du blanc, un beige ne se lit pas comme une bordure
+     mais comme une salissure. */
+  --color-ink-950: #17140f;
+  --color-ink-900: #26221c; /* texte principal — 15,4:1 sur le fond */
   --color-ink-800: #3a342a;
   --color-ink-700: #4e4638;
-  --color-ink-600: #5e5445;
-  --color-ink-500: #6b5f4e; /* texte secondaire — 6,0:1 sur le crème */
-  --color-ink-400: #9a8e7b; /* secondaire sur fond sombre */
-  --color-ink-300: #c4b8a3;
-  --color-ink-200: #e7ddc9; /* bordures */
-  --color-ink-100: #f5eedd;
-  --color-ink-50: #fffbeb; /* crema — le fond du site */
+  --color-ink-600: #5b5346;
+  --color-ink-500: #665f50; /* texte secondaire — 6,0:1 sur le fond */
+  --color-ink-400: #9c968a; /* secondaire sur fond sombre — 5,4:1 dessus */
+  --color-ink-300: #c8c3b8; /* secondaire sur fond sombre — 9,0:1 dessus */
+  --color-ink-200: #e2dfd8; /* bordures */
+  --color-ink-100: #f1efea; /* survol, remplissages sourds */
+  /* Le fond du site. Pas #FFFFFF : à blanc pur, les cartes `bg-white` n'ont
+     plus rien au-dessus de quoi flotter et la page s'aplatit. À #FAF9F7 elles
+     gardent 1,05:1 d'écart — assez pour se détacher, trop peu pour se
+     remarquer. */
+  --color-ink-50: #faf9f7;
 
   /* ---- Bleu : la couleur de LECTURE ---- */
   --color-accent: #3b82f6; /* sur fonds sombres et remplissages */
@@ -384,18 +403,83 @@
      droit, sans bord visible, et UNE ligne de route qui entre dans la page en
      bas. Le motif ne se répète pas — il se pose une fois, comme une signature.
      Le reste du travail d'identité est porté par le contenu : le tracé des
-     trois étapes et celui des six corridors. */
+     trois étapes et celui des six corridors.
+
+     Depuis que la page est blanche, la lumière porte davantage : sur du
+     crème elle se noyait dans un fond déjà jaune, sur du blanc elle se voit.
+     Elle est donc à peine plus dense, et une seconde couche très froide en
+     bas à gauche l'empêche de tourner à l'orange plat — c'est le contraste
+     chaud/froid qui fait le ciel, pas la quantité d'ambre. */
   .sky {
     background-color: var(--color-ink-50);
     background-image:
       /* La lumière du matin, très étalée pour n'avoir aucun bord. */
       radial-gradient(
-        150% 100% at 92% -20%,
-        rgb(245 158 11 / 0.3),
-        rgb(245 158 11 / 0.08) 46%,
-        transparent 74%
-      );
+          150% 105% at 94% -22%,
+          rgb(251 191 36 / 0.38),
+          rgb(245 158 11 / 0.1) 44%,
+          transparent 72%
+        ),
+      /* Le froid qui lui répond, presque invisible pris isolément. */
+        radial-gradient(
+          120% 90% at -10% 108%,
+          rgb(59 130 246 / 0.09),
+          transparent 62%
+        );
     background-repeat: no-repeat;
+  }
+
+  /* ---- LA SURFACE SOMBRE ----
+     Un aplat de brun sur toute la largeur d'un écran, c'est de la boue : la
+     couleur n'a nulle part où aller, et plus la zone est grande plus elle
+     paraît sale. Le client a mis le doigt dessus.
+
+     Trois couches, aucune agressive prise seule :
+       · une base qui va du brun tiède en haut au presque-noir en bas —
+         donc la lumière vient d'en haut, comme partout ailleurs sur la page ;
+       · une lueur ambre en haut à gauche, la même que celle du premier
+         écran, ce qui raccroche la section au reste du site ;
+       · une lueur bleue en bas à droite : sans elle le brun tourne au
+         marron uni, avec elle il a une profondeur.
+
+     Le texte ne repose jamais sur le dégradé seul — les contrastes sont
+     calculés contre la valeur la PLUS claire de la base (#332C24). */
+  .noche {
+    background-color: #221e18;
+    background-image:
+      radial-gradient(
+          80% 60% at 8% 0%,
+          rgb(245 158 11 / 0.16),
+          transparent 62%
+        ),
+      radial-gradient(
+          70% 70% at 100% 100%,
+          rgb(59 130 246 / 0.13),
+          transparent 60%
+        ),
+      linear-gradient(172deg, #332c24 0%, #241f19 46%, #1a1712 100%);
+  }
+
+  /* Le tracé des corridors. Un dégradé donne la DIRECTION — l'ambre s'assombrit
+     vers l'arrivée — et le `mask` découpe les tirets par-dessus sans jamais les
+     étirer, quelle que soit la largeur de la piste. */
+  .ruta-trait {
+    background-image: linear-gradient(
+      90deg,
+      var(--color-action-bright),
+      var(--color-action) 55%,
+      var(--color-action-deep)
+    );
+    -webkit-mask-image: repeating-linear-gradient(
+      90deg,
+      #000 0 9px,
+      transparent 9px 16px
+    );
+    mask-image: repeating-linear-gradient(
+      90deg,
+      #000 0 9px,
+      transparent 9px 16px
+    );
   }
 
   /* Le trait du bas est en pointillés : c'est un marquage au sol, pas une

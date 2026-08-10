@@ -5,8 +5,11 @@ export const SITE = {
   /** Domaine d'origine — à brancher une fois le domaine acheté (⛔ HUMAIN). */
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://partimos.com",
   locale: "es-PA",
+  /* Tenue à ~155 signes : au-delà, Google coupe la phrase en plein milieu.
+     Ne dit plus « este fin de semana » — il part des voitures tous les
+     jours, et la page d'accueil l'annonce depuis longtemps. */
   description:
-    "Viajes compartidos entre particulares en Panamá. Encuentra quién va a tu pueblo este fin de semana y comparte los gastos. Le pagas directo a la persona, en efectivo o por Yappy.",
+    "Comparte carro entre Ciudad de Panamá y el interior. Te recogen cerca, vas sentado todo el camino y le pagas directo al conductor. Reservar es gratis.",
 } as const;
 
 export function canonical(path = "/") {

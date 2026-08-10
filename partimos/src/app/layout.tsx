@@ -41,20 +41,23 @@ export const metadata: Metadata = {
     locale: "es_PA",
     title: "Partimos — Alguien ya va para allá",
     description:
-      "Viajes compartidos entre particulares en Panamá. Sin terminales, sin esperas.",
+      "Te recogen cerca, vas sentado todo el camino y le pagas directo al conductor. Sin comisión.",
     url: canonical("/"),
   },
   twitter: {
     card: "summary_large_image",
     title: "Partimos — Alguien ya va para allá",
     description:
-      "Viajes compartidos entre particulares en Panamá. Sin terminales, sin esperas.",
+      "Te recogen cerca, vas sentado todo el camino y le pagas directo al conductor. Sin comisión.",
   },
   robots: { index: true, follow: true },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0c3a56",
+  /* Doit être le fond réel de la page : sur Android, la barre du navigateur
+     prend cette couleur et un bleu résiduel d'une ancienne palette faisait un
+     bandeau qui n'existe nulle part sur le site. */
+  themeColor: "#faf9f7",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",

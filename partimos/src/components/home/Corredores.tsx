@@ -41,9 +41,9 @@ export function Corredores() {
               Las seis rutas abiertas
             </h2>
             <p className="mt-3 text-[15.5px] leading-relaxed text-ink-500">
-              Todas salen de Ciudad de Panamá. El tope está calculado con un
-              carro estándar y tres puestos: menos puestos suben el tope, porque
-              hay menos gente entre quien repartir el mismo costo.
+              Todas salen de Ciudad de Panamá. El tope se calcula con un carro
+              estándar y tres puestos — con menos puestos sube, porque hay menos
+              gente entre quien repartir el mismo costo.
             </p>
           </div>
 
@@ -68,20 +68,33 @@ export function Corredores() {
                       </span>
                     </span>
 
-                    {/* La piste. Largeur fixe, remplissage proportionnel : les
-                      six lignes se comparent sur la même règle. Ordre 3 sur
-                      téléphone pour qu'elle passe sous les deux colonnes. */}
+                    {/* LA PISTE. Largeur fixe, remplissage proportionnel : les
+                        six lignes se comparent sur la même règle. Ordre 3 sur
+                        téléphone pour qu'elle passe sous les deux colonnes.
+
+                        Ce qui la rend agréable à regarder, dans l'ordre :
+                          · le rail creux est un trait FIN et clair, la route
+                            un trait ÉPAIS — c'est le contraste d'épaisseur qui
+                            fait lire le remplissage, pas la couleur ;
+                          · la route est un dégradé ambre clair → ambre profond
+                            dans le sens de la marche, donc elle a une
+                            direction ; les tirets sont découpés au `mask`, ce
+                            qui les garde nets à toutes les largeurs ;
+                          · les deux extrémités ne sont pas le même objet : un
+                            anneau creux pour le départ, un disque plein cerclé
+                            de blanc pour l'arrivée. On sait où on va. */}
                     <span
                       aria-hidden
-                      className="relative order-3 col-span-2 block h-[3px] rounded-full bg-ink-200 sm:order-none sm:col-span-1"
+                      className="relative order-3 col-span-2 flex h-4 items-center sm:order-none sm:col-span-1"
                     >
+                      <i className="absolute inset-x-0 top-1/2 h-px -translate-y-1/2 rounded-full bg-ink-200" />
                       <i
-                        className="absolute inset-y-0 left-0 rounded-full bg-[repeating-linear-gradient(90deg,var(--color-action)_0_8px,transparent_8px_17px)]"
+                        className="ruta-trait absolute top-1/2 left-0 h-[5px] -translate-y-1/2 rounded-full transition-[width] duration-500"
                         style={{ width: `${pct}%` }}
                       />
-                      <i className="absolute top-1/2 left-0 size-2.5 -translate-y-1/2 rounded-full border-2 border-ink-900 bg-ink-50" />
+                      <i className="absolute top-1/2 left-0 size-[11px] -translate-y-1/2 rounded-full border-[2.5px] border-ink-900 bg-ink-50" />
                       <i
-                        className="absolute top-1/2 size-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-action ring-2 ring-ink-50"
+                        className="absolute top-1/2 size-[13px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-action-deep shadow-[0_0_0_3px_var(--color-ink-50),0_2px_6px_rgb(180_83_9/0.35)] transition-transform duration-300 group-hover:scale-115"
                         style={{ left: `${pct}%` }}
                       />
                     </span>
@@ -90,11 +103,8 @@ export function Corredores() {
                       <span className="tnum block font-display text-[21px] leading-none font-extrabold tracking-[-0.03em] text-action-ink">
                         {formatUsd(cap.maxPriceCents)}
                       </span>
-                      <span className="tnum mt-1 block text-[11.5px] text-ink-500">
+                      <span className="mt-1 block text-[11.5px] text-ink-500">
                         aporte máx.
-                        {corridor.busPriceCents
-                          ? ` · bus ${formatUsd(corridor.busPriceCents)}`
-                          : ""}
                       </span>
                     </span>
                   </Link>
@@ -103,10 +113,10 @@ export function Corredores() {
             })}
           </ul>
 
-          <p className="mt-6 max-w-[62ch] border-t border-ink-200 pt-5 text-[13px] leading-relaxed text-ink-500">
-            El bus está ahí para que compares, no porque fijemos precio con él.
-            Casi siempre el bus sale más barato: lo que cambia es que sales
-            cuando el conductor sale, y te deja donde vas, no en la terminal.
+          <p className="mt-6 max-w-[62ch] border-t border-ink-200 pt-5 text-[13.5px] leading-relaxed text-ink-500">
+            Vas sentado desde el primer minuto, con tu maleta atrás y una sola
+            parada: la tuya. Sales a la hora que acordaron, no a la que salga el
+            próximo.
           </p>
         </div>
       </Container>

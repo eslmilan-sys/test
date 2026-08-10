@@ -51,8 +51,8 @@ const STORIES: Story[] = [
   },
   {
     eyebrow: "La ciudad",
-    title: "Salir de Panamá sin terminal",
-    body: "Costa del Este, Albrook, Vía Centenario. Tres salidas por donde los conductores ya pasan, sin dar una vuelta de más.",
+    title: "Salir de la ciudad sin dar vueltas",
+    body: "Costa del Este, Albrook, Vía Centenario. Los conductores ya pasan por ahí: te montas de camino, no al otro lado de la ciudad.",
     href: "/viajes",
     photo: "panamaCity",
     tone: "photo",

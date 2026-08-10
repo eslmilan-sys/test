@@ -15,9 +15,11 @@ import { Icon, type IconName } from "@/components/ui/Icon";
  *    elle est visible de toute façon.
  *
  * 2. LE PREMIER ÉCRAN EST CLAIR. Une bande sombre en haut de page ferme la
- *    page au lieu de l'ouvrir — c'est ce qu'il y a de moins gai. Ici, du crème
- *    avec un soleil ambre en haut à droite, un reflet bleu en bas à gauche, et
- *    un grain très fin. On lit « beau temps », pas « logiciel ».
+ *    page au lieu de l'ouvrir — c'est ce qu'il y a de moins gai. Depuis que la
+ *    page est blanche, la lumière ambre du coin haut droit se voit vraiment :
+ *    sur le crème d'avant, elle se noyait dans un fond déjà jaune. Un reflet
+ *    froid en bas à gauche lui répond, plus un grain très fin. On lit « beau
+ *    temps », pas « logiciel ».
  *
  * 3. L'ENTRÉE EST CHORÉGRAPHIÉE. Une séquence décalée à l'ouverture plutôt
  *    que des effets au survol dispersés — et rien au survol sur un téléphone,
@@ -27,11 +29,28 @@ import { Icon, type IconName } from "@/components/ui/Icon";
  *    800, texte d'accroche en 300 : l'écart se voit même en plissant les yeux,
  *    ce qui est le test.
  */
+/**
+ * Les quatre preuves, dans l'ordre où la question se pose : où je monte, à
+ * quoi ressemble le trajet, avec qui, et ce que ça m'engage.
+ *
+ * La deuxième a remplacé « Pagas en el carro / Efectivo o Yappy » : le
+ * paiement était déjà dit deux lignes plus haut sous le bouton, et redit
+ * ensuite sur toute une section. Le confort du trajet, lui, n'était écrit
+ * nulle part — alors que c'est la vraie différence vécue.
+ */
 const PROOF: { icon: IconName; title: string; detail: string }[] = [
   { icon: "pin", title: "Te recogen cerca", detail: "No en una terminal" },
+  {
+    icon: "car",
+    title: "Vas sentado y con espacio",
+    detail: "Tu maleta atrás, sin transbordos",
+  },
   { icon: "id", title: "Sabes quién maneja", detail: "Cédula verificada" },
-  { icon: "cash", title: "Pagas en el carro", detail: "Efectivo o Yappy" },
-  { icon: "check", title: "Reservar es gratis", detail: "Sin comisión" },
+  {
+    icon: "check",
+    title: "Reservar es gratis",
+    detail: "Le pagas a la persona",
+  },
 ];
 
 export function Hero() {
@@ -50,14 +69,14 @@ export function Hero() {
 
             <h1 className="enter enter-2 mb-5 text-[clamp(36px,7.4vw,62px)] leading-[0.98] font-extrabold tracking-[-0.045em]">
               Viaja con{" "}
-              <em className="text-action-deep not-italic">quien ya va</em>{" "}
-              para allá.
+              <em className="text-action-deep not-italic">quien ya va</em> para
+              allá.
             </h1>
 
             <p className="enter enter-2 max-w-[44ch] text-[17px] leading-[1.5] font-light text-ink-600 md:text-[19px]">
               Partimos junta a quien maneja al interior con quien va para el
-              mismo lado. Buscas tu ruta, reservas sin pagar nada, y el aporte
-              se lo das al conductor el día del viaje.
+              mismo lado. Buscas tu ruta, reservas sin pagar nada y haces el
+              camino sentado, con una sola parada: la tuya.
             </p>
           </div>
 
@@ -79,7 +98,10 @@ export function Hero() {
                   index > 1 ? "border-t border-ink-200" : "",
                 ].join(" ")}
               >
-                <Icon name={item.icon} className="mb-2.5 size-5 text-accent-ink" />
+                <Icon
+                  name={item.icon}
+                  className="mb-2.5 size-5 text-accent-ink"
+                />
                 <b className="block font-display text-[15.5px] leading-tight font-bold tracking-[-0.02em] md:text-[17px]">
                   {item.title}
                 </b>

@@ -33,8 +33,6 @@ export type Corridor = {
   distanceKm: number;
   tollCents: number;
   typicalDurationMin: number;
-  /** Référence bus — comparaison éditoriale, jamais une base de tarif. */
-  busPriceCents: number | null;
   isPriority: boolean;
   /** Points de prise en charge habituels. Jamais un terminal (§10). */
   pickupPoints: string[];
@@ -207,7 +205,6 @@ export const CORRIDORS: Corridor[] = [
     distanceKm: 250,
     tollCents: 300,
     typicalDurationMin: 220,
-    busPriceCents: 900,
     isPriority: true,
     pickupPoints: [...PANAMA_PICKUPS, "Divisa — cruce hacia Azuero"],
     intro:
@@ -221,7 +218,6 @@ export const CORRIDORS: Corridor[] = [
     distanceKm: 285,
     tollCents: 300,
     typicalDurationMin: 245,
-    busPriceCents: 1050,
     isPriority: true,
     pickupPoints: [...PANAMA_PICKUPS, "Chitré — si te queda de paso"],
     intro:
@@ -241,7 +237,6 @@ export const CORRIDORS: Corridor[] = [
     distanceKm: 85,
     tollCents: 200,
     typicalDurationMin: 75,
-    busPriceCents: 450,
     isPriority: true,
     pickupPoints: [
       "Costa del Este — Town Center",
@@ -259,7 +254,6 @@ export const CORRIDORS: Corridor[] = [
     distanceKm: 250,
     tollCents: 300,
     typicalDurationMin: 210,
-    busPriceCents: 950,
     isPriority: false,
     pickupPoints: [...PANAMA_PICKUPS, "Aguadulce — parada en carretera"],
     intro:
@@ -273,7 +267,6 @@ export const CORRIDORS: Corridor[] = [
     distanceKm: 145,
     tollCents: 300,
     typicalDurationMin: 120,
-    busPriceCents: 600,
     isPriority: false,
     pickupPoints: [...PANAMA_PICKUPS, "Penonomé — entrada del pueblo"],
     intro:
@@ -287,7 +280,6 @@ export const CORRIDORS: Corridor[] = [
     distanceKm: 440,
     tollCents: 300,
     typicalDurationMin: 390,
-    busPriceCents: 2100,
     isPriority: false,
     pickupPoints: [...PANAMA_PICKUPS, "Santiago — parada de descanso"],
     intro:

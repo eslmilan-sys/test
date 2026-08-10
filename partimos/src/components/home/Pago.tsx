@@ -11,8 +11,8 @@ export function Pago() {
     <Section
       id="pago"
       stop
-      stopRing="#0E2A35"
-      className="bg-ink-900 text-white"
+      stopRing="#221E18"
+      className="noche text-white"
     >
       <SectionTitle className="max-w-[18ch]">
         Le pagas a la persona, no a una app
