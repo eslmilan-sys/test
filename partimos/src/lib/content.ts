@@ -40,7 +40,7 @@ export const GENERAL_FAQ: Faq[] = [
   },
   {
     q: "¿Dónde me recogen exactamente?",
-    a: "Cada conductor marca de dos a cuatro puntos por donde ya va a pasar: su barrio, una salida de la ciudad, una estación en la carretera. Escoges el que te quede mejor. Si ninguno te sirve, puedes proponer el tuyo y el conductor te dice si le queda de paso.",
+    a: "Cada conductor marca de dos a cuatro puntos por donde ya va a pasar: por donde vive, una salida de la ciudad, una estación en la carretera. Escoges el que te quede mejor. Si ninguno te sirve, puedes proponer el tuyo y el conductor te dice si le queda de paso.",
   },
   {
     q: "¿Y si nadie va a mi destino?",

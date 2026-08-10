@@ -137,7 +137,11 @@ export function SearchResults() {
 
   return (
     <>
-      <div className="sticky top-[57px] z-30 border-b border-ink-200 bg-white/97 py-3">
+      {/* Le résumé flotte SOUS la barre de navigation, dans le même système :
+          une vitre détachée, les résultats défilent derrière. `--nav-space`
+          et non une constante — l'ancien `top-[57px]` datait de la barre
+          collée au bord et faisait glisser le résumé sous la pilule. */}
+      <div className="sticky top-[calc(var(--nav-space)-0.25rem)] z-30 py-1.5">
         <Container>
           <SearchSummary criteria={criteria} onApply={apply} />
         </Container>
