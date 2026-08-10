@@ -288,7 +288,7 @@ export const CORRIDORS: Corridor[] = [
     isPriority: false,
     pickupPoints: [...PANAMA_PICKUPS, "Santiago — parada de descanso"],
     intro:
-      "Seis horas y media de carretera, casi siempre con una parada en Santiago. Es el trayecto donde más se nota la diferencia con el bus nocturno: sales cuando el conductor sale, no cuando salga la flota.",
+      "Seis horas y media de carretera, casi siempre con una parada en Santiago para estirar las piernas. Muchos salen de madrugada para llegar con el día por delante; mira también los viajes de la tarde, que llegan de noche.",
     waypoints: road("panama-city", "coronado", "penonome", "santiago", "david"),
   },
 ];

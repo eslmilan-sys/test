@@ -50,8 +50,8 @@ export function Pasos() {
     <Section id="como" stop>
       <SectionTitle>Tres pasos y ya vas en camino</SectionTitle>
       <Lead>
-        Alguien ya hizo el plan de manejar. Tú te sumas al carro y ponen los
-        gastos entre los dos.
+        Alguien ya hizo el plan de manejar. Tú te sumas al carro y el costo del
+        camino se reparte entre todos.
       </Lead>
 
       <ol className="ruta mt-10 grid gap-0 min-[860px]:grid-cols-3 min-[860px]:gap-x-7">
