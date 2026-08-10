@@ -27,8 +27,12 @@ export function StickyCta({ watch = "#buscar" }: { watch?: string }) {
   }, [watch]);
 
   useEffect(() => {
-    // Réserve la place de la barre pour qu'elle ne recouvre pas le pied de page.
-    document.body.style.paddingBottom = visible ? "74px" : "";
+    // Réserve la place de la barre pour qu'elle ne recouvre pas le pied de
+    // page. Depuis qu'elle flotte, il faut compter en plus son décollement du
+    // bas — sinon la dernière ligne du pied passe sous la vitre.
+    document.body.style.paddingBottom = visible
+      ? "calc(5.5rem + env(safe-area-inset-bottom))"
+      : "";
     return () => {
       document.body.style.paddingBottom = "";
     };
@@ -36,8 +40,13 @@ export function StickyCta({ watch = "#buscar" }: { watch?: string }) {
 
   return (
     <div
-      className={`fixed inset-x-0 bottom-0 z-40 flex gap-2.5 border-t border-ink-200 bg-white px-4 pt-2.5 pb-[calc(0.625rem+env(safe-area-inset-bottom))] transition-transform duration-300 min-[900px]:hidden ${
-        visible ? "translate-y-0" : "translate-y-[120%]"
+      /* Elle répond à la barre du haut : même verre, même détachement du
+         bord, mêmes coins. Deux objets flottants qui se ressemblent se
+         lisent comme UN système ; deux traitements différents, comme deux
+         morceaux collés. Le `translate-y` de repli tient compte de la marge
+         basse, sinon un liseré du plateau resterait visible en bas. */
+      className={`glass fixed inset-x-3 bottom-[calc(0.75rem+env(safe-area-inset-bottom))] z-40 flex gap-2.5 rounded-[20px] p-2.5 transition-transform duration-300 min-[900px]:hidden ${
+        visible ? "translate-y-0" : "translate-y-[calc(100%+1.5rem)]"
       }`}
       // `inert` retire la barre repliée de la navigation clavier ET de l'arbre
       // d'accessibilité en une seule déclaration. `aria-hidden` seul ne suffit

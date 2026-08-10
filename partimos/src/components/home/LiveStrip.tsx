@@ -89,7 +89,11 @@ function Card({
 
 export function LiveStrip() {
   return (
-    <div
+    /* `section` et non `div` : ARIA interdit `aria-label` sur un élément
+       générique, et le poser dessus ne nomme donc rien. Une `section` nommée
+       porte le rôle `region` — le libellé devient valide ET utile, puisque la
+       zone apparaît alors dans la liste des repères d'un lecteur d'écran. */
+    <section
       className="group mt-8 overflow-hidden border-t border-ink-200 pt-4 pb-7.5 [mask-image:linear-gradient(90deg,transparent,#000_6%,#000_94%,transparent)]"
       aria-label="Viajes publicados recientemente"
     >
@@ -108,6 +112,6 @@ export function LiveStrip() {
           <Card key={`${trip.slug}-clone`} trip={trip} clone />
         ))}
       </ul>
-    </div>
+    </section>
   );
 }

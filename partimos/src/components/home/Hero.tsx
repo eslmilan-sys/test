@@ -56,6 +56,11 @@ const PROOF: { icon: IconName; title: string; detail: string }[] = [
 export function Hero() {
   return (
     <div className="sky grain relative overflow-hidden border-b border-ink-200">
+      {/* Ce que la barre en verre floute. Un flou n'a de sens que s'il a
+          quelque chose à flouter : sans ces deux halos, la vitre floute un
+          aplat, et un aplat flouté reste un aplat. */}
+      <span aria-hidden className="halos" />
+
       <div className="relative z-[2] mx-auto w-full max-w-[1120px] px-5 pt-14 md:pt-24">
         <div className="flex flex-col min-[960px]:grid min-[960px]:grid-cols-[1.02fr_0.98fr] min-[960px]:items-start min-[960px]:gap-x-16 min-[960px]:gap-y-8">
           <div className="order-1 min-[960px]:col-start-1 min-[960px]:row-start-1">

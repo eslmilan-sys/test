@@ -96,7 +96,7 @@ export function CityCombobox({
             onKeyDown={(e) => {
               if (e.key === "Escape") setOpen(false);
             }}
-            className="w-full border-none bg-transparent py-px text-[16px] font-semibold text-ink-900 placeholder:font-medium placeholder:text-ink-300 focus:outline-none"
+            className="w-full border-none bg-transparent py-px text-[16px] font-semibold text-ink-900 placeholder:font-medium placeholder:text-ink-500 focus:outline-none"
           />
         </div>
         <Icon

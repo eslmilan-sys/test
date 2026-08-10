@@ -147,8 +147,8 @@ export function AvisameForm({
               aria-describedby={state === "error" ? `${id}-error` : undefined}
               className={`tnum w-full border-none bg-transparent text-[16px] font-semibold focus:outline-none ${
                 onDark
-                  ? "text-white placeholder:text-ink-400/70"
-                  : "text-ink-900 placeholder:text-ink-300"
+                  ? "text-white placeholder:text-ink-400"
+                  : "text-ink-900 placeholder:text-ink-500"
               }`}
             />
           </div>

@@ -124,8 +124,15 @@ export function Historias() {
       <ul
         ref={track}
         className="flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth px-5 pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        /* `scroll-padding` EN PLUS de `padding`, et c'est tout le bug.
+           `scroll-snap-align: start` aligne la carte sur le bord du
+           SCROLLPORT, pas sur la boîte de contenu : le padding tenait la
+           première carte à sa place au repos, puis la deuxième venait se
+           coller au bord de l'écran dès le premier glissement. Il faut dire
+           séparément au défilement où commence la marge. */
         style={{
           paddingInline: "max(20px, calc((100vw - 1120px) / 2))",
+          scrollPaddingInline: "max(20px, calc((100vw - 1120px) / 2))",
         }}
       >
         {STORIES.map((story, index) => (

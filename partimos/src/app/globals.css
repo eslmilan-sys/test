@@ -112,8 +112,10 @@
      comme de la profondeur. */
   /* Ombres teintées de la MATIÈRE du fond, jamais du noir : une ombre grise
      sur un fond crème se lit comme de la saleté. */
-  --shadow-card: 0 1px 2px rgb(120 85 20 / 0.06), 0 10px 26px -14px rgb(120 85 20 / 0.3);
-  --shadow-lift: 0 2px 6px rgb(120 85 20 / 0.08), 0 20px 44px -20px rgb(120 85 20 / 0.36);
+  --shadow-card:
+    0 1px 2px rgb(120 85 20 / 0.06), 0 10px 26px -14px rgb(120 85 20 / 0.3);
+  --shadow-lift:
+    0 2px 6px rgb(120 85 20 / 0.08), 0 20px 44px -20px rgb(120 85 20 / 0.36);
   --shadow-float: 0 26px 64px -26px rgb(38 34 28 / 0.45);
 
   /* ---- Tracé de la route sélectionnée sur la carte ---- */
@@ -172,6 +174,33 @@
     --gradient-brand: linear-gradient(118deg, #0ea5e9 0%, #a0d838 100%);
     --rail-gutter: 0px;
     color-scheme: light;
+
+    /* ---- LA BARRE FLOTTANTE ----
+       Une seule source pour sa hauteur et pour la place qu'elle réserve. La
+       barre est `fixed` : sans réservoir, le premier titre de chaque page
+       passerait dessous. */
+    --nav-h: 3.5rem;
+    --nav-gap: 0.75rem;
+    --nav-space: calc(var(--nav-h) + var(--nav-gap) * 2);
+
+    /* ---- LE VERRE ----
+       Ivoire à 0,74, pas blanc pur : la page est chaude, un verre blanc y
+       ferait un rectangle froid posé dessus.
+
+       `--on-glass-muted` est LA variable qui compte. Le verre est translucide,
+       donc sa valeur composite dépend de ce qui passe dessous, et la barre
+       survole aussi bien le premier écran clair que la section sombre. Sur
+       fond sombre, le verre composite tombe à #C6C3BD : `ink-900` y tient à
+       9,0:1, `ink-700` à 5,3:1 — mais `ink-500` chute à 3,6:1, sous le seuil.
+       D'où un jeton défini une fois plutôt qu'une couleur choisie au cas par
+       cas, qui finirait par être fausse quelque part.
+
+       Corollaire à ne pas oublier : sur du verre, PAS de texte bleu ni ambre.
+       `accent-ink` y tombe à 3,7:1, `action-ink` à 3,9:1. */
+    --glass-tint: 255 253 247;
+    --glass-alpha: 0.74;
+    --on-glass: var(--color-ink-900);
+    --on-glass-muted: var(--color-ink-700);
   }
 
   /* Le décalage du contenu et l'apparition du ruban partagent le même seuil :
@@ -182,14 +211,207 @@
     }
   }
 
+  /* ---- CE QUI SÉPARE UN VRAI VERRE D'UN APLAT À 74 % ----
+
+     1. `saturate(180%)` EN PLUS du flou. Un flou seul délave ce qu'il y a
+        dessous : les couleurs se moyennent vers le gris et la vitre paraît
+        sale. Re-saturer rend la lumière derrière — c'est ce que fait macOS,
+        et c'est la moitié de l'effet.
+
+     2. UN LISERÉ DE LUMIÈRE EN HAUT. Une vitre a une tranche, et sa tranche
+        supérieure accroche la lumière. Ce pixel blanc à 65 % fait la
+        différence entre « du verre » et « un rectangle translucide ».
+
+     3. DEUX OMBRES, PAS UNE. Une très courte pour poser l'objet sur la page,
+        une longue et diffuse pour le décoller. Une seule ombre moyenne donne
+        toujours l'air d'un `box-shadow` par défaut.
+
+     Ce qu'il faut derrière : du CONTENU, pas un aplat. Un flou n'a de sens
+     que s'il a quelque chose à flouter — c'est là que la plupart des essais
+     de verre échouent. D'où les halos, plus bas. */
+  .glass {
+    background-color: rgb(var(--glass-tint) / var(--glass-alpha));
+    color: var(--on-glass);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.65),
+      0 1px 2px rgb(38 34 28 / 0.05),
+      0 14px 34px -14px rgb(38 34 28 / 0.22);
+  }
+
+  /* Le flou n'est appliqué QUE s'il est réellement supporté. Sinon la règle
+     `background-color` translucide resterait, sans rien flouter : on verrait
+     le texte de la page au travers de la barre. On rend donc le fond opaque
+     dans le même bloc que le repli. */
+  @supports not (
+    (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))
+  ) {
+    .glass {
+      --glass-alpha: 1;
+    }
+  }
+
+  @supports (
+    (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))
+  ) {
+    .glass {
+      -webkit-backdrop-filter: blur(18px) saturate(180%);
+      backdrop-filter: blur(18px) saturate(180%);
+    }
+  }
+
+  /* Certains utilisateurs demandent explicitement moins de transparence — sur
+     iOS et Windows c'est un réglage système, souvent activé pour une raison
+     de lisibilité. On le respecte au lieu de l'ignorer. */
+  @media (prefers-reduced-transparency: reduce) {
+    .glass {
+      --glass-alpha: 1;
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+    }
+  }
+
+  /* Verre SOMBRE, pour les objets posés sur la section sombre. Même logique
+     inversée : un voile clair très faible, et le liseré passe du blanc franc
+     à un blanc discret. Vérifié sur la valeur la plus CLAIRE du dégradé de la
+     section (#332C24), donc le pire cas : blanc 10,1:1, `ink-300` 5,7:1. */
+  .glass-noche {
+    background-color: rgb(255 255 255 / 0.1);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.16),
+      0 10px 26px -14px rgb(0 0 0 / 0.5);
+  }
+
+  @supports (
+    (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))
+  ) {
+    .glass-noche {
+      -webkit-backdrop-filter: blur(14px) saturate(160%);
+      backdrop-filter: blur(14px) saturate(160%);
+    }
+  }
+
+  @media (prefers-reduced-transparency: reduce) {
+    .glass-noche {
+      background-color: #3a342a;
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+    }
+  }
+
+  /* ---- CE QUE LE VERRE FLOUTE ----
+     Deux halos chauds qui dérivent lentement sous le premier écran. Sans eux
+     la barre floute un aplat, et un aplat flouté reste un aplat : tout
+     l'effet tombe. Ils sont volontairement TRÈS lents (28 et 34 s) — on ne
+     doit jamais les voir bouger, seulement s'apercevoir que la page n'est pas
+     figée.
+
+     Coupés sous 768 px : un `filter: blur(70px)` sur deux grandes surfaces
+     coûte cher sur un téléphone d'entrée de gamme, et à cette largeur la
+     barre a déjà le dégradé du premier écran à flouter. Coupés aussi en
+     `reduced-motion` — c'est la TIMELINE qu'on retire, pas seulement la
+     durée. */
+  .halos {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  @media (min-width: 768px) {
+    .halos::before,
+    .halos::after {
+      content: "";
+      position: absolute;
+      border-radius: 9999px;
+      filter: blur(70px);
+      will-change: transform;
+    }
+
+    .halos::before {
+      width: 34rem;
+      height: 24rem;
+      top: -9rem;
+      right: -5rem;
+      background: radial-gradient(
+        circle,
+        rgb(251 191 36 / 0.55),
+        transparent 68%
+      );
+    }
+
+    /* Le froid doit se DEVINER, pas se voir. À 0,34 il faisait une tache
+       bleue identifiable dans le coin — donc un objet, alors que son rôle est
+       seulement d'empêcher l'ambre de tourner à l'orange uni. */
+    .halos::after {
+      width: 27rem;
+      height: 20rem;
+      top: 3rem;
+      left: -9rem;
+      background: radial-gradient(
+        circle,
+        rgb(96 165 250 / 0.2),
+        transparent 70%
+      );
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      .halos::before {
+        animation: derive-a 28s ease-in-out infinite alternate;
+      }
+      .halos::after {
+        animation: derive-b 34s ease-in-out infinite alternate;
+      }
+    }
+  }
+
+  @keyframes derive-a {
+    to {
+      transform: translate3d(-3.5rem, 2rem, 0) scale(1.12);
+    }
+  }
+
+  @keyframes derive-b {
+    to {
+      transform: translate3d(3rem, -1.5rem, 0) scale(1.09);
+    }
+  }
+
+  /* La barre se resserre quand on descend : elle se rapproche du bord et perd
+     un peu de hauteur, donc elle prend moins de place une fois qu'on lit.
+
+     Piloté par le défilement NATIF — pas d'écouteur, pas de `useState`, pas
+     de rendu React à chaque image. Là où `scroll()` n'existe pas, la barre
+     reste simplement à sa taille d'ouverture : c'est la même page, sans le
+     mouvement. La hauteur réservée dans le flux, elle, ne change jamais —
+     sinon le contenu sauterait au premier pixel de défilement. */
+  @supports (animation-timeline: scroll()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .nav-pill {
+        animation: nav-serre linear both;
+        animation-timeline: scroll(root block);
+        animation-range: 0 140px;
+      }
+    }
+  }
+
+  @keyframes nav-serre {
+    to {
+      height: 3rem;
+      margin-top: -0.25rem;
+      border-radius: 999px;
+    }
+  }
+
   * {
     -webkit-tap-highlight-color: transparent;
   }
 
   html {
     scroll-behavior: smooth;
-    /* la nav collante ne doit pas recouvrir la cible d'une ancre */
-    scroll-padding-top: 84px;
+    /* La barre flottante ne doit pas recouvrir la cible d'une ancre. Dérivé
+       de sa hauteur réelle : une constante en dur se désynchronise dès qu'on
+       touche à la barre, et le bug ne se voit qu'en cliquant une ancre. */
+    scroll-padding-top: calc(var(--nav-space) + 0.5rem);
   }
 
   body {
@@ -263,7 +485,6 @@
      Deux raisons : il est plus dur à lire qu'un aplat, et l'emphase se fait
      à la graisse et à la taille — pas à la couleur qui bouge. La marque garde
      son vert dans le logo, où c'est une forme et pas du texte. */
-
 
   /* ---- LA ROUTE DES TROIS PAS ----
      Le trait qui relie les arrêts, dessiné en CSS plutôt qu'en SVG : il doit
@@ -377,10 +598,18 @@
       animation: enter-up 0.72s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
 
-    .enter-1 { animation-delay: 0.04s; }
-    .enter-2 { animation-delay: 0.12s; }
-    .enter-3 { animation-delay: 0.2s; }
-    .enter-4 { animation-delay: 0.3s; }
+    .enter-1 {
+      animation-delay: 0.04s;
+    }
+    .enter-2 {
+      animation-delay: 0.12s;
+    }
+    .enter-3 {
+      animation-delay: 0.2s;
+    }
+    .enter-4 {
+      animation-delay: 0.3s;
+    }
   }
 
   @keyframes enter-up {
@@ -410,16 +639,22 @@
      Elle est donc à peine plus dense, et une seconde couche très froide en
      bas à gauche l'empêche de tourner à l'orange plat — c'est le contraste
      chaud/froid qui fait le ciel, pas la quantité d'ambre. */
+  /* Le premier écran REMONTE derrière la barre. Sans ces deux lignes, le
+     réservoir laisserait une bande blanche de 80 px au-dessus du dégradé et
+     la barre flotterait sur du vide — elle doit flotter sur la page. La marge
+     annule le réservoir pour le FOND, le padding le rend au CONTENU. */
   .sky {
+    margin-top: calc(-1 * var(--nav-space));
+    padding-top: var(--nav-space);
     background-color: var(--color-ink-50);
     background-image:
       /* La lumière du matin, très étalée pour n'avoir aucun bord. */
       radial-gradient(
-          150% 105% at 94% -22%,
-          rgb(251 191 36 / 0.38),
-          rgb(245 158 11 / 0.1) 44%,
-          transparent 72%
-        ),
+        150% 105% at 94% -22%,
+        rgb(251 191 36 / 0.38),
+        rgb(245 158 11 / 0.1) 44%,
+        transparent 72%
+      ),
       /* Le froid qui lui répond, presque invisible pris isolément. */
         radial-gradient(
           120% 90% at -10% 108%,
@@ -448,15 +683,15 @@
     background-color: #221e18;
     background-image:
       radial-gradient(
-          80% 60% at 8% 0%,
-          rgb(245 158 11 / 0.16),
-          transparent 62%
-        ),
+        80% 60% at 8% 0%,
+        rgb(245 158 11 / 0.16),
+        transparent 62%
+      ),
       radial-gradient(
-          70% 70% at 100% 100%,
-          rgb(59 130 246 / 0.13),
-          transparent 60%
-        ),
+        70% 70% at 100% 100%,
+        rgb(59 130 246 / 0.13),
+        transparent 60%
+      ),
       linear-gradient(172deg, #332c24 0%, #241f19 46%, #1a1712 100%);
   }
 

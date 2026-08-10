@@ -30,7 +30,15 @@ export function Pago() {
           en une ligne — de ta main à la sienne — et ce qui circule dessus est
           posé juste en dessous. Le trait est ambre comme partout ailleurs sur
           le site : le vert de marque ne sert qu'au logo. */}
-      <div className="mt-8 rounded-[20px] border border-white/14 bg-white/6 px-5 py-6 sm:px-7">
+      {/* LE PLATEAU EST EN VERRE, LES MOYENS DE PAIEMENT NE LE SONT PAS.
+          C'est le seul découpage qui tienne ici. Le verre a besoin d'un
+          dégradé sous lui pour exister, et cette section en a un — c'est
+          l'endroit du site où il travaille le mieux. Mais Yappy est une
+          marque tierce : son orange doit rester sur du blanc franc, sinon il
+          vire sur le brun. Donc le plateau est une vitre, et les deux puces
+          sont des objets opaques POSÉS dessus. C'est exactement la façon dont
+          macOS empile ses fenêtres, et c'est ce qui donne la profondeur. */}
+      <div className="glass-noche mt-8 rounded-[20px] border border-white/12 px-5 py-6 sm:px-7">
         <div className="grid grid-cols-[auto_1fr_auto] items-center gap-x-3 sm:gap-x-5">
           <span className="flex size-12 items-center justify-center rounded-full bg-action font-display text-[18px] font-bold text-ink-900">
             Tú
@@ -72,8 +80,8 @@ export function Pago() {
       {/* Deux encarts, deux registres : ce qui se passe / ce qui ne se passe
           jamais. Le second est le seul endroit du site où le corail apparaît. */}
       <div className="mt-6.5 grid gap-3.5 md:grid-cols-2">
-        <div className="flex items-start gap-3.5 rounded-[18px] border border-white/14 bg-white/6 px-5.5 py-5">
-          <span className="flex size-8 shrink-0 items-center justify-center rounded-[10px] bg-white/12">
+        <div className="glass-noche flex items-start gap-3.5 rounded-[18px] border border-white/12 px-5.5 py-5">
+          <span className="flex size-8 shrink-0 items-center justify-center rounded-[10px] bg-white/14">
             <Icon name="phone" className="size-4.5" />
           </span>
           <div>
