@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Bricolage_Grotesque, Nunito_Sans } from "next/font/google";
+import { Gabarito, Nunito_Sans } from "next/font/google";
 import { Nav } from "@/components/site/Nav";
 import { Footer } from "@/components/site/Footer";
 import { SessionProvider } from "@/lib/session";
@@ -13,10 +13,10 @@ import "./globals.css";
  * aligne les métriques de la police de repli pour qu'il n'y ait aucun décalage
  * visuel au chargement. C'est le principal levier Lighthouse de cette page.
  */
-const bricolage = Bricolage_Grotesque({
+const gabarito = Gabarito({
   subsets: ["latin"],
-  weight: ["600", "700", "800"],
-  variable: "--font-bricolage",
+  weight: ["500", "600", "700", "800", "900"],
+  variable: "--font-gabarito",
   display: "swap",
 });
 
@@ -75,7 +75,7 @@ export default function RootLayout({
   return (
     <html
       lang="es-PA"
-      className={`${bricolage.variable} ${nunito.variable}`}
+      className={`${gabarito.variable} ${nunito.variable}`}
     >
       <body>
         <a

@@ -13,7 +13,7 @@ export function DriverCta() {
             />
             <div className="relative z-[2] max-w-[52ch]">
               <h2 className="mb-3.5 text-[clamp(26px,4.6vw,38px)] leading-[1.06] font-extrabold">
-                ¿Bajas al interior este viernes?
+                ¿Bajas al interior esta semana?
               </h2>
               <p className="mb-6 text-[16.5px] leading-relaxed text-ink-500">
                 Publicar toma menos de un minuto. Tres puestos vacíos en la

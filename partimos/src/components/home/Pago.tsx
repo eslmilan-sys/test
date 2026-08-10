@@ -5,6 +5,7 @@ import {
   Lead,
 } from "@/components/site/Section";
 import { Icon } from "@/components/ui/Icon";
+import { PayMarks } from "@/components/ui/PayMark";
 
 /**
  * La section la plus importante du site : elle explique que la plateforme ne
@@ -76,21 +77,9 @@ export function Pago() {
         </div>
       </div>
 
-      <ul className="mt-3.5 flex flex-wrap justify-center gap-2.5">
-        <li className="flex items-center gap-2 rounded-[11px] bg-white/9 px-3.5 py-2.5 text-[13.5px] font-semibold">
-          <Icon name="cash" className="size-4.5 text-ink-300" />
-          Efectivo el día del viaje
-        </li>
-        <li className="flex items-center gap-2 rounded-[11px] bg-white/9 px-3.5 py-2.5 text-[13.5px] font-semibold">
-          <span
-            aria-hidden
-            className="flex size-4.5 items-center justify-center rounded-[6px] bg-white/15 text-[10px] font-extrabold"
-          >
-            Y
-          </span>
-          Yappy directo a su número
-        </li>
-      </ul>
+      <div className="mt-3.5">
+        <PayMarks tone="dark" />
+      </div>
 
       {/* Deux encarts, deux registres : ce qui se passe / ce qui ne se passe
           jamais. Le second est le seul endroit du site où le corail apparaît. */}

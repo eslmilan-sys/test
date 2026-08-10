@@ -45,7 +45,7 @@ export function Hero() {
                 aria-hidden
                 className="size-1.5 animate-pulse rounded-full bg-brand-green-deep"
               />
-              34 viajes publicados para este viernes
+              Salidas todos los días, a toda hora
             </p>
 
             <h1 className="enter enter-2 mb-5 text-[clamp(40px,8.6vw,72px)] leading-[0.96] font-extrabold tracking-[-0.048em]">
@@ -54,7 +54,7 @@ export function Hero() {
             </h1>
 
             <p className="enter enter-2 max-w-[40ch] text-[17px] leading-[1.45] font-light text-ink-600 md:text-[20px]">
-              El viernes hay alguien saliendo a tu pueblo con puestos vacíos.
+              Todos los días sale gente hacia el interior con puestos vacíos.
               Solo falta que se enteren.
             </p>
           </div>

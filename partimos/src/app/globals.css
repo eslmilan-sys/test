@@ -51,7 +51,13 @@
   /* ---- Ambre : la couleur d'ACTION ---- */
   --color-action: #f59e0b; /* fond de bouton, texte ENCRE dessus — 7,4:1 */
   --color-action-bright: #fbbf24; /* survol */
-  --color-action-deep: #b45309; /* texte ambre sur clair — 5,1:1 */
+  --color-action-deep: #b45309; /* ambre sur clair, grands corps — 4,8:1 */
+  /* Le jeton manquait alors que `text-action-ink` était écrit dans le
+     tableau des corridors : Tailwind ne générait donc pas la classe, et le
+     chiffre le plus important de la page — l'aporte maximum — s'affichait en
+     couleur héritée, c'est-à-dire en encre. Vérifié au navigateur avant
+     correction : rgb(38, 34, 28). */
+  --color-action-ink: #92400e; /* ambre pour du TEXTE — 6,8:1 sur le crème */
   --color-action-soft: #fef3c7;
 
   /* ---- Marque (jamais informatif) ---- */
@@ -68,7 +74,7 @@
      interface générée finit par porter. Nunito Sans porte le texte — plus
      chaud et plus rond qu'Instrument Sans, ce qui est exactement ce qui
      manquait. */
-  --font-display: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-gabarito), ui-sans-serif, system-ui, sans-serif;
   --font-sans: var(--font-nunito), ui-sans-serif, system-ui, sans-serif;
 
   /* ---- Rayons ----

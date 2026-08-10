@@ -37,11 +37,16 @@ const PATHS = {
       <path d="M3.5 10h17M8 3v4M16 3v4" />
     </>
   ),
+  /* Un billet SEUL se lit comme une carte bancaire — exactement ce que
+     Partimos n'accepte pas. La pièce derrière lève l'ambiguïté : on lit
+     « efectivo ». */
   cash: (
     <>
-      <rect x="2.5" y="6" width="19" height="12" rx="2.5" />
-      <circle cx="12" cy="12" r="2.6" />
-      <path d="M6 12h.01M18 12h.01" />
+      <rect x="1.8" y="6.4" width="16.4" height="10.6" rx="2" />
+      <circle cx="10" cy="11.7" r="2.4" />
+      <path d="M5.2 11.7h.01M14.8 11.7h.01" />
+      <circle cx="18.6" cy="15.4" r="3.6" />
+      <path d="M18.6 13.9v3M17.7 14.7h1.6M17.9 16.1h1.6" />
     </>
   ),
   phone: (
