@@ -8,7 +8,7 @@ import { PayMarks } from "@/components/ui/PayMark";
  */
 export function Pago() {
   return (
-    <Section id="pago" stop stopRing="#221E18" className="noche text-white">
+    <Section id="pago" stop stopRing="#2F4346" className="noche text-white">
       <SectionTitle className="max-w-[18ch]">
         Le pagas a la persona, no a una app
       </SectionTitle>
@@ -60,7 +60,7 @@ export function Pago() {
           <PayMarks />
         </div>
 
-        <div className="mt-5 grid gap-2 text-[14px] leading-snug text-ink-300 sm:grid-cols-2 sm:gap-7">
+        <div className="mt-5 grid gap-2 text-[14px] leading-snug text-night-200 sm:grid-cols-2 sm:gap-7">
           <p>
             <b className="font-display font-bold text-white">Pasajero</b> —
             apartas tu puesto en la app. Ahí no pagas nada.
@@ -83,7 +83,7 @@ export function Pago() {
             <h3 className="mb-1.5 font-display text-[17px] font-bold">
               El número del conductor aparece al reservar
             </h3>
-            <p className="text-[14.5px] leading-relaxed text-ink-300">
+            <p className="text-[14.5px] leading-relaxed text-night-200">
               Para coordinar el punto exacto y el pago, necesitas hablar con la
               persona. Por eso su número se desbloquea apenas confirmas tu
               puesto — antes no, para que nadie reciba llamadas de quien no va a
@@ -106,7 +106,7 @@ export function Pago() {
             <h3 className="mb-1.5 font-display text-[17px] font-bold">
               No pedimos tarjeta de crédito
             </h3>
-            <p className="text-[14.5px] leading-relaxed text-ink-300">
+            <p className="text-[14.5px] leading-relaxed text-night-200">
               Nunca. No guardamos datos bancarios porque no manejamos pagos. Si
               alguna vez una página te pide tarjeta a nombre de Partimos, no es
               nuestra.

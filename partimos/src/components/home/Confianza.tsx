@@ -66,14 +66,14 @@ export function Confianza() {
   const [lead, ...rest] = TRUST_ITEMS;
 
   return (
-    <Section id="seguridad" stop stopRing="#F2F7F9" className="bg-ink-50">
+    <Section id="seguridad" stop stopRing="#FAF9F7" className="bg-ink-50">
       <Eyebrow>Confianza y seguridad</Eyebrow>
       <SectionTitle>Sabes con quién viajas antes de subirte</SectionTitle>
 
       <div className="mt-9 grid gap-3.5 min-[900px]:grid-cols-[1.15fr_1fr]">
         {/* La carte maîtresse : photo, argument principal, et la seule chose
             que les gens retiennent vraiment — ce qu'on ne garde PAS. */}
-        <article className="relative flex min-h-[380px] flex-col justify-end overflow-hidden rounded-[24px] bg-ink-900 p-7 text-white">
+        <article className="relative flex min-h-[380px] flex-col justify-end overflow-hidden rounded-[24px] bg-night-900 p-7 text-white">
           <Photo
             photo={PHOTOS.carroLleno}
             sizes="(min-width: 900px) 600px, 100vw"

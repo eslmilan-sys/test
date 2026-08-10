@@ -130,7 +130,7 @@ export function AvisameForm({
           >
             <Icon
               name="phone"
-              className={`size-[18px] shrink-0 ${onDark ? "text-ink-300" : "text-ink-500"}`}
+              className={`size-[18px] shrink-0 ${onDark ? "text-night-200" : "text-ink-500"}`}
             />
             <input
               id={id}
@@ -147,7 +147,7 @@ export function AvisameForm({
               aria-describedby={state === "error" ? `${id}-error` : undefined}
               className={`tnum w-full border-none bg-transparent text-[16px] font-semibold focus:outline-none ${
                 onDark
-                  ? "text-white placeholder:text-ink-400"
+                  ? "text-white placeholder:text-night-300"
                   : "text-ink-900 placeholder:text-ink-500"
               }`}
             />
@@ -173,7 +173,7 @@ export function AvisameForm({
       )}
 
       <p
-        className={`text-[12.5px] leading-relaxed ${onDark ? "text-ink-300" : "text-ink-500"}`}
+        className={`text-[12.5px] leading-relaxed ${onDark ? "text-night-200" : "text-ink-500"}`}
       >
         Solo lo usamos para avisarte de este viaje. Nada de publicidad.
       </p>

@@ -43,12 +43,12 @@ export default function SeguridadPage() {
   return (
     <>
       <main id="contenido">
-        <div className="bg-ink-900 pt-10 pb-11 text-white">
+        <div className="noche pt-10 pb-11 text-white">
           <Container>
             <h1 className="mb-4 max-w-[18ch] text-[clamp(32px,6.4vw,50px)] leading-[1.03] font-extrabold tracking-[-0.04em]">
               Sabes con quién viajas antes de subirte
             </h1>
-            <p className="max-w-[56ch] text-[16.5px] leading-relaxed text-ink-300">
+            <p className="max-w-[56ch] text-[16.5px] leading-relaxed text-night-200">
               La carretera se hace larga con un desconocido. Esto es lo que
               hacemos para que no lo sea — y lo que deliberadamente no
               guardamos.

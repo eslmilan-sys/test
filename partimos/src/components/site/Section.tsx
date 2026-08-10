@@ -43,7 +43,7 @@ export function Section({
   id,
   children,
   stop = false,
-  stopRing = "#fff",
+  stopRing = "#FAF9F7",
   className = "",
   inset = true,
   reveal = true,
@@ -84,7 +84,7 @@ export function Eyebrow({
   return (
     <p
       className={`mb-3 flex items-center gap-2.5 text-[11.5px] font-bold tracking-[0.16em] uppercase ${
-        tone === "dark" ? "text-ink-300" : "text-ink-500"
+        tone === "dark" ? "text-night-200" : "text-ink-500"
       }`}
     >
       <span aria-hidden className="h-0.5 w-5.5 rounded-full bg-brand-green" />
@@ -121,7 +121,7 @@ export function Lead({
   return (
     <p
       className={`max-w-[54ch] text-[17px] leading-relaxed ${
-        tone === "dark" ? "text-ink-300" : "text-ink-500"
+        tone === "dark" ? "text-night-200" : "text-ink-500"
       } ${className}`}
     >
       {children}

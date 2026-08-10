@@ -113,7 +113,14 @@ export function SearchResults() {
       })
       .filter((v): v is { date: string; count: number } => v !== null)
       .slice(0, 3);
-  }, [serving, criteria.from, criteria.to, criteria.date, criteria.seats, today]);
+  }, [
+    serving,
+    criteria.from,
+    criteria.to,
+    criteria.date,
+    criteria.seats,
+    today,
+  ]);
 
   function apply(next: typeof criteria) {
     const q = new URLSearchParams({

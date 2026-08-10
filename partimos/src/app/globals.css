@@ -79,6 +79,32 @@
   --color-action-ink: #92400e; /* ambre pour du TEXTE — 6,8:1 sur le crème */
   --color-action-soft: #fef3c7;
 
+  /* ---- La NUIT : les grandes surfaces sombres ----
+     Bleu nuit, plus le brun. Le brun sombre était l'encre du texte étalée en
+     fond — sur un écran entier elle se lisait comme de la boue, et le client
+     l'a dit deux fois. Le bleu nuit, lui, a trois raisons d'être :
+       · le bleu est déjà la couleur de CONFIANCE du système (liens, focus),
+         et ces sections disent précisément « fais-nous confiance » ;
+       · les voiles sombres posés sur les photos étaient DÉJÀ de ce bleu
+         (rgb(8 32 42)) — les photos et leur section parlent enfin la même
+         langue ;
+       · c'est la nuit du produit : on descend à l'intérieur le vendredi
+         soir, et l'ambre y devient ce qu'il est sur la Panamericana — des
+         feux dans la nuit.
+     L'encre chaude reste la couleur des OBJETS (texte, avatars, boutons
+     sombres) ; la nuit est celle des ENVIRONNEMENTS. Deux rôles, deux
+     familles.
+     Textes secondaires : night-200 pour le corps (6,6:1 sur le pire cas
+     composite, lueur comprise), night-300 pour les mentions (4,7:1). Les
+     gris chauds ink-300/400 sur la nuit viraient kaki — bannis ici. */
+  --color-night-950: #06141d;
+  --color-night-900: #0a1b26;
+  --color-night-800: #102a3a;
+  --color-night-700: #17384c;
+  --color-night-300: #9db3c0;
+  --color-night-200: #c3d2db;
+  --color-night-100: #e4ecf1;
+
   /* ---- Marque (jamais informatif) ---- */
   --color-brand-green: #a0d838;
   --color-brand-green-deep: #4d7c0f;
@@ -270,10 +296,10 @@
     }
   }
 
-  /* Verre SOMBRE, pour les objets posés sur la section sombre. Même logique
-     inversée : un voile clair très faible, et le liseré passe du blanc franc
-     à un blanc discret. Vérifié sur la valeur la plus CLAIRE du dégradé de la
-     section (#332C24), donc le pire cas : blanc 10,1:1, `ink-300` 5,7:1. */
+  /* Verre SOMBRE, pour les objets posés sur la nuit. Même logique inversée :
+     un voile clair très faible, et le liseré passe du blanc franc à un blanc
+     discret. Vérifié sur le composite le plus CLAIR de la nuit (base #17384C
+     + lueur ambre), donc le pire cas : blanc 7,6:1, `night-200` 4,9:1. */
   .glass-noche {
     background-color: rgb(255 255 255 / 0.1);
     box-shadow:
@@ -292,7 +318,7 @@
 
   @media (prefers-reduced-transparency: reduce) {
     .glass-noche {
-      background-color: #3a342a;
+      background-color: var(--color-night-800);
       -webkit-backdrop-filter: none;
       backdrop-filter: none;
     }
@@ -664,50 +690,49 @@
     background-repeat: no-repeat;
   }
 
-  /* ---- LA SURFACE SOMBRE ----
-     Un aplat de brun sur toute la largeur d'un écran, c'est de la boue : la
-     couleur n'a nulle part où aller, et plus la zone est grande plus elle
-     paraît sale. Le client a mis le doigt dessus.
-
-     Trois couches, aucune agressive prise seule :
-       · une base qui va du brun tiède en haut au presque-noir en bas —
-         donc la lumière vient d'en haut, comme partout ailleurs sur la page ;
-       · une lueur ambre en haut à gauche, la même que celle du premier
-         écran, ce qui raccroche la section au reste du site ;
-       · une lueur bleue en bas à droite : sans elle le brun tourne au
-         marron uni, avec elle il a une profondeur.
+  /* ---- LE QUARTIER DE NUIT ----
+     Bleu nuit — voir la note de la palette pour le pourquoi. Trois couches,
+     aucune agressive prise seule :
+       · une base qui va du bleu de crépuscule au presque-noir — la lumière
+         vient d'en haut, comme partout ailleurs sur la page ;
+       · une lueur ambre : les feux de la route dans la nuit, le même ambre
+         que le premier écran et le tracé ;
+       · une lueur bleu franc qui donne la profondeur d'un ciel, pas d'un
+         panneau peint.
 
      Le texte ne repose jamais sur le dégradé seul — les contrastes sont
-     calculés contre la valeur la PLUS claire de la base (#332C24). */
-  /* Le HAUT du quartier sombre (Historias). Son dégradé se termine sur la
-     valeur exacte où celui de `.noche` commence (#332C24) : les deux sections
-     se raccordent sans couture et se lisent comme UN seul quartier de nuit,
-     pas deux sections peintes chacune de leur côté. */
+     calculés contre le composite le PLUS clair (base #17384C + lueur ambre) :
+     blanc 10,3:1, night-200 6,6:1, ambre #F59E0B 4,8:1.
+
+     `.noche-alto` est le HAUT du quartier (Historias) : son dégradé se
+     termine sur la valeur exacte où celui de `.noche` commence (#17384C).
+     Les deux sections se raccordent sans couture et se lisent comme UN seul
+     quartier de nuit, pas deux sections peintes chacune de leur côté. */
   .noche-alto {
-    background-color: #2a241d;
+    background-color: var(--color-night-800);
     background-image:
       radial-gradient(
         70% 60% at 92% 0%,
-        rgb(245 158 11 / 0.1),
+        rgb(245 158 11 / 0.09),
         transparent 60%
       ),
-      linear-gradient(178deg, #241f19 0%, #2e2820 68%, #332c24 100%);
+      linear-gradient(178deg, #0e2431 0%, #133043 68%, #17384c 100%);
   }
 
   .noche {
-    background-color: #221e18;
+    background-color: var(--color-night-900);
     background-image:
       radial-gradient(
         80% 60% at 8% 0%,
-        rgb(245 158 11 / 0.16),
+        rgb(245 158 11 / 0.12),
         transparent 62%
       ),
       radial-gradient(
         70% 70% at 100% 100%,
-        rgb(59 130 246 / 0.13),
+        rgb(59 130 246 / 0.16),
         transparent 60%
       ),
-      linear-gradient(172deg, #332c24 0%, #241f19 46%, #1a1712 100%);
+      linear-gradient(172deg, #17384c 0%, #0e2534 46%, #0a1b26 100%);
   }
 
   /* Le tracé des corridors. Un dégradé donne la DIRECTION — l'ambre s'assombrit

@@ -76,10 +76,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html
-      lang="es-PA"
-      className={`${gabarito.variable} ${nunito.variable}`}
-    >
+    <html lang="es-PA" className={`${gabarito.variable} ${nunito.variable}`}>
       <body>
         <a
           href="#contenido"

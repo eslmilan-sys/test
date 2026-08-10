@@ -15,12 +15,12 @@ export default function AyudaPage() {
   return (
     <>
       <main id="contenido">
-        <div className="bg-ink-900 pt-10 pb-11 text-white">
+        <div className="noche pt-10 pb-11 text-white">
           <Container>
             <h1 className="mb-4 max-w-[16ch] text-[clamp(32px,6.4vw,50px)] leading-[1.03] font-extrabold tracking-[-0.04em]">
               Lo que todo el mundo pregunta
             </h1>
-            <p className="max-w-[54ch] text-[16.5px] leading-relaxed text-ink-300">
+            <p className="max-w-[54ch] text-[16.5px] leading-relaxed text-night-200">
               Y si falta algo, escríbenos: contestamos personas, no un
               formulario.
             </p>

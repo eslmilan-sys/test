@@ -35,7 +35,7 @@ const COLUMNS = [
 
 export function Footer() {
   return (
-    <footer className="mt-5 bg-ink-900 pt-13 pb-8 text-ink-400">
+    <footer className="mt-5 bg-night-900 pt-13 pb-8 text-night-300">
       <div className="mx-auto w-full max-w-[1120px] px-5">
         <div className="mb-9 grid gap-8 md:grid-cols-[1.6fr_1fr_1fr_1fr]">
           <div>
@@ -98,7 +98,7 @@ export function Footer() {
 
         {/* Mention légale obligatoire sur toutes les pages (§8 du brief). */}
         <div className="flex flex-wrap items-start justify-between gap-5 border-t border-white/12 pt-6">
-          <p className="max-w-[70ch] text-[12.5px] leading-relaxed text-ink-400">
+          <p className="max-w-[70ch] text-[12.5px] leading-relaxed text-night-300">
             {LEGAL_FOOTER}
           </p>
           <span className="text-[12.5px] whitespace-nowrap">

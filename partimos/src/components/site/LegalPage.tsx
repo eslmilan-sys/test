@@ -20,15 +20,15 @@ export function LegalPage({
   return (
     <>
       <main id="contenido">
-        <div className="bg-ink-900 pt-10 pb-11 text-white">
+        <div className="noche pt-10 pb-11 text-white">
           <Container>
             <h1 className="mb-4 max-w-[18ch] text-[clamp(30px,5.6vw,44px)] leading-[1.05] font-extrabold tracking-[-0.04em]">
               {title}
             </h1>
-            <p className="max-w-[56ch] text-[16px] leading-relaxed text-ink-300">
+            <p className="max-w-[56ch] text-[16px] leading-relaxed text-night-200">
               {intro}
             </p>
-            <p className="mt-5 text-[12.5px] tracking-wide text-ink-400 uppercase">
+            <p className="mt-5 text-[12.5px] tracking-wide text-night-300 uppercase">
               Última actualización: {updatedAt}
             </p>
           </Container>

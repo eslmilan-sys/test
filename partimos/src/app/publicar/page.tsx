@@ -41,12 +41,12 @@ export default function PublicarPage() {
   return (
     <>
       <main id="contenido">
-        <div className="bg-ink-900 pt-10 pb-11 text-white">
+        <div className="noche pt-10 pb-11 text-white">
           <Container>
             <h1 className="mb-4 max-w-[16ch] text-[clamp(32px,6.4vw,52px)] leading-[1.02] font-extrabold tracking-[-0.04em]">
               El viaje ya lo ibas a hacer
             </h1>
-            <p className="max-w-[54ch] text-[16.5px] leading-relaxed text-ink-300">
+            <p className="max-w-[54ch] text-[16.5px] leading-relaxed text-night-200">
               No ganas dinero manejando: recuperas parte de lo que ibas a gastar
               igual. La gasolina cuesta lo mismo vayas solo o acompañado.
             </p>

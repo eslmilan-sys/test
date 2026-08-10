@@ -172,9 +172,7 @@ export function TripDetail({
         // départ, ce sont ceux que le conducteur a déclarés ; en cours de
         // route, ceux de la ville — proposer Costa del Este à quelqu'un qui
         // monte à Penonomé n'a aucun sens.
-        stops={
-          segment.fromIndex === 0 ? trip.stops : segment.from.pickupPoints
-        }
+        stops={segment.fromIndex === 0 ? trip.stops : segment.from.pickupPoints}
         baseKm={segment.km}
         tollCents={segment.tollCents}
         category={trip.vehicle.category}

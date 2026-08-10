@@ -146,11 +146,11 @@ export default async function CorridorPage({ params }: Params) {
     <>
       {/* ---------- En-tête ---------- */}
       <main id="contenido">
-        <div id="ruta-hero" className="bg-ink-900 pt-8 pb-11 text-white">
+        <div id="ruta-hero" className="noche pt-8 pb-11 text-white">
           <Container>
             <nav
               aria-label="Ruta de navegación"
-              className="mb-5 text-[13px] text-ink-400"
+              className="mb-5 text-[13px] text-night-300"
             >
               <ol className="flex flex-wrap items-center gap-1.5">
                 <li>
@@ -165,20 +165,20 @@ export default async function CorridorPage({ params }: Params) {
                   </Link>
                 </li>
                 <li aria-hidden>/</li>
-                <li aria-current="page" className="text-ink-300">
+                <li aria-current="page" className="text-night-200">
                   {corridor.origin.shortName} → {corridor.destination.shortName}
                 </li>
               </ol>
             </nav>
 
-            <p className="mb-3 text-[11.5px] font-bold tracking-[0.16em] text-ink-400 uppercase">
+            <p className="mb-3 text-[11.5px] font-bold tracking-[0.16em] text-night-300 uppercase">
               {corridor.origin.province} → {corridor.destination.province}
             </p>
             <h1 className="mb-4 max-w-[18ch] text-[clamp(32px,6.4vw,54px)] leading-[1.02] font-extrabold tracking-[-0.04em]">
               Carro compartido {corridor.origin.shortName} →{" "}
               {corridor.destination.shortName}
             </h1>
-            <p className="max-w-[58ch] text-[16.5px] leading-relaxed text-ink-300">
+            <p className="max-w-[58ch] text-[16.5px] leading-relaxed text-night-200">
               {corridor.intro}
             </p>
 
@@ -193,11 +193,7 @@ export default async function CorridorPage({ params }: Params) {
                 value={formatUsd(cap.maxPriceCents)}
                 hint="Carro estándar, 3 puestos"
               />
-              <Stat
-                label="Paradas"
-                value="1"
-                hint="La tuya. Sin transbordos"
-              />
+              <Stat label="Paradas" value="1" hint="La tuya. Sin transbordos" />
             </dl>
           </Container>
         </div>
@@ -428,13 +424,13 @@ function Stat({
 }) {
   return (
     <div>
-      <dt className="text-[11.5px] font-bold tracking-[0.11em] text-ink-400 uppercase">
+      <dt className="text-[11.5px] font-bold tracking-[0.11em] text-night-300 uppercase">
         {label}
       </dt>
       <dd className="tnum font-display text-[22px] font-bold tracking-[-0.02em]">
         {value}
       </dd>
-      {hint && <dd className="text-[12px] text-ink-400">{hint}</dd>}
+      {hint && <dd className="text-[12px] text-night-300">{hint}</dd>}
     </div>
   );
 }
