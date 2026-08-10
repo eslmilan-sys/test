@@ -76,9 +76,9 @@ L'écart s'affiche en kilomètres, jamais en dollars.
 
 | Rôle | Valeur | Contraste vérifié |
 |---|---|---|
-| Fond de page (crème) | `#FFFBEB` | — |
-| Texte principal | `#26221C` | 15,3:1 sur le crème |
-| Texte secondaire | `#6B5F4E` | 6,0:1 |
+| Fond de page (blanc tiédi) | `#FAF9F7` | carte blanche dessus : 1,05:1 |
+| Texte principal | `#26221C` | 15,0:1 sur le fond |
+| Texte secondaire | `#665F50` | 6,0:1 |
 | **Action** (bouton) | `#F59E0B` | texte encre dessus : **7,4:1** |
 | Ambre foncé (texte) | `#B45309` | 5,1:1 |
 | **Lecture** (liens, focus) | `#1D4ED8` | 6,5:1 |
@@ -87,8 +87,12 @@ L'écart s'affiche en kilomètres, jamais en dollars.
 
 ### Les trois décisions qui portent tout
 
-1. **Le fond est crème, pas blanc.** La page est chaude avant qu'un élément
-   soit dessiné. C'est le geste le moins cher pour rendre une interface gaie.
+1. **Le fond est un blanc à peine tiédi, pas du crème.** Le crème teintait
+   tout : cartes blanches en halo jaune, photos sépia, ambre noyé dans un fond
+   déjà jaune. La chaleur se met désormais **là où elle travaille** — la
+   lumière du premier écran, le bouton, le tracé, la section sombre — et le
+   reste respire en blanc. Pas `#FFFFFF` non plus : à blanc pur les cartes
+   n'ont plus rien au-dessus de quoi flotter.
 
 2. **Le bouton est ambre avec du texte ENCRE, pas blanc.** À 7,4:1 il devient
    l'élément le plus lisible de la page. Le réflexe habituel — du blanc sur la
@@ -117,8 +121,14 @@ c'est exactement le reproche qui a été fait à la version précédente.
 
 ### Refusé délibérément — ne le re-propose pas
 
-- **Tout dégradé.** Retiré du système, pas seulement de ses appels. L'emphase
-  se fait à la graisse, à la taille et à un aplat.
+- **Tout dégradé sur du TEXTE.** L'emphase se fait à la graisse, à la taille
+  et à un aplat. Sur une grande *surface* sombre, en revanche, un dégradé très
+  sourd est autorisé — un aplat de brun sur toute la largeur d'un écran fait de
+  la boue, et le client l'a dit.
+- **Toute comparaison avec le bus.** Prix du bus, « más barato que », référence
+  de terminal comme repère tarifaire : retirés partout, et le champ de données
+  supprimé du modèle pour qu'ils ne reviennent pas. L'argument est le confort
+  du trajet, pas un écart de prix.
 - **Le sur-titre en capitales au-dessus d'un titre.** Le titre porte son poids.
 - **La grille de cartes identiques** icône + titre + texte comme structure de
   page. Le client l'a rejetée deux fois. Les six routes sont donc des **pistes
