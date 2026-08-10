@@ -100,9 +100,20 @@ L'écart s'affiche en kilomètres, jamais en dollars.
 
 ### Typographie
 
-- **Bricolage Grotesque** (variable, axe optique) pour les titres.
+- **Gabarito** pour les titres.
 - **Nunito Sans** pour le texte. Poids 300 pour les accroches, 800 pour les
   titres : la hiérarchie se fait à la **graisse** autant qu'à la taille.
+
+### Le motif : le tracé
+
+C'est ce qui tient l'ensemble. Un **trait pointillé ambre**, toujours le même,
+revient à quatre endroits : il longe le bas du premier écran, il relie les
+trois étapes de « Cómo funciona », il porte le geste du paiement (`Tú ──▸ A`),
+et il mesure les six corridors. Un ruban d'asphalte vertical traverse en plus
+la page au-dessus de 1160 px.
+
+C'est délibéré : sans motif répété, une page n'est qu'une suite de blocs, et
+c'est exactement le reproche qui a été fait à la version précédente.
 
 ### Refusé délibérément — ne le re-propose pas
 
@@ -110,8 +121,9 @@ L'écart s'affiche en kilomètres, jamais en dollars.
   se fait à la graisse, à la taille et à un aplat.
 - **Le sur-titre en capitales au-dessus d'un titre.** Le titre porte son poids.
 - **La grille de cartes identiques** icône + titre + texte comme structure de
-  page. Les six routes sont un **tableau comparable**, pas six cartes — le
-  client a rejeté la grille de cartes deux fois.
+  page. Le client l'a rejetée deux fois. Les six routes sont donc des **pistes
+  comparables** — largeur fixe, remplissage proportionnel à la distance — et
+  surtout pas six cartes.
 - **Les émojis en guise d'icônes.** Icônes SVG au trait, 1,9 px.
 - **Toute donnée inventée présentée comme réelle.** Il n'y a aucun utilisateur
   réel, aucun témoignage, aucun compteur véritable. Les trajets affichés sont
@@ -135,7 +147,7 @@ Espagnol du Panama, tutoiement. « carro » et non « coche », « puesto » et 
 5. **Pago** — le paiement hors plateforme
 6. **Conductores** — pour ceux qui conduisent
 7. **Confianza** — sécurité et vérification
-8. **Corredores** — le tableau des six routes
+8. **Corredores** — les six routes, en pistes proportionnelles
 9. **DriverCta** — appel à publier
 10. **Faq** — questions fréquentes
 11. **Pied de page** avec la mention légale
@@ -169,14 +181,23 @@ Par ordre d'intérêt :
 
 1. **Le rythme vertical entre sections.** Elles font toutes à peu près la même
    hauteur et le même espacement ; la page manque d'alternance dense/aéré.
-2. **La densité du tableau des corridors sur petit écran.** Il défile
-   horizontalement, ce qui est correct mais pas satisfaisant.
-3. **La hiérarchie de la section paiement.** C'est l'argument le plus
-   important du produit et il ne se lit pas comme tel.
+   C'est le point qui reste le plus faible.
+2. **Le motif du tracé va-t-il assez loin ?** Il revient à quatre endroits.
+   Est-ce une signature, ou faut-il l'étendre — ou au contraire l'enlever
+   d'un endroit où il ne dit rien ?
+3. **La section paiement.** C'est l'argument central du produit. Elle vient
+   d'être resserrée en un seul bloc ; est-ce qu'elle se lit maintenant comme
+   l'argument principal, ou juste comme une section de plus ?
 4. **Le premier écran sur mobile.** La recherche est au-dessus de la ligne de
    flottaison, mais l'ensemble reste dense.
 5. **Les quatre preuves** sous le titre — deux colonnes séparées de filets.
    Elles fonctionnent, sans plus.
+
+À ne PAS proposer, déjà tranché : le tableau à colonnes pour les corridors (il
+défilait horizontalement sur téléphone), la flèche verticale entre deux cartes
+dans la section paiement (elle mangeait un quart d'écran), un schéma expliquant
+que Partimos ne touche pas l'argent (c'est notre position, pas une question que
+le visiteur se pose), et les rayures diagonales en fond (effet papier peint).
 
 ---
 
