@@ -170,7 +170,7 @@ function Card({ story }: { story: Story }) {
       {story.tone === "gradient" && (
         <span
           aria-hidden
-          className="brand-gradient absolute inset-0 opacity-90"
+          className="absolute inset-0 bg-ink-900 opacity-90"
         />
       )}
 

@@ -228,7 +228,7 @@ export default async function CorridorPage({ params }: Params) {
                     >
                       <span
                         aria-hidden
-                        className="brand-gradient flex size-10 shrink-0 items-center justify-center rounded-full font-display font-bold text-white"
+                        className="flex size-10 shrink-0 items-center justify-center rounded-full font-display font-bold text-ink-50 bg-ink-900"
                       >
                         {trip.driverFirstName.charAt(0)}
                       </span>

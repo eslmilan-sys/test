@@ -64,7 +64,7 @@ export default async function TripPage({ params }: Params) {
               <div className="flex items-center gap-4">
                 <span
                   aria-hidden
-                  className="brand-gradient flex size-14 shrink-0 items-center justify-center rounded-full font-display text-[21px] font-bold text-white"
+                  className="flex size-14 shrink-0 items-center justify-center rounded-full font-display text-[21px] font-bold text-ink-50 bg-ink-900"
                 >
                   {trip.driver.initial}
                 </span>

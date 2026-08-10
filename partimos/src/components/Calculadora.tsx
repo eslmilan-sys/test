@@ -120,7 +120,7 @@ export function Calculadora({
           <p className="text-[11.5px] font-bold tracking-[0.13em] text-ink-500 uppercase">
             Tope por puesto
           </p>
-          <p className="brand-gradient-text tnum font-display text-5xl leading-tight font-extrabold tracking-[-0.045em]">
+          <p className="tnum font-display text-5xl leading-tight font-extrabold tracking-[-0.045em] text-action-deep">
             {formatUsd(result.maxPriceCents)}
           </p>
           <p className="text-[13px] text-ink-500">

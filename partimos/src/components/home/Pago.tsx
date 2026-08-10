@@ -29,7 +29,7 @@ export function Pago() {
 
       <div className="mt-9 grid items-stretch gap-3.5 min-[860px]:grid-cols-[1fr_210px_1fr] min-[860px]:gap-0">
         <div className="rounded-[20px] border border-white/14 bg-white/6 p-6 text-center">
-          <span className="brand-gradient mx-auto mb-3.5 flex size-14 items-center justify-center rounded-full font-display text-[21px] font-bold text-white">
+          <span className="mx-auto mb-3.5 flex size-14 items-center justify-center rounded-full bg-action font-display text-[21px] font-bold text-ink-900">
             Tú
           </span>
           <h3 className="mb-1.5 font-display text-lg font-bold">Pasajero</h3>
@@ -66,7 +66,7 @@ export function Pago() {
         </div>
 
         <div className="rounded-[20px] border border-white/14 bg-white/6 p-6 text-center">
-          <span className="brand-gradient mx-auto mb-3.5 flex size-14 items-center justify-center rounded-full font-display text-[21px] font-bold text-white">
+          <span className="mx-auto mb-3.5 flex size-14 items-center justify-center rounded-full bg-action font-display text-[21px] font-bold text-ink-900">
             A
           </span>
           <h3 className="mb-1.5 font-display text-lg font-bold">Conductor</h3>

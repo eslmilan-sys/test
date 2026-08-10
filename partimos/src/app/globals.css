@@ -1,62 +1,62 @@
 @import "tailwindcss";
 
 /* =====================================================================
-   PARTIMOS — SYSTÈME DE DESIGN
+   PARTIMOS — « SOL »
    ---------------------------------------------------------------------
-   Palette issue de la base ui-ux-pro-max, entrée « Travel/Tourism » :
-   bleu ciel + orange aventure sur fond ciel très clair. C'est la
-   combinaison que la base associe au voyage et à la confiance, et c'est
-   aussi ce qui manquait à la version précédente — de la CHALEUR. Le bleu
-   seul donnait un site correct et froid.
+   Le soleil du Panama. Ambre et bleu profond sur un fond crème.
 
-   Discipline chromatique :
+   Trois décisions qui portent tout le reste :
 
-   1. UNE rampe neutre, décalée vers le bleu ciel plutôt que l'asphalte.
-      Elle porte ~85 % de l'interface et rend l'ensemble plus léger.
-   2. LE BLEU est la couleur de lecture : liens, focus, états actifs,
-      icônes. `--accent` sur fond sombre, `--accent-ink` sur blanc (5,9:1).
-   3. L'ORANGE est la couleur d'ACTION, et uniquement elle. Le bouton
-      principal, le prix qu'on regarde, la place qui reste. Jamais un
-      libellé décoratif.
-      Le ton retenu est #C2410C et non le #EA580C de la base : à 3,6:1, le
-      texte blanc dessus tombait sous AA. À #C2410C il passe à 5,2:1.
-   4. Le VERT ne veut pas dire « validé », il veut dire « Partimos ».
-      Réservé à la marque : logo, dégradé. Jamais un état.
-   5. Le ROUGE est réservé aux erreurs.
+   1. LE FOND EST CRÈME, PAS BLANC. #FFFBEB. La page est chaude dès le
+      premier pixel, avant même qu'un élément soit dessiné. C'est le geste
+      le moins cher et le plus efficace pour rendre une interface gaie.
 
-   Contrastes vérifiés au calcul : texte principal 12,0:1 sur blanc et
-   11,2:1 sur le fond ciel ; texte secondaire 5,8:1 et 5,4:1 ; lien bleu
-   5,9:1 ; blanc sur bouton orange 5,2:1.
+   2. L'ACTION EST AMBRE AVEC DU TEXTE ENCRE, pas blanc. #26221C sur
+      #F59E0B donne 7,4:1 — le bouton devient l'élément le PLUS lisible de
+      la page. Presque personne ne fait ça : le réflexe est de poser du
+      blanc sur sa couleur de marque, ce qui donne un bouton plus difficile
+      à lire que le texte courant.
+
+   3. LE BLEU EST LA COULEUR DE LECTURE. Liens, focus, icônes. Il porte la
+      confiance pendant que l'ambre porte l'envie.
+
+   AUCUN DÉGRADÉ. L'emphase se fait à la graisse et à la taille — un texte
+   en dégradé est plus dur à lire et se démode plus vite qu'un texte gras.
+
+   Le VERT reste la marque et rien d'autre. Le ROUGE reste l'erreur.
+
+   Contrastes vérifiés au calcul : texte principal 15,3:1 sur le crème,
+   secondaire 6,0:1, lien bleu 6,5:1, encre sur bouton ambre 7,4:1.
    ===================================================================== */
 
 @theme {
-  /* ---- Rampe neutre, famille ciel ---- */
-  --color-ink-950: #062537;
-  --color-ink-900: #0c3a56; /* texte principal — 12,0:1 sur blanc */
-  --color-ink-800: #134a6b;
-  --color-ink-700: #1d5c80;
-  --color-ink-600: #2c5f7d;
-  --color-ink-500: #3d6b85; /* texte secondaire — 5,8:1 sur blanc */
-  --color-ink-400: #7fa6bc; /* secondaire sur fond sombre */
-  --color-ink-300: #a8c9dc;
-  --color-ink-200: #cfe6f3; /* bordures */
-  --color-ink-100: #e0f2fe;
-  --color-ink-50: #f0f9ff; /* cielo — fonds clairs */
+  /* ---- Rampe neutre chaude ---- */
+  --color-ink-950: #1a1611;
+  --color-ink-900: #26221c; /* texte principal — 15,3:1 sur le crème */
+  --color-ink-800: #3a342a;
+  --color-ink-700: #4e4638;
+  --color-ink-600: #5e5445;
+  --color-ink-500: #6b5f4e; /* texte secondaire — 6,0:1 sur le crème */
+  --color-ink-400: #9a8e7b; /* secondaire sur fond sombre */
+  --color-ink-300: #c4b8a3;
+  --color-ink-200: #e7ddc9; /* bordures */
+  --color-ink-100: #f5eedd;
+  --color-ink-50: #fffbeb; /* crema — le fond du site */
 
   /* ---- Bleu : la couleur de LECTURE ---- */
-  --color-accent: #0ea5e9; /* fonds sombres, remplissages, focus */
-  --color-accent-ink: #0369a1; /* texte et icônes sur blanc — 5,9:1 */
-  --color-accent-soft: #e0f2fe;
+  --color-accent: #3b82f6; /* sur fonds sombres et remplissages */
+  --color-accent-ink: #1d4ed8; /* liens et icônes sur clair — 6,5:1 */
+  --color-accent-soft: #dbeafe;
 
-  /* ---- Orange : la couleur d'ACTION ---- */
-  --color-action: #c2410c; /* fond de bouton, texte blanc — 5,2:1 */
-  --color-action-bright: #ea580c; /* survol et grandes surfaces */
-  --color-action-ink: #9a3412; /* texte orange sur blanc — 6,4:1 */
-  --color-action-soft: #fff1e7;
+  /* ---- Ambre : la couleur d'ACTION ---- */
+  --color-action: #f59e0b; /* fond de bouton, texte ENCRE dessus — 7,4:1 */
+  --color-action-bright: #fbbf24; /* survol */
+  --color-action-deep: #b45309; /* texte ambre sur clair — 5,1:1 */
+  --color-action-soft: #fef3c7;
 
   /* ---- Marque (jamais informatif) ---- */
   --color-brand-green: #a0d838;
-  --color-brand-green-deep: #6fa82b;
+  --color-brand-green-deep: #4d7c0f;
 
   /* ---- Erreur uniquement ---- */
   --color-danger: #b3261e;
@@ -71,18 +71,25 @@
   --font-display: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif;
   --font-sans: var(--font-nunito), ui-sans-serif, system-ui, sans-serif;
 
-  /* ---- Rayons : 13–15 px, le logo est rond ---- */
+  /* ---- Rayons ----
+     Un rayon imbriqué se CALCULE, il ne se devine pas :
+     rayon intérieur = rayon extérieur − espacement.
+     Une carte à 24 px avec 8 px de padding porte des enfants à 16 px. Réutiliser
+     24 px à l'intérieur donne une courbe visiblement fausse. */
   --radius-lg: 14px;
   --radius-xl: 18px;
   --radius-2xl: 24px;
+  --radius-nested: 16px; /* 24 − 8 */
 
   /* ---- Ombres douces, jamais dures ---- */
   /* Ombres TEINTÉES du bleu, jamais du noir : une ombre grise sur un fond
      coloré se lit comme de la saleté, une ombre de la teinte du fond se lit
      comme de la profondeur. */
-  --shadow-card: 0 1px 2px rgb(3 105 161 / 0.05), 0 10px 26px -14px rgb(3 105 161 / 0.28);
-  --shadow-lift: 0 2px 6px rgb(3 105 161 / 0.07), 0 20px 44px -20px rgb(3 105 161 / 0.35);
-  --shadow-float: 0 26px 64px -26px rgb(6 37 55 / 0.5);
+  /* Ombres teintées de la MATIÈRE du fond, jamais du noir : une ombre grise
+     sur un fond crème se lit comme de la saleté. */
+  --shadow-card: 0 1px 2px rgb(120 85 20 / 0.06), 0 10px 26px -14px rgb(120 85 20 / 0.3);
+  --shadow-lift: 0 2px 6px rgb(120 85 20 / 0.08), 0 20px 44px -20px rgb(120 85 20 / 0.36);
+  --shadow-float: 0 26px 64px -26px rgb(38 34 28 / 0.45);
 
   /* ---- Tracé de la route sélectionnée sur la carte ---- */
   @keyframes draw {
@@ -161,7 +168,7 @@
   }
 
   body {
-    background: #fff;
+    background: var(--color-ink-50);
     color: var(--color-ink-900);
     font-family: var(--font-sans);
     font-size: 16.5px;
@@ -208,21 +215,29 @@
     font: inherit;
     color: inherit;
   }
+
+  /* Le chevron natif d'un `select` est rendu par le système, collé au bord,
+     sans espacement contrôlable. Laissé tel quel il jure avec tous les autres
+     champs. On le retire et on en dessine un, avec un retrait constant — et on
+     réserve la marge de droite pour que le texte ne vienne jamais dessous :
+     padding = retrait + largeur du chevron + retrait. */
+  select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    padding-inline-end: 2.5rem;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%236b5f4e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 6l4 4 4-4'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 16px 16px;
+  }
 }
 
 @layer components {
-  /* ---- Marque : le seul endroit où le dégradé porte du texte ---- */
-  .brand-gradient-text {
-    background: var(--gradient-brand);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-  }
-
-  .brand-gradient {
-    background: var(--gradient-brand);
-  }
-
+  /* Le dégradé de marque a été RETIRÉ du système.
+     Deux raisons : il est plus dur à lire qu'un aplat, et l'emphase se fait
+     à la graisse et à la taille — pas à la couleur qui bouge. La marque garde
+     son vert dans le logo, où c'est une forme et pas du texte. */
 
   /* ---- Chorégraphie d'entrée ----
      Une séquence à l'ouverture plutôt que des micro-effets éparpillés :
@@ -261,28 +276,26 @@
     }
   }
 
-  /* ---- Le ciel du hero ----
-     Trois couches plutôt qu'un aplat : une lueur chaude basse à gauche (le
-     couchant sur la Panaméricaine), une lueur bleue haute à droite, et un
-     grain très fin. Un fond plat se lit comme un gabarit ; une atmosphère
-     se lit comme une marque.
+  /* ---- Le ciel du hero, en CLAIR ----
+     Une bande sombre en haut de page est ce qu'il y a de moins gai : elle
+     ferme la page au lieu de l'ouvrir. Ici, trois couches de lumière sur le
+     crème — un soleil ambre en haut à droite, un reflet bleu en bas à gauche,
+     et un grain très fin par-dessus. On lit « beau temps », pas « logiciel ».
 
-     Le grain est un SVG en ligne, donc aucune requête réseau et aucun
-     octet d'image. */
+     Le grain est un SVG en ligne : aucune requête réseau, aucun octet d'image. */
   .sky {
-    background-color: var(--color-ink-900);
+    background-color: var(--color-ink-50);
     background-image:
       radial-gradient(
-        ellipse 80% 60% at 8% 92%,
-        rgb(194 65 12 / 0.3),
-        transparent 62%
-      ),
-      radial-gradient(
-        ellipse 70% 70% at 88% 4%,
-        rgb(14 165 233 / 0.32),
+        ellipse 70% 62% at 88% -6%,
+        rgb(245 158 11 / 0.42),
         transparent 60%
       ),
-      linear-gradient(168deg, #0f4a68 0%, #0c3a56 46%, #082c42 100%);
+      radial-gradient(
+        ellipse 66% 60% at 4% 104%,
+        rgb(59 130 246 / 0.2),
+        transparent 62%
+      );
   }
 
   .grain::after {
@@ -290,8 +303,8 @@
     position: absolute;
     inset: 0;
     pointer-events: none;
-    opacity: 0.38;
-    mix-blend-mode: overlay;
+    opacity: 0.2;
+    mix-blend-mode: multiply;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
   }
 

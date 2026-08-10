@@ -208,7 +208,7 @@ export function SearchCard() {
             </div>
           </div>
 
-          <div className="flex max-w-[132px] items-center gap-3 rounded-[14px] border-l border-ink-200 px-3.5 py-3 transition-colors hover:bg-ink-50">
+          <div className="flex max-w-[176px] items-center gap-3 rounded-[14px] border-l border-ink-200 py-3 pl-3.5 transition-colors hover:bg-ink-50">
             <div className="min-w-0 flex-1">
               <label htmlFor="puestos" className={FIELD_LABEL}>
                 Puestos

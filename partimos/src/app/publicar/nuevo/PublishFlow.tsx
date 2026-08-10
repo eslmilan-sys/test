@@ -432,7 +432,7 @@ export function PublishFlow() {
                 <p className="text-center text-[11.5px] font-bold tracking-[0.13em] text-ink-500 uppercase">
                   Aporte por puesto
                 </p>
-                <p className="brand-gradient-text tnum text-center font-display text-[44px] leading-tight font-extrabold tracking-[-0.04em]">
+                <p className="tnum text-center font-display text-[44px] leading-tight font-extrabold tracking-[-0.04em] text-action-deep">
                   {formatUsd(price)}
                 </p>
                 <input

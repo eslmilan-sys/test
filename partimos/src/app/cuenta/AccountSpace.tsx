@@ -77,7 +77,7 @@ export function AccountSpace() {
       <div className="mb-5 flex flex-wrap items-center gap-4 rounded-[20px] border border-ink-200 bg-white p-5">
         <span
           aria-hidden
-          className="brand-gradient flex size-14 shrink-0 items-center justify-center rounded-full font-display text-[21px] font-bold text-white"
+          className="flex size-14 shrink-0 items-center justify-center rounded-full font-display text-[21px] font-bold text-ink-50 bg-ink-900"
         >
           {session.firstName.charAt(0)}
         </span>

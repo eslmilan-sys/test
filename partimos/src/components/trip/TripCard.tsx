@@ -96,7 +96,7 @@ export function TripCard({ match }: { match: TripMatch }) {
           <div className="mt-3.5 flex flex-wrap items-center gap-x-3 gap-y-2 border-t border-ink-200 pt-3.5">
             <span
               aria-hidden
-              className="brand-gradient flex size-8 shrink-0 items-center justify-center rounded-full font-display text-[13px] font-bold text-white"
+              className="flex size-8 shrink-0 items-center justify-center rounded-full bg-ink-900 font-display text-[13px] font-bold text-ink-50"
             >
               {trip.driver.initial}
             </span>

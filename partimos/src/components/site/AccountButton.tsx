@@ -28,7 +28,7 @@ export function AccountButton() {
       {session ? (
         <span
           aria-hidden
-          className="brand-gradient flex size-10 items-center justify-center rounded-full font-display text-[15px] font-bold text-white"
+          className="flex size-10 items-center justify-center rounded-full bg-ink-900 font-display text-[15px] font-bold text-ink-50"
         >
           {session.firstName.charAt(0).toUpperCase()}
         </span>

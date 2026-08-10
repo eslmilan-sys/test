@@ -45,7 +45,7 @@ export function Footer() {
               aria-label="Partimos — inicio"
             >
               <LogoMark gradientId="brand-footer" dotColor="#0E2A35" />
-              <span className="brand-gradient-text font-display text-[22px] font-extrabold tracking-[-0.03em]">
+              <span className="font-display text-[22px] font-extrabold tracking-[-0.03em] text-ink-50">
                 Partimos
               </span>
             </Link>

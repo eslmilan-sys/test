@@ -34,8 +34,10 @@ const BASE =
  * n'attire l'œil. L'orange est la seule couleur chaude du système, il ne
  * sert qu'à ça, donc il ne peut être confondu avec rien d'autre.
  *
- * Le ton est #C2410C et non l'orange vif : à 3,6:1, du texte blanc sur
- * l'orange vif tombe sous AA. Le survol, lui, peut monter en luminosité.
+ * Le texte du bouton est de l'ENCRE, pas du blanc : #26221C sur l'ambre donne
+ * 7,4:1, ce qui fait du bouton l'élément le plus lisible de la page. Le réflexe
+ * habituel — du blanc sur la couleur de marque — produit presque toujours un
+ * bouton moins lisible que le texte courant qui l'entoure.
  *
  * `active:scale-[0.97]` : la réponse tactile recommandée par la base de
  * règles. Sur mobile il n'y a pas de survol — sans réponse au doigt, un
@@ -43,7 +45,7 @@ const BASE =
  */
 const VARIANTS: Record<Variant, string> = {
   primary:
-    "bg-action text-white shadow-[0_8px_20px_-8px_rgb(194_65_12/0.5)] hover:bg-action-bright hover:-translate-y-px active:scale-[0.97]",
+    "bg-action text-ink-900 shadow-[0_8px_20px_-8px_rgb(180_83_9/0.45)] hover:bg-action-bright hover:-translate-y-px active:scale-[0.97]",
   secondary:
     "bg-white text-ink-900 border-[1.5px] border-ink-200 hover:border-accent hover:text-accent-ink active:scale-[0.97]",
   onDark:
