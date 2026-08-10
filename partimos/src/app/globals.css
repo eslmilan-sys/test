@@ -245,6 +245,99 @@
      à la graisse et à la taille — pas à la couleur qui bouge. La marque garde
      son vert dans le logo, où c'est une forme et pas du texte. */
 
+
+  /* ---- LA ROUTE DES TROIS PAS ----
+     Le trait qui relie les arrêts, dessiné en CSS plutôt qu'en SVG : il doit
+     changer d'axe entre le téléphone (vertical) et le bureau (horizontal), ce
+     qu'un SVG ne fait pas sans deux tracés à tenir d'accord.
+
+     Deux couches, comme une vraie route : l'asphalte, puis le marquage au sol
+     en pointillés. Le marquage défile au scroll, nativement — pas une ligne
+     de JavaScript, pas un écouteur d'événement. */
+  .ruta {
+    --ruta-epaisseur: 3px;
+  }
+
+  /* Sur téléphone : une route verticale qui descend le long des numéros. */
+  .ruta-paso::before,
+  .ruta-paso::after {
+    content: "";
+    position: absolute;
+    left: calc(28px - var(--ruta-epaisseur) / 2);
+    top: 56px;
+    bottom: -8px;
+    width: var(--ruta-epaisseur);
+    z-index: 1;
+  }
+
+  .ruta-paso:last-child::before,
+  .ruta-paso:last-child::after {
+    display: none;
+  }
+
+  .ruta-paso::before {
+    background: var(--color-ink-200);
+    border-radius: 999px;
+  }
+
+  .ruta-paso::after {
+    background: repeating-linear-gradient(
+      180deg,
+      var(--color-action) 0 10px,
+      transparent 10px 22px
+    );
+  }
+
+  /* À partir de 860 px la route se couche : elle traverse les trois colonnes
+     à hauteur des numéros. */
+  @media (min-width: 860px) {
+    .ruta-paso::before,
+    .ruta-paso::after {
+      left: 56px;
+      right: -28px;
+      top: calc(28px - var(--ruta-epaisseur) / 2);
+      bottom: auto;
+      width: auto;
+      height: var(--ruta-epaisseur);
+    }
+
+    .ruta-paso::after {
+      background: repeating-linear-gradient(
+        90deg,
+        var(--color-action) 0 10px,
+        transparent 10px 22px
+      );
+    }
+  }
+
+  /* Le marquage défile quand la section traverse l'écran. Le déplacement est
+     un multiple exact de la période du motif (22 px), donc la boucle est
+     invisible. Sans `view()`, le marquage reste simplement fixe — c'est la
+     même route, sans le mouvement. */
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .ruta-paso::after {
+        animation: ruta-defile linear;
+        animation-timeline: view();
+        animation-range: entry 0% exit 100%;
+      }
+    }
+  }
+
+  @keyframes ruta-defile {
+    to {
+      background-position-y: -220px;
+    }
+  }
+
+  @media (min-width: 860px) {
+    @keyframes ruta-defile {
+      to {
+        background-position-x: -220px;
+      }
+    }
+  }
+
   /* ---- Chorégraphie d'entrée ----
      Une séquence à l'ouverture plutôt que des micro-effets éparpillés :
      c'est ce qui fait qu'une page « arrive » au lieu d'apparaître.

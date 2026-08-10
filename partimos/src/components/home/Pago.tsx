@@ -1,6 +1,5 @@
 import {
   Section,
-  Eyebrow,
   SectionTitle,
   Lead,
 } from "@/components/site/Section";
@@ -19,7 +18,6 @@ export function Pago() {
       stopRing="#0E2A35"
       className="bg-ink-900 text-white"
     >
-      <Eyebrow tone="dark">El pago</Eyebrow>
       <SectionTitle className="max-w-[18ch]">
         Le pagas a la persona, no a una app
       </SectionTitle>
@@ -28,7 +26,25 @@ export function Pago() {
         tu mano a la del conductor, el día del viaje.
       </Lead>
 
-      <div className="mt-9 grid items-stretch gap-3.5 min-[860px]:grid-cols-[1fr_210px_1fr] min-[860px]:gap-0">
+      {/* Partimos, HORS du chemin de l'argent.
+          C'est l'argument juridique et commercial du produit, et il était
+          jusqu'ici écrit en toutes lettres dans un paragraphe. Un schéma le
+          montre en une seconde : la plateforme est branchée au-dessus, et son
+          trait s'arrête sur une croix avant d'atteindre la ligne des fonds. */}
+      <div aria-hidden className="mt-10 flex flex-col items-center">
+        <span className="inline-flex items-center gap-2 rounded-full border-[1.5px] border-dashed border-white/30 px-4 py-2 text-[13px] font-bold text-ink-300">
+          Partimos
+        </span>
+        <span className="h-6 w-0.5 bg-[repeating-linear-gradient(180deg,rgb(255_255_255/0.3)_0_5px,transparent_5px_10px)]" />
+        <span className="flex size-6 items-center justify-center rounded-full border-2 border-white/30 text-ink-300">
+          <Icon name="cross" className="size-3" />
+        </span>
+        <span className="mt-1 text-[11.5px] font-semibold tracking-[0.1em] text-ink-400 uppercase">
+          No toca la plata
+        </span>
+      </div>
+
+      <div className="mt-4 grid items-stretch gap-3.5 min-[860px]:grid-cols-[1fr_210px_1fr] min-[860px]:gap-0">
         <div className="rounded-[20px] border border-white/14 bg-white/6 p-6 text-center">
           <span className="mx-auto mb-3.5 flex size-14 items-center justify-center rounded-full bg-action font-display text-[21px] font-bold text-ink-900">
             Tú
@@ -78,7 +94,7 @@ export function Pago() {
       </div>
 
       <div className="mt-3.5">
-        <PayMarks tone="dark" />
+        <PayMarks />
       </div>
 
       {/* Deux encarts, deux registres : ce qui se passe / ce qui ne se passe
