@@ -151,11 +151,13 @@ let searchSession: string | null = null;
  * rendez-vous. Le session_token regroupe les frappes d'une même
  * recherche pour la facturation Mapbox.
  */
+export type SuggestedPlace = GeocodedPlace & { mapboxId: string };
+
 export async function suggestPlaces(
   query: string,
   near?: { lat: number; lng: number },
   signal?: AbortSignal,
-): Promise<GeocodedPlace[]> {
+): Promise<SuggestedPlace[]> {
   if (!MAPBOX_TOKEN || query.trim().length < 3) return [];
   searchSession ??=
     typeof crypto !== "undefined" && "randomUUID" in crypto
@@ -177,16 +179,53 @@ export async function suggestPlaces(
     );
     if (!res.ok) return [];
     const data = (await res.json()) as {
-      suggestions?: { name: string; place_formatted?: string }[];
+      suggestions?: {
+        name: string;
+        place_formatted?: string;
+        mapbox_id: string;
+      }[];
     };
     return (data.suggestions ?? []).map((s) => ({
       name: s.name,
       context: (s.place_formatted ?? "").replace(/, Panam[aá]$/i, ""),
       lat: 0,
       lng: 0,
+      mapboxId: s.mapbox_id,
     }));
   } catch {
     return [];
+  }
+}
+
+/**
+ * Les coordonnées d'une suggestion Search Box — l'étape « retrieve ».
+ * Une seule requête, au moment où l'utilisateur CHOISIT : c'est elle qui
+ * permet de rattacher un PH ou un commerce à la ville desservie la plus
+ * proche. Renvoie null en cas d'échec — l'appelant décide du repli.
+ */
+export async function retrievePlace(
+  mapboxId: string,
+  signal?: AbortSignal,
+): Promise<{ lat: number; lng: number } | null> {
+  if (!MAPBOX_TOKEN || !searchSession) return null;
+  const params = new URLSearchParams({
+    access_token: MAPBOX_TOKEN,
+    session_token: searchSession,
+  });
+  try {
+    const res = await fetch(
+      `https://api.mapbox.com/search/searchbox/v1/retrieve/` +
+        `${encodeURIComponent(mapboxId)}?${params}`,
+      { signal },
+    );
+    if (!res.ok) return null;
+    const data = (await res.json()) as {
+      features?: { geometry?: { coordinates?: [number, number] } }[];
+    };
+    const coords = data.features?.[0]?.geometry?.coordinates;
+    return coords ? { lng: coords[0], lat: coords[1] } : null;
+  } catch {
+    return null;
   }
 }
 

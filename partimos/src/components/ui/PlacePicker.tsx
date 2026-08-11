@@ -135,7 +135,7 @@ export function PlacePicker({
         />
       </div>
 
-      {open && (local.length > 0 || remoteShown.length > 0) && (
+      {open && query.trim().length > 0 && (
         <Command
           id={`${id}-list`}
           shouldFilter={false}
@@ -172,6 +172,22 @@ export function PlacePicker({
                   </span>
                 </Command.Item>
               ))}
+            {/* La saisie libre, en clair : un lieu qu'aucune base ne
+                connaît reste un rendez-vous valable. */}
+            <Command.Item
+              key="libre"
+              value="libre"
+              onMouseDown={(e) => e.preventDefault()}
+              onSelect={() => pick(query.trim())}
+              className="flex cursor-pointer items-baseline justify-between gap-3 rounded-[10px] px-3 py-2.5 text-[14.5px] data-[selected=true]:bg-ink-50"
+            >
+              <span className="font-semibold">
+                Usar «{query.trim()}» tal cual
+              </span>
+              <span className="shrink-0 text-[12px] text-ink-500">
+                Punto libre
+              </span>
+            </Command.Item>
           </Command.List>
         </Command>
       )}

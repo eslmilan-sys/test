@@ -4,7 +4,13 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Command } from "cmdk";
 import { ALL_CITIES } from "@/lib/corridors";
 import { nearestCity, searchPlaces } from "@/lib/places";
-import { geocodePlaces, MAPBOX_TOKEN, type GeocodedPlace } from "@/lib/mapbox";
+import {
+  geocodePlaces,
+  retrievePlace,
+  suggestPlaces,
+  MAPBOX_TOKEN,
+  type SuggestedPlace,
+} from "@/lib/mapbox";
 import { Icon } from "@/components/ui/Icon";
 
 /**
@@ -80,14 +86,26 @@ export function CityCombobox({
      desservie la plus proche : chercher « Boquete » propose David,
      parce que c'est le corridor qui y mène. Débouncé, annulable,
      silencieux sans jeton. */
-  const [remote, setRemote] = useState<GeocodedPlace[]>([]);
+  const [remote, setRemote] = useState<SuggestedPlace[]>([]);
+  const [resolving, setResolving] = useState<string | null>(null);
   const debounce = useRef<number>(0);
   useEffect(() => {
     if (!open || !MAPBOX_TOKEN || query.trim().length < 3) return;
     const controller = new AbortController();
     window.clearTimeout(debounce.current);
     debounce.current = window.setTimeout(() => {
-      geocodePlaces(query, undefined, controller.signal).then(setRemote);
+      /* Search Box d'abord — elle connaît les immeubles (les PH), les
+         commerces, tout le référentiel riche. Le géocodeur v5 reprend
+         si elle ne répond rien (il garde les rues et les pueblos). */
+      suggestPlaces(query, undefined, controller.signal).then((found) =>
+        found.length > 0
+          ? setRemote(found)
+          : geocodePlaces(query, undefined, controller.signal).then((v5) =>
+              setRemote(
+                v5.map((r) => ({ ...r, mapboxId: "" })),
+              ),
+            ),
+      );
     }, 300);
     return () => {
       controller.abort();
@@ -98,19 +116,33 @@ export function CityCombobox({
   const remoteResults = useMemo(() => {
     if (query.trim().length < 3) return [];
     return remote
-      .map((r) => ({
-        ...r,
-        city: nearestCity(r.lat, r.lng, ALL_CITIES),
-      }))
       .filter(
         (r) =>
-          r.city.slug !== exclude &&
           /* Déjà proposé en ville ou en lieu connu : inutile en double. */
           !results.some((c) => normalize(c.name) === normalize(r.name)) &&
           !placeResults.some((p) => normalize(p.name) === normalize(r.name)),
       )
       .slice(0, 4);
-  }, [remote, query, exclude, results, placeResults]);
+  }, [remote, query, results, placeResults]);
+
+  /* Le choix d'un lieu : ses coordonnées arrivent au moment du clic
+     (retrieve pour Search Box, déjà là pour v5), puis la ville desservie
+     la plus proche devient la valeur du champ. */
+  const pickRemote = async (r: SuggestedPlace) => {
+    setResolving(r.mapboxId || r.name);
+    const coords =
+      r.lat !== 0 || r.lng !== 0
+        ? { lat: r.lat, lng: r.lng }
+        : r.mapboxId
+          ? await retrievePlace(r.mapboxId)
+          : null;
+    setResolving(null);
+    if (!coords) return;
+    const city = nearestCity(coords.lat, coords.lng, ALL_CITIES);
+    if (city.slug === exclude) return;
+    onChange(city.slug);
+    setOpen(false);
+  };
 
   return (
     <div className="relative">
@@ -197,13 +229,10 @@ export function CityCombobox({
             })}
             {remoteResults.map((r) => (
               <Command.Item
-                key={`geo-${r.name}-${r.lat}`}
-                value={`geo-${r.name}-${r.lat}`}
+                key={`geo-${r.mapboxId || r.name}`}
+                value={`geo-${r.mapboxId || r.name}`}
                 onMouseDown={(e) => e.preventDefault()}
-                onSelect={() => {
-                  onChange(r.city.slug);
-                  setOpen(false);
-                }}
+                onSelect={() => void pickRemote(r)}
                 className="flex cursor-pointer items-baseline justify-between gap-3 rounded-[10px] px-3 py-2.5 text-[15px] data-[selected=true]:bg-ink-50"
               >
                 <span className="min-w-0">
@@ -215,7 +244,7 @@ export function CityCombobox({
                   </span>
                 </span>
                 <span className="shrink-0 text-[12.5px] font-semibold text-accent-ink">
-                  → {r.city.name.replace("Ciudad de ", "")}
+                  {resolving === (r.mapboxId || r.name) ? "…" : "→ ruta"}
                 </span>
               </Command.Item>
             ))}
