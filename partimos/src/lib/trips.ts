@@ -281,6 +281,34 @@ function buildTrip(corridor: Corridor, date: string, index: number): Trip {
 }
 
 /**
+ * « Desde $X » d'une paire de villes : le plafond le plus bas que la
+ * flotte de démonstration peut afficher sur ce segment — carro le plus
+ * sobre, carro le plus rempli. Indépendant de la date, donc identique au
+ * build et à l'hydratation : pas de « desde » qui clignote.
+ */
+export function minPriceForPair(
+  fromSlug: string,
+  toSlug: string,
+): number | null {
+  let best: number | null = null;
+  for (const corridor of corridorsServing(fromSlug, toSlug)) {
+    const segment = findSegment(corridor.waypoints, fromSlug, toSlug);
+    if (!segment) continue;
+    for (const vehicle of VEHICLES) {
+      for (let seats = 2; seats <= 4; seats++) {
+        const cap = segmentCap(
+          segment,
+          vehicle.ratePerKmCents,
+          seats,
+        ).maxPriceCents;
+        if (best === null || cap < best) best = cap;
+      }
+    }
+  }
+  return best;
+}
+
+/**
  * Tous les trajets d'un corridor pour une date, sans filtre.
  *
  * Séparé de `getTripsFor` parce que la recherche par segment a besoin des

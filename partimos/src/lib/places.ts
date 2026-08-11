@@ -53,6 +53,14 @@ export const KNOWN_PLACES: KnownPlace[] = [
   { citySlug: "panama-city", name: "El Dorado (centro comercial)", kind: "mall" },
   { citySlug: "panama-city", name: "Parque Urracá", kind: "parque" },
 
+  // La Chorrera
+  { citySlug: "la-chorrera", name: "Parque Libertador", kind: "parque" },
+  {
+    citySlug: "la-chorrera",
+    name: "El Machetazo de La Chorrera",
+    kind: "tienda",
+  },
+
   // Coronado
   { citySlug: "coronado", name: "Coronado Mall", kind: "mall" },
   { citySlug: "coronado", name: "El Rey de Coronado", kind: "tienda" },

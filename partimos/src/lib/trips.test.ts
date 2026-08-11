@@ -279,7 +279,15 @@ test("un trajet plein sur son tronçon central reste réservable ailleurs", () =
     ...buildTripsFor("panama-david", DATE)[0],
     servedStops: stops,
     seatsOffered: 3,
-    holds: [{ fromIndex: 1, toIndex: 2, seats: 3 }],
+    // Par slug et non par index : l'itinéraire peut gagner des arrêts
+    // (La Chorrera est arrivée après l'écriture de ce test).
+    holds: [
+      {
+        fromIndex: stops.findIndex((s) => s.citySlug === "coronado"),
+        toIndex: stops.findIndex((s) => s.citySlug === "penonome"),
+        seats: 3,
+      },
+    ],
   };
 
   const busy = findSegment(stops, "coronado", "penonome")!;

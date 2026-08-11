@@ -1,4 +1,5 @@
 import { Hero } from "@/components/home/Hero";
+import { RutasFrecuentes } from "@/components/home/RutasFrecuentes";
 import { Pasos } from "@/components/home/Pasos";
 import { Pago } from "@/components/home/Pago";
 import { Conductores } from "@/components/home/Conductores";
@@ -20,6 +21,7 @@ export default function Home() {
     <>
       <main id="contenido">
         <Hero />
+        <RutasFrecuentes />
         <Pasos />
 
         {/* UNE seule section de nuit sur la page. Le client a raison : deux

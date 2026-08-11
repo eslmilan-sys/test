@@ -107,6 +107,14 @@ export const CITIES = {
     lat: 8.5333,
     lng: -79.95,
   },
+  chorrera: {
+    slug: "la-chorrera",
+    name: "La Chorrera",
+    shortName: "La Chorrera",
+    province: "Panamá Oeste",
+    lat: 8.8803,
+    lng: -79.7833,
+  },
 } as const satisfies Record<string, City>;
 
 /**
@@ -136,6 +144,14 @@ const ROAD = {
     km: 0,
     tollCents: 0,
     pickupPoints: PANAMA_PICKUPS,
+  },
+  "la-chorrera": {
+    km: 37,
+    tollCents: 200,
+    pickupPoints: [
+      "La Chorrera — salida oeste",
+      "La Chorrera — Parque Libertador",
+    ],
   },
   coronado: {
     km: 85,
@@ -214,7 +230,7 @@ export const CORRIDORS: Corridor[] = [
     pickupPoints: [...PANAMA_PICKUPS, "Divisa — cruce hacia Azuero"],
     intro:
       "La ruta de Azuero por excelencia. Los viernes en la tarde y los domingos al mediodía es cuando más gente se mueve, sobre todo en temporada de festivales. La mayoría de los conductores sale por la Panamericana y toma el cruce de Divisa.",
-    waypoints: road("panama-city", "coronado", "penonome", "chitre"),
+    waypoints: road("panama-city", "la-chorrera", "coronado", "penonome", "chitre"),
   },
   {
     slug: "panama-las-tablas",
@@ -246,11 +262,10 @@ export const CORRIDORS: Corridor[] = [
     pickupPoints: [
       "Costa del Este — Town Center",
       "Vía Centenario — entrada a la Panamericana",
-      "La Chorrera — salida oeste",
     ],
     intro:
       "El corredor más corto y el más frecuente: mucha gente baja los viernes en la tarde y sube los domingos. Como el trayecto es de poco más de una hora, el aporte por puesto es pequeño y los conductores suelen tener horarios flexibles.",
-    waypoints: road("panama-city", "coronado"),
+    waypoints: road("panama-city", "la-chorrera", "coronado"),
   },
   {
     slug: "panama-santiago",
@@ -263,7 +278,7 @@ export const CORRIDORS: Corridor[] = [
     pickupPoints: [...PANAMA_PICKUPS, "Aguadulce — parada en carretera"],
     intro:
       "Santiago es el punto medio del país: mucha gente que va a Chiriquí para ahí, y muchos veragüenses suben a Panamá entre semana por trámites. Es de los corredores donde más se consigue puesto en días laborables.",
-    waypoints: road("panama-city", "coronado", "penonome", "santiago"),
+    waypoints: road("panama-city", "la-chorrera", "coronado", "penonome", "santiago"),
   },
   {
     slug: "panama-penonome",
@@ -276,7 +291,7 @@ export const CORRIDORS: Corridor[] = [
     pickupPoints: [...PANAMA_PICKUPS, "Penonomé — entrada del pueblo"],
     intro:
       "Dos horas de carretera y buena parte de los conductores que van a Chiriquí o a Veraguas pasan por aquí. Si no encuentras un viaje directo a Penonomé, mira también los que van más lejos: casi todos pueden dejarte en la entrada.",
-    waypoints: road("panama-city", "coronado", "penonome"),
+    waypoints: road("panama-city", "la-chorrera", "coronado", "penonome"),
   },
   {
     slug: "panama-david",
@@ -289,7 +304,7 @@ export const CORRIDORS: Corridor[] = [
     pickupPoints: [...PANAMA_PICKUPS, "Santiago — parada de descanso"],
     intro:
       "Seis horas y media de carretera, casi siempre con una parada en Santiago para estirar las piernas. Muchos salen de madrugada para llegar con el día por delante; mira también los viajes de la tarde, que llegan de noche.",
-    waypoints: road("panama-city", "coronado", "penonome", "santiago", "david"),
+    waypoints: road("panama-city", "la-chorrera", "coronado", "penonome", "santiago", "david"),
   },
 ];
 
