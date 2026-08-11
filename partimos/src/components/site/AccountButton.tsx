@@ -23,19 +23,19 @@ export function AccountButton() {
       aria-label={
         session ? `Mi cuenta, ${session.firstName}` : "Entrar a mi cuenta"
       }
-      className="flex size-10 shrink-0 items-center justify-center rounded-full transition-opacity hover:opacity-85"
+      className="flex size-9 shrink-0 items-center justify-center rounded-full transition-opacity hover:opacity-85"
     >
       {session ? (
         <span
           aria-hidden
-          className="flex size-10 items-center justify-center rounded-full bg-ink-900 font-display text-[15px] font-bold text-ink-50"
+          className="flex size-9 items-center justify-center rounded-full bg-ink-900 font-display text-[14px] font-bold text-ink-50"
         >
           {session.firstName.charAt(0).toUpperCase()}
         </span>
       ) : (
         <span
           aria-hidden
-          className="flex size-10 items-center justify-center rounded-full bg-ink-50 text-ink-600"
+          className="flex size-9 items-center justify-center rounded-full bg-ink-50 text-ink-600"
         >
           <Icon name="user" className="size-5" />
         </span>

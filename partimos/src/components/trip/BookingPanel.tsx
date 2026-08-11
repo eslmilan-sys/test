@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/Button";
+import { ChatSheet } from "./ChatSheet";
 import { Icon } from "@/components/ui/Icon";
 import { AuthDialog } from "@/components/site/AuthDialog";
 import { useSession } from "@/lib/session";
@@ -36,6 +37,7 @@ type Props = {
 };
 
 export function BookingPanel({
+  tripId,
   driverName,
   priceCents,
   seatsLeft,
@@ -241,6 +243,17 @@ export function BookingPanel({
           }
         />
       )}
+
+      <ChatSheet
+        tripId={tripId}
+        driverName={driverName}
+        trigger={
+          <button className="mt-2.5 inline-flex w-full items-center justify-center gap-2 rounded-[14px] border-[1.5px] border-ink-200 px-5 py-3 font-display text-[15px] font-bold transition-colors hover:border-accent hover:text-accent-ink">
+            <Icon name="chat" className="size-4.5" />
+            Preguntar a {driverName}
+          </button>
+        }
+      />
 
       <p className="mt-3 text-center text-[12.5px] leading-relaxed text-ink-500">
         Reservar es gratis y no pide tarjeta.

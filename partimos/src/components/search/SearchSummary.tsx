@@ -60,7 +60,7 @@ export function SearchSummary({
           derrière en défilant, comme sous la barre de navigation — deux
           objets flottants, une seule matière. Le liseré bleu reste : c'est
           lui qui dit « ceci se modifie ». */}
-      <Dialog.Trigger className="glass flex w-full items-center gap-3 rounded-[16px] border-[1.5px] border-accent px-4 py-3 text-left transition-colors hover:bg-white">
+      <Dialog.Trigger className="glass liquid flex w-full items-center gap-3 rounded-[16px] border-[1.5px] border-accent px-4 py-3 text-left transition-colors hover:bg-white">
         <Icon name="search" className="size-5 shrink-0 text-ink-500" />
         <span className="min-w-0 flex-1">
           <span className="block truncate font-display text-[16px] font-bold tracking-[-0.02em]">

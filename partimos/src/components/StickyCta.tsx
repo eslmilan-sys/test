@@ -45,7 +45,7 @@ export function StickyCta({ watch = "#buscar" }: { watch?: string }) {
          lisent comme UN système ; deux traitements différents, comme deux
          morceaux collés. Le `translate-y` de repli tient compte de la marge
          basse, sinon un liseré du plateau resterait visible en bas. */
-      className={`glass fixed inset-x-3 bottom-[calc(0.75rem+env(safe-area-inset-bottom))] z-40 flex gap-2.5 rounded-[20px] p-2.5 transition-transform duration-300 min-[900px]:hidden ${
+      className={`glass liquid fixed inset-x-3 bottom-[calc(0.75rem+env(safe-area-inset-bottom))] z-40 flex gap-2.5 rounded-[20px] p-2.5 transition-transform duration-300 min-[900px]:hidden ${
         visible ? "translate-y-0" : "translate-y-[calc(100%+1.5rem)]"
       }`}
       // `inert` retire la barre repliée de la navigation clavier ET de l'arbre

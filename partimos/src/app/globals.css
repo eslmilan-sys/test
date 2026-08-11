@@ -460,6 +460,18 @@
     }
   }
 
+  /* Le verre LIQUIDE, en utilitaire : la même lentille SVG que la barre,
+     pour les autres objets flottants (carte de recherche, barre basse,
+     chat). Un seul matériau dans toute la page — c'est ce qui fait
+     « système » plutôt que « collage ». La cascade retire la déclaration
+     invalide là où url(#…) n'est pas supporté : le flou simple reste. */
+  .liquid {
+    -webkit-backdrop-filter: blur(var(--glass-blur-xl)) saturate(185%);
+    backdrop-filter: blur(var(--glass-blur-xl)) saturate(185%);
+    backdrop-filter: url(#liquid-lens) blur(var(--glass-blur-xl))
+      saturate(185%);
+  }
+
   .nav-pill {
     --glass-alpha: 0.6;
     -webkit-backdrop-filter: blur(var(--glass-blur-2xl)) saturate(190%);
@@ -509,10 +521,10 @@
     background: var(--color-ink-50);
     background-image: linear-gradient(
       45deg,
-      #fdfbf6,
-      #f2f6fa,
-      #fdf5ea,
-      #f6f9fb
+      #fefdfb,
+      #f6f9fc,
+      #fdfaf4,
+      #f8fafc
     );
     background-size: 380% 380%;
     background-attachment: fixed;
@@ -706,10 +718,10 @@
     background-image:
       /* La lumière du matin, très étalée pour n'avoir aucun bord. */
       radial-gradient(
-        150% 105% at 94% -22%,
-        rgb(251 191 36 / 0.38),
-        rgb(245 158 11 / 0.1) 44%,
-        transparent 72%
+        110% 80% at 94% -22%,
+        rgb(251 191 36 / 0.22),
+        rgb(245 158 11 / 0.05) 44%,
+        transparent 66%
       ),
       /* Le froid qui répond à la lumière n'est plus un bleu générique : c'est
          LE bleu du quartier de nuit (#17384C), très dilué. Le premier écran

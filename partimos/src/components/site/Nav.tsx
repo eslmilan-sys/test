@@ -91,8 +91,15 @@ export function Nav() {
               </ButtonLink>
             </span>
 
-            <AccountButton />
-            <MobileMenu />
+            {/* Sur mobile, compte et menu partagent UNE capsule — un seul
+                objet à droite, qui répond à la marque à gauche. Deux cercles
+                indépendants (avatar plein + hamburger cerclé) se lisaient
+                comme deux boutons dépareillés. À partir de 900 px la capsule
+                s'efface : le menu disparaît, l'avatar vit seul. */}
+            <div className="flex items-center gap-0.5 rounded-full border-[1.5px] border-ink-200/80 bg-white/60 p-[3px] min-[900px]:border-0 min-[900px]:bg-transparent min-[900px]:p-0">
+              <AccountButton />
+              <MobileMenu />
+            </div>
           </div>
         </nav>
       </header>

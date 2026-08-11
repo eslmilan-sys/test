@@ -2,6 +2,7 @@ import Link from "next/link";
 import { CORRIDORS } from "@/lib/corridors";
 import { LEGAL_FOOTER } from "@/lib/content";
 import { LogoMark } from "./Logo";
+import { AppBadges } from "./AppBadges";
 
 const COLUMNS = [
   {
@@ -53,6 +54,7 @@ export function Footer() {
               Viajes compartidos entre particulares en Panamá. Alguien ya va
               para allá.
             </p>
+            <AppBadges />
           </div>
 
           {COLUMNS.map((col) => (
