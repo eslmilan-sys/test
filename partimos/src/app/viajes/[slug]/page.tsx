@@ -20,6 +20,7 @@ import {
 import { formatDuration, formatUsd } from "@/lib/pricing";
 import { getUpcomingTrips } from "@/lib/supabase";
 import { canonical } from "@/lib/site";
+import { corridorMapUrl, MAPBOX_TOKEN } from "@/lib/mapbox";
 import type { Faq } from "@/lib/content";
 
 /**
@@ -329,6 +330,21 @@ export default async function CorridorPage({ params }: Params) {
                   <h2 className="mb-4 text-[clamp(24px,4vw,34px)] font-extrabold">
                     Puntos habituales
                   </h2>
+                  {/* La vraie carte, en image statique : le tracé ambre sur
+                      le pays réel, rendu par Mapbox et mis en cache par son
+                      CDN — zéro JavaScript embarqué. Le langage est celui du
+                      site : bleu = origine, vert = destination. */}
+                  {MAPBOX_TOKEN && (
+                    <img
+                      src={corridorMapUrl(corridor)}
+                      alt={`Mapa de la ruta ${corridor.origin.shortName} → ${corridor.destination.shortName}`}
+                      width={760}
+                      height={440}
+                      loading="lazy"
+                      decoding="async"
+                      className="mb-6 w-full rounded-[18px] border border-ink-200 shadow-card"
+                    />
+                  )}
                   <p className="mb-6 max-w-[46ch] text-[15.5px] leading-relaxed text-ink-500">
                     Los conductores de esta ruta suelen pasar por aquí. Máximo
                     cuatro paradas por viaje, y ninguna en una terminal.

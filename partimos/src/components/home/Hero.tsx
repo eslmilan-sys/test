@@ -72,6 +72,19 @@ export function Hero() {
       <div className="relative z-[2] mx-auto w-full max-w-[1120px] px-5 pt-14 md:pt-24">
         <div className="flex flex-col min-[960px]:grid min-[960px]:grid-cols-[1.02fr_0.98fr] min-[960px]:items-start min-[960px]:gap-x-16 min-[960px]:gap-y-8">
           <div className="order-1 min-[960px]:col-start-1 min-[960px]:row-start-1">
+            {/* La pilule est revenue avec une RAISON d'exister : annoncer le
+                lancement. La version d'avant disait une évidence permanente
+                (« salidas todos los días ») — un badge sans nouvelle est du
+                bruit ; un badge de lancement est une information, et il
+                partira quand le lancement sera vieux. Les 12 routes sont
+                réelles : douze pages, une par sens. */}
+            <p className="glass enter enter-1 mb-5 inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-[12.5px] font-semibold text-ink-600">
+              <span className="font-display font-bold tracking-wide text-action-deep uppercase">
+                Lanzamiento
+              </span>
+              12 rutas abiertas por todo el país
+            </p>
+
             <h1 className="enter enter-2 mb-5 text-[clamp(36px,7.4vw,62px)] leading-[0.98] font-extrabold tracking-[-0.045em]">
               Viaja con{" "}
               <em className="text-action-deep not-italic">quien ya va</em> para
