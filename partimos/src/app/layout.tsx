@@ -84,6 +84,31 @@ export default function RootLayout({
         >
           Saltar al contenido
         </a>
+        {/* LA LENTILLE LIQUIDE. Un bruit très basse fréquence déplace de
+            quelques pixels ce que les vitres floutent : l'ondulation d'une
+            épaisseur d'eau, pas une déformation. Le filtre n'est référencé
+            que par `backdrop-filter: url(#liquid-lens)` — les navigateurs
+            qui ne le lisent pas gardent le flou net, par la cascade CSS.
+            `seed` figé : la même eau à chaque visite. */}
+        <svg aria-hidden width="0" height="0" style={{ position: "absolute" }}>
+          <filter id="liquid-lens">
+            <feTurbulence
+              type="fractalNoise"
+              baseFrequency="0.008 0.014"
+              numOctaves="2"
+              seed="7"
+              result="ruido"
+            />
+            <feDisplacementMap
+              in="SourceGraphic"
+              in2="ruido"
+              scale="14"
+              xChannelSelector="R"
+              yChannelSelector="G"
+            />
+          </filter>
+        </svg>
+
         <SessionProvider>
           <Nav />
           {children}
