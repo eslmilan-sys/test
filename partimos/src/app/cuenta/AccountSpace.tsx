@@ -13,6 +13,7 @@ import {
   startIdVerification,
   type VerificationState,
 } from "@/lib/didit";
+import { connectLinkedIn, hasLinkedIn } from "@/lib/linkedin";
 
 /**
  * ESPACE COMPTE
@@ -172,6 +173,9 @@ export function AccountSpace() {
               <Field label="Ciudad" value="Sin definir" />
               <Field label="Sobre mí" value="Sin definir" />
             </dl>
+
+            <LinkedInRow />
+
             <p className="mt-4 text-[13px] leading-relaxed text-ink-500">
               Tu celular queda oculto hasta que tengas una reserva confirmada.
               Es una regla de la base de datos, no de la pantalla.
@@ -210,6 +214,81 @@ export function AccountSpace() {
         </p>
       )}
     </Container>
+  );
+}
+
+/**
+ * LinkedIn au profil — une insigne, pas un privilège.
+ *
+ * Avec Supabase configuré, `linkIdentity` attache l'identité LinkedIn au
+ * compte déjà connecté (OTP) et redirige vers l'OAuth. En démonstration,
+ * on l'annonce comme à venir — sans le simuler.
+ */
+function LinkedInRow() {
+  const [connected, setConnected] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!isSupabaseConfigured) return;
+    let cancelled = false;
+    hasLinkedIn().then((v) => {
+      if (!cancelled) setConnected(v);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const connect = async () => {
+    setBusy(true);
+    setError(null);
+    const result = await connectLinkedIn();
+    if (result?.error) {
+      setBusy(false);
+      setError("No se pudo conectar LinkedIn. Intenta de nuevo.");
+    }
+    // Sin error: el navegador ya va camino a LinkedIn.
+  };
+
+  return (
+    <div className="mt-4 flex flex-wrap items-center gap-3 rounded-[14px] border border-ink-200 px-4 py-3">
+      <Icon name="briefcase" className="size-5 shrink-0 text-ink-500" />
+      <div className="min-w-0 flex-1">
+        <p className="text-[14.5px] font-semibold">
+          LinkedIn
+          {connected && (
+            <span className="ml-2 rounded-full bg-ink-900 px-2 py-0.5 text-[11px] font-bold text-white">
+              Conectado
+            </span>
+          )}
+        </p>
+        <p className="text-[12.5px] leading-snug text-ink-500">
+          {connected
+            ? "Tu perfil muestra la insignia profesional."
+            : "Da una insignia en tu perfil público. No copiamos nada de tu perfil de LinkedIn — solo que está conectado."}
+        </p>
+        {error && (
+          <p role="alert" className="mt-1 text-[12.5px] font-semibold text-danger">
+            {error}
+          </p>
+        )}
+      </div>
+      {!connected &&
+        (isSupabaseConfigured ? (
+          <button
+            onClick={connect}
+            disabled={busy}
+            className="rounded-[12px] border-[1.5px] border-ink-200 px-4 py-2 text-[13.5px] font-semibold transition-colors hover:border-accent hover:text-accent-ink disabled:opacity-60"
+          >
+            {busy ? "Abriendo…" : "Conectar"}
+          </button>
+        ) : (
+          <span className="text-[12.5px] font-semibold text-ink-500">
+            Disponible al conectar la base
+          </span>
+        ))}
+    </div>
   );
 }
 

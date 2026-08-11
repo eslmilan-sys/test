@@ -20,6 +20,7 @@ import {
   ArrowRight,
   Banknote,
   Bell,
+  Briefcase,
   Bus,
   Calendar,
   Car,
@@ -63,6 +64,7 @@ const ICONS = {
   arrowRight: ArrowRight,
   bus: Bus,
   bell: Bell,
+  briefcase: Briefcase,
 } as const satisfies Record<string, LucideIcon>;
 
 export type IconName = keyof typeof ICONS;

@@ -64,16 +64,20 @@ export type PriceBreakdown = {
 /**
  * @param distanceKm  distance du corridor
  * @param tollCents   péages du corridor, en centimes
- * @param category    catégorie du véhicule
+ * @param category    catégorie du barème, OU un taux au km explicite en
+ *                    centimes — celui du carro réel, calculé par
+ *                    `rateFromConsumption()` (src/lib/cars.ts) sur la même
+ *                    droite que le barème. La formule ne change pas.
  * @param seats       sièges OFFERTS aux passagers (le conducteur n'y est pas)
  */
 export function computePriceCap(
   distanceKm: number,
   tollCents: number,
-  category: VehicleCategory,
+  category: VehicleCategory | number,
   seats: number,
 ): PriceBreakdown {
-  const ratePerKmCents = RATE_PER_KM_CENTS[category];
+  const ratePerKmCents =
+    typeof category === "number" ? category : RATE_PER_KM_CENTS[category];
 
   // Même ordre d'opérations que la fonction SQL : on arrondit le coût
   // kilométrique au centime avant d'ajouter les péages.

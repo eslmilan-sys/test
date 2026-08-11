@@ -18,6 +18,14 @@ import {
   type VehicleCategory,
 } from "@/lib/pricing";
 import { formatDayLabel, servedPairCount } from "@/lib/trips";
+import {
+  CAR_MAKES,
+  CAR_YEARS,
+  agedConsumption,
+  findCar,
+  modelsForMake,
+  rateFromConsumption,
+} from "@/lib/cars";
 
 /**
  * PUBLICATION EN QUATRE ÉTAPES (§6 du brief).
@@ -60,14 +68,30 @@ export function PublishFlow() {
   const [hour, setHour] = useState("06:00");
   const [seats, setSeats] = useState(3);
   const [category, setCategory] = useState<VehicleCategory>("standard");
+  const [carMake, setCarMake] = useState("");
+  const [carModel, setCarModel] = useState("");
+  const [carYear, setCarYear] = useState(2020);
   const [priceCents, setPriceCents] = useState<number | null>(null);
   const [published, setPublished] = useState(false);
+
+  /* Le carro réel prime sur la catégorie : sa consommation de référence,
+     corrigée de l'âge, donne le taux au km sur la MÊME droite que le
+     barème (voir src/lib/cars.ts). « Otro carro » retombe sur les trois
+     catégories — jamais bloquant. */
+  const car = carMake === "otro" ? undefined : findCar(carMake, carModel);
+  const carL100 = car ? agedConsumption(car.l100, carYear) : null;
+  const carRate = carL100 !== null ? rateFromConsumption(carL100) : null;
 
   const corridor = CORRIDORS.find(
     (c) => c.origin.slug === from && c.destination.slug === to,
   );
   const cap = corridor
-    ? computePriceCap(corridor.distanceKm, corridor.tollCents, category, seats)
+    ? computePriceCap(
+        corridor.distanceKm,
+        corridor.tollCents,
+        carRate ?? category,
+        seats,
+      )
     : null;
   const price = priceCents ?? cap?.maxPriceCents ?? 0;
 
@@ -398,22 +422,101 @@ export function PublishFlow() {
                 <legend className="mb-2 text-[11.5px] font-bold tracking-[0.11em] text-ink-500 uppercase">
                   Tu carro
                 </legend>
-                <div className="flex flex-wrap gap-2">
-                  {(["economy", "standard", "suv"] as const).map((code) => (
-                    <button
-                      key={code}
-                      type="button"
-                      aria-pressed={category === code}
-                      onClick={() => {
-                        setCategory(code);
-                        setPriceCents(null);
-                      }}
-                      className={pill(category === code)}
-                    >
-                      {VEHICLE_LABELS[code]}
-                    </button>
-                  ))}
+                <div className="grid gap-2 sm:grid-cols-3">
+                  <select
+                    value={carMake}
+                    onChange={(e) => {
+                      setCarMake(e.target.value);
+                      setCarModel("");
+                      setPriceCents(null);
+                    }}
+                    aria-label="Marca del carro"
+                    className={carSelect()}
+                  >
+                    <option value="">Marca…</option>
+                    {CAR_MAKES.map((m) => (
+                      <option key={m} value={m}>
+                        {m}
+                      </option>
+                    ))}
+                    <option value="otro">Otro / no está</option>
+                  </select>
+
+                  <select
+                    value={carModel}
+                    onChange={(e) => {
+                      setCarModel(e.target.value);
+                      setPriceCents(null);
+                    }}
+                    disabled={!carMake || carMake === "otro"}
+                    aria-label="Modelo del carro"
+                    className={carSelect()}
+                  >
+                    <option value="">Modelo…</option>
+                    {carMake !== "otro" &&
+                      modelsForMake(carMake).map((m) => (
+                        <option key={m.model} value={m.model}>
+                          {m.model}
+                        </option>
+                      ))}
+                  </select>
+
+                  <select
+                    value={carYear}
+                    onChange={(e) => {
+                      setCarYear(Number(e.target.value));
+                      setPriceCents(null);
+                    }}
+                    disabled={!car}
+                    aria-label="Año del carro"
+                    className={carSelect()}
+                  >
+                    {CAR_YEARS.map((y) => (
+                      <option key={y} value={y}>
+                        {y}
+                      </option>
+                    ))}
+                  </select>
                 </div>
+
+                {car && carL100 !== null && carRate !== null && (
+                  <p className="tnum mt-2.5 rounded-[12px] bg-ink-50 px-3.5 py-2.5 text-[13px] leading-relaxed text-ink-500">
+                    <b className="font-semibold text-ink-900">
+                      {car.make} {car.model} {carYear}
+                    </b>
+                    {" — consumo de referencia ~"}
+                    {carL100.toFixed(1).replace(".", ",")} L/100 km, o sea{" "}
+                    <b className="font-semibold text-ink-900">
+                      {formatUsd(carRate)} por km
+                    </b>
+                    . El tope refleja lo que cuesta mover TU carro — un carro
+                    que gasta más puede pedir más, uno ahorrador pide menos.
+                  </p>
+                )}
+
+                {carMake === "otro" && (
+                  <div className="mt-2.5">
+                    <p className="mb-2 text-[13px] text-ink-500">
+                      Sin problema — elige la categoría que más se parece:
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {(["economy", "standard", "suv"] as const).map((code) => (
+                        <button
+                          key={code}
+                          type="button"
+                          aria-pressed={category === code}
+                          onClick={() => {
+                            setCategory(code);
+                            setPriceCents(null);
+                          }}
+                          className={pill(category === code)}
+                        >
+                          {VEHICLE_LABELS[code]}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </fieldset>
             </>
           )}
@@ -452,6 +555,15 @@ export function PublishFlow() {
               </div>
 
               <dl className="mt-4 text-[14.5px]">
+                <Row
+                  label={
+                    car
+                      ? `Tu ${car.make} ${car.model} ${carYear}, por km`
+                      : `Categoría ${VEHICLE_LABELS[category]}, por km`
+                  }
+                >
+                  {formatUsd(cap.ratePerKmCents)}
+                </Row>
                 <Row label={`${corridor.distanceKm} km, peajes y desgaste`}>
                   {formatUsd(cap.costTotalCents)}
                 </Row>
@@ -510,6 +622,15 @@ export function PublishFlow() {
       </div>
     </Container>
   );
+}
+
+function carSelect() {
+  return [
+    "w-full appearance-none rounded-[12px] border-[1.5px] border-ink-200 bg-white",
+    "px-3.5 py-2.5 text-[14.5px] font-semibold text-ink-900 transition-colors",
+    "hover:border-accent focus:border-accent focus:outline-none",
+    "disabled:cursor-not-allowed disabled:opacity-50",
+  ].join(" ");
 }
 
 function pill(active: boolean) {
