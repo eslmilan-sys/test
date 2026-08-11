@@ -106,6 +106,36 @@ const normalize = (value: string) =>
 
 /** Recherche un lieu connu par son nom — le buscador s'en sert pour que
  *  « multiplaza » sélectionne Ciudad de Panamá. */
+/**
+ * La ville desservie la plus proche d'un point — c'est elle que la
+ * recherche interroge quand on tape un VRAI lieu (une barriada, un
+ * restaurant, une école) plutôt qu'un nom de ville. Haversine suffit :
+ * à l'échelle d'un pays, l'erreur de la sphère est négligeable.
+ */
+export function nearestCity(
+  lat: number,
+  lng: number,
+  cities: { slug: string; name: string; lat: number; lng: number }[],
+): { slug: string; name: string; distanceKm: number } {
+  let best = cities[0];
+  let bestD = Infinity;
+  for (const c of cities) {
+    const dLat = ((c.lat - lat) * Math.PI) / 180;
+    const dLng = ((c.lng - lng) * Math.PI) / 180;
+    const a =
+      Math.sin(dLat / 2) ** 2 +
+      Math.cos((lat * Math.PI) / 180) *
+        Math.cos((c.lat * Math.PI) / 180) *
+        Math.sin(dLng / 2) ** 2;
+    const d = 6371 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    if (d < bestD) {
+      bestD = d;
+      best = c;
+    }
+  }
+  return { slug: best.slug, name: best.name, distanceKm: Math.round(bestD) };
+}
+
 export function searchPlaces(query: string, limit = 4): KnownPlace[] {
   const q = normalize(query.trim());
   if (q.length < 2) return [];

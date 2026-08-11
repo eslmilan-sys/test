@@ -1,9 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Command } from "cmdk";
 import { ALL_CITIES } from "@/lib/corridors";
-import { searchPlaces } from "@/lib/places";
+import { nearestCity, searchPlaces } from "@/lib/places";
+import { geocodePlaces, MAPBOX_TOKEN, type GeocodedPlace } from "@/lib/mapbox";
 import { Icon } from "@/components/ui/Icon";
 
 /**
@@ -73,6 +74,44 @@ export function CityCombobox({
     [query, exclude],
   );
 
+  /* LES VRAIS LIEUX, tous : quand ni les villes ni le catalogue ne
+     répondent, le géocodeur Mapbox prend le relais — une barriada, un
+     restaurant, une école. Chaque résultat est rattaché à la ville
+     desservie la plus proche : chercher « Boquete » propose David,
+     parce que c'est le corridor qui y mène. Débouncé, annulable,
+     silencieux sans jeton. */
+  const [remote, setRemote] = useState<GeocodedPlace[]>([]);
+  const debounce = useRef<number>(0);
+  useEffect(() => {
+    if (!open || !MAPBOX_TOKEN || query.trim().length < 3) return;
+    const controller = new AbortController();
+    window.clearTimeout(debounce.current);
+    debounce.current = window.setTimeout(() => {
+      geocodePlaces(query, undefined, controller.signal).then(setRemote);
+    }, 300);
+    return () => {
+      controller.abort();
+      window.clearTimeout(debounce.current);
+    };
+  }, [query, open]);
+
+  const remoteResults = useMemo(() => {
+    if (query.trim().length < 3) return [];
+    return remote
+      .map((r) => ({
+        ...r,
+        city: nearestCity(r.lat, r.lng, ALL_CITIES),
+      }))
+      .filter(
+        (r) =>
+          r.city.slug !== exclude &&
+          /* Déjà proposé en ville ou en lieu connu : inutile en double. */
+          !results.some((c) => normalize(c.name) === normalize(r.name)) &&
+          !placeResults.some((p) => normalize(p.name) === normalize(r.name)),
+      )
+      .slice(0, 4);
+  }, [remote, query, exclude, results, placeResults]);
+
   return (
     <div className="relative">
       <div className="flex items-center gap-3 rounded-[14px] px-3.5 py-3 transition-colors hover:bg-ink-50">
@@ -126,7 +165,9 @@ export function CityCombobox({
           className="absolute inset-x-0 top-full z-30 mt-1 overflow-hidden rounded-[14px] border border-ink-200 bg-white shadow-lift"
         >
           <Command.List className="max-h-64 overflow-y-auto p-1.5">
-            {results.length === 0 && placeResults.length === 0 && (
+            {results.length === 0 &&
+              placeResults.length === 0 &&
+              remoteResults.length === 0 && (
               <Command.Empty className="px-3 py-3 text-[14px] text-ink-500">
                 Todavía no llegamos a esa ciudad. Escríbela igual y te avisamos
                 cuando abramos la ruta.
@@ -154,6 +195,30 @@ export function CityCombobox({
                 </Command.Item>
               );
             })}
+            {remoteResults.map((r) => (
+              <Command.Item
+                key={`geo-${r.name}-${r.lat}`}
+                value={`geo-${r.name}-${r.lat}`}
+                onMouseDown={(e) => e.preventDefault()}
+                onSelect={() => {
+                  onChange(r.city.slug);
+                  setOpen(false);
+                }}
+                className="flex cursor-pointer items-baseline justify-between gap-3 rounded-[10px] px-3 py-2.5 text-[15px] data-[selected=true]:bg-ink-50"
+              >
+                <span className="min-w-0">
+                  <span className="block truncate font-semibold">
+                    {r.name}
+                  </span>
+                  <span className="block truncate text-[12px] text-ink-500">
+                    {r.context}
+                  </span>
+                </span>
+                <span className="shrink-0 text-[12.5px] font-semibold text-accent-ink">
+                  → {r.city.name.replace("Ciudad de ", "")}
+                </span>
+              </Command.Item>
+            ))}
             {results.map((city) => (
               <Command.Item
                 key={city.slug}

@@ -83,6 +83,8 @@ export type GeocodedPlace = {
   name: string;
   /** Contexte lisible (« Avenida Balboa, Panamá ») */
   context: string;
+  lat: number;
+  lng: number;
 };
 
 /**
@@ -115,7 +117,13 @@ export async function geocodePlaces(
     );
     if (!res.ok) return [];
     const data = (await res.json()) as {
-      features?: { text_es?: string; text: string; place_name_es?: string; place_name: string }[];
+      features?: {
+        text_es?: string;
+        text: string;
+        place_name_es?: string;
+        place_name: string;
+        center: [number, number];
+      }[];
     };
     return (data.features ?? []).map((f) => {
       const name = f.text_es ?? f.text;
@@ -123,7 +131,7 @@ export async function geocodePlaces(
       const context = full
         .replace(`${name}, `, "")
         .replace(/, Panam[aá]$/i, "");
-      return { name, context };
+      return { name, context, lng: f.center[0], lat: f.center[1] };
     });
   } catch {
     return [];
