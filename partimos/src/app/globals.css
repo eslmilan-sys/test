@@ -791,6 +791,34 @@
      le même pixel sur toute la largeur — la couture se voyait, le client
      l'a vue. */
 
+  /* Les BORDS de la nuit : un dégradé court fond la section sombre dans
+     la page claire, en haut comme en bas. Sans lui, la coupure nette se
+     lit comme deux pages collées ; avec lui, c'est le même décor qui
+     passe du jour à la nuit. Posé en pseudo-éléments : aucun balisage,
+     et la section reste UNE section. */
+  .noche {
+    position: relative;
+  }
+  .noche::before,
+  .noche::after {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    height: 56px;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .noche::before {
+    top: 0;
+    background: linear-gradient(to bottom, var(--color-ink-50), transparent);
+    opacity: 0.16;
+  }
+  .noche::after {
+    bottom: 0;
+    background: linear-gradient(to top, var(--color-ink-50), transparent);
+    opacity: 0.12;
+  }
+
   .noche {
     background-color: var(--color-night-900);
     background-image:

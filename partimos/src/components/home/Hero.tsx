@@ -49,7 +49,7 @@ const PROOF: {
   {
     icon: "pin",
     tone: "amber",
-    title: "Te recogen donde te sirve",
+    title: "Te recogen donde quieras",
     detail: "Escoges el punto al reservar",
   },
   {
@@ -84,7 +84,7 @@ export function Hero() {
       <HeroScene />
 
       <div className="relative z-[2] mx-auto w-full max-w-[1120px] px-5 pt-6 md:pt-20">
-        <div className="flex flex-col min-[960px]:grid min-[960px]:grid-cols-[1.02fr_0.98fr] min-[960px]:items-start min-[960px]:gap-x-16 min-[960px]:gap-y-8">
+        <div className="flex flex-col min-[960px]:grid min-[960px]:grid-cols-[1.08fr_0.92fr] min-[960px]:items-start min-[960px]:gap-x-16 min-[960px]:gap-y-8">
           <div className="order-1 min-[960px]:col-start-1 min-[960px]:row-start-1">
             {/* La pilule est revenue avec une RAISON d'exister : annoncer le
                 lancement. La version d'avant disait une évidence permanente
@@ -127,7 +127,7 @@ export function Hero() {
           {/* La recherche : deuxième sur téléphone, colonne de droite ensuite. */}
           <div
             id="buscar"
-            className="enter enter-3 relative order-2 mt-7 scroll-mt-24 min-[960px]:col-start-2 min-[960px]:row-span-2 min-[960px]:row-start-1 min-[960px]:mt-0"
+            className="enter enter-3 relative order-2 mt-7 scroll-mt-24 min-[960px]:col-start-2 min-[960px]:row-span-2 min-[960px]:row-start-1 min-[960px]:mt-[52px]"
           >
             {/* UNE forme de couleur pleine glissée SOUS la carte : là où le
                 verre la recouvre, il la fond en lumière ; le coin qui
