@@ -4,13 +4,12 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Command } from "cmdk";
 import { ALL_CITIES } from "@/lib/corridors";
 import { nearestCity, searchPlaces } from "@/lib/places";
+import { retrievePlace } from "@/lib/mapbox";
 import {
-  geocodePlaces,
-  retrievePlace,
-  suggestPlaces,
-  MAPBOX_TOKEN,
-  type SuggestedPlace,
-} from "@/lib/mapbox";
+  searchEverywhere,
+  GEOSEARCH_ENABLED,
+  type FoundPlace,
+} from "@/lib/geosearch";
 import { Icon } from "@/components/ui/Icon";
 
 /**
@@ -86,26 +85,16 @@ export function CityCombobox({
      desservie la plus proche : chercher « Boquete » propose David,
      parce que c'est le corridor qui y mène. Débouncé, annulable,
      silencieux sans jeton. */
-  const [remote, setRemote] = useState<SuggestedPlace[]>([]);
+  const [remote, setRemote] = useState<FoundPlace[]>([]);
   const [resolving, setResolving] = useState<string | null>(null);
   const debounce = useRef<number>(0);
   useEffect(() => {
-    if (!open || !MAPBOX_TOKEN || query.trim().length < 3) return;
+    if (!open || !GEOSEARCH_ENABLED || query.trim().length < 3) return;
     const controller = new AbortController();
     window.clearTimeout(debounce.current);
     debounce.current = window.setTimeout(() => {
-      /* Search Box d'abord — elle connaît les immeubles (les PH), les
-         commerces, tout le référentiel riche. Le géocodeur v5 reprend
-         si elle ne répond rien (il garde les rues et les pueblos). */
-      suggestPlaces(query, undefined, controller.signal).then((found) =>
-        found.length > 0
-          ? setRemote(found)
-          : geocodePlaces(query, undefined, controller.signal).then((v5) =>
-              setRemote(
-                v5.map((r) => ({ ...r, mapboxId: "" })),
-              ),
-            ),
-      );
+      /* TomTom + LocationIQ + Mapbox en parallèle — voir geosearch.ts. */
+      searchEverywhere(query, undefined, controller.signal).then(setRemote);
     }, 300);
     return () => {
       controller.abort();
@@ -128,7 +117,7 @@ export function CityCombobox({
   /* Le choix d'un lieu : ses coordonnées arrivent au moment du clic
      (retrieve pour Search Box, déjà là pour v5), puis la ville desservie
      la plus proche devient la valeur du champ. */
-  const pickRemote = async (r: SuggestedPlace) => {
+  const pickRemote = async (r: FoundPlace) => {
     setResolving(r.mapboxId || r.name);
     const coords =
       r.lat !== 0 || r.lng !== 0

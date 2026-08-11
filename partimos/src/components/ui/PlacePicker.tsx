@@ -4,12 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { Command } from "cmdk";
 import { Icon } from "@/components/ui/Icon";
 import { placesForCity, KIND_LABELS } from "@/lib/places";
-import {
-  geocodePlaces,
-  suggestPlaces,
-  MAPBOX_TOKEN,
-  type GeocodedPlace,
-} from "@/lib/mapbox";
+import { searchEverywhere, GEOSEARCH_ENABLED, type FoundPlace } from "@/lib/geosearch";
 import { ALL_CITIES } from "@/lib/corridors";
 
 /**
@@ -45,7 +40,7 @@ export function PlacePicker({
 }) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
-  const [remote, setRemote] = useState<GeocodedPlace[]>([]);
+  const [remote, setRemote] = useState<FoundPlace[]>([]);
   const debounce = useRef<number>(0);
 
   const city = ALL_CITIES.find((c) => c.slug === citySlug);
@@ -71,18 +66,14 @@ export function PlacePicker({
     /* Sous le seuil ou fermé : rien à chercher. L'affichage est DÉRIVÉ
        (remoteShown) — pas de setState de purge ici, React 19 le refuse
        à raison : un setState synchrone dans l'effet recasque un rendu. */
-    if (!open || !MAPBOX_TOKEN || query.trim().length < 3) return;
+    if (!open || !GEOSEARCH_ENABLED || query.trim().length < 3) return;
     const controller = new AbortController();
     window.clearTimeout(debounce.current);
     debounce.current = window.setTimeout(() => {
       const near = city ? { lat: city.lat, lng: city.lng } : undefined;
-      /* Search Box connaît les immeubles (les PH) et les commerces ;
-         si elle ne répond rien, le géocodeur v5 reprend les rues. */
-      suggestPlaces(query, near, controller.signal).then((found) =>
-        found.length > 0
-          ? setRemote(found)
-          : geocodePlaces(query, near, controller.signal).then(setRemote),
-      );
+      /* TomTom + LocationIQ + Mapbox en parallèle : le lieu n'a besoin
+         d'exister que dans UNE des trois bases pour sortir. */
+      searchEverywhere(query, near, controller.signal).then(setRemote);
     }, 300);
     return () => {
       controller.abort();
