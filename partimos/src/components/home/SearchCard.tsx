@@ -96,7 +96,7 @@ export function SearchCard() {
   const toCity = ALL_CITIES.find((c) => c.slug === to);
 
   return (
-    <div className="rounded-[22px] bg-white p-2.5 shadow-float">
+    <div className="glass rounded-[22px] p-2.5 shadow-float [--glass-alpha:0.88]">
       <div className="px-3 pt-2.5 pb-2">
         <div
           role="group"

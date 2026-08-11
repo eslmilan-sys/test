@@ -1,6 +1,7 @@
 import { SearchCard } from "./SearchCard";
 import { LiveStrip } from "./LiveStrip";
 import { Icon, type IconName } from "@/components/ui/Icon";
+import { HeroScene } from "./HeroScene";
 
 /**
  * LE PREMIER ÉCRAN
@@ -64,6 +65,9 @@ export function Hero() {
           quelque chose à flouter : sans ces deux halos, la vitre floute un
           aplat, et un aplat flouté reste un aplat. */}
       <span aria-hidden className="halos" />
+      {/* Les orbes WebGL par-dessus les halos : c'est ce que le verre floute.
+          Sous 768 px et sans WebGL, les halos seuls font le travail. */}
+      <HeroScene />
 
       <div className="relative z-[2] mx-auto w-full max-w-[1120px] px-5 pt-14 md:pt-24">
         <div className="flex flex-col min-[960px]:grid min-[960px]:grid-cols-[1.02fr_0.98fr] min-[960px]:items-start min-[960px]:gap-x-16 min-[960px]:gap-y-8">

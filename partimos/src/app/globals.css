@@ -1,5 +1,11 @@
 @import "tailwindcss";
 
+@property --glass-alpha {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0.74;
+}
+
 /* =====================================================================
    PARTIMOS — « SOL »
    ---------------------------------------------------------------------
@@ -238,6 +244,10 @@
     --glass-blur-sm: 8px;
     --glass-blur-md: 14px;
     --glass-blur-xl: 20px;
+    /* Réservé aux PETITES surfaces (la barre) : le coût d'un flou croît avec
+       le rayon ET l'aire. 28 px sur une bande de 64 px de haut est payable ;
+       sur un écran entier, non. */
+    --glass-blur-2xl: 28px;
   }
 
   /* ---- CE QUI SÉPARE UN VRAI VERRE D'UN APLAT À 74 % ----
@@ -444,11 +454,18 @@
     }
   }
 
+  .nav-pill {
+    --glass-alpha: 0.6;
+    -webkit-backdrop-filter: blur(var(--glass-blur-2xl)) saturate(190%);
+    backdrop-filter: blur(var(--glass-blur-2xl)) saturate(190%);
+  }
+
   @keyframes nav-serre {
     to {
       height: 3.25rem;
       margin-top: -0.25rem;
       border-radius: 999px;
+      --glass-alpha: 0.82;
     }
   }
 
