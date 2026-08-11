@@ -125,7 +125,7 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
       <Dialog.Trigger asChild>{trigger}</Dialog.Trigger>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 z-[110] bg-night-950/55 motion-safe:animate-[fade-in_0.18s_ease-out]" />
-        <Dialog.Content className="fixed top-1/2 left-1/2 z-[120] max-h-[92vh] w-[calc(100vw-28px)] max-w-[440px] -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-[26px] bg-white p-6 shadow-float motion-safe:animate-[sheet-in_0.22s_cubic-bezier(0.2,0.9,0.3,1)]">
+        <Dialog.Content className="fixed top-1/2 left-1/2 z-[120] max-h-[92vh] w-[calc(100vw-28px)] max-w-[440px] -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-[26px] glass liquid [--glass-alpha:0.94] p-6 shadow-float motion-safe:animate-[sheet-in_0.22s_cubic-bezier(0.2,0.9,0.3,1)]">
           <div className="mb-5 flex items-start justify-between gap-4">
             <div>
               <Dialog.Title className="font-display text-[24px] font-extrabold tracking-[-0.035em]">
@@ -171,6 +171,16 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
                   Continuar como {firstName.trim() || "invitado"}
                 </button>
               </Dialog.Close>
+              <p className="mt-3 text-center text-[12.5px] leading-relaxed text-ink-500">
+                ¿Manejas? Registra tu carro en{" "}
+                <a
+                  href="/cuenta"
+                  className="font-semibold text-accent-ink hover:underline"
+                >
+                  Mi cuenta
+                </a>{" "}
+                — el modelo fija tu costo por kilómetro al publicar.
+              </p>
             </>
           ) : step === "identity" ? (
             <form

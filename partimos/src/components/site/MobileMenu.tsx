@@ -37,7 +37,7 @@ export function MobileMenu() {
 
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 z-[110] bg-night-950/55 motion-safe:animate-[fade-in_0.18s_ease-out]" />
-        <Dialog.Content className="fixed inset-y-0 right-0 z-[120] flex w-[min(360px,88vw)] flex-col bg-white shadow-float motion-safe:animate-[drawer-in_0.24s_cubic-bezier(0.2,0.9,0.3,1)]">
+        <Dialog.Content className="glass liquid fixed inset-y-0 right-0 z-[120] flex w-[min(360px,88vw)] flex-col [--glass-alpha:0.93] shadow-float motion-safe:animate-[drawer-in_0.24s_cubic-bezier(0.2,0.9,0.3,1)]">
           <div className="flex items-center justify-between border-b border-ink-200 px-5 py-3.5">
             <Dialog.Title className="font-display text-[17px] font-bold">
               Menú

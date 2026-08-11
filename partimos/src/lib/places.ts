@@ -49,6 +49,9 @@ export const KNOWN_PLACES: KnownPlace[] = [
     name: "Westland Mall (Arraiján)",
     kind: "mall",
   },
+  { citySlug: "panama-city", name: "Multicentro (Avenida Balboa)", kind: "mall" },
+  { citySlug: "panama-city", name: "El Dorado (centro comercial)", kind: "mall" },
+  { citySlug: "panama-city", name: "Parque Urracá", kind: "parque" },
 
   // Coronado
   { citySlug: "coronado", name: "Coronado Mall", kind: "mall" },
@@ -81,6 +84,7 @@ export const KNOWN_PLACES: KnownPlace[] = [
   { citySlug: "david", name: "Parque Cervantes", kind: "parque" },
   { citySlug: "david", name: "Chiriquí Mall", kind: "mall" },
   { citySlug: "david", name: "Federal Mall", kind: "mall" },
+  { citySlug: "david", name: "Súper Barú (David)", kind: "tienda" },
 ];
 
 export const KIND_LABELS: Record<PlaceKind, string> = {

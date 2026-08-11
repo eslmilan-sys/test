@@ -46,8 +46,20 @@ export type Session = {
   /** Insigne employeur ou université, si l'utilisateur l'a connecté. */
   affiliation: string | null;
   since: string;
+  /** Héritage : premier carro enregistré (les anciens comptes de démo
+   *  n'en avaient qu'un). Lire via carsOf(), écrire via cars. */
   car?: SavedCar | null;
+  /** Les carros enregistrés. À la publication on choisit lequel ; s'il
+   *  n'y en a qu'un, c'est lui d'office. */
+  cars?: SavedCar[] | null;
 };
+
+/** La liste des carros, quel que soit l'âge de la session. */
+export function carsOf(session: Session | null): SavedCar[] {
+  if (!session) return [];
+  if (session.cars && session.cars.length > 0) return session.cars;
+  return session.car ? [session.car] : [];
+}
 
 const STORAGE_KEY = "partimos.demo-session";
 const EVENT = "partimos:session";

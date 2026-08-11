@@ -10,7 +10,7 @@ import { RouteMap } from "@/components/map/RouteMap";
 import { CityCombobox } from "@/components/ui/CityCombobox";
 import { PlacePicker } from "@/components/ui/PlacePicker";
 import { AuthDialog } from "@/components/site/AuthDialog";
-import { useSession } from "@/lib/session";
+import { carsOf, useSession } from "@/lib/session";
 import { CORRIDORS, ALL_CITIES, getCorridor } from "@/lib/corridors";
 import {
   computePriceCap,
@@ -83,11 +83,15 @@ export function PublishFlow() {
      barème (voir src/lib/cars.ts). Le carro ENREGISTRÉ dans Mi cuenta
      arrive prérempli — publier ne redemande pas ce qu'on sait déjà.
      « Otro carro » retombe sur les trois catégories — jamais bloquant. */
-  const savedCar =
-    session?.car && findCar(session.car.make, session.car.model)
-      ? session.car
-      : null;
+  const registeredCars = carsOf(session).filter((c) =>
+    findCar(c.make, c.model),
+  );
   const [useSavedCar, setUseSavedCar] = useState(true);
+  const [carIndex, setCarIndex] = useState(0);
+  /* S'il n'a qu'un carro, c'est lui d'office ; s'il en a plusieurs, il
+     choisit lequel il prend ce jour-là. */
+  const savedCar =
+    registeredCars[Math.min(carIndex, registeredCars.length - 1)] ?? null;
   const pickerCar = carMake === "otro" ? undefined : findCar(carMake, carModel);
   const activeCar =
     savedCar && useSavedCar
@@ -521,6 +525,25 @@ export function PublishFlow() {
                 </legend>
 
                 {savedCar && useSavedCar ? (
+                  <>
+                    {registeredCars.length > 1 && (
+                      <div className="mb-2 flex flex-wrap gap-2">
+                        {registeredCars.map((c, i) => (
+                          <button
+                            key={`${c.make}-${c.model}-${c.year}-${i}`}
+                            type="button"
+                            aria-pressed={i === carIndex}
+                            onClick={() => {
+                              setCarIndex(i);
+                              setPriceCents(null);
+                            }}
+                            className={pill(i === carIndex)}
+                          >
+                            {c.make} {c.model}
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   <div className="flex flex-wrap items-center gap-3 rounded-[14px] border border-ink-200 px-4 py-3">
                     {savedCar.photoDataUrl ? (
                       /* eslint-disable-next-line @next/next/no-img-element -- data URL locale */
@@ -554,6 +577,7 @@ export function PublishFlow() {
                       Usar otro
                     </button>
                   </div>
+                  </>
                 ) : (
                   <>
                     {savedCar && (

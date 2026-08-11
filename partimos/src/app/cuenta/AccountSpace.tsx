@@ -6,7 +6,7 @@ import { Container } from "@/components/site/Section";
 import { Icon, type IconName } from "@/components/ui/Icon";
 import { ButtonLink } from "@/components/ui/Button";
 import { AuthDialog } from "@/components/site/AuthDialog";
-import { useSession } from "@/lib/session";
+import { carsOf, useSession, type SavedCar } from "@/lib/session";
 import {
   getVerificationState,
   isSupabaseConfigured,
@@ -226,23 +226,36 @@ export function AccountSpace() {
  */
 function CarPanel() {
   const { session, updateSession } = useSession();
-  const saved = session?.car ?? null;
-  const [editing, setEditing] = useState(!saved);
-  const [make, setMake] = useState(saved?.make ?? "");
-  const [model, setModel] = useState(saved?.model ?? "");
-  const [year, setYear] = useState(saved?.year ?? 2020);
-  const [color, setColor] = useState(saved?.color ?? "");
-  const [photo, setPhoto] = useState<string | null>(saved?.photoDataUrl ?? null);
+  const cars = carsOf(session);
+  const [editing, setEditing] = useState(cars.length === 0);
+  const [make, setMake] = useState("");
+  const [model, setModel] = useState("");
+  const [year, setYear] = useState(2020);
+  const [color, setColor] = useState("");
+  const [photo, setPhoto] = useState<string | null>(null);
   const [photoBusy, setPhotoBusy] = useState(false);
 
   const ref = findCar(make, model);
   const l100 = ref ? agedConsumption(ref.l100, year) : null;
   const rate = l100 !== null ? rateFromConsumption(l100) : null;
 
-  const savedRef = saved ? findCar(saved.make, saved.model) : undefined;
-  const savedRate = savedRef
-    ? rateFromConsumption(agedConsumption(savedRef.l100, saved!.year))
-    : null;
+  const saveCars = (next: SavedCar[]) => {
+    /* `car` reste synchronisé sur le premier : les vieilles sessions et
+       tout code qui lirait encore le champ hérité voient la même chose. */
+    updateSession({ cars: next, car: next[0] ?? null });
+  };
+
+  const addCar = () => {
+    saveCars([
+      ...cars,
+      { make, model, year, color: color.trim(), photoDataUrl: photo },
+    ]);
+    setMake("");
+    setModel("");
+    setColor("");
+    setPhoto(null);
+    setEditing(false);
+  };
 
   const onPhoto = async (file: File | undefined) => {
     if (!file) return;
@@ -254,181 +267,196 @@ function CarPanel() {
     }
   };
 
-  if (saved && !editing) {
-    return (
-      <>
-        <h2 className="mb-4 font-display text-[19px] font-bold">Mi carro</h2>
-        <div className="flex flex-wrap items-start gap-4">
-          {saved.photoDataUrl ? (
-            /* eslint-disable-next-line @next/next/no-img-element -- data URL locale, next/image n'optimise rien ici */
-            <img
-              src={saved.photoDataUrl}
-              alt={`${saved.make} ${saved.model} ${saved.color}`}
-              className="h-28 w-40 rounded-[14px] border border-ink-200 object-cover"
-            />
-          ) : (
-            <span className="flex h-28 w-40 items-center justify-center rounded-[14px] bg-ink-50 text-ink-500">
-              <Icon name="car" className="size-8" />
-            </span>
-          )}
-          <div className="min-w-[220px] flex-1">
-            <p className="font-display text-[18px] font-bold">
-              {saved.make} {saved.model} {saved.year}
-            </p>
-            <p className="text-[14px] text-ink-500 capitalize">{saved.color}</p>
-            {savedRate !== null && (
-              <p className="tnum mt-2 rounded-[12px] bg-ink-50 px-3.5 py-2.5 text-[13px] leading-relaxed text-ink-500">
-                Con este carro, tu costo de referencia es{" "}
-                <b className="font-semibold text-ink-900">
-                  ${(savedRate / 100).toFixed(2)} por km
-                </b>
-                . Es lo que fija el tope de tus viajes al publicar.
-              </p>
-            )}
-            <button
-              onClick={() => setEditing(true)}
-              className="mt-3 rounded-[12px] border-[1.5px] border-ink-200 px-4 py-2 text-[13.5px] font-semibold transition-colors hover:border-accent hover:text-accent-ink"
-            >
-              Cambiar carro o foto
-            </button>
-          </div>
-        </div>
-      </>
-    );
-  }
-
   return (
     <>
-      <h2 className="mb-1.5 font-display text-[19px] font-bold">Mi carro</h2>
+      <h2 className="mb-1.5 font-display text-[19px] font-bold">
+        {cars.length === 1 ? "Mi carro" : "Mis carros"}
+      </h2>
       <p className="mb-4 text-[14px] leading-relaxed text-ink-500">
-        Se registra una vez y queda listo para publicar. El modelo y el año
-        fijan tu costo por kilómetro; la foto ayuda a que te encuentren en el
-        punto de salida.
+        Se registran una vez y quedan listos para publicar. Al publicar eliges
+        cuál llevas; si tienes uno solo, va ese. El modelo y el año fijan tu
+        costo por kilómetro.
       </p>
 
-      <div className="grid gap-2 sm:grid-cols-3">
-        <select
-          value={make}
-          onChange={(e) => {
-            setMake(e.target.value);
-            setModel("");
-          }}
-          aria-label="Marca del carro"
-          className={accountSelect()}
-        >
-          <option value="">Marca…</option>
-          {CAR_MAKES.map((m) => (
-            <option key={m} value={m}>
-              {m}
-            </option>
-          ))}
-        </select>
-        <select
-          value={model}
-          onChange={(e) => setModel(e.target.value)}
-          disabled={!make}
-          aria-label="Modelo del carro"
-          className={accountSelect()}
-        >
-          <option value="">Modelo…</option>
-          {modelsForMake(make).map((m) => (
-            <option key={m.model} value={m.model}>
-              {m.model}
-            </option>
-          ))}
-        </select>
-        <select
-          value={year}
-          onChange={(e) => setYear(Number(e.target.value))}
-          disabled={!ref}
-          aria-label="Año del carro"
-          className={accountSelect()}
-        >
-          {CAR_YEARS.map((y) => (
-            <option key={y} value={y}>
-              {y}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <input
-        value={color}
-        onChange={(e) => setColor(e.target.value)}
-        placeholder="Color (gris, blanco…)"
-        aria-label="Color del carro"
-        className="mt-2 w-full rounded-[12px] border-[1.5px] border-ink-200 px-3.5 py-2.5 text-[14.5px] font-semibold placeholder:font-normal placeholder:text-ink-400 focus:border-accent focus:outline-none sm:max-w-[calc((100%-1rem)/3)]"
-      />
-
-      {ref && l100 !== null && rate !== null && (
-        <p className="tnum mt-2.5 rounded-[12px] bg-ink-50 px-3.5 py-2.5 text-[13px] leading-relaxed text-ink-500">
-          <b className="font-semibold text-ink-900">
-            {make} {model} {year}
-          </b>
-          {" — consumo de referencia ~"}
-          {l100.toFixed(1).replace(".", ",")} L/100 km, o sea{" "}
-          <b className="font-semibold text-ink-900">
-            ${(rate / 100).toFixed(2)} por km
-          </b>
-          .
-        </p>
+      {cars.length > 0 && (
+        <ul className="mb-5 grid gap-3">
+          {cars.map((c, i) => {
+            const cRef = findCar(c.make, c.model);
+            const cRate = cRef
+              ? rateFromConsumption(agedConsumption(cRef.l100, c.year))
+              : null;
+            return (
+              <li
+                key={`${c.make}-${c.model}-${c.year}-${i}`}
+                className="flex flex-wrap items-center gap-4 rounded-[16px] border border-ink-200 px-4 py-3.5"
+              >
+                {c.photoDataUrl ? (
+                  /* eslint-disable-next-line @next/next/no-img-element -- data URL locale */
+                  <img
+                    src={c.photoDataUrl}
+                    alt={`${c.make} ${c.model} ${c.color}`}
+                    className="h-16 w-24 rounded-[12px] border border-ink-200 object-cover"
+                  />
+                ) : (
+                  <span className="flex h-16 w-24 items-center justify-center rounded-[12px] bg-ink-50 text-ink-500">
+                    <Icon name="car" className="size-6" />
+                  </span>
+                )}
+                <div className="min-w-0 flex-1">
+                  <p className="text-[15.5px] font-semibold">
+                    {c.make} {c.model} {c.year}
+                  </p>
+                  <p className="tnum text-[13px] text-ink-500 capitalize">
+                    {c.color}
+                    {cRate !== null &&
+                      ` · $${(cRate / 100).toFixed(2)} por km`}
+                  </p>
+                </div>
+                <button
+                  onClick={() => saveCars(cars.filter((_, j) => j !== i))}
+                  className="text-[13px] font-semibold text-ink-500 transition-colors hover:text-danger"
+                >
+                  Quitar
+                </button>
+              </li>
+            );
+          })}
+        </ul>
       )}
 
-      <div className="mt-4">
-        <p className="mb-2 text-[13px] font-semibold text-ink-900">
-          Foto del carro
-        </p>
-        <div className="flex flex-wrap items-center gap-3">
-          {photo ? (
-            /* eslint-disable-next-line @next/next/no-img-element -- data URL locale */
-            <img
-              src={photo}
-              alt="Foto elegida de tu carro"
-              className="h-24 w-36 rounded-[12px] border border-ink-200 object-cover"
-            />
-          ) : (
-            <span className="flex h-24 w-36 items-center justify-center rounded-[12px] border-2 border-dashed border-ink-200 text-ink-400">
-              <Icon name="car" className="size-7" />
-            </span>
-          )}
-          <label className="cursor-pointer rounded-[12px] border-[1.5px] border-ink-200 px-4 py-2.5 text-[13.5px] font-semibold transition-colors hover:border-accent hover:text-accent-ink">
-            {photoBusy ? "Procesando…" : photo ? "Cambiar foto" : "Subir foto"}
-            <input
-              type="file"
-              accept="image/*"
-              className="sr-only"
-              onChange={(e) => onPhoto(e.target.files?.[0])}
-            />
-          </label>
-        </div>
-        <p className="mt-2 text-[12.5px] leading-snug text-ink-500">
-          Una sola foto, del exterior. Nada de placa completa: en tu perfil
-          público solo aparecen el modelo, el color y la foto.
-        </p>
-      </div>
-
-      <div className="mt-5 flex gap-3">
+      {!editing ? (
         <button
-          disabled={!ref}
-          onClick={() => {
-            updateSession({
-              car: { make, model, year, color: color.trim(), photoDataUrl: photo },
-            });
-            setEditing(false);
-          }}
-          className="rounded-[14px] bg-ink-900 px-6 py-3 font-display text-[15px] font-bold text-white transition-colors hover:bg-ink-800 disabled:opacity-50"
+          onClick={() => setEditing(true)}
+          className="rounded-[14px] border-[1.5px] border-ink-200 px-5 py-3 font-display text-[15px] font-bold transition-colors hover:border-accent hover:text-accent-ink"
         >
-          Guardar mi carro
+          {cars.length === 0 ? "Registrar mi carro" : "Agregar otro carro"}
         </button>
-        {saved && (
-          <button
-            onClick={() => setEditing(false)}
-            className="rounded-[14px] border-[1.5px] border-ink-200 px-5 py-3 font-display text-[15px] font-bold transition-colors hover:border-accent"
-          >
-            Cancelar
-          </button>
-        )}
-      </div>
+      ) : (
+        <div className={cars.length > 0 ? "border-t border-ink-200 pt-5" : ""}>
+          <div className="grid gap-2 sm:grid-cols-3">
+            <select
+              value={make}
+              onChange={(e) => {
+                setMake(e.target.value);
+                setModel("");
+              }}
+              aria-label="Marca del carro"
+              className={accountSelect()}
+            >
+              <option value="">Marca…</option>
+              {CAR_MAKES.map((m) => (
+                <option key={m} value={m}>
+                  {m}
+                </option>
+              ))}
+            </select>
+            <select
+              value={model}
+              onChange={(e) => setModel(e.target.value)}
+              disabled={!make}
+              aria-label="Modelo del carro"
+              className={accountSelect()}
+            >
+              <option value="">Modelo…</option>
+              {modelsForMake(make).map((m) => (
+                <option key={m.model} value={m.model}>
+                  {m.model}
+                </option>
+              ))}
+            </select>
+            <select
+              value={year}
+              onChange={(e) => setYear(Number(e.target.value))}
+              disabled={!ref}
+              aria-label="Año del carro"
+              className={accountSelect()}
+            >
+              {CAR_YEARS.map((y) => (
+                <option key={y} value={y}>
+                  {y}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <input
+            value={color}
+            onChange={(e) => setColor(e.target.value)}
+            placeholder="Color (gris, blanco…)"
+            aria-label="Color del carro"
+            className="mt-2 w-full rounded-[12px] border-[1.5px] border-ink-200 px-3.5 py-2.5 text-[14.5px] font-semibold placeholder:font-normal placeholder:text-ink-400 focus:border-accent focus:outline-none sm:max-w-[calc((100%-1rem)/3)]"
+          />
+
+          {ref && l100 !== null && rate !== null && (
+            <p className="tnum mt-2.5 rounded-[12px] bg-ink-50 px-3.5 py-2.5 text-[13px] leading-relaxed text-ink-500">
+              <b className="font-semibold text-ink-900">
+                {make} {model} {year}
+              </b>
+              {" — consumo de referencia ~"}
+              {l100.toFixed(1).replace(".", ",")} L/100 km, o sea{" "}
+              <b className="font-semibold text-ink-900">
+                ${(rate / 100).toFixed(2)} por km
+              </b>
+              .
+            </p>
+          )}
+
+          <div className="mt-4">
+            <p className="mb-2 text-[13px] font-semibold text-ink-900">
+              Foto del carro
+            </p>
+            <div className="flex flex-wrap items-center gap-3">
+              {photo ? (
+                /* eslint-disable-next-line @next/next/no-img-element -- data URL locale */
+                <img
+                  src={photo}
+                  alt="Foto elegida de tu carro"
+                  className="h-24 w-36 rounded-[12px] border border-ink-200 object-cover"
+                />
+              ) : (
+                <span className="flex h-24 w-36 items-center justify-center rounded-[12px] border-2 border-dashed border-ink-200 text-ink-400">
+                  <Icon name="car" className="size-7" />
+                </span>
+              )}
+              <label className="cursor-pointer rounded-[12px] border-[1.5px] border-ink-200 px-4 py-2.5 text-[13.5px] font-semibold transition-colors hover:border-accent hover:text-accent-ink">
+                {photoBusy
+                  ? "Procesando…"
+                  : photo
+                    ? "Cambiar foto"
+                    : "Subir foto"}
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="sr-only"
+                  onChange={(e) => onPhoto(e.target.files?.[0])}
+                />
+              </label>
+            </div>
+            <p className="mt-2 text-[12.5px] leading-snug text-ink-500">
+              Una sola foto, del exterior. Nada de placa completa: en tu perfil
+              público solo aparecen el modelo, el color y la foto.
+            </p>
+          </div>
+
+          <div className="mt-5 flex gap-3">
+            <button
+              disabled={!ref}
+              onClick={addCar}
+              className="rounded-[14px] bg-ink-900 px-6 py-3 font-display text-[15px] font-bold text-white transition-colors hover:bg-ink-800 disabled:opacity-50"
+            >
+              Guardar este carro
+            </button>
+            {cars.length > 0 && (
+              <button
+                onClick={() => setEditing(false)}
+                className="rounded-[14px] border-[1.5px] border-ink-200 px-5 py-3 font-display text-[15px] font-bold transition-colors hover:border-accent"
+              >
+                Cancelar
+              </button>
+            )}
+          </div>
+        </div>
+      )}
     </>
   );
 }

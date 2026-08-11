@@ -83,7 +83,7 @@ export function Hero() {
           Sous 768 px et sans WebGL, les halos seuls font le travail. */}
       <HeroScene />
 
-      <div className="relative z-[2] mx-auto w-full max-w-[1120px] px-5 pt-14 md:pt-24">
+      <div className="relative z-[2] mx-auto w-full max-w-[1120px] px-5 pt-6 md:pt-20">
         <div className="flex flex-col min-[960px]:grid min-[960px]:grid-cols-[1.02fr_0.98fr] min-[960px]:items-start min-[960px]:gap-x-16 min-[960px]:gap-y-8">
           <div className="order-1 min-[960px]:col-start-1 min-[960px]:row-start-1">
             {/* La pilule est revenue avec une RAISON d'exister : annoncer le
@@ -128,17 +128,13 @@ export function Hero() {
             id="buscar"
             className="enter enter-3 relative order-2 mt-7 scroll-mt-24 min-[960px]:col-start-2 min-[960px]:row-span-2 min-[960px]:row-start-1 min-[960px]:mt-0"
           >
-            {/* Deux formes de couleur pleine glissées SOUS la carte : là où
-                le verre les recouvre, il les fond en lumière ; les coins qui
-                dépassent restent nets. C'est le geste des références — un
-                objet vif à moitié mangé par le verre. */}
+            {/* UNE forme de couleur pleine glissée SOUS la carte : là où le
+                verre la recouvre, il la fond en lumière ; le coin qui
+                dépasse reste net. Un seul objet — le geste vaut par sa
+                rareté. */}
             <span
               aria-hidden
               className="absolute -top-5 -left-6 size-24 rotate-[10deg] rounded-[24px] bg-[linear-gradient(135deg,#fde68a,#f59e0b_58%,#d97706)] opacity-90"
-            />
-            <span
-              aria-hidden
-              className="absolute -right-4 -bottom-5 size-20 rounded-full bg-[radial-gradient(circle_at_32%_30%,#bae6fd,#0284c7_80%)] opacity-85"
             />
             <div className="relative">
               <SearchCard />
