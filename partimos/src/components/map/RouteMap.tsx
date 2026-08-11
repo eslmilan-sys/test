@@ -9,6 +9,7 @@ import {
   mapCity,
 } from "@/lib/map";
 import { MAPBOX_TOKEN, panamaOverviewUrl } from "@/lib/mapbox";
+import { CORRIDORS } from "@/lib/corridors";
 
 /**
  * Carte des corridors — sélection de l'origine et de la destination.
@@ -51,7 +52,11 @@ export function RouteMap({
           sont vraies dans les deux cas. */}
       {MAPBOX_TOKEN && (
         <img
-          src={panamaOverviewUrl()}
+          src={panamaOverviewUrl(
+            activeLink
+              ? CORRIDORS.find((c) => c.slug === activeLink.slug)
+              : undefined,
+          )}
           alt=""
           aria-hidden
           width={MAP_VIEWBOX.width}
@@ -74,30 +79,34 @@ export function RouteMap({
           </linearGradient>
         </defs>
 
-        {/* Corridors existants, en fond. Ils montrent d'un coup d'œil ce que
-            la plateforme couvre — l'information que les listes déroulantes,
-            elles, ne donnent jamais. */}
-        <g fill="none" strokeLinecap="round">
-          {MAP_LINKS.map((link) => (
-            <path
-              key={link.slug}
-              d={linkPath(link.from, link.to)}
-              stroke="currentColor"
-              strokeWidth={link.isPriority ? 3 : 2}
-              className="text-ink-200"
-              strokeDasharray={link.isPriority ? undefined : "6 8"}
-            />
-          ))}
+        {/* Sur la VRAIE carte, le tracé vit dans l'image (il suit la
+            route, dessiné par l'API) : les traits SVG se taisent — des
+            courbes abstraites par-dessus une carte routière se lisent
+            comme une erreur. Sans clé, ils reviennent : sur fond nu ce
+            sont eux qui montrent ce que la plateforme couvre. */}
+        {!MAPBOX_TOKEN && (
+          <g fill="none" strokeLinecap="round">
+            {MAP_LINKS.map((link) => (
+              <path
+                key={link.slug}
+                d={linkPath(link.from, link.to)}
+                stroke="currentColor"
+                strokeWidth={link.isPriority ? 3 : 2}
+                className="text-ink-200"
+                strokeDasharray={link.isPriority ? undefined : "6 8"}
+              />
+            ))}
 
-          {activeLink && (
-            <path
-              d={linkPath(activeLink.from, activeLink.to)}
-              stroke={`url(#${id}-active)`}
-              strokeWidth={5}
-              className="[stroke-dasharray:1000] [stroke-dashoffset:0] motion-safe:animate-[draw_0.7s_ease-out]"
-            />
-          )}
-        </g>
+            {activeLink && (
+              <path
+                d={linkPath(activeLink.from, activeLink.to)}
+                stroke={`url(#${id}-active)`}
+                strokeWidth={5}
+                className="[stroke-dasharray:1000] [stroke-dashoffset:0] motion-safe:animate-[draw_0.7s_ease-out]"
+              />
+            )}
+          </g>
+        )}
 
         {MAP_CITIES.map((city) => {
           const isOrigin = city.slug === originSlug;

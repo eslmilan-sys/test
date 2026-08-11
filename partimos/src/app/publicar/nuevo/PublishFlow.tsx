@@ -20,6 +20,7 @@ import {
   type VehicleCategory,
 } from "@/lib/pricing";
 import { formatDayLabel, servedPairCount } from "@/lib/trips";
+import { MAPBOX_TOKEN, corridorStopsMapUrl } from "@/lib/mapbox";
 import {
   CAR_MAKES,
   CAR_YEARS,
@@ -228,7 +229,7 @@ export function PublishFlow() {
           ))}
         </ol>
 
-        <div className="rounded-[22px] border border-ink-200 bg-white p-5 sm:p-6">
+        <div className="glass liquid rounded-[22px] p-5 sm:p-6 [--glass-alpha:0.88]">
           {step === 0 && (
             <>
               <h1 className="mb-1.5 font-display text-[24px] font-extrabold tracking-[-0.03em]">
@@ -349,6 +350,30 @@ export function PublishFlow() {
                   placeholder="Ej. el parque central, tu barriada…"
                 />
               </section>
+
+              {/* LA CARTE DU RECORRIDO, vivante : le tracé suit la route,
+                  l'origine est bleue, la destination verte, et chaque ville
+                  cochée ci-dessous pose son épingle ambre À LA SECONDE où on
+                  la coche. C'est l'API qui redessine — un échange de src,
+                  zéro bibliothèque. */}
+              {MAPBOX_TOKEN && (
+                <figure className="glass liquid mb-6 overflow-hidden rounded-[16px] p-2 [--glass-alpha:0.8]">
+                  {/* eslint-disable-next-line @next/next/no-img-element -- image statique Mapbox, dynamique par src */}
+                  <img
+                    src={corridorStopsMapUrl(corridor, cityStops)}
+                    alt={`Recorrido ${corridor.origin.shortName} → ${corridor.destination.shortName} con tus paradas marcadas`}
+                    width={720}
+                    height={300}
+                    loading="lazy"
+                    decoding="async"
+                    className="h-auto w-full rounded-[11px] object-cover"
+                  />
+                  <figcaption className="px-2 pt-1.5 pb-0.5 text-[12px] text-ink-500">
+                    Azul: sales · Verde: llegas · Ámbar: donde aceptas parar y
+                    recoger — se dibujan al marcar.
+                  </figcaption>
+                </figure>
+              )}
 
               {/* Villes de passage — le multiplicateur de couverture. Un
                   conducteur qui déclare deux arrêts répond à six recherches au

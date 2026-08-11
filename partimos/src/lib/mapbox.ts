@@ -235,11 +235,64 @@ export async function retrievePlace(
  * par-dessus, projetés dans le MÊME Mercator par la MÊME caméra — c'est ce
  * qui les fait tomber au pixel. `@2x` : l'image sert un conteneur fluide.
  */
-export function panamaOverviewUrl(): string {
+export function panamaOverviewUrl(activeCorridor?: Corridor): string {
   const { centerLng, centerLat, zoom, width, height } = MAP_CAMERA;
+  /* Le tracé actif est DESSINÉ PAR L'API, dans l'image : il suit la
+     chaîne des villes traversées (Panamá → La Chorrera → Coronado…),
+     pas une courbe abstraite par-dessus. L'image change quand la
+     sélection change — un simple échange de src. */
+  const path = activeCorridor
+    ? `path-4+f59e0b-0.92(${encodeURIComponent(
+        encodePolyline(
+          activeCorridor.waypoints.map((w) => {
+            const city = cityBySlug(w.citySlug);
+            return [city.lat, city.lng] as [number, number];
+          }),
+        ),
+      )})/`
+    : "";
   return (
     `https://api.mapbox.com/styles/v1/mapbox/light-v11/static/` +
-    `${centerLng.toFixed(5)},${centerLat.toFixed(5)},${zoom.toFixed(3)},0/` +
+    `${path}${centerLng.toFixed(5)},${centerLat.toFixed(5)},${zoom.toFixed(3)},0/` +
     `${width}x${height}@2x?access_token=${MAPBOX_TOKEN}`
+  );
+}
+
+/**
+ * La carte du recorrido pendant la publication : le tracé, l'origine
+ * (bleu), la destination (vert), et UNE épingle ambre par ville où le
+ * conducteur accepte de s'arrêter — elle apparaît quand il coche, elle
+ * disparaît quand il décoche. Dynamique par échange de src : zéro
+ * bibliothèque, la carte suit l'état du formulaire.
+ */
+export function corridorStopsMapUrl(
+  corridor: Corridor,
+  selectedCitySlugs: string[],
+  width = 720,
+  height = 300,
+): string {
+  const points = corridor.waypoints.map((w) => {
+    const city = cityBySlug(w.citySlug);
+    return [city.lat, city.lng] as [number, number];
+  });
+  const path = `path-4+f59e0b-0.9(${encodeURIComponent(encodePolyline(points))})`;
+
+  const origin = cityBySlug(corridor.origin.slug);
+  const destination = cityBySlug(corridor.destination.slug);
+  const stopPins = selectedCitySlugs
+    .map((slug) => {
+      const city = cityBySlug(slug);
+      return city ? `,pin-s+f59e0b(${city.lng},${city.lat})` : "";
+    })
+    .join("");
+  const pins =
+    `pin-s+0369a1(${origin.lng},${origin.lat})` +
+    `,pin-s+4d7c0f(${destination.lng},${destination.lat})` +
+    stopPins;
+
+  return (
+    `https://api.mapbox.com/styles/v1/mapbox/light-v11/static/` +
+    `${path},${pins}/auto/${width}x${height}@2x` +
+    `?padding=48&access_token=${MAPBOX_TOKEN}`
   );
 }
