@@ -1,12 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Container } from "@/components/site/Section";
 import { Icon, type IconName } from "@/components/ui/Icon";
 import { ButtonLink } from "@/components/ui/Button";
 import { AuthDialog } from "@/components/site/AuthDialog";
 import { useSession } from "@/lib/session";
+import {
+  getVerificationState,
+  isSupabaseConfigured,
+  startIdVerification,
+  type VerificationState,
+} from "@/lib/didit";
 
 /**
  * ESPACE COMPTE
@@ -187,30 +193,7 @@ export function AccountSpace() {
         )}
 
         {tab === "verificacion" && (
-          <>
-            <h2 className="mb-4 font-display text-[19px] font-bold">
-              Verificación
-            </h2>
-            <ul className="grid gap-2.5">
-              <Status
-                done
-                label="Celular confirmado"
-                detail="Con el código que acabas de usar"
-              />
-              <Status
-                done={session.isVerified}
-                label="Cédula verificada"
-                detail="La hace un proveedor certificado. No guardamos la imagen ni el número."
-              />
-            </ul>
-            {!session.isVerified && (
-              <p className="mt-4 rounded-[14px] bg-ink-50 px-4 py-3 text-[13.5px] leading-relaxed text-ink-500">
-                La verificación de cédula se activa cuando el proveedor esté
-                contratado. Puedes buscar y reservar sin ella; para publicar sí
-                hace falta.
-              </p>
-            )}
-          </>
+          <VerificacionPanel sessionVerified={session.isVerified} />
         )}
       </div>
 
@@ -227,6 +210,109 @@ export function AccountSpace() {
         </p>
       )}
     </Container>
+  );
+}
+
+/**
+ * Onglet Verificación — la cédula pasa por Didit, nunca por nosotros.
+ *
+ * Con Supabase configurado, el botón pide a la función Edge `didit-start`
+ * una sesión de verificación y redirige al recorrido alojado de Didit ;
+ * el veredicto vuelve por webhook y aquí solo se lee un estado. En modo
+ * demostración no hay backend : el panel lo dice tal cual, sin fingir.
+ */
+function VerificacionPanel({ sessionVerified }: { sessionVerified: boolean }) {
+  const [remote, setRemote] = useState<VerificationState | null>(null);
+  const [launching, setLaunching] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!isSupabaseConfigured) return;
+    let cancelled = false;
+    getVerificationState().then((state) => {
+      if (!cancelled) setRemote(state);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const status = remote?.status ?? "none";
+  const verified = sessionVerified || status === "verified";
+  const pending = status === "pending";
+
+  const launch = async () => {
+    setLaunching(true);
+    setError(null);
+    const result = await startIdVerification();
+    if ("url" in result) {
+      window.location.assign(result.url);
+      return;
+    }
+    setLaunching(false);
+    setError(
+      result.error === "already_verified"
+        ? "Tu cédula ya está verificada."
+        : "No se pudo abrir la verificación. Intenta de nuevo en un momento.",
+    );
+  };
+
+  return (
+    <>
+      <h2 className="mb-4 font-display text-[19px] font-bold">Verificación</h2>
+      <ul className="grid gap-2.5">
+        <Status
+          done
+          label="Celular confirmado"
+          detail="Con el código que acabas de usar"
+        />
+        <Status
+          done={verified}
+          label={
+            pending ? "Cédula en revisión" : "Cédula verificada"
+          }
+          detail={
+            pending
+              ? "Didit está revisando tu documento. El resultado aparece aquí solo."
+              : "La hace Didit, un proveedor certificado. No guardamos la imagen ni el número — solo el resultado."
+          }
+        />
+      </ul>
+
+      {!verified && !pending && isSupabaseConfigured && (
+        <div className="mt-4">
+          <button
+            onClick={launch}
+            disabled={launching}
+            className="rounded-[14px] bg-ink-900 px-6 py-3.5 font-display text-[15.5px] font-bold text-white transition-colors hover:bg-ink-800 disabled:opacity-60"
+          >
+            {launching ? "Abriendo…" : "Verificar mi cédula"}
+          </button>
+          <p className="mt-3 text-[13px] leading-relaxed text-ink-500">
+            Te lleva al recorrido seguro de Didit: foto de la cédula y una
+            selfie, dos minutos. Al terminar vuelves aquí.
+            {status === "rejected" &&
+              " Tu intento anterior no pasó; puedes volver a intentarlo."}
+            {status === "expired" &&
+              " Tu intento anterior expiró; puedes volver a empezar."}
+          </p>
+          {error && (
+            <p role="alert" className="mt-2 text-[13.5px] font-semibold text-danger">
+              {error}
+            </p>
+          )}
+        </div>
+      )}
+
+      {!verified && !isSupabaseConfigured && (
+        <p className="mt-4 rounded-[14px] bg-ink-50 px-4 py-3 text-[13.5px] leading-relaxed text-ink-500">
+          La verificación la hará Didit, un proveedor certificado: nosotros
+          nunca vemos ni guardamos tu cédula, solo el resultado. En esta
+          demostración todavía no está conectada. Puedes buscar y reservar sin
+          ella; para publicar sí hace falta.
+        </p>
+      )}
+    </>
   );
 }
 

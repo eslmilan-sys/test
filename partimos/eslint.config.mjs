@@ -18,6 +18,9 @@ const eslintConfig = defineConfig([
     // nôtre. Elles ne font pas partie de l'application non plus — rien dans
     // src/ ne les importe.
     ".claude/skills/**",
+    // Fonctions Edge Supabase : du Deno (imports npm:, Deno.serve). Les
+    // règles Next/Node ne s'y appliquent pas — c'est un autre runtime.
+    "supabase/functions/**",
   ]),
 ]);
 
