@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
 import { RouteMap } from "@/components/map/RouteMap";
 import { CityCombobox } from "@/components/ui/CityCombobox";
+import { PlacePicker } from "@/components/ui/PlacePicker";
 import { AuthDialog } from "@/components/site/AuthDialog";
 import { useSession } from "@/lib/session";
 import { CORRIDORS, ALL_CITIES, getCorridor } from "@/lib/corridors";
@@ -64,6 +65,8 @@ export function PublishFlow() {
   const [to, setTo] = useState(preset?.destination.slug ?? "chitre");
   const [picking, setPicking] = useState<"origin" | "destination">("origin");
   const [stops, setStops] = useState<string[]>([]);
+  const [exactFrom, setExactFrom] = useState("");
+  const [exactTo, setExactTo] = useState("");
   const [cityStops, setCityStops] = useState<string[]>([]);
   const [date, setDate] = useState(days[1].value);
   const [hour, setHour] = useState("06:00");
@@ -137,10 +140,12 @@ export function PublishFlow() {
             Tu viaje está publicado
           </h1>
           <p className="mb-6 text-[15px] leading-relaxed text-ink-500">
-            {corridor.origin.shortName} → {corridor.destination.shortName},{" "}
-            {formatDayLabel(date)} a las {hour}. {seats}{" "}
-            {seats === 1 ? "puesto" : "puestos"} a {formatUsd(price)}. Te
-            avisamos por WhatsApp en cuanto alguien pida un puesto.
+            {exactFrom || corridor.origin.shortName} →{" "}
+            {exactTo || corridor.destination.shortName}, {formatDayLabel(date)}{" "}
+            a las {hour}. {seats} {seats === 1 ? "puesto" : "puestos"} a{" "}
+            {formatUsd(price)}. Te avisamos por WhatsApp en cuanto alguien pida
+            un puesto — cada quien te propone su punto y tú decides si te queda
+            de paso.
           </p>
           {cityStops.length > 0 && (
             <p className="mb-6 rounded-[14px] bg-accent-soft px-4 py-3 text-[13.5px] leading-relaxed text-accent-ink">
@@ -295,6 +300,30 @@ export function PublishFlow() {
               <p className="mb-5 text-[14.5px] leading-relaxed text-ink-500">
                 Tú decides el recorrido. Marca solo lo que ya te queda de paso.
               </p>
+
+              {/* Le point EXACT du conducteur : c'est LUI qui fixe d'où il
+                  part vraiment et jusqu'où il va (R4). Les passagers
+                  proposeront leur point ensuite — et c'est lui qui accepte
+                  ou pas. Catalogue local + géocodeur Mapbox, saisie libre
+                  toujours valable. */}
+              <section className="mb-6 grid gap-3 sm:grid-cols-2">
+                <PlacePicker
+                  id="pub-salida-exacta"
+                  label={`Sales exactamente de… (${corridor.origin.shortName})`}
+                  citySlug={corridor.origin.slug}
+                  value={exactFrom}
+                  onChange={setExactFrom}
+                  placeholder="Ej. Multiplaza, Parque Omar…"
+                />
+                <PlacePicker
+                  id="pub-llegada-exacta"
+                  label={`Llegas hasta… (${corridor.destination.shortName})`}
+                  citySlug={corridor.destination.slug}
+                  value={exactTo}
+                  onChange={setExactTo}
+                  placeholder="Ej. el parque central, tu barriada…"
+                />
+              </section>
 
               {/* Villes de passage — le multiplicateur de couverture. Un
                   conducteur qui déclare deux arrêts répond à six recherches au

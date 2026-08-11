@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { Command } from "cmdk";
 import { ALL_CITIES } from "@/lib/corridors";
+import { searchPlaces } from "@/lib/places";
 import { Icon } from "@/components/ui/Icon";
 
 /**
@@ -59,6 +60,19 @@ export function CityCombobox({
     });
   }, [query, exclude]);
 
+  /* Les LIEUX connus aussi : taper « multiplaza » ou « machetazo » doit
+     marcher — les gens pensent en repères, pas en municipios. Choisir un
+     lieu sélectionne sa ville. */
+  const placeResults = useMemo(
+    () =>
+      searchPlaces(query).filter(
+        (p) =>
+          p.citySlug !== exclude &&
+          ALL_CITIES.some((c) => c.slug === p.citySlug),
+      ),
+    [query, exclude],
+  );
+
   return (
     <div className="relative">
       <div className="flex items-center gap-3 rounded-[14px] px-3.5 py-3 transition-colors hover:bg-ink-50">
@@ -112,12 +126,34 @@ export function CityCombobox({
           className="absolute inset-x-0 top-full z-30 mt-1 overflow-hidden rounded-[14px] border border-ink-200 bg-white shadow-lift"
         >
           <Command.List className="max-h-64 overflow-y-auto p-1.5">
-            {results.length === 0 && (
+            {results.length === 0 && placeResults.length === 0 && (
               <Command.Empty className="px-3 py-3 text-[14px] text-ink-500">
                 Todavía no llegamos a esa ciudad. Escríbela igual y te avisamos
                 cuando abramos la ruta.
               </Command.Empty>
             )}
+            {placeResults.map((place) => {
+              const placeCity = ALL_CITIES.find(
+                (c) => c.slug === place.citySlug,
+              )!;
+              return (
+                <Command.Item
+                  key={`place-${place.name}`}
+                  value={`place-${place.name}`}
+                  onMouseDown={(e) => e.preventDefault()}
+                  onSelect={() => {
+                    onChange(place.citySlug);
+                    setOpen(false);
+                  }}
+                  className="flex cursor-pointer items-baseline justify-between gap-3 rounded-[10px] px-3 py-2.5 text-[15px] data-[selected=true]:bg-ink-50"
+                >
+                  <span className="font-semibold">{place.name}</span>
+                  <span className="text-[12.5px] text-ink-500">
+                    {placeCity.shortName}
+                  </span>
+                </Command.Item>
+              );
+            })}
             {results.map((city) => (
               <Command.Item
                 key={city.slug}

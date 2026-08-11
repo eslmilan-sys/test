@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { ChatSheet } from "./ChatSheet";
+import { PlacePicker } from "@/components/ui/PlacePicker";
 import { Icon } from "@/components/ui/Icon";
 import { AuthDialog } from "@/components/site/AuthDialog";
 import { useSession } from "@/lib/session";
@@ -32,6 +33,8 @@ type Props = {
   baseKm: number;
   tollCents: number;
   category: VehicleCategory | number;
+  /** Ville où le passager monte — nourrit le sélecteur de lieu exact. */
+  citySlug: string;
   seatsOffered: number;
   instantBooking: boolean;
 };
@@ -39,6 +42,7 @@ type Props = {
 export function BookingPanel({
   tripId,
   driverName,
+  citySlug,
   priceCents,
   seatsLeft,
   stops,
@@ -54,12 +58,25 @@ export function BookingPanel({
   const [customPoint, setCustomPoint] = useState("");
   const [extraKm, setExtraKm] = useState(5);
   const [booked, setBooked] = useState(false);
+  /* L'offre du passager : MOINS que l'aporte publié, jamais plus. Offrir
+     plus serait enchérir — le prix suivrait la demande, exactement ce que
+     la règle R3 interdit. Vers le bas, c'est une négociation entre
+     particuliers : le conducteur accepte ou refuse. */
+  const [offerOpen, setOfferOpen] = useState(false);
+  const [offerCents, setOfferCents] = useState<number | null>(null);
 
   const isCustom = stopIndex === stops.length;
   const quote = quoteDetour(baseKm, tollCents, extraKm, category, seatsOffered);
-  const unitCents = isCustom ? priceCents + quote.extraCents : priceCents;
+  const activeOffer = offerOpen && offerCents !== null && offerCents < priceCents;
+  const baseCents = activeOffer ? offerCents : priceCents;
+  /* Les km de détour restent en sus de l'offre : ils compensent un coût
+     réel, ils ne se négocient pas. */
+  const unitCents = isCustom ? baseCents + quote.extraCents : baseCents;
   const totalCents = unitCents * seats;
   const blocked = isCustom && !quote.accepted;
+  /* Une offre ou un point proposé retirent la réservation instantanée :
+     il y a une décision humaine à prendre de l'autre côté. */
+  const needsDriverOk = !instantBooking || isCustom || activeOffer;
 
   if (booked) {
     return (
@@ -68,14 +85,16 @@ export function BookingPanel({
           <Icon name="check" className="size-5" />
         </span>
         <h2 className="mb-2 font-display text-[20px] font-bold">
-          {instantBooking ? "Puesto confirmado" : "Solicitud enviada"}
+          {needsDriverOk ? "Solicitud enviada" : "Puesto confirmado"}
         </h2>
         <p className="mb-4 text-[14.5px] leading-relaxed text-ink-500">
-          {instantBooking
-            ? `Ya tienes tu puesto. Te compartimos el número de ${driverName} para que coordinen la hora y el punto exacto.`
-            : `${driverName} tiene 24 horas para confirmarte. Te avisamos por WhatsApp apenas responda.`}
+          {needsDriverOk
+            ? `${driverName} tiene 24 horas para responder${
+                activeOffer ? ` a tu oferta de ${formatUsd(unitCents)}` : ""
+              }${isCustom ? " y a tu punto propuesto" : ""}. Te avisamos por WhatsApp apenas decida.`
+            : `Ya tienes tu puesto. Te compartimos el número de ${driverName} para que coordinen la hora y el punto exacto.`}
         </p>
-        {instantBooking && (
+        {!needsDriverOk && (
           <p className="tnum mb-4 inline-flex items-center gap-2 rounded-[10px] bg-ink-50 px-3 py-2 text-[14px] font-semibold">
             <Icon name="phone" className="size-4" />
             {driverName} · +507 6XXX-4471
@@ -157,14 +176,19 @@ export function BookingPanel({
 
       {isCustom && (
         <div className="mb-4 rounded-[14px] bg-ink-50 p-4">
-          <input
-            type="text"
-            value={customPoint}
-            onChange={(e) => setCustomPoint(e.target.value)}
-            placeholder="Ej. Vía Israel, frente al parque"
-            aria-label="Tu punto de recogida"
-            className="mb-3 w-full rounded-[10px] border border-ink-200 bg-white px-3 py-2 text-[14.5px] focus:border-accent focus:outline-none"
-          />
+          <div className="mb-3">
+            <PlacePicker
+              id="book-punto"
+              label="Tu punto exacto"
+              citySlug={citySlug}
+              value={customPoint}
+              onChange={setCustomPoint}
+              placeholder="Ej. Multiplaza, Vía Israel, frente al parque…"
+            />
+            <p className="mt-1.5 text-[12px] leading-snug text-ink-500">
+              {`${driverName} decide si le queda de paso — el recorrido es suyo.`}
+            </p>
+          </div>
           <div className="mb-1 flex items-baseline justify-between">
             <label
               htmlFor="book-km"
@@ -203,10 +227,65 @@ export function BookingPanel({
         </div>
       )}
 
+      {/* L'offre : vers le bas seulement. Le curseur ne PEUT pas dépasser
+          l'aporte publié — enchérir n'existe pas ici (R3). */}
+      <div className="mb-4">
+        <button
+          type="button"
+          aria-expanded={offerOpen}
+          onClick={() => {
+            setOfferOpen((v) => !v);
+            if (offerCents === null) setOfferCents(priceCents);
+          }}
+          className="text-[13.5px] font-semibold text-accent-ink hover:underline"
+        >
+          {offerOpen ? "Quitar mi oferta" : "Ofrecer otro aporte"}
+        </button>
+        {offerOpen && (
+          <div className="mt-2.5 rounded-[14px] bg-ink-50 p-4">
+            <div className="mb-1 flex items-baseline justify-between">
+              <label
+                htmlFor="book-oferta"
+                className="text-[12px] font-semibold text-ink-500"
+              >
+                Tu oferta por puesto
+              </label>
+              <b className="tnum text-[16px]">
+                {formatUsd(offerCents ?? priceCents)}
+              </b>
+            </div>
+            <input
+              id="book-oferta"
+              type="range"
+              min={0}
+              max={priceCents}
+              step={50}
+              value={offerCents ?? priceCents}
+              onChange={(e) => setOfferCents(Number(e.target.value))}
+              className="h-1.5 w-full cursor-pointer appearance-none rounded-full bg-ink-200 [&::-moz-range-thumb]:size-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-4 [&::-moz-range-thumb]:border-accent [&::-moz-range-thumb]:bg-white [&::-webkit-slider-thumb]:size-5 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-4 [&::-webkit-slider-thumb]:border-accent [&::-webkit-slider-thumb]:bg-white"
+            />
+            <p className="mt-2 text-[12.5px] leading-relaxed text-ink-500">
+              {activeOffer ? (
+                <>
+                  {driverName} decide si la acepta — la reserva queda en
+                  solicitud hasta que responda.
+                </>
+              ) : (
+                <>
+                  Puedes ofrecer menos, nunca más: subir el aporte porque hay
+                  demanda es justo lo que aquí no existe.
+                </>
+              )}
+            </p>
+          </div>
+        )}
+      </div>
+
       <dl className="mb-4 border-t border-ink-200 pt-3.5 text-[14.5px]">
         <div className="flex justify-between gap-3 py-1">
           <dt className="text-ink-500">
             {seats} × {formatUsd(unitCents)}
+            {activeOffer && " (tu oferta)"}
           </dt>
           <dd className="tnum font-semibold">{formatUsd(totalCents)}</dd>
         </div>
@@ -229,7 +308,7 @@ export function BookingPanel({
           disabled={blocked}
           onClick={() => setBooked(true)}
         >
-          {instantBooking ? "Reservar mi puesto" : "Pedir el puesto"}
+          {needsDriverOk ? "Pedir el puesto" : "Reservar mi puesto"}
         </Button>
       ) : (
         <AuthDialog

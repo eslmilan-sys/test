@@ -77,6 +77,59 @@ export function corridorMapUrl(
   );
 }
 
+/** Un résultat du géocodeur, réduit à ce que l'interface affiche. */
+export type GeocodedPlace = {
+  /** Nom court (« Multicentro ») */
+  name: string;
+  /** Contexte lisible (« Avenida Balboa, Panamá ») */
+  context: string;
+};
+
+/**
+ * Recherche de lieux via le géocodeur Mapbox — le jeton public suffit.
+ *
+ * Borné au Panama, en espagnol, centré sur la ville concernée pour que
+ * « el rey » trouve le supermarché d'à côté et pas celui de David. Toute
+ * erreur (réseau, quota, jeton absent) renvoie une liste vide : le
+ * catalogue local et la saisie libre restent, rien ne casse jamais.
+ */
+export async function geocodePlaces(
+  query: string,
+  near?: { lat: number; lng: number },
+  signal?: AbortSignal,
+): Promise<GeocodedPlace[]> {
+  if (!MAPBOX_TOKEN || query.trim().length < 3) return [];
+  const params = new URLSearchParams({
+    access_token: MAPBOX_TOKEN,
+    country: "pa",
+    language: "es",
+    limit: "5",
+    types: "poi,address,neighborhood,locality",
+  });
+  if (near) params.set("proximity", `${near.lng},${near.lat}`);
+  try {
+    const res = await fetch(
+      `https://api.mapbox.com/geocoding/v5/mapbox.places/` +
+        `${encodeURIComponent(query.trim())}.json?${params}`,
+      { signal },
+    );
+    if (!res.ok) return [];
+    const data = (await res.json()) as {
+      features?: { text_es?: string; text: string; place_name_es?: string; place_name: string }[];
+    };
+    return (data.features ?? []).map((f) => {
+      const name = f.text_es ?? f.text;
+      const full = f.place_name_es ?? f.place_name;
+      const context = full
+        .replace(`${name}, `, "")
+        .replace(/, Panam[aá]$/i, "");
+      return { name, context };
+    });
+  } catch {
+    return [];
+  }
+}
+
 /**
  * La vue d'ensemble du pays pour le sélecteur de la recherche. PAS de
  * marqueurs dans l'image : les villes sont les boutons interactifs posés
