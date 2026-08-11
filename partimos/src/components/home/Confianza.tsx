@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Section, Eyebrow, SectionTitle } from "@/components/site/Section";
 import { Icon, type IconName } from "@/components/ui/Icon";
+import { GlassIcon, type GlassTone } from "@/components/ui/GlassIcon";
 import { Photo } from "@/components/ui/Photo";
 import { PHOTOS } from "@/lib/photos";
 
@@ -51,9 +52,7 @@ export function TrustCard({
 }) {
   return (
     <div className="rounded-[18px] border border-ink-200 bg-white p-5.5 transition-[border-color,transform] duration-200 hover:-translate-y-0.5 hover:border-accent">
-      <span className="mb-3.5 flex size-10.5 items-center justify-center rounded-xl bg-ink-50 text-ink-900">
-        <Icon name={icon} className="size-5.5" />
-      </span>
+      <GlassIcon name={icon} size="sm" className="mb-3.5" />
       <h3 className="mb-1.5 font-display text-[16.5px] font-bold tracking-[-0.015em]">
         {title}
       </h3>
@@ -98,14 +97,16 @@ export function Confianza() {
         </article>
 
         <div className="grid gap-3.5">
-          {rest.map((item) => (
+          {rest.map((item, i) => (
             <div
               key={item.title}
               className="flex items-start gap-4 rounded-[18px] border border-ink-200 bg-white p-5 transition-[border-color] hover:border-accent"
             >
-              <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-ink-50 text-ink-900">
-                <Icon name={item.icon} className="size-5" />
-              </span>
+              <GlassIcon
+                name={item.icon}
+                tone={(["sky", "green", "amber"] as GlassTone[])[i % 3]}
+                size="sm"
+              />
               <div className="min-w-0">
                 <h3 className="mb-1 font-display text-[16.5px] font-bold tracking-[-0.015em]">
                   {item.title}

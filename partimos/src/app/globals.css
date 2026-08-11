@@ -472,6 +472,42 @@
       saturate(185%);
   }
 
+  /* ---- PARALLAXE DU PREMIER ÉCRAN ----
+     Le texte s'éloigne en profondeur quand on descend : chaque couche
+     traîne d'une vitesse différente (le badge est le plus « loin », il
+     traîne le plus), et l'ensemble s'éteint doucement. Piloté par le
+     défilement NATIF, comme la barre — pas un écouteur JS. Les classes
+     vivent sur des CONTENEURS, jamais sur les éléments `.enter` : deux
+     animations qui écrivent transform sur le même nœud se marchent
+     dessus, et c'est l'entrée qui perdrait. */
+  @supports (animation-timeline: scroll()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .para-lejos,
+      .para-medio,
+      .para-cerca {
+        animation: para-fuite linear both;
+        animation-timeline: scroll(root block);
+        animation-range: 0 640px;
+      }
+      .para-lejos {
+        --para-y: 120px;
+      }
+      .para-medio {
+        --para-y: 72px;
+      }
+      .para-cerca {
+        --para-y: 34px;
+      }
+    }
+  }
+
+  @keyframes para-fuite {
+    to {
+      transform: translateY(var(--para-y));
+      opacity: 0.1;
+    }
+  }
+
   .nav-pill {
     --glass-alpha: 0.6;
     -webkit-backdrop-filter: blur(var(--glass-blur-2xl)) saturate(190%);

@@ -1,6 +1,7 @@
 import { SearchCard } from "./SearchCard";
 import { LiveStrip } from "./LiveStrip";
-import { Icon, type IconName } from "@/components/ui/Icon";
+import { type IconName } from "@/components/ui/Icon";
+import { GlassIcon, type GlassTone } from "@/components/ui/GlassIcon";
 import { HeroScene } from "./HeroScene";
 
 /**
@@ -39,20 +40,33 @@ import { HeroScene } from "./HeroScene";
  * ensuite sur toute une section. Le confort du trajet, lui, n'était écrit
  * nulle part — alors que c'est la vraie différence vécue.
  */
-const PROOF: { icon: IconName; title: string; detail: string }[] = [
+const PROOF: {
+  icon: IconName;
+  tone: GlassTone;
+  title: string;
+  detail: string;
+}[] = [
   {
     icon: "pin",
+    tone: "amber",
     title: "Te recogen donde te sirve",
     detail: "Escoges el punto al reservar",
   },
   {
     icon: "car",
+    tone: "sky",
     title: "Vas sentado y con espacio",
     detail: "Tu maleta atrás, sin transbordos",
   },
-  { icon: "id", title: "Sabes quién maneja", detail: "Cédula verificada" },
+  {
+    icon: "id",
+    tone: "green",
+    title: "Sabes quién maneja",
+    detail: "Cédula verificada",
+  },
   {
     icon: "check",
+    tone: "amber",
     title: "Reservar es gratis",
     detail: "Le pagas a la persona",
   },
@@ -78,32 +92,57 @@ export function Hero() {
                 bruit ; un badge de lancement est une information, et il
                 partira quand le lancement sera vieux. Les 12 routes sont
                 réelles : douze pages, une par sens. */}
-            <p className="glass enter enter-1 mb-5 inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-[12.5px] font-semibold text-ink-600">
-              <span className="font-display font-bold tracking-wide text-action-deep uppercase">
-                Lanzamiento
-              </span>
-              12 rutas abiertas por todo el país
-            </p>
+            {/* Trois couches de profondeur : le badge est le plus « loin »
+                (il traîne le plus au défilement), le titre au milieu, le
+                texte d'accroche devant. Le parallaxe vit sur ces conteneurs
+                — les éléments `.enter` gardent leur transform d'entrée. */}
+            <div className="para-lejos">
+              <p className="glass enter enter-1 mb-5 inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-[12.5px] font-semibold text-ink-600">
+                <span className="font-display font-bold tracking-wide text-action-deep uppercase">
+                  Lanzamiento
+                </span>
+                12 rutas abiertas por todo el país
+              </p>
+            </div>
 
-            <h1 className="enter enter-2 mb-5 text-[clamp(36px,7.4vw,62px)] leading-[0.98] font-extrabold tracking-[-0.045em]">
-              Viaja con{" "}
-              <em className="text-action-deep not-italic">quien ya va</em> para
-              allá.
-            </h1>
+            <div className="para-medio">
+              <h1 className="enter enter-2 mb-5 text-[clamp(36px,7.4vw,62px)] leading-[0.98] font-extrabold tracking-[-0.045em]">
+                Viaja con{" "}
+                <em className="text-action-deep not-italic">quien ya va</em>{" "}
+                para allá.
+              </h1>
+            </div>
 
-            <p className="enter enter-2 max-w-[44ch] text-[17px] leading-[1.5] font-light text-ink-600 md:text-[19px]">
-              Partimos junta a quien maneja con quien va para el mismo lado — de
-              bajada al interior o de vuelta a la ciudad. Reservas sin pagar
-              nada y haces el camino sentado, con una sola parada: la tuya.
-            </p>
+            <div className="para-cerca">
+              <p className="enter enter-2 max-w-[44ch] text-[17px] leading-[1.5] font-light text-ink-600 md:text-[19px]">
+                Partimos junta a quien maneja con quien va para el mismo lado —
+                de bajada al interior o de vuelta a la ciudad. Reservas sin
+                pagar nada y haces el camino sentado, con una sola parada: la
+                tuya.
+              </p>
+            </div>
           </div>
 
           {/* La recherche : deuxième sur téléphone, colonne de droite ensuite. */}
           <div
             id="buscar"
-            className="enter enter-3 order-2 mt-7 scroll-mt-24 min-[960px]:col-start-2 min-[960px]:row-span-2 min-[960px]:row-start-1 min-[960px]:mt-0"
+            className="enter enter-3 relative order-2 mt-7 scroll-mt-24 min-[960px]:col-start-2 min-[960px]:row-span-2 min-[960px]:row-start-1 min-[960px]:mt-0"
           >
-            <SearchCard />
+            {/* Deux formes de couleur pleine glissées SOUS la carte : là où
+                le verre les recouvre, il les fond en lumière ; les coins qui
+                dépassent restent nets. C'est le geste des références — un
+                objet vif à moitié mangé par le verre. */}
+            <span
+              aria-hidden
+              className="absolute -top-5 -left-6 size-24 rotate-[10deg] rounded-[24px] bg-[linear-gradient(135deg,#fde68a,#f59e0b_58%,#d97706)] opacity-90"
+            />
+            <span
+              aria-hidden
+              className="absolute -right-4 -bottom-5 size-20 rounded-full bg-[radial-gradient(circle_at_32%_30%,#bae6fd,#0284c7_80%)] opacity-85"
+            />
+            <div className="relative">
+              <SearchCard />
+            </div>
           </div>
 
           <ul className="enter enter-4 order-3 mt-8 grid grid-cols-2 border-t border-ink-200 min-[960px]:col-start-1 min-[960px]:row-start-2 min-[960px]:mt-0">
@@ -116,9 +155,11 @@ export function Hero() {
                   index > 1 ? "border-t border-ink-200" : "",
                 ].join(" ")}
               >
-                <Icon
+                <GlassIcon
                   name={item.icon}
-                  className="mb-2.5 size-5 text-accent-ink"
+                  tone={item.tone}
+                  size="sm"
+                  className="mb-3"
                 />
                 <b className="block font-display text-[15.5px] leading-tight font-bold tracking-[-0.02em] md:text-[17px]">
                   {item.title}
