@@ -87,6 +87,10 @@ export function CityCombobox({
      silencieux sans jeton. */
   const [remote, setRemote] = useState<FoundPlace[]>([]);
   const [resolving, setResolving] = useState<string | null>(null);
+  /* Jamais un clic qui ne fait rien : quand un lieu ne peut pas devenir
+     une ville (échec de résolution, ou même ville que l'autre champ),
+     on le DIT sous le champ au lieu d'avaler le clic. */
+  const [notice, setNotice] = useState<string | null>(null);
   const debounce = useRef<number>(0);
   useEffect(() => {
     if (!open || !GEOSEARCH_ENABLED || query.trim().length < 3) return;
@@ -111,6 +115,16 @@ export function CityCombobox({
           !results.some((c) => normalize(c.name) === normalize(r.name)) &&
           !placeResults.some((p) => normalize(p.name) === normalize(r.name)),
       )
+      .map((r) => ({
+        ...r,
+        /* Coordonnées connues (TomTom, LocationIQ) : la ville s'affiche
+           AVANT le clic — on sait où on va atterrir. Mapbox (coords au
+           retrieve) : résolue au clic. */
+        city:
+          r.lat !== 0 || r.lng !== 0
+            ? nearestCity(r.lat, r.lng, ALL_CITIES)
+            : null,
+      }))
       .slice(0, 4);
   }, [remote, query, results, placeResults]);
 
@@ -119,6 +133,7 @@ export function CityCombobox({
      la plus proche devient la valeur du champ. */
   const pickRemote = async (r: FoundPlace) => {
     setResolving(r.mapboxId || r.name);
+    setNotice(null);
     const coords =
       r.lat !== 0 || r.lng !== 0
         ? { lat: r.lat, lng: r.lng }
@@ -126,9 +141,17 @@ export function CityCombobox({
           ? await retrievePlace(r.mapboxId)
           : null;
     setResolving(null);
-    if (!coords) return;
+    if (!coords) {
+      setNotice("No pudimos ubicar ese lugar. Elige una ciudad de la lista.");
+      return;
+    }
     const city = nearestCity(coords.lat, coords.lng, ALL_CITIES);
-    if (city.slug === exclude) return;
+    if (city.slug === exclude) {
+      setNotice(
+        `Ese lugar queda por ${city.name}, que ya es tu otro punto.`,
+      );
+      return;
+    }
     onChange(city.slug);
     setOpen(false);
   };
@@ -165,7 +188,10 @@ export function CityCombobox({
               setQuery("");
               setOpen(true);
             }}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setNotice(null);
+            }}
             onBlur={() => window.setTimeout(() => setOpen(false), 120)}
             onKeyDown={(e) => {
               if (e.key === "Escape") setOpen(false);
@@ -194,6 +220,23 @@ export function CityCombobox({
                 cuando abramos la ruta.
               </Command.Empty>
             )}
+            {results.map((city) => (
+              <Command.Item
+                key={city.slug}
+                value={city.slug}
+                onMouseDown={(e) => e.preventDefault()}
+                onSelect={() => {
+                  onChange(city.slug);
+                  setOpen(false);
+                }}
+                className="flex cursor-pointer items-baseline justify-between gap-3 rounded-[10px] px-3 py-2.5 text-[15px] data-[selected=true]:bg-ink-50"
+              >
+                <span className="font-semibold">{city.name}</span>
+                <span className="text-[12.5px] text-ink-500">
+                  {city.province}
+                </span>
+              </Command.Item>
+            ))}
             {placeResults.map((place) => {
               const placeCity = ALL_CITIES.find(
                 (c) => c.slug === place.citySlug,
@@ -233,29 +276,22 @@ export function CityCombobox({
                   </span>
                 </span>
                 <span className="shrink-0 text-[12.5px] font-semibold text-accent-ink">
-                  {resolving === (r.mapboxId || r.name) ? "…" : "→ ruta"}
-                </span>
-              </Command.Item>
-            ))}
-            {results.map((city) => (
-              <Command.Item
-                key={city.slug}
-                value={city.slug}
-                onMouseDown={(e) => e.preventDefault()}
-                onSelect={() => {
-                  onChange(city.slug);
-                  setOpen(false);
-                }}
-                className="flex cursor-pointer items-baseline justify-between gap-3 rounded-[10px] px-3 py-2.5 text-[15px] data-[selected=true]:bg-ink-50"
-              >
-                <span className="font-semibold">{city.name}</span>
-                <span className="text-[12.5px] text-ink-500">
-                  {city.province}
+                  {resolving === (r.mapboxId || r.name)
+                    ? "…"
+                    : r.city
+                      ? `→ ${r.city.name.replace("Ciudad de ", "")}`
+                      : "→ elegir"}
                 </span>
               </Command.Item>
             ))}
           </Command.List>
         </Command>
+      )}
+
+      {notice && (
+        <p role="alert" className="mt-1.5 px-1 text-[12.5px] font-medium text-danger">
+          {notice}
+        </p>
       )}
     </div>
   );

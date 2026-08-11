@@ -82,6 +82,13 @@ export function PublishFlow() {
   const [date, setDate] = useState(days[1].value);
   const [hour, setHour] = useState("06:00");
   const [seats, setSeats] = useState(3);
+  /* Le trajet du lundi est souvent celui de TOUS les lundis : la
+     récurrence évite de republier le même viaje chaque semaine. Chaque
+     occurrence reste un viaje à part entière (sa page, ses réservations,
+     son instantané de barème). */
+  const [recurrence, setRecurrence] = useState<
+    "una-vez" | "diario" | "semanal" | "mensual"
+  >("una-vez");
   const [category, setCategory] = useState<VehicleCategory>("standard");
   const [carMake, setCarMake] = useState("");
   const [carModel, setCarModel] = useState("");
@@ -158,9 +165,12 @@ export function PublishFlow() {
             {exactFrom || corridor.origin.shortName} →{" "}
             {exactTo || corridor.destination.shortName}, {formatDayLabel(date)}{" "}
             a las {hour}. {seats} {seats === 1 ? "puesto" : "puestos"} a{" "}
-            {formatUsd(price)}. Te avisamos por WhatsApp en cuanto alguien pida
-            un puesto — cada quien te propone su punto y tú decides si te queda
-            de paso.
+            {formatUsd(price)}
+            {recurrence === "diario" && ", repetido cada día"}
+            {recurrence === "semanal" && ", repetido cada semana"}
+            {recurrence === "mensual" && ", repetido cada mes"}. Te avisamos
+            por WhatsApp en cuanto alguien pida un puesto — cada quien te
+            propone su punto y tú decides si te queda de paso.
           </p>
           {cityStops.length > 0 && (
             <p className="mb-6 rounded-[14px] bg-accent-soft px-4 py-3 text-[13.5px] leading-relaxed text-accent-ink">
@@ -528,6 +538,39 @@ export function PublishFlow() {
                     </button>
                   ))}
                 </div>
+              </fieldset>
+
+              <fieldset className="mt-5">
+                <legend className="mb-2 text-[11.5px] font-bold tracking-[0.11em] text-ink-500 uppercase">
+                  ¿Se repite?
+                </legend>
+                <div className="flex flex-wrap gap-2">
+                  {(
+                    [
+                      ["una-vez", "Solo esta vez"],
+                      ["diario", "Cada día"],
+                      ["semanal", "Cada semana"],
+                      ["mensual", "Cada mes"],
+                    ] as const
+                  ).map(([value, label]) => (
+                    <button
+                      key={value}
+                      type="button"
+                      aria-pressed={recurrence === value}
+                      onClick={() => setRecurrence(value)}
+                      className={pill(recurrence === value)}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+                {recurrence !== "una-vez" && (
+                  <p className="mt-2 text-[12.5px] leading-relaxed text-ink-500">
+                    Cada salida se publica como su propio viaje: puedes
+                    cancelar una sin tocar las demás, y el aporte se congela
+                    viaje por viaje.
+                  </p>
+                )}
               </fieldset>
 
               <fieldset className="mt-5">
