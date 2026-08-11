@@ -18,6 +18,7 @@
 
 import {
   ArrowRight,
+  ArrowUpDown,
   Banknote,
   Bell,
   Briefcase,
@@ -62,6 +63,7 @@ const ICONS = {
   plus: Plus,
   cross: X,
   arrowRight: ArrowRight,
+  swap: ArrowUpDown,
   bus: Bus,
   bell: Bell,
   briefcase: Briefcase,

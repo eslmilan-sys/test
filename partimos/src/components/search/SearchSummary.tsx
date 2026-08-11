@@ -96,7 +96,7 @@ export function SearchSummary({
             Cambia el origen, el destino, la fecha o el número de pasajeros.
           </Dialog.Description>
 
-          <div className="rounded-[18px] border border-ink-200">
+          <div className="relative rounded-[18px] border border-ink-200">
             <CityCombobox
               id="sheet-desde"
               label="Desde"
@@ -105,6 +105,18 @@ export function SearchSummary({
               tone="origin"
               onChange={(slug) => setDraft((d) => ({ ...d, from: slug }))}
             />
+            {/* Inverser en un geste : le retour est la moitié des recherches,
+                le retaper en deux listes était la vraie friction. */}
+            <button
+              type="button"
+              aria-label="Invertir origen y destino"
+              onClick={() =>
+                setDraft((d) => ({ ...d, from: d.to, to: d.from }))
+              }
+              className="absolute top-1/2 right-3 z-10 flex size-9 -translate-y-1/2 items-center justify-center rounded-full border border-ink-200 bg-white text-ink-500 shadow-sm transition-colors hover:border-accent hover:text-accent-ink"
+            >
+              <Icon name="swap" className="size-4" />
+            </button>
             <div className="border-t border-ink-200">
               <CityCombobox
                 id="sheet-hacia"

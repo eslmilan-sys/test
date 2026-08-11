@@ -52,7 +52,7 @@ export function quoteDetour(
   baseKm: number,
   tollCents: number,
   extraKm: number,
-  category: VehicleCategory,
+  category: VehicleCategory | number,
   seats: number,
 ): DetourQuote {
   // Vitesse moyenne interurbaine au Panama, pour convertir des kilomètres

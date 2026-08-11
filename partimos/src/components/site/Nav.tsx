@@ -57,7 +57,7 @@ export function Nav() {
       <header className="pointer-events-none sticky top-0 z-50 px-3 pt-[var(--nav-gap)] pb-[var(--nav-gap)]">
         <nav
           aria-label="Principal"
-          className="glass nav-pill pointer-events-auto mx-auto flex h-[var(--nav-h)] max-w-[1120px] items-center gap-4 rounded-[22px] px-4 sm:px-6"
+          className="glass nav-pill pointer-events-auto mx-auto flex h-[var(--nav-h)] max-w-[1120px] items-center gap-3 rounded-full pr-2.5 pl-4 sm:pr-3 sm:pl-6"
         >
           <Logo gradientId="brand-nav" />
 
@@ -86,7 +86,7 @@ export function Nav() {
             </span>
 
             <span className="hidden min-[900px]:block">
-              <ButtonLink href="/buscar" size="sm">
+              <ButtonLink href="/buscar" size="sm" className="rounded-full!">
                 Buscar viaje
               </ButtonLink>
             </span>

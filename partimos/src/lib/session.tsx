@@ -22,6 +22,19 @@ import { isSupabaseConfigured } from "./supabase";
  * garantirait pas la cohérence entre deux composants abonnés.
  */
 
+/** Le carro enregistré du conducteur. Choisi dans le catalogue : c'est lui
+ *  qui fixe le taux au km à la publication, et sa photo rassure le passager
+ *  qui cherche le bon véhicule au point de rencontre. */
+export type SavedCar = {
+  make: string;
+  model: string;
+  year: number;
+  color: string;
+  /** Photo compressée (JPEG ~800 px) en data URL — mode démonstration.
+   *  Avec Supabase, elle partira dans le bucket Storage `carros`. */
+  photoDataUrl: string | null;
+};
+
 export type Session = {
   /** Téléphone en E.164 ou adresse e-mail, selon le canal choisi. */
   contact: string;
@@ -33,6 +46,7 @@ export type Session = {
   /** Insigne employeur ou université, si l'utilisateur l'a connecté. */
   affiliation: string | null;
   since: string;
+  car?: SavedCar | null;
 };
 
 const STORAGE_KEY = "partimos.demo-session";
@@ -106,6 +120,26 @@ export function useSession() {
     [],
   );
 
+  /** Met à jour la session en place — le carro, plus tard d'autres champs.
+   *  Écrit puis émet : tous les composants abonnés voient le même état. */
+  const updateSession = useCallback(
+    (patch: Partial<Session>) => {
+      const raw = getSnapshot();
+      if (!raw) return;
+      try {
+        const current = JSON.parse(raw) as Session;
+        window.localStorage.setItem(
+          STORAGE_KEY,
+          JSON.stringify({ ...current, ...patch }),
+        );
+      } catch {
+        return; // stockage refusé : rien à mettre à jour
+      }
+      emit();
+    },
+    [],
+  );
+
   const signOut = useCallback(() => {
     try {
       window.localStorage.removeItem(STORAGE_KEY);
@@ -118,7 +152,7 @@ export function useSession() {
   // Pas de drapeau « prêt » : il vaudrait false sur le serveur et true dans
   // le navigateur, ce qui casserait l'hydratation. Le premier rendu est celui
   // d'un visiteur déconnecté, et React le corrige dès la lecture du stockage.
-  return { session, isDemo: !isSupabaseConfigured, signIn, signOut };
+  return { session, isDemo: !isSupabaseConfigured, signIn, signOut, updateSession };
 }
 
 /** Conservé pour que l'arbre reste explicite : la session n'a pas d'état

@@ -94,7 +94,8 @@ export default async function TripPage({ params }: Params) {
                   </Badge>
                 )}
                 <Badge icon="car">
-                  {trip.vehicle.make} {trip.vehicle.model} {trip.vehicle.color}
+                  {trip.vehicle.make} {trip.vehicle.model} {trip.vehicle.year},{" "}
+                  {trip.vehicle.color} — el aporte se calcula con este carro
                 </Badge>
                 {trip.womenOnly && (
                   <Badge icon="users">Este viaje es solo para mujeres</Badge>

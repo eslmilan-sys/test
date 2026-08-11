@@ -20,7 +20,7 @@ export function MobileMenu() {
     <Dialog.Root>
       <Dialog.Trigger
         aria-label="Abrir el menú"
-        className="flex size-10 items-center justify-center rounded-[11px] border-[1.5px] border-ink-200 text-ink-900 transition-colors hover:border-accent min-[900px]:hidden"
+        className="flex size-10 items-center justify-center rounded-full border-[1.5px] border-ink-200 text-ink-900 transition-colors hover:border-accent min-[900px]:hidden"
       >
         <svg
           viewBox="0 0 24 24"

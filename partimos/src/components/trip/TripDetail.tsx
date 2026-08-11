@@ -53,7 +53,7 @@ export function TripDetail({
 
   const { segment } = match;
   const date = trip.departureAt.slice(0, 10);
-  const cap = segmentCap(segment, trip.vehicle.category, trip.seatsOffered);
+  const cap = segmentCap(segment, trip.vehicle.ratePerKmCents, trip.seatsOffered);
   const durationMin = Math.round(
     (new Date(match.droppingAt).getTime() -
       new Date(match.boardingAt).getTime()) /
@@ -175,7 +175,7 @@ export function TripDetail({
         stops={segment.fromIndex === 0 ? trip.stops : segment.from.pickupPoints}
         baseKm={segment.km}
         tollCents={segment.tollCents}
-        category={trip.vehicle.category}
+        category={trip.vehicle.ratePerKmCents}
         seatsOffered={trip.seatsOffered}
         instantBooking={trip.instantBooking}
       />

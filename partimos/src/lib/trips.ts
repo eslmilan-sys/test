@@ -23,6 +23,12 @@ import {
 } from "./corridors.ts";
 import { computePriceCap, type VehicleCategory } from "./pricing.ts";
 import {
+  agedConsumption,
+  categoryFromConsumption,
+  findCar,
+  rateFromConsumption,
+} from "./cars.ts";
+import {
   findSegment,
   seatsFreeOnSegment,
   segmentCap,
@@ -64,8 +70,13 @@ export type Trip = {
   vehicle: {
     make: string;
     model: string;
+    year: number;
     color: string;
     category: VehicleCategory;
+    /** Taux au km du carro réel, sur la droite du barème (src/lib/cars.ts).
+     *  C'est LUI qui entre dans le calcul : deux carros sur le même trajet
+     *  donnent deux topes différents — le coût, jamais la demande. */
+    ratePerKmCents: number;
   };
   stops: string[];
   womenOnly: boolean;
@@ -131,13 +142,29 @@ const DRIVERS = [
   },
 ];
 
-const VEHICLES: Trip["vehicle"][] = [
-  { make: "Toyota", model: "Corolla", color: "gris", category: "standard" },
-  { make: "Hyundai", model: "Accent", color: "blanco", category: "economy" },
-  { make: "Kia", model: "Sportage", color: "negro", category: "suv" },
-  { make: "Nissan", model: "Sentra", color: "azul", category: "standard" },
-  { make: "Toyota", model: "Hilux", color: "plata", category: "suv" },
-];
+/** Les carros de la démo viennent du catalogue : le taux de chacun sort de
+ *  sa consommation réelle (corrigée de l'âge), et c'est pour ça que le même
+ *  corridor affiche des aportes différents d'une carte à l'autre. */
+const DEMO_CARS: { make: string; model: string; year: number; color: string }[] =
+  [
+    { make: "Toyota", model: "Corolla", year: 2021, color: "gris" },
+    { make: "Hyundai", model: "Accent", year: 2016, color: "blanco" },
+    { make: "Kia", model: "Sportage", year: 2018, color: "negro" },
+    { make: "Nissan", model: "Sentra", year: 2023, color: "azul" },
+    { make: "Toyota", model: "Hilux", year: 2020, color: "plata" },
+    { make: "Kia", model: "Picanto", year: 2019, color: "rojo" },
+    { make: "Toyota", model: "Prado", year: 2022, color: "blanco" },
+  ];
+
+const VEHICLES: Trip["vehicle"][] = DEMO_CARS.map((c) => {
+  const ref = findCar(c.make, c.model)!;
+  const l100 = agedConsumption(ref.l100, c.year);
+  return {
+    ...c,
+    category: categoryFromConsumption(l100),
+    ratePerKmCents: rateFromConsumption(l100),
+  };
+});
 
 /** Heures de départ typiques : tôt le matin, midi, fin d'après-midi, nuit. */
 const DEPARTURE_HOURS = [5, 6, 8, 11, 14, 16, 17, 19, 21];
@@ -229,7 +256,7 @@ function buildTrip(corridor: Corridor, date: string, index: number): Trip {
   const cap = computePriceCap(
     corridor.distanceKm,
     corridor.tollCents,
-    vehicle.category,
+    vehicle.ratePerKmCents,
     seatsOffered,
   ).maxPriceCents;
   const discount = (seed >> 17) % 3 === 0 ? 50 : 0;
@@ -378,7 +405,7 @@ export function matchFor(trip: Trip, segment: Segment): TripMatch | null {
   const corridor = getCorridor(trip.corridorSlug);
   if (!corridor) return null;
 
-  const cap = segmentCap(segment, trip.vehicle.category, trip.seatsOffered);
+  const cap = segmentCap(segment, trip.vehicle.ratePerKmCents, trip.seatsOffered);
 
   return {
     trip,

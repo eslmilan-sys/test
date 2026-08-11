@@ -7,6 +7,7 @@ import { Container } from "@/components/site/Section";
 import { Button } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
 import { RouteMap } from "@/components/map/RouteMap";
+import { CityCombobox } from "@/components/ui/CityCombobox";
 import { AuthDialog } from "@/components/site/AuthDialog";
 import { useSession } from "@/lib/session";
 import { CORRIDORS, ALL_CITIES, getCorridor } from "@/lib/corridors";
@@ -76,10 +77,28 @@ export function PublishFlow() {
 
   /* Le carro réel prime sur la catégorie : sa consommation de référence,
      corrigée de l'âge, donne le taux au km sur la MÊME droite que le
-     barème (voir src/lib/cars.ts). « Otro carro » retombe sur les trois
-     catégories — jamais bloquant. */
-  const car = carMake === "otro" ? undefined : findCar(carMake, carModel);
-  const carL100 = car ? agedConsumption(car.l100, carYear) : null;
+     barème (voir src/lib/cars.ts). Le carro ENREGISTRÉ dans Mi cuenta
+     arrive prérempli — publier ne redemande pas ce qu'on sait déjà.
+     « Otro carro » retombe sur les trois catégories — jamais bloquant. */
+  const savedCar =
+    session?.car && findCar(session.car.make, session.car.model)
+      ? session.car
+      : null;
+  const [useSavedCar, setUseSavedCar] = useState(true);
+  const pickerCar = carMake === "otro" ? undefined : findCar(carMake, carModel);
+  const activeCar =
+    savedCar && useSavedCar
+      ? {
+          ref: findCar(savedCar.make, savedCar.model)!,
+          year: savedCar.year,
+          fromProfile: true,
+        }
+      : pickerCar
+        ? { ref: pickerCar, year: carYear, fromProfile: false }
+        : null;
+  const carL100 = activeCar
+    ? agedConsumption(activeCar.ref.l100, activeCar.year)
+    : null;
   const carRate = carL100 !== null ? rateFromConsumption(carL100) : null;
 
   const corridor = CORRIDORS.find(
@@ -189,6 +208,55 @@ export function PublishFlow() {
                 Escoge tu salida y tu destino. Solo puedes publicar en las rutas
                 que ya están abiertas.
               </p>
+
+              {/* Les deux listes D'ABORD, la carte en dessous : écrire sa
+                  ville est le geste évident, la carte confirme d'un coup
+                  d'œil. Avant, la carte seule portait tout, avec un état
+                  « je choisis l'origine ou la destination ? » invisible —
+                  c'était le point où l'on s'emmêlait. */}
+              <div className="relative mb-3 rounded-[18px] border border-ink-200 bg-white">
+                <CityCombobox
+                  id="pub-desde"
+                  label="Desde"
+                  value={from}
+                  exclude={to}
+                  tone="origin"
+                  onChange={(slug) => {
+                    setFrom(slug);
+                    if (slug === to) setTo("");
+                    setStops([]);
+                    setCityStops([]);
+                  }}
+                />
+                <button
+                  type="button"
+                  aria-label="Invertir salida y destino"
+                  onClick={() => {
+                    setFrom(to);
+                    setTo(from);
+                    setStops([]);
+                    setCityStops([]);
+                  }}
+                  className="absolute top-1/2 right-3 z-10 flex size-9 -translate-y-1/2 items-center justify-center rounded-full border border-ink-200 bg-white text-ink-500 shadow-sm transition-colors hover:border-accent hover:text-accent-ink"
+                >
+                  <Icon name="swap" className="size-4" />
+                </button>
+                <div className="border-t border-ink-200">
+                  <CityCombobox
+                    id="pub-hacia"
+                    label="Hacia"
+                    value={to}
+                    exclude={from}
+                    tone="destination"
+                    onChange={(slug) => {
+                      setTo(slug);
+                      setStops([]);
+                      setCityStops([]);
+                    }}
+                  />
+                </div>
+              </div>
+
               <div className="rounded-[16px] border border-ink-200 bg-ink-50/60 p-3">
                 <RouteMap
                   originSlug={from}
@@ -422,7 +490,57 @@ export function PublishFlow() {
                 <legend className="mb-2 text-[11.5px] font-bold tracking-[0.11em] text-ink-500 uppercase">
                   Tu carro
                 </legend>
-                <div className="grid gap-2 sm:grid-cols-3">
+
+                {savedCar && useSavedCar ? (
+                  <div className="flex flex-wrap items-center gap-3 rounded-[14px] border border-ink-200 px-4 py-3">
+                    {savedCar.photoDataUrl ? (
+                      /* eslint-disable-next-line @next/next/no-img-element -- data URL locale */
+                      <img
+                        src={savedCar.photoDataUrl}
+                        alt=""
+                        aria-hidden
+                        className="h-12 w-16 rounded-[10px] border border-ink-200 object-cover"
+                      />
+                    ) : (
+                      <Icon name="car" className="size-6 text-ink-500" />
+                    )}
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-[15px] font-semibold">
+                        {savedCar.make} {savedCar.model} {savedCar.year}
+                      </span>
+                      {carRate !== null && (
+                        <span className="tnum block text-[12.5px] text-ink-500">
+                          {formatUsd(carRate)} por km — tu carro registrado
+                        </span>
+                      )}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setUseSavedCar(false);
+                        setPriceCents(null);
+                      }}
+                      className="text-[13px] font-semibold text-accent-ink hover:underline"
+                    >
+                      Usar otro
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    {savedCar && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setUseSavedCar(true);
+                          setPriceCents(null);
+                        }}
+                        className="mb-2 text-[13px] font-semibold text-accent-ink hover:underline"
+                      >
+                        ← Volver a mi carro registrado ({savedCar.make}{" "}
+                        {savedCar.model})
+                      </button>
+                    )}
+                    <div className="grid gap-2 sm:grid-cols-3">
                   <select
                     value={carMake}
                     onChange={(e) => {
@@ -467,7 +585,7 @@ export function PublishFlow() {
                       setCarYear(Number(e.target.value));
                       setPriceCents(null);
                     }}
-                    disabled={!car}
+                    disabled={!pickerCar}
                     aria-label="Año del carro"
                     className={carSelect()}
                   >
@@ -479,10 +597,10 @@ export function PublishFlow() {
                   </select>
                 </div>
 
-                {car && carL100 !== null && carRate !== null && (
+                {pickerCar && carL100 !== null && carRate !== null && (
                   <p className="tnum mt-2.5 rounded-[12px] bg-ink-50 px-3.5 py-2.5 text-[13px] leading-relaxed text-ink-500">
                     <b className="font-semibold text-ink-900">
-                      {car.make} {car.model} {carYear}
+                      {pickerCar.make} {pickerCar.model} {carYear}
                     </b>
                     {" — consumo de referencia ~"}
                     {carL100.toFixed(1).replace(".", ",")} L/100 km, o sea{" "}
@@ -516,6 +634,8 @@ export function PublishFlow() {
                       ))}
                     </div>
                   </div>
+                )}
+                  </>
                 )}
               </fieldset>
             </>
@@ -557,8 +677,8 @@ export function PublishFlow() {
               <dl className="mt-4 text-[14.5px]">
                 <Row
                   label={
-                    car
-                      ? `Tu ${car.make} ${car.model} ${carYear}, por km`
+                    activeCar
+                      ? `Tu ${activeCar.ref.make} ${activeCar.ref.model} ${activeCar.year}, por km`
                       : `Categoría ${VEHICLE_LABELS[category]}, por km`
                   }
                 >

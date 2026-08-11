@@ -30,7 +30,7 @@ type Props = {
   stops: string[];
   baseKm: number;
   tollCents: number;
-  category: VehicleCategory;
+  category: VehicleCategory | number;
   seatsOffered: number;
   instantBooking: boolean;
 };

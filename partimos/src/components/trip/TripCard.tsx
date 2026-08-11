@@ -109,6 +109,11 @@ export function TripCard({ match }: { match: TripMatch }) {
                 {trip.driver.rating.toFixed(1)} · {trip.driver.ridesCount}{" "}
                 viajes
               </span>
+              <span className="flex items-center gap-1 text-[12.5px] text-ink-500">
+                <Icon name="car" className="size-3.5 shrink-0" />
+                {trip.vehicle.make} {trip.vehicle.model} {trip.vehicle.year} ·{" "}
+                {trip.vehicle.color}
+              </span>
             </span>
 
             <span className="ml-auto flex flex-wrap items-center justify-end gap-1.5">

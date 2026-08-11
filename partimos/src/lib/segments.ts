@@ -88,11 +88,12 @@ export function findSegment(
 
 /**
  * Plafond du segment. Même formule que le trajet complet, appliquée aux
- * kilomètres du segment — donc `divisor = sièges + 1` intact.
+ * kilomètres du segment — donc `divisor = sièges + 1` intact. Comme elle,
+ * accepte une catégorie du barème OU le taux au km du carro réel.
  */
 export function segmentCap(
   segment: Segment,
-  category: VehicleCategory,
+  category: VehicleCategory | number,
   seats: number,
 ) {
   return computePriceCap(segment.km, segment.tollCents, category, seats);
