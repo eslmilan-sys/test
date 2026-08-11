@@ -60,7 +60,11 @@ export function PublishFlow() {
   const days = useMemo(() => nextDays(), []);
 
   const preset = getCorridor(params.get("ruta") ?? "");
-  const [step, setStep] = useState(0);
+  /* Venu de la première page avec sa route déjà choisie ? On ne la lui
+     redemande pas : l'étape Ruta est sautée, « Atrás » y ramène si
+     besoin. Une étape qui répète ce qu'on vient de dire est du travail
+     en trop. */
+  const [step, setStep] = useState(preset ? 1 : 0);
   const [from, setFrom] = useState(preset?.origin.slug ?? "panama-city");
   const [to, setTo] = useState(preset?.destination.slug ?? "chitre");
   const [picking, setPicking] = useState<"origin" | "destination">("origin");

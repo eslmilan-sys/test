@@ -106,7 +106,7 @@ export async function geocodePlaces(
     country: "pa",
     language: "es",
     limit: "5",
-    types: "poi,address,neighborhood,locality",
+    types: "poi,address,neighborhood,locality,place",
   });
   if (near) params.set("proximity", `${near.lng},${near.lat}`);
   try {

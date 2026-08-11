@@ -1,4 +1,5 @@
 import { SearchCard } from "./SearchCard";
+import { LiveStrip } from "./LiveStrip";
 import { type IconName } from "@/components/ui/Icon";
 import { GlassIcon, type GlassTone } from "@/components/ui/GlassIcon";
 import { HeroScene } from "./HeroScene";
@@ -167,6 +168,7 @@ export function Hero() {
           </ul>
         </div>
 
+        <LiveStrip />
       </div>
     </div>
   );

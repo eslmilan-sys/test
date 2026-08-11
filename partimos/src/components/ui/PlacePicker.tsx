@@ -71,7 +71,7 @@ export function PlacePicker({
     window.clearTimeout(debounce.current);
     debounce.current = window.setTimeout(() => {
       geocodePlaces(
-        city ? `${query} ${city.shortName}` : query,
+        query,
         city ? { lat: city.lat, lng: city.lng } : undefined,
         controller.signal,
       ).then(setRemote);

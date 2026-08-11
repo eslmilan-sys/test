@@ -4,7 +4,6 @@ import { Pasos } from "@/components/home/Pasos";
 import { Pago } from "@/components/home/Pago";
 import { Conductores } from "@/components/home/Conductores";
 import { Confianza } from "@/components/home/Confianza";
-import { Corredores } from "@/components/home/Corredores";
 import { DriverCta } from "@/components/home/DriverCta";
 import { Faq, FaqJsonLd } from "@/components/home/Faq";
 import { Historias } from "@/components/home/Historias";
@@ -21,7 +20,6 @@ export default function Home() {
     <>
       <main id="contenido">
         <Hero />
-        <RutasFrecuentes />
         <Pasos />
 
         {/* UNE seule section de nuit sur la page. Le client a raison : deux
@@ -33,7 +31,7 @@ export default function Home() {
         <Pago />
         <Conductores />
         <Confianza />
-        <Corredores />
+        <RutasFrecuentes />
         <DriverCta />
         <Faq items={GENERAL_FAQ} />
       </main>
