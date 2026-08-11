@@ -46,7 +46,7 @@ export function RutaCard({ slug }: { slug: string }) {
 
 export function Rutas() {
   return (
-    <Section id="rutas" stop>
+    <Section id="rutas">
       <Eyebrow>Rutas</Eyebrow>
       <SectionTitle>Las rutas que más se mueven</SectionTitle>
       <Lead>

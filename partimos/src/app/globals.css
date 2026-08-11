@@ -62,10 +62,14 @@
      remarquer. */
   --color-ink-50: #faf9f7;
 
-  /* ---- Bleu : la couleur de LECTURE ---- */
-  --color-accent: #3b82f6; /* sur fonds sombres et remplissages */
-  --color-accent-ink: #1d4ed8; /* liens et icônes sur clair — 6,5:1 */
-  --color-accent-soft: #dbeafe;
+  /* ---- Bleu : la couleur de LECTURE ----
+     LA MÊME TEINTE QUE LA NUIT (203°), éclaircie. L'ancien indigo (#1D4ED8,
+     228°) se disputait avec le bleu-pétrole des sections sombres : deux bleus
+     voisins mais pas parents, et c'est exactement ce qui rendait la palette
+     inharmonieuse. Un site n'a droit qu'à UN bleu. */
+  --color-accent: #0284c7; /* remplissages, focus, bordures — jamais du texte */
+  --color-accent-ink: #0369a1; /* liens et icônes sur clair — 5,6:1 */
+  --color-accent-soft: #e0f2fe;
 
   /* ---- Ambre : la couleur d'ACTION ---- */
   --color-action: #f59e0b; /* fond de bouton, texte ENCRE dessus — 7,4:1 */
@@ -227,14 +231,6 @@
     --glass-alpha: 0.74;
     --on-glass: var(--color-ink-900);
     --on-glass-muted: var(--color-ink-700);
-  }
-
-  /* Le décalage du contenu et l'apparition du ruban partagent le même seuil :
-     un contenu décalé sans ruban donnerait une marge gauche inexpliquée. */
-  @media (min-width: 1160px) {
-    :root {
-      --rail-gutter: 60px;
-    }
   }
 
   /* ---- CE QUI SÉPARE UN VRAI VERRE D'UN APLAT À 74 % ----
@@ -538,9 +534,10 @@
      changer d'axe entre le téléphone (vertical) et le bureau (horizontal), ce
      qu'un SVG ne fait pas sans deux tracés à tenir d'accord.
 
-     Deux couches, comme une vraie route : l'asphalte, puis le marquage au sol
-     en pointillés. Le marquage défile au scroll, nativement — pas une ligne
-     de JavaScript, pas un écouteur d'événement. */
+     Un seul trait sobre relie les trois arrêts. Le marquage ambre n'y vit
+     plus : le budget du motif est de deux usages (pistes des corridors,
+     geste du paiement), et un connecteur n'a pas besoin d'être une route
+     pour dire « ceci mène à cela ». */
   .ruta {
     --ruta-epaisseur: 3px;
   }
@@ -567,14 +564,6 @@
     border-radius: 999px;
   }
 
-  .ruta-paso::after {
-    background: repeating-linear-gradient(
-      180deg,
-      var(--color-action) 0 10px,
-      transparent 10px 22px
-    );
-  }
-
   /* À partir de 860 px la route se couche : elle traverse les trois colonnes
      à hauteur des numéros. */
   @media (min-width: 860px) {
@@ -586,42 +575,6 @@
       bottom: auto;
       width: auto;
       height: var(--ruta-epaisseur);
-    }
-
-    .ruta-paso::after {
-      background: repeating-linear-gradient(
-        90deg,
-        var(--color-action) 0 10px,
-        transparent 10px 22px
-      );
-    }
-  }
-
-  /* Le marquage défile quand la section traverse l'écran. Le déplacement est
-     un multiple exact de la période du motif (22 px), donc la boucle est
-     invisible. Sans `view()`, le marquage reste simplement fixe — c'est la
-     même route, sans le mouvement. */
-  @supports (animation-timeline: view()) {
-    @media (prefers-reduced-motion: no-preference) {
-      .ruta-paso::after {
-        animation: ruta-defile linear;
-        animation-timeline: view();
-        animation-range: entry 0% exit 100%;
-      }
-    }
-  }
-
-  @keyframes ruta-defile {
-    to {
-      background-position-y: -220px;
-    }
-  }
-
-  @media (min-width: 860px) {
-    @keyframes ruta-defile {
-      to {
-        background-position-x: -220px;
-      }
     }
   }
 
@@ -676,10 +629,9 @@
      peint et écrasent le contenu.
 
      Ce qui reste : une lumière chaude très large qui monte vers le coin haut
-     droit, sans bord visible, et UNE ligne de route qui entre dans la page en
-     bas. Le motif ne se répète pas — il se pose une fois, comme une signature.
-     Le reste du travail d'identité est porté par le contenu : le tracé des
-     trois étapes et celui des six corridors.
+     droit, sans bord visible. Le travail d'identité est porté par le contenu
+     — les pistes des corridors et le geste du paiement, les deux seuls
+     endroits où vit le trait pointillé ambre.
 
      Depuis que la page est blanche, la lumière porte davantage : sur du
      crème elle se noyait dans un fond déjà jaune, sur du blanc elle se voit.
@@ -835,30 +787,6 @@
     );
   }
 
-  /* Le trait du bas est en pointillés : c'est un marquage au sol, pas une
-     bordure. `mask` plutôt qu'un dégradé répété, pour que les tirets restent
-     nets à toutes les largeurs. */
-  .sky::before {
-    content: "";
-    position: absolute;
-    inset-inline: 0;
-    bottom: 0;
-    height: 3px;
-    background: var(--color-action);
-    -webkit-mask-image: repeating-linear-gradient(
-      90deg,
-      #000 0 22px,
-      transparent 22px 44px
-    );
-    mask-image: repeating-linear-gradient(
-      90deg,
-      #000 0 22px,
-      transparent 22px 44px
-    );
-    opacity: 0.55;
-    pointer-events: none;
-  }
-
   .grain::after {
     content: "";
     position: absolute;
@@ -867,71 +795,6 @@
     opacity: 0.14;
     mix-blend-mode: multiply;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
-  }
-
-  /* ---- Le ruban d'asphalte : signature visuelle ----
-     Une seule route continue traverse la page, alignée sur la gouttière
-     gauche du conteneur. Chaque section est une « parada ».
-     Purement décoratif : masqué au clavier, au lecteur d'écran et sous
-     1160 px, où l'espace horizontal ne le permet pas. */
-  .road {
-    position: relative;
-  }
-
-  @media (min-width: 1160px) {
-    .road::before,
-    .road::after {
-      content: "";
-      position: absolute;
-      /* Commence exactement où commencent les sections. À -16 px, le ruban
-         remontait dans le hero sombre et s'y lisait comme une barre parasite
-         plutôt que comme une route qui entre dans la page. */
-      top: 0;
-      bottom: -16px;
-      z-index: 1;
-      pointer-events: none;
-    }
-
-    /* Filet de sécurité : si le conteneur venait à s'élargir, `max()` empêche
-       le ruban de sortir de l'écran quand `50% - 560px` devient négatif. */
-    .road::before {
-      left: max(20px, calc(50% - 560px + 26px));
-      width: 20px;
-      background: var(--color-ink-900);
-      border-radius: 10px;
-    }
-
-    .road::after {
-      left: max(29px, calc(50% - 560px + 35px));
-      width: 2px;
-      border-radius: 1px;
-      background: repeating-linear-gradient(
-        180deg,
-        #f5d95c 0 18px,
-        transparent 18px 44px
-      );
-    }
-  }
-
-  /* ---- Le marquage au sol défile quand on descend la page ----
-     Animation pilotée par le scroll, native : pas une image de JavaScript,
-     pas un écouteur d'événement, pas une ligne de bundle. Le déplacement est
-     un multiple exact de la période du motif (44 px), donc la boucle est
-     invisible. Là où `scroll()` n'existe pas, le marquage reste simplement
-     fixe — c'est la même page, sans le mouvement. */
-  @supports (animation-timeline: scroll()) {
-    @media (prefers-reduced-motion: no-preference) {
-      .road::after {
-        animation: road-scroll linear;
-        animation-timeline: scroll(root block);
-      }
-    }
-  }
-
-  @keyframes road-scroll {
-    to {
-      background-position-y: -1320px;
-    }
   }
 
   /* ---- Apparition des sections à l'entrée dans le champ ----
@@ -958,27 +821,6 @@
     to {
       opacity: 1;
       transform: none;
-    }
-  }
-
-  /* Le point d'arrêt vert — usage « marque », pas « validé ». */
-  .parada::before {
-    content: "";
-    position: absolute;
-    left: 7px;
-    top: 12px;
-    width: 18px;
-    height: 18px;
-    border-radius: 999px;
-    background: var(--color-brand-green);
-    border: 4px solid var(--stop-ring, #fff);
-    z-index: 2;
-    display: none;
-  }
-
-  @media (min-width: 1160px) {
-    .parada::before {
-      display: block;
     }
   }
 }

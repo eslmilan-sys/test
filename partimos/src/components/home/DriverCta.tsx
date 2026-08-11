@@ -5,7 +5,7 @@ export function DriverCta() {
   return (
     <section className="pb-16 md:pb-[76px]">
       <Container>
-        <div className="lg:pl-[var(--rail-gutter)]">
+        <div>
           <div className="relative overflow-hidden rounded-[28px] bg-ink-50 px-7 py-9.5 min-[860px]:px-12 min-[860px]:py-13">
             <div
               aria-hidden

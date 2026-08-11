@@ -27,13 +27,7 @@ export function Container({
 type SectionProps = {
   id?: string;
   children: ReactNode;
-  /** Marque la section comme une « parada » du ruban d'asphalte. */
-  stop?: boolean;
-  /** Couleur de l'anneau du point d'arrêt : il doit disparaître dans le fond. */
-  stopRing?: string;
   className?: string;
-  /** Décale le contenu pour laisser passer le ruban sur grand écran. */
-  inset?: boolean;
   /** Apparition à l'entrée dans le champ. À couper au-dessus de la ligne de
    *  flottaison, où il n'y a rien à révéler. */
   reveal?: boolean;
@@ -42,29 +36,16 @@ type SectionProps = {
 export function Section({
   id,
   children,
-  stop = false,
-  stopRing = "#FAF9F7",
   className = "",
-  inset = true,
   reveal = true,
 }: SectionProps) {
   return (
     <section id={id} className={`relative py-16 md:py-[76px] ${className}`}>
       <Container>
         <div
-          className={[
-            "relative z-[2]",
-            stop && "parada",
-            inset && "pl-[var(--rail-gutter)]",
-            reveal && "reveal",
-          ]
+          className={["relative z-[2]", reveal && "reveal"]
             .filter(Boolean)
             .join(" ")}
-          style={
-            stop
-              ? ({ "--stop-ring": stopRing } as React.CSSProperties)
-              : undefined
-          }
         >
           {children}
         </div>

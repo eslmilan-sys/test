@@ -20,35 +20,20 @@ export default function Home() {
     <>
       <main id="contenido">
         <Hero />
-        {/* `road` porte le ruban d'asphalte : une seule route continue qui
-            traverse toutes les sections, chacune marquée d'une parada. */}
-        <div className="road">
-          <Pasos />
-        </div>
+        <Pasos />
 
-        {/* LE QUARTIER DE NUIT EST UNE SEULE TOILE.
-            Historias et Pago partagent UN élément porteur du dégradé : deux
-            sections peintes chacune de leur côté se raccordaient sur une
-            couture visible — deux dégradés ne tombent jamais exactement sur
-            le même pixel sur toute la largeur. Un seul fond ne peut pas se
-            désaccorder avec lui-même.
-
-            Le carrousel reste hors du ruban d'asphalte, qui lui passait
-            dessus et coupait la première carte ; le ruban reprend à Pago. */}
-        <div className="noche text-white">
-          <Historias />
-          <div className="road">
-            <Pago />
-          </div>
-        </div>
-
-        <div className="road">
-          <Conductores />
-          <Confianza />
-          <Corredores />
-          <DriverCta />
-          <Faq items={GENERAL_FAQ} />
-        </div>
+        {/* UNE seule section de nuit sur la page. Le client a raison : deux
+            écrans de bleu sombre à la suite, c'est un tunnel. Historias garde
+            la nuit — ses photos et ses vitres en ont besoin — et Pago revient
+            à la lumière, où ses cartes blanches (Yappy, efectivo) sont chez
+            elles. */}
+        <Historias />
+        <Pago />
+        <Conductores />
+        <Confianza />
+        <Corredores />
+        <DriverCta />
+        <Faq items={GENERAL_FAQ} />
       </main>
       <StickyCta />
       <FaqJsonLd items={GENERAL_FAQ} />

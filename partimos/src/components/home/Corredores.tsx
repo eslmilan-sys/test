@@ -22,9 +22,9 @@ import { formatDuration, formatUsd } from "@/lib/pricing";
  *      entre sa fin et le prix.
  *
  * David remplit la piste entière, Coronado un cinquième : on lit l'échelle du
- * pays sans lire un seul chiffre. Et c'est le motif du site — le même trait
- * pointillé ambre relie les trois étapes plus haut et longe le premier écran.
- * Répété, il devient une signature.
+ * pays sans lire un seul chiffre. C'est l'un des DEUX seuls usages du trait
+ * pointillé ambre (l'autre : le geste Tú ──▸ A du paiement). Un motif répété
+ * partout cesse d'être une signature — le client l'a dit.
  */
 export function Corredores() {
   const rows = CORRIDORS.filter((c) => !c.isReturn).sort(
@@ -34,10 +34,8 @@ export function Corredores() {
 
   return (
     <section className="border-t border-ink-200 py-14 sm:py-20">
-      {/* Même décalage que les `Section` voisines : sans lui, le ruban
-          d'asphalte passait au travers du texte au-dessus de 1160 px. */}
       <Container>
-        <div className="relative z-[2] pl-[var(--rail-gutter)]">
+        <div className="relative z-[2]">
           <div className="mb-8 max-w-[52ch]">
             <h2 className="font-display text-[clamp(28px,4.2vw,40px)] leading-[1.08] font-extrabold tracking-[-0.03em]">
               Las seis rutas abiertas

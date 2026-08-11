@@ -101,12 +101,11 @@ export function Historias() {
   }
 
   return (
-    /* Le fond de nuit vit sur le PARENT (une seule toile avec Pago — deux
-       dégradés voisins font une couture, un seul ne peut pas). Les cartes
-       éditoriales sans photo sont des vitres posées dessus ; les cartes à
-       photo restent des photos — une image floutée derrière une vitre n'est
-       plus une image. */
-    <section className="py-16 text-white md:py-[76px]">
+    /* LA seule section de nuit de la page — deux écrans sombres à la suite
+       faisaient un tunnel. Les cartes éditoriales sans photo sont des vitres
+       posées sur ce fond ; les cartes à photo restent des photos — une image
+       floutée derrière une vitre n'est plus une image. */
+    <section className="noche py-16 text-white md:py-[76px]">
       <Container>
         <div className="mb-7 flex items-end justify-between gap-6">
           <h2 className="max-w-[16ch] text-[clamp(28px,5.2vw,44px)] leading-[1.05] font-extrabold">

@@ -66,7 +66,7 @@ export function Confianza() {
   const [lead, ...rest] = TRUST_ITEMS;
 
   return (
-    <Section id="seguridad" stop stopRing="#FAF9F7" className="bg-ink-50">
+    <Section id="seguridad" className="bg-ink-50">
       <Eyebrow>Confianza y seguridad</Eyebrow>
       <SectionTitle>Sabes con quién viajas antes de subirte</SectionTitle>
 

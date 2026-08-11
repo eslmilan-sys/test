@@ -47,7 +47,7 @@ const PASOS: { icon: IconName; title: string; body: string }[] = [
 
 export function Pasos() {
   return (
-    <Section id="como" stop>
+    <Section id="como">
       <SectionTitle>Tres pasos y ya vas en camino</SectionTitle>
       <Lead>
         Alguien ya hizo el plan de manejar. Tú te sumas al carro y el costo del

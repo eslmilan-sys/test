@@ -27,7 +27,7 @@ const DRIVER_POINTS = [
 
 export function Conductores() {
   return (
-    <Section id="conductores" stop>
+    <Section id="conductores">
       <Eyebrow>Para conductores</Eyebrow>
       <SectionTitle>El viaje ya lo ibas a hacer</SectionTitle>
       <Lead>

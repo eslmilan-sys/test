@@ -33,7 +33,7 @@ export function FaqList({ items }: { items: FaqItem[] }) {
 
 export function Faq({ items }: { items: FaqItem[] }) {
   return (
-    <Section id="faq" stop className="pt-5 md:pt-5">
+    <Section id="faq" className="pt-5 md:pt-5">
       <Eyebrow>Preguntas</Eyebrow>
       <SectionTitle>Lo que todo el mundo pregunta</SectionTitle>
       <FaqList items={items} />
