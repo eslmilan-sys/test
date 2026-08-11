@@ -1,16 +1,16 @@
 /**
- * PROJECTION DE LA CARTE SCHÉMATIQUE
+ * PROJECTION DE LA CARTE — Web Mercator, la même que Mapbox.
  *
- * Pourquoi pas Mapbox : la clé est une étape ⛔ HUMAIN, et une carte à tuiles
- * impose un service tiers sur le chemin critique de la recherche — ce que le
- * §10 du brief interdit pour l'interface. Le jour où la clé existe, cette
- * carte devient le repli hors ligne.
+ * Le jour prévu par ce fichier est arrivé : la clé Mapbox existe, et la
+ * vraie carte du pays passe SOUS les pastilles. Pour que les villes tombent
+ * au pixel sur l'image, la projection maison est passée de l'équirectangulaire
+ * au Web Mercator — celui dans lequel Mapbox rend — et la caméra de l'image
+ * statique est calculée ICI, depuis le même cadre : une seule source de
+ * vérité, l'image et l'interaction ne peuvent pas se désaccorder.
  *
- * Pourquoi pas un contour du Panama : dessiner une côte de mémoire produirait
- * une géographie fausse. On projette donc les VRAIES coordonnées des villes,
- * reliées par les corridors réels — la topologie et les positions relatives
- * sont exactes, le trait est assumé comme schématique. Un plan de métro ne
- * ment pas parce qu'il n'est pas une carte routière.
+ * Sans clé au build, rien ne change : les pastilles sur fond nu restent une
+ * carte honnête — les positions sont les vraies. Un plan de métro ne ment
+ * pas parce qu'il n'est pas une carte routière.
  */
 
 import { ALL_CITIES, CORRIDORS, type City } from "./corridors";
@@ -23,23 +23,44 @@ const BOUNDS = {
   maxLat: 9.25,
 };
 
-export const MAP_VIEWBOX = { width: 1000, height: 460 };
+const WIDTH = 1000;
 
-/**
- * Projection équirectangulaire, corrigée du cosinus de la latitude moyenne.
- * À l'échelle du Panama (moins de 2° de latitude), l'écart avec une
- * projection conforme est inférieur au rayon des pastilles.
- */
+/* Mercator « monde » à un zoom donné : x et y en pixels dans un monde de
+   512 · 2^z px de côté. Formules standard, rien d'inventé. */
+const mercX = (lng: number, world: number) => ((lng + 180) / 360) * world;
+const mercY = (lat: number, world: number) => {
+  const rad = (lat * Math.PI) / 180;
+  return (
+    (0.5 - Math.log(Math.tan(Math.PI / 4 + rad / 2)) / (2 * Math.PI)) * world
+  );
+};
+
+/* Le zoom qui fait tenir exactement la largeur du cadre dans WIDTH px. */
+const ZOOM = Math.log2((WIDTH * 360) / ((BOUNDS.maxLng - BOUNDS.minLng) * 512));
+const WORLD = 512 * 2 ** ZOOM;
+const LEFT = mercX(BOUNDS.minLng, WORLD);
+const TOP = mercY(BOUNDS.maxLat, WORLD);
+const HEIGHT = Math.round(mercY(BOUNDS.minLat, WORLD) - TOP);
+
+export const MAP_VIEWBOX = { width: WIDTH, height: HEIGHT };
+
+/** La caméra de l'image statique Mapbox — même cadre, même projection. */
+export const MAP_CAMERA = {
+  centerLng: (BOUNDS.minLng + BOUNDS.maxLng) / 2,
+  /* Le centre VERTICAL se calcule en Mercator puis se reprojette en
+     latitude : le milieu des latitudes n'est pas le milieu de l'image. */
+  centerLat:
+    (Math.atan(Math.sinh(Math.PI * (1 - (2 * (TOP + HEIGHT / 2)) / WORLD))) *
+      180) /
+    Math.PI,
+  zoom: ZOOM,
+  width: WIDTH,
+  height: HEIGHT,
+};
+
 export function project(lat: number, lng: number): { x: number; y: number } {
-  const midLat = ((BOUNDS.minLat + BOUNDS.maxLat) / 2) * (Math.PI / 180);
-  const spanLng = (BOUNDS.maxLng - BOUNDS.minLng) * Math.cos(midLat);
-  const spanLat = BOUNDS.maxLat - BOUNDS.minLat;
-
-  const x =
-    (((lng - BOUNDS.minLng) * Math.cos(midLat)) / spanLng) * MAP_VIEWBOX.width;
-  // L'axe y d'un SVG descend, la latitude monte.
-  const y = ((BOUNDS.maxLat - lat) / spanLat) * MAP_VIEWBOX.height;
-
+  const x = mercX(lng, WORLD) - LEFT;
+  const y = mercY(lat, WORLD) - TOP;
   return { x: Math.round(x * 10) / 10, y: Math.round(y * 10) / 10 };
 }
 

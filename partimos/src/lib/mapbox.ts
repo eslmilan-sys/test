@@ -16,6 +16,7 @@
  */
 
 import { CITIES, type Corridor } from "./corridors.ts";
+import { MAP_CAMERA } from "./map.ts";
 
 export const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN ?? "";
 
@@ -73,5 +74,20 @@ export function corridorMapUrl(
     `https://api.mapbox.com/styles/v1/mapbox/light-v11/static/` +
     `${path},${pins}/auto/${width}x${height}@2x` +
     `?padding=56&access_token=${MAPBOX_TOKEN}`
+  );
+}
+
+/**
+ * La vue d'ensemble du pays pour le sélecteur de la recherche. PAS de
+ * marqueurs dans l'image : les villes sont les boutons interactifs posés
+ * par-dessus, projetés dans le MÊME Mercator par la MÊME caméra — c'est ce
+ * qui les fait tomber au pixel. `@2x` : l'image sert un conteneur fluide.
+ */
+export function panamaOverviewUrl(): string {
+  const { centerLng, centerLat, zoom, width, height } = MAP_CAMERA;
+  return (
+    `https://api.mapbox.com/styles/v1/mapbox/light-v11/static/` +
+    `${centerLng.toFixed(5)},${centerLat.toFixed(5)},${zoom.toFixed(3)},0/` +
+    `${width}x${height}@2x?access_token=${MAPBOX_TOKEN}`
   );
 }

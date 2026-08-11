@@ -8,6 +8,7 @@ import {
   linkPath,
   mapCity,
 } from "@/lib/map";
+import { MAPBOX_TOKEN, panamaOverviewUrl } from "@/lib/mapbox";
 
 /**
  * Carte des corridors — sélection de l'origine et de la destination.
@@ -44,9 +45,25 @@ export function RouteMap({
 
   return (
     <div className={`relative ${className}`}>
+      {/* La vraie carte, sous les pastilles. Même cadre, même Mercator, même
+          caméra que la projection des villes : l'alignement est un théorème,
+          pas un réglage. Sans clé au build, le fond reste nu — les positions
+          sont vraies dans les deux cas. */}
+      {MAPBOX_TOKEN && (
+        <img
+          src={panamaOverviewUrl()}
+          alt=""
+          aria-hidden
+          width={MAP_VIEWBOX.width}
+          height={MAP_VIEWBOX.height}
+          loading="lazy"
+          decoding="async"
+          className="pointer-events-none absolute inset-0 h-full w-full rounded-[14px] object-cover opacity-90"
+        />
+      )}
       <svg
         viewBox={`0 0 ${MAP_VIEWBOX.width} ${MAP_VIEWBOX.height}`}
-        className="w-full"
+        className="relative w-full"
         role="group"
         aria-label="Mapa de rutas de Panamá"
       >
@@ -94,10 +111,12 @@ export function RouteMap({
                 x={anchorEnd ? city.x - 18 : city.x + 18}
                 y={city.y + 5}
                 textAnchor={anchorEnd ? "end" : "start"}
-                className={`pointer-events-none text-[19px] ${
+                stroke="#ffffff"
+                strokeWidth={4}
+                className={`pointer-events-none text-[19px] [paint-order:stroke] ${
                   selected
                     ? "fill-ink-900 font-bold"
-                    : "fill-ink-500 font-medium"
+                    : "fill-ink-600 font-semibold"
                 }`}
               >
                 {city.shortName}
