@@ -37,7 +37,7 @@ export function AccountButton() {
           aria-hidden
           className="flex size-10 items-center justify-center rounded-full bg-ink-50 text-ink-600"
         >
-          <Icon name="users" className="size-5" />
+          <Icon name="user" className="size-5" />
         </span>
       )}
     </Link>

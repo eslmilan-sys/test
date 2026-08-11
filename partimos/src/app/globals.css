@@ -231,6 +231,13 @@
     --glass-alpha: 0.74;
     --on-glass: var(--color-ink-900);
     --on-glass-muted: var(--color-ink-700);
+
+    /* Paliers de flou, nommés une fois (grille : sm / md / xl). Pas de
+       palier « 3xl » : un blur de 64 px sur un Android d'entrée de gamme
+       coûte plus qu'il ne rend, et la cible est en données mobiles. */
+    --glass-blur-sm: 8px;
+    --glass-blur-md: 14px;
+    --glass-blur-xl: 20px;
   }
 
   /* ---- CE QUI SÉPARE UN VRAI VERRE D'UN APLAT À 74 % ----
@@ -270,7 +277,7 @@
       inset 0 1px 0 rgb(255 255 255 / 0.65),
       inset 0 -1px 0 rgb(38 34 28 / 0.07),
       0 1px 2px rgb(38 34 28 / 0.05),
-      0 14px 34px -14px rgb(38 34 28 / 0.22);
+      0 14px 34px -14px rgb(180 83 9 / 0.2);
   }
 
   /* Le flou n'est appliqué QUE s'il est réellement supporté. Sinon la règle
@@ -289,8 +296,8 @@
     (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))
   ) {
     .glass {
-      -webkit-backdrop-filter: blur(18px) saturate(180%);
-      backdrop-filter: blur(18px) saturate(180%);
+      -webkit-backdrop-filter: blur(var(--glass-blur-xl)) saturate(180%);
+      backdrop-filter: blur(var(--glass-blur-xl)) saturate(180%);
     }
   }
 
@@ -321,15 +328,15 @@
     box-shadow:
       inset 0 1px 0 rgb(255 255 255 / 0.18),
       inset 0 -1px 0 rgb(6 20 29 / 0.4),
-      0 10px 26px -14px rgb(0 0 0 / 0.5);
+      0 10px 26px -14px rgb(6 20 29 / 0.6);
   }
 
   @supports (
     (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))
   ) {
     .glass-noche {
-      -webkit-backdrop-filter: blur(14px) saturate(160%);
-      backdrop-filter: blur(14px) saturate(160%);
+      -webkit-backdrop-filter: blur(var(--glass-blur-md)) saturate(160%);
+      backdrop-filter: blur(var(--glass-blur-md)) saturate(160%);
     }
   }
 

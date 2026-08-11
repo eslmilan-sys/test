@@ -185,7 +185,7 @@ export default async function CorridorPage({ params }: Params) {
             {/* Les chiffres sur un plateau de verre, pas derrière un filet :
                 même matière que le plateau de paiement de l'accueil — le
                 verre est le langage des objets posés sur la nuit. */}
-            <dl className="glass-noche mt-7 grid grid-cols-2 gap-x-5 gap-y-4 rounded-[18px] border border-white/12 px-5 py-5 min-[760px]:grid-cols-4">
+            <dl className="glass-noche mt-7 grid grid-cols-2 gap-x-5 gap-y-4 rounded-[18px] border border-white/20 px-5 py-5 min-[760px]:grid-cols-4">
               <Stat label="Distancia" value={`${corridor.distanceKm} km`} />
               <Stat
                 label="Tiempo de camino"

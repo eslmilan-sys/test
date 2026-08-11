@@ -164,7 +164,7 @@ function Card({ story }: { story: Story }) {
     <Link
       href={story.href}
       className={`group relative flex aspect-[4/5] flex-col justify-end overflow-hidden rounded-[24px] p-6 text-white transition-transform duration-300 hover:-translate-y-1 ${
-        photo ? "bg-night-900" : "glass-noche border border-white/12"
+        photo ? "bg-night-900" : "glass-noche border border-white/20"
       }`}
     >
       {photo && (
