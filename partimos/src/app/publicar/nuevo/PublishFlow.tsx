@@ -59,11 +59,18 @@ export function PublishFlow() {
   const { session, isDemo } = useSession();
   const days = useMemo(() => nextDays(), []);
 
-  const preset = getCorridor(params.get("ruta") ?? "");
-  /* Venu de la première page avec sa route déjà choisie ? On ne la lui
-     redemande pas : l'étape Ruta est sautée, « Atrás » y ramène si
-     besoin. Une étape qui répète ce qu'on vient de dire est du travail
-     en trop. */
+  /* La route peut arriver par ?ruta= (pages corridor) OU par
+     ?desde=&hacia= (la carte de la première page). Les deux comptent :
+     c'est le bug qui empêchait le saut d'étape — la carte envoyait
+     desde/hacia et le flux ne lisait que ruta. */
+  const presetPair = CORRIDORS.find(
+    (c) =>
+      c.origin.slug === params.get("desde") &&
+      c.destination.slug === params.get("hacia"),
+  );
+  const preset = getCorridor(params.get("ruta") ?? "") ?? presetPair;
+  /* Route déjà choisie ? On ne la redemande pas : l'étape Ruta est
+     sautée, « Atrás » y ramène si besoin. */
   const [step, setStep] = useState(preset ? 1 : 0);
   const [from, setFrom] = useState(preset?.origin.slug ?? "panama-city");
   const [to, setTo] = useState(preset?.destination.slug ?? "chitre");
@@ -784,7 +791,7 @@ export function PublishFlow() {
               <AuthDialog
                 trigger={
                   <button className="ml-auto inline-flex items-center justify-center rounded-[14px] bg-ink-900 px-5.5 py-3.5 font-display text-[16px] font-bold text-white transition-colors hover:bg-ink-800">
-                    Entrar y publicar
+                    Conectarme y publicar
                   </button>
                 }
               />

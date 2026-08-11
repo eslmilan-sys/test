@@ -75,7 +75,7 @@ export function Pasos() {
               <GlassIcon
                 name={paso.icon}
                 tone={(["amber", "sky", "green"] as GlassTone[])[index % 3]}
-                className="mb-3"
+                className="mb-3 ml-2.5"
               />
               <h3 className="mb-2 font-display text-[19px] font-bold tracking-[-0.02em]">
                 {paso.title}

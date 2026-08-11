@@ -56,8 +56,8 @@ export function AccountSpace() {
           </h1>
           <p className="mb-6 text-[15px] leading-relaxed text-ink-500">
             Aquí ves tus viajes reservados y publicados, tu perfil, tu carro y
-            el estado de tu verificación. Entrar toma diez segundos: te mandamos
-            un código por SMS, sin contraseña.
+            el estado de tu verificación. Conectarte toma diez segundos: te
+            mandamos un código por SMS, sin contraseña.
           </p>
 
           <ul className="mb-6 grid gap-2.5">
@@ -75,7 +75,7 @@ export function AccountSpace() {
           <AuthDialog
             trigger={
               <button className="w-full rounded-[14px] bg-ink-900 px-7 py-4 font-display text-[17px] font-bold text-white transition-colors hover:bg-ink-800">
-                Entrar
+                Conectarme o crear cuenta
               </button>
             }
           />

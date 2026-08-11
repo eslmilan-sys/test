@@ -138,6 +138,58 @@ export async function geocodePlaces(
   }
 }
 
+let searchSession: string | null = null;
+
+/**
+ * Suggestions via l'API Search Box — le référentiel RICHE de Mapbox.
+ *
+ * Le géocodeur v5 connaît les rues et les pueblos mais rate beaucoup de
+ * bâtiments : un PH de la ville (les tours résidentielles s'appellent
+ * « PH … » au Panama) n'y est souvent pas. Search Box couvre les POI,
+ * les commerces et les immeubles. On ne demande que des LIBELLÉS — pas
+ * besoin de l'étape retrieve ni de coordonnées pour un point de
+ * rendez-vous. Le session_token regroupe les frappes d'une même
+ * recherche pour la facturation Mapbox.
+ */
+export async function suggestPlaces(
+  query: string,
+  near?: { lat: number; lng: number },
+  signal?: AbortSignal,
+): Promise<GeocodedPlace[]> {
+  if (!MAPBOX_TOKEN || query.trim().length < 3) return [];
+  searchSession ??=
+    typeof crypto !== "undefined" && "randomUUID" in crypto
+      ? crypto.randomUUID()
+      : `${Math.floor(Math.random() * 1e9)}`;
+  const params = new URLSearchParams({
+    q: query.trim(),
+    access_token: MAPBOX_TOKEN,
+    session_token: searchSession,
+    language: "es",
+    country: "pa",
+    limit: "6",
+  });
+  if (near) params.set("proximity", `${near.lng},${near.lat}`);
+  try {
+    const res = await fetch(
+      `https://api.mapbox.com/search/searchbox/v1/suggest?${params}`,
+      { signal },
+    );
+    if (!res.ok) return [];
+    const data = (await res.json()) as {
+      suggestions?: { name: string; place_formatted?: string }[];
+    };
+    return (data.suggestions ?? []).map((s) => ({
+      name: s.name,
+      context: (s.place_formatted ?? "").replace(/, Panam[aá]$/i, ""),
+      lat: 0,
+      lng: 0,
+    }));
+  } catch {
+    return [];
+  }
+}
+
 /**
  * La vue d'ensemble du pays pour le sélecteur de la recherche. PAS de
  * marqueurs dans l'image : les villes sont les boutons interactifs posés

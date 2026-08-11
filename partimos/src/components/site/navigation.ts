@@ -34,7 +34,7 @@ export const NAV_SECTIONS: NavSection[] = [
       {
         href: "/viajes",
         label: "Todas las rutas",
-        hint: "Seis corredores, con horarios y aportes",
+        hint: "Ida y vuelta por todo el país, con aportes",
         icon: "route",
       },
       {

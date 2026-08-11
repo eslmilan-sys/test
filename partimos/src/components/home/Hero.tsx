@@ -90,8 +90,9 @@ export function Hero() {
                 lancement. La version d'avant disait une évidence permanente
                 (« salidas todos los días ») — un badge sans nouvelle est du
                 bruit ; un badge de lancement est une information, et il
-                partira quand le lancement sera vieux. Les 12 routes sont
-                réelles : douze pages, une par sens. */}
+                partira quand le lancement sera vieux. Pas de nombre de
+                routes : les conducteurs publient les leurs, la carte des
+                rutas est ouverte. */}
             {/* Trois couches de profondeur : le badge est le plus « loin »
                 (il traîne le plus au défilement), le titre au milieu, le
                 texte d'accroche devant. Le parallaxe vit sur ces conteneurs
@@ -101,7 +102,7 @@ export function Hero() {
                 <span className="font-display font-bold tracking-wide text-action-deep uppercase">
                   Lanzamiento
                 </span>
-                12 rutas abiertas por todo el país
+                Rutas ilimitadas por todo el país
               </p>
             </div>
 
@@ -155,7 +156,7 @@ export function Hero() {
                   name={item.icon}
                   tone={item.tone}
                   size="sm"
-                  className="mb-3"
+                  className="mb-3 ml-2.5"
                 />
                 <b className="block font-display text-[15.5px] leading-tight font-bold tracking-[-0.02em] md:text-[17px]">
                   {item.title}

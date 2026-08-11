@@ -95,7 +95,7 @@ export function MobileMenu() {
             <AuthDialog
               trigger={
                 <button className="w-full rounded-[14px] border-[1.5px] border-ink-200 px-5 py-3 font-display text-[15px] font-bold transition-colors hover:border-accent hover:text-accent-ink">
-                  Entrar
+                  Conectarme
                 </button>
               }
             />

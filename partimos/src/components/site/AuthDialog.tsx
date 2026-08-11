@@ -31,12 +31,17 @@ import { useSession } from "@/lib/session";
 
 type Step = "identity" | "code" | "done";
 type Channel = "phone" | "email";
+/** Se connecter à un compte qui existe, ou en créer un. Même code OTP
+ *  derrière — la différence est ce qu'on demande : la connexion n'a
+ *  besoin QUE du contact, l'inscription ajoute nom et apellido. */
+type Mode = "login" | "register";
 
 export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
   const id = useId();
   const { signIn } = useSession();
 
   const [step, setStep] = useState<Step>("identity");
+  const [mode, setMode] = useState<Mode>("login");
   const [channel, setChannel] = useState<Channel>("phone");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -57,8 +62,10 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
   const e164 = digits.length <= 8 ? `+507${digits}` : `+${digits}`;
 
   function validate(): string {
-    if (firstName.trim().length < 2) return "Escribe tu nombre.";
-    if (lastName.trim().length < 2) return "Escribe tu apellido.";
+    if (mode === "register" && firstName.trim().length < 2)
+      return "Escribe tu nombre.";
+    if (mode === "register" && lastName.trim().length < 2)
+      return "Escribe tu apellido.";
     if (channel === "phone" && (digits.length < 7 || digits.length > 13))
       return "Escribe tu celular, por ejemplo 6123-4567.";
     if (
@@ -129,12 +136,18 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
           <div className="mb-5 flex items-start justify-between gap-4">
             <div>
               <Dialog.Title className="font-display text-[24px] font-extrabold tracking-[-0.035em]">
-                {step === "code" ? "Escribe tu código" : "Entrar a Partimos"}
+                {step === "code"
+                  ? "Escribe tu código"
+                  : mode === "login"
+                    ? "Conectarme"
+                    : "Crear mi cuenta"}
               </Dialog.Title>
               <Dialog.Description className="mt-1 text-[14.5px] leading-relaxed text-ink-500">
                 {step === "code"
                   ? `Te mandamos un código de seis dígitos a ${contact}.`
-                  : "Sin contraseña. Te mandamos un código y listo."}
+                  : mode === "login"
+                    ? "Sin contraseña: tu celular o correo, un código y listo."
+                    : "Toma diez segundos. Sin contraseña, sin tarjeta."}
               </Dialog.Description>
             </div>
             <Dialog.Close
@@ -188,23 +201,55 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
               noValidate
               className="flex flex-col gap-3"
             >
-              <div className="grid grid-cols-2 gap-3">
-                <Field
-                  id={`${id}-first`}
-                  label="Nombre"
-                  value={firstName}
-                  onChange={setFirstName}
-                  autoComplete="given-name"
-                  autoFocus
-                />
-                <Field
-                  id={`${id}-last`}
-                  label="Apellido"
-                  value={lastName}
-                  onChange={setLastName}
-                  autoComplete="family-name"
-                />
+              <div
+                role="group"
+                aria-label="¿Ya tienes cuenta?"
+                className="flex rounded-xl bg-ink-50 p-0.5"
+              >
+                {(
+                  [
+                    ["login", "Conectarme"],
+                    ["register", "Crear cuenta"],
+                  ] as const
+                ).map(([value, label]) => (
+                  <button
+                    key={value}
+                    type="button"
+                    aria-pressed={mode === value}
+                    onClick={() => {
+                      setMode(value);
+                      setError("");
+                    }}
+                    className={`flex-1 rounded-[9px] px-3 py-2 text-[14px] font-semibold transition-colors ${
+                      mode === value
+                        ? "bg-white text-ink-900 shadow-[0_1px_4px_rgb(14_42_53/0.12)]"
+                        : "text-ink-500 hover:text-ink-900"
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
               </div>
+
+              {mode === "register" && (
+                <div className="grid grid-cols-2 gap-3">
+                  <Field
+                    id={`${id}-first`}
+                    label="Nombre"
+                    value={firstName}
+                    onChange={setFirstName}
+                    autoComplete="given-name"
+                    autoFocus
+                  />
+                  <Field
+                    id={`${id}-last`}
+                    label="Apellido"
+                    value={lastName}
+                    onChange={setLastName}
+                    autoComplete="family-name"
+                  />
+                </div>
+              )}
 
               <div
                 role="group"
@@ -307,7 +352,7 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
                 className="tnum rounded-[14px] border border-ink-200 px-3.5 py-3 text-center text-[24px] font-bold tracking-[0.4em] focus:border-accent focus:outline-none"
               />
               <Button type="submit" size="lg" full disabled={busy}>
-                {busy ? "Verificando…" : "Entrar"}
+                {busy ? "Verificando…" : "Confirmar"}
               </Button>
               <button
                 type="button"

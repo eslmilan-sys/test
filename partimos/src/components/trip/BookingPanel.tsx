@@ -317,7 +317,7 @@ export function BookingPanel({
               disabled={blocked}
               className="inline-flex w-full items-center justify-center rounded-[14px] bg-ink-900 px-7 py-4 font-display text-[17px] font-bold text-white transition-colors hover:bg-ink-800 disabled:pointer-events-none disabled:opacity-50"
             >
-              Entrar y reservar
+              Conectarme y reservar
             </button>
           }
         />

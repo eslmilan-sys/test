@@ -4,7 +4,12 @@ import { useEffect, useRef, useState } from "react";
 import { Command } from "cmdk";
 import { Icon } from "@/components/ui/Icon";
 import { placesForCity, KIND_LABELS } from "@/lib/places";
-import { geocodePlaces, MAPBOX_TOKEN, type GeocodedPlace } from "@/lib/mapbox";
+import {
+  geocodePlaces,
+  suggestPlaces,
+  MAPBOX_TOKEN,
+  type GeocodedPlace,
+} from "@/lib/mapbox";
 import { ALL_CITIES } from "@/lib/corridors";
 
 /**
@@ -70,11 +75,14 @@ export function PlacePicker({
     const controller = new AbortController();
     window.clearTimeout(debounce.current);
     debounce.current = window.setTimeout(() => {
-      geocodePlaces(
-        query,
-        city ? { lat: city.lat, lng: city.lng } : undefined,
-        controller.signal,
-      ).then(setRemote);
+      const near = city ? { lat: city.lat, lng: city.lng } : undefined;
+      /* Search Box connaît les immeubles (les PH) et les commerces ;
+         si elle ne répond rien, le géocodeur v5 reprend les rues. */
+      suggestPlaces(query, near, controller.signal).then((found) =>
+        found.length > 0
+          ? setRemote(found)
+          : geocodePlaces(query, near, controller.signal).then(setRemote),
+      );
     }, 300);
     return () => {
       controller.abort();
