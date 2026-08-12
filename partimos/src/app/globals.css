@@ -539,9 +539,13 @@
       transform: rotate(8.5deg) translateX(8px);
     }
   }
+  /* La course va jusqu'au BORD DROIT du conteneur, pas jusqu'au milieu :
+     on anime `left` en pourcentage (impossible avec translateX, dont le
+     % se réfère à l'élément lui-même). Fin de course symétrique du
+     départ : il dépasse à droite de ce qu'il dépassait à gauche. */
   @keyframes carro-avanza {
     to {
-      transform: translateX(120px);
+      left: calc(100% - 4.5rem);
     }
   }
 

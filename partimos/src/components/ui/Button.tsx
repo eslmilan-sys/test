@@ -27,17 +27,12 @@ const BASE =
   "active:translate-y-0 disabled:opacity-50 disabled:pointer-events-none select-none";
 
 /**
- * L'action principale est ORANGE, pas encre.
- *
- * C'est le changement qui apporte le plus de chaleur à l'ensemble : un
- * bouton bleu marine sur une page bleue est correct et froid, et rien
- * n'attire l'œil. L'orange est la seule couleur chaude du système, il ne
- * sert qu'à ça, donc il ne peut être confondu avec rien d'autre.
- *
- * Le texte du bouton est de l'ENCRE, pas du blanc : #26221C sur l'ambre donne
- * 7,4:1, ce qui fait du bouton l'élément le plus lisible de la page. Le réflexe
- * habituel — du blanc sur la couleur de marque — produit presque toujours un
- * bouton moins lisible que le texte courant qui l'entoure.
+ * L'action principale est de l'ENCRE — blanc sur asphalte (décision du
+ * propriétaire, 2026-08-12 : « l'orange avec des lettres noires, c'est
+ * moche »). Le contraste est maximal (14:1), le bouton sombre se
+ * distingue de tout le reste de la page claire, et l'ambre redevient ce
+ * qu'il est ailleurs : un ACCENT — le rectangle du hero, les insignes,
+ * jamais un fond de bouton.
  *
  * `active:scale-[0.97]` : la réponse tactile recommandée par la base de
  * règles. Sur mobile il n'y a pas de survol — sans réponse au doigt, un
@@ -45,7 +40,7 @@ const BASE =
  */
 const VARIANTS: Record<Variant, string> = {
   primary:
-    "bg-action text-ink-900 shadow-[0_8px_20px_-8px_rgb(180_83_9/0.45)] hover:bg-action-bright hover:-translate-y-px active:scale-[0.97]",
+    "bg-ink-900 text-white shadow-[0_8px_20px_-8px_rgb(14_42_53/0.5)] hover:bg-ink-800 hover:-translate-y-px active:scale-[0.97]",
   secondary:
     "bg-white text-ink-900 border-[1.5px] border-ink-200 hover:border-accent hover:text-accent-ink active:scale-[0.97]",
   onDark:

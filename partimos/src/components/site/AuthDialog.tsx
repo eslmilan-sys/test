@@ -223,7 +223,11 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
       <Dialog.Trigger asChild>{trigger}</Dialog.Trigger>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 z-[130] bg-night-950/70 backdrop-blur-[6px] motion-safe:animate-[fade-in_0.18s_ease-out]" />
-        <Dialog.Content className="fixed top-1/2 left-1/2 z-[140] w-[calc(100vw-24px)] max-w-[420px] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-[30px] border border-white/12 bg-night-950/95 text-white shadow-float backdrop-blur-xl motion-safe:animate-[sheet-in_0.22s_cubic-bezier(0.2,0.9,0.3,1)]">
+        {/* Le fond de la carte est un DÉGRADÉ, pas un aplat : plus clair
+            en haut (là où vivent la marque et le titre), il descend vers
+            la nuit — c'est la lumière des bonnes cartes sombres, et ça
+            différencie naturellement la tête du corps. */}
+        <Dialog.Content className="fixed top-1/2 left-1/2 z-[140] w-[calc(100vw-24px)] max-w-[420px] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-[30px] border border-white/12 bg-[linear-gradient(168deg,#1d475f_0%,#0e2534_46%,#06141d_100%)] text-white shadow-float backdrop-blur-xl motion-safe:animate-[sheet-in_0.22s_cubic-bezier(0.2,0.9,0.3,1)]">
           <div className="relative max-h-[90vh] overflow-y-auto rounded-[30px] px-6 pt-8 pb-6">
             {/* La lueur de la maison : UN rectangle ambre incliné, fondu
                 dans la nuit derrière le titre. */}
@@ -297,7 +301,7 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
                         lastName.trim(),
                       )
                     }
-                    className="mt-4 w-full rounded-full bg-action px-5 py-3.5 font-display text-[16px] font-bold text-ink-900 transition-opacity hover:opacity-90"
+                    className="mt-4 w-full rounded-full bg-white px-5 py-3.5 font-display text-[16px] font-bold text-ink-900 transition-colors hover:bg-ink-50"
                   >
                     Continuar como {firstName.trim() || "invitado"}
                   </button>
@@ -305,10 +309,13 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
               </>
             ) : step === "identity" ? (
               <>
+                {/* Zone 1 — TES DONNÉES, dans son propre panneau : la
+                    tête (titre) au-dessus, le panneau au milieu, la voie
+                    express en dessous. Trois zones, trois matières. */}
                 <form
                   onSubmit={submitIdentity}
                   noValidate
-                  className="flex flex-col gap-3.5"
+                  className="flex flex-col gap-3.5 rounded-[22px] border border-white/10 bg-white/[0.06] p-4"
                 >
                   {mode === "register" && (
                     <div className="grid grid-cols-2 gap-2.5">
@@ -412,7 +419,7 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
                           onClick={() => setCodeVia(value)}
                           className={`rounded-full border px-3 py-1.5 text-[13px] font-semibold transition-colors ${
                             codeVia === value
-                              ? "border-action bg-action text-ink-900"
+                              ? "border-white bg-white text-ink-900"
                               : "border-white/15 bg-white/5 text-night-200 hover:border-white/35"
                           }`}
                         >
@@ -425,7 +432,7 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
                   <button
                     type="submit"
                     disabled={busy}
-                    className="mt-1 w-full rounded-full bg-action px-5 py-3.5 font-display text-[16px] font-bold text-ink-900 transition-opacity hover:opacity-90 disabled:opacity-50"
+                    className="mt-1 w-full rounded-full bg-white px-5 py-3.5 font-display text-[16px] font-bold text-ink-900 transition-colors hover:bg-ink-50 disabled:opacity-50"
                   >
                     {busy ? "Mandando…" : "Mandarme el código"}
                   </button>
@@ -463,7 +470,7 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
 
                 {/* La bascule, EN BAS et en une phrase : l'écran ne
                     montre qu'un chemin à la fois. */}
-                <p className="mt-6 text-center text-[13.5px] text-night-200">
+                <p className="mt-5 border-t border-white/10 pt-4 text-center text-[13.5px] text-night-200">
                   {mode === "login" ? (
                     <>
                       ¿Todavía no tienes cuenta?{" "}
@@ -555,7 +562,7 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
                 <button
                   type="submit"
                   disabled={busy}
-                  className="w-full rounded-full bg-action px-5 py-3.5 font-display text-[16px] font-bold text-ink-900 transition-opacity hover:opacity-90 disabled:opacity-50"
+                  className="w-full rounded-full bg-white px-5 py-3.5 font-display text-[16px] font-bold text-ink-900 transition-colors hover:bg-ink-50 disabled:opacity-50"
                 >
                   {busy ? "Verificando…" : "Confirmar"}
                 </button>
