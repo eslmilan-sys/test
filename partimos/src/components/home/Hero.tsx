@@ -132,11 +132,13 @@ export function Hero() {
             {/* UNE forme de couleur pleine glissée SOUS la carte : là où le
                 verre la recouvre, il la fond en lumière ; le coin qui
                 dépasse reste net. Un seul objet — le geste vaut par sa
-                rareté. */}
-            <span
-              aria-hidden
-              className="absolute -top-5 -left-6 size-24 rotate-[10deg] rounded-[24px] bg-[linear-gradient(135deg,#fde68a,#f59e0b_58%,#d97706)] opacity-90"
-            />
+                rareté. Et il ROULE : dérive continue lente + avancée vers
+                la droite au défilement (.carro-avanza / .carro-flota,
+                globals.css) — l'unique élément animé du hero, parce que
+                c'est le carro. */}
+            <span aria-hidden className="carro-avanza absolute -top-5 -left-6 size-24">
+              <span className="carro-flota block size-full rotate-[10deg] rounded-[24px] bg-[linear-gradient(135deg,#fde68a,#f59e0b_58%,#d97706)] opacity-90" />
+            </span>
             <div className="relative">
               <SearchCard />
             </div>

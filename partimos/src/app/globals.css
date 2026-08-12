@@ -508,6 +508,43 @@
     }
   }
 
+  /* ---- LE RECTANGLE-CARRO DU HERO ----
+     L'objet ambre sous la carte de recherche est le seul élément
+     « véhicule » de la page : il dérive lentement de gauche à droite,
+     comme un carro qui roule — course courte, cadence lente, jamais de
+     rebond : c'est la frontière entre un objet vivant et un gadget.
+     Deux couches pour deux moteurs : l'enveloppe avance AVEC le
+     défilement (timeline native, comme la parallaxe), l'intérieur
+     flotte en continu. Deux transforms sur deux nœuds — jamais deux
+     animations sur le même. */
+  @media (prefers-reduced-motion: no-preference) {
+    .carro-flota {
+      animation: carro-flota 5.2s ease-in-out infinite alternate;
+    }
+  }
+  @supports (animation-timeline: scroll()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .carro-avanza {
+        animation: carro-avanza linear both;
+        animation-timeline: scroll(root block);
+        animation-range: 0 560px;
+      }
+    }
+  }
+  @keyframes carro-flota {
+    from {
+      transform: rotate(10deg) translateX(-5px);
+    }
+    to {
+      transform: rotate(8.5deg) translateX(8px);
+    }
+  }
+  @keyframes carro-avanza {
+    to {
+      transform: translateX(120px);
+    }
+  }
+
   .nav-pill {
     --glass-alpha: 0.6;
     -webkit-backdrop-filter: blur(var(--glass-blur-2xl)) saturate(190%);

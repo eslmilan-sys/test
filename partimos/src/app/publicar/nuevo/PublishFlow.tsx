@@ -11,7 +11,7 @@ import { CityCombobox } from "@/components/ui/CityCombobox";
 import { PlacePicker } from "@/components/ui/PlacePicker";
 import { AuthDialog } from "@/components/site/AuthDialog";
 import { carsOf, useSession } from "@/lib/session";
-import { buildRoute, getCorridor } from "@/lib/corridors";
+import { ALL_CITIES, buildRoute, getCorridor } from "@/lib/corridors";
 import {
   computePriceCap,
   formatUsd,
@@ -151,6 +151,23 @@ export function PublishFlow() {
 
   /** Villes traversées entre l'origine et la destination — les arrêts possibles. */
   const innerStops = corridor ? corridor.waypoints.slice(1, -1) : [];
+  /* Sur une longue ruta le réseau dense propose une douzaine de pueblos —
+     tous valables, mais une grille de 14 cases écrase l'écran. Le tri
+     intelligent : les villes MAJEURES d'abord (celles que tout le monde
+     connaît), les pueblos repliés derrière un bouton — et un pueblo déjà
+     coché reste toujours visible. */
+  const isMajorCity = (slug: string) =>
+    ALL_CITIES.find((c) => c.slug === slug)?.isMajor ?? false;
+  const [showPueblos, setShowPueblos] = useState(false);
+  const majorStops = innerStops.filter((s) => isMajorCity(s.citySlug));
+  const puebloStops = innerStops.filter((s) => !isMajorCity(s.citySlug));
+  const visibleStops =
+    showPueblos || majorStops.length === 0
+      ? innerStops
+      : innerStops.filter(
+          (s) => isMajorCity(s.citySlug) || cityStops.includes(s.citySlug),
+        );
+  const hiddenCount = innerStops.length - visibleStops.length;
   /** Combien de recherches distinctes les arrêts cochés rendent possibles. */
   const pairCount = servedPairCount(2 + cityStops.length);
 
@@ -424,7 +441,7 @@ export function PublishFlow() {
                     alguien puede bajarse ahí y aportar por esos kilómetros.
                   </p>
                   <div className="grid gap-2 sm:grid-cols-2">
-                    {innerStops.map((stop) => {
+                    {visibleStops.map((stop) => {
                       const active = cityStops.includes(stop.citySlug);
                       return (
                         <button
@@ -468,6 +485,18 @@ export function PublishFlow() {
                       );
                     })}
                   </div>
+                  {puebloStops.length > 0 && majorStops.length > 0 && (
+                    <button
+                      type="button"
+                      aria-expanded={showPueblos}
+                      onClick={() => setShowPueblos((v) => !v)}
+                      className="mt-2.5 text-[13.5px] font-semibold text-accent-ink hover:underline"
+                    >
+                      {showPueblos
+                        ? "Ocultar los pueblos del camino"
+                        : `Mostrar los pueblos del camino (${hiddenCount} más)`}
+                    </button>
+                  )}
                   <p
                     className="mt-3 rounded-[12px] bg-accent-soft px-4 py-3 text-[13.5px] leading-relaxed text-accent-ink"
                     aria-live="polite"
