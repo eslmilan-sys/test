@@ -195,6 +195,23 @@ export function CityCombobox({
             onBlur={() => window.setTimeout(() => setOpen(false), 120)}
             onKeyDown={(e) => {
               if (e.key === "Escape") setOpen(false);
+              /* LE bug du téléphone : la touche « intro » du clavier ne
+                 sélectionnait RIEN — la liste restait ouverte et le tap
+                 suivant tombait dedans, choisissant une ville au hasard.
+                 Entrée prend le premier résultat, dans l'ordre d'affichage :
+                 ville, puis lieu connu, puis lieu du géocodeur. */
+              if (e.key === "Enter" && open) {
+                e.preventDefault();
+                if (results[0]) {
+                  onChange(results[0].slug);
+                  setOpen(false);
+                } else if (placeResults[0]) {
+                  onChange(placeResults[0].citySlug);
+                  setOpen(false);
+                } else if (remoteResults[0]) {
+                  void pickRemote(remoteResults[0]);
+                }
+              }
             }}
             className="w-full border-none bg-transparent py-px text-[16px] font-semibold text-ink-900 placeholder:font-medium placeholder:text-ink-500 focus:outline-none"
           />

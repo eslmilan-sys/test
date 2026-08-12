@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ALL_CITIES, CORRIDORS } from "@/lib/corridors";
+import { ALL_CITIES, buildRoute, CORRIDORS } from "@/lib/corridors";
 import { Button } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
 import { CityCombobox } from "@/components/ui/CityCombobox";
@@ -238,6 +238,7 @@ export function SearchCard() {
             <RouteMap
               originSlug={from}
               destinationSlug={to}
+              route={buildRoute(from, to) ?? undefined}
               picking={picking}
               onPick={pickOnMap}
             />

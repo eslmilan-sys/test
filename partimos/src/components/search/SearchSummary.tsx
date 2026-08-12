@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
-import { ALL_CITIES } from "@/lib/corridors";
+import { ALL_CITIES, buildRoute } from "@/lib/corridors";
 import { CityCombobox } from "@/components/ui/CityCombobox";
 import { RouteMap } from "@/components/map/RouteMap";
 import { Button } from "@/components/ui/Button";
@@ -179,6 +179,7 @@ export function SearchSummary({
             <RouteMap
               originSlug={draft.from}
               destinationSlug={draft.to}
+              route={buildRoute(draft.from, draft.to) ?? undefined}
               picking={picking}
               onPick={(slug) => {
                 if (picking === "origin") {
