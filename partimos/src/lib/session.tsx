@@ -57,6 +57,11 @@ export type Session = {
    *  Mi cuenta. Il présélectionne le canal à la réservation — il ne
    *  l'impose jamais : les trois restent visibles à chaque reserva. */
   payPref?: PayChannel | null;
+  /** CONDUCTEUR : comment il accepte l'aporte HORS app. Le cobro dans
+   *  l'app est toujours accepté (l'argent lui arrive en versement, il
+   *  n'a rien à gérer) ; ici il déclare s'il prend aussi le Yappy directo
+   *  et/ou l'efectivo en main. Vide = « solo por la app ». */
+  acceptsOutside?: ("yappy" | "efectivo")[] | null;
 };
 
 /** La liste des carros, quel que soit l'âge de la session. */

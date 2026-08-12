@@ -57,7 +57,7 @@ function nextDays(count = 14) {
 
 export function PublishFlow() {
   const params = useSearchParams();
-  const { session, isDemo } = useSession();
+  const { session, isDemo, updateSession } = useSession();
   const days = useMemo(() => nextDays(), []);
 
   /* La route peut arriver par ?ruta= (pages corridor) OU par
@@ -90,6 +90,15 @@ export function PublishFlow() {
     "una-vez" | "diario" | "semanal" | "mensual"
   >("una-vez");
   const [category, setCategory] = useState<VehicleCategory>("standard");
+  /* Comment le conducteur ACCEPTE l'aporte hors app. Le cobro dans l'app
+     est toujours là (il n'a rien à gérer, l'argent lui arrive complet) ;
+     le reste, c'est SON choix — dérivé de la session tant qu'il n'a pas
+     cliqué, comme le canal du passager côté réservation. */
+  const [outsideChoice, setOutsideChoice] = useState<
+    ("yappy" | "efectivo")[] | null
+  >(null);
+  const acceptsOutside = outsideChoice ??
+    session?.acceptsOutside ?? ["yappy", "efectivo"];
   const [carMake, setCarMake] = useState("");
   const [carModel, setCarModel] = useState("");
   const [carYear, setCarYear] = useState(2020);
@@ -172,6 +181,15 @@ export function PublishFlow() {
             {recurrence === "mensual" && ", repetido cada mes"}. Te avisamos
             por WhatsApp en cuanto alguien pida un puesto — cada quien te
             propone su punto y tú decides si te queda de paso.
+          </p>
+          <p className="mb-6 rounded-[14px] bg-ink-50 px-4 py-3 text-[13.5px] leading-relaxed text-ink-500">
+            Aceptas el aporte{" "}
+            {acceptsOutside.length === 0
+              ? "solo por la app — todo llega cobrado, con comprobante"
+              : `por la app${
+                  acceptsOutside.includes("yappy") ? ", por Yappy directo" : ""
+                }${acceptsOutside.includes("efectivo") ? " y en efectivo" : ""}`}
+            . Te llega completo en todos los casos.
           </p>
           {cityStops.length > 0 && (
             <p className="mb-6 rounded-[14px] bg-accent-soft px-4 py-3 text-[13.5px] leading-relaxed text-accent-ink">
@@ -846,6 +864,110 @@ export function PublishFlow() {
                   {formatUsd(Math.max(0, cap.costTotalCents - price * seats))}
                 </Row>
               </dl>
+
+              {/* Comment il ACCEPTE l'aporte. La ligne app est fixe et
+                  cochée — c'est la promesse de la maison : cobro déjà
+                  hecho au moment de confirmer, aporte complet, rien à
+                  gérer. Le hors-app est à lui : Yappy directo, efectivo,
+                  les deux, ou aucun (« solo por la app »). */}
+              {(() => {
+                const toggle = (method: "yappy" | "efectivo") =>
+                  setOutsideChoice(
+                    acceptsOutside.includes(method)
+                      ? acceptsOutside.filter((m) => m !== method)
+                      : [...acceptsOutside, method],
+                  );
+                return (
+                  <fieldset className="mt-6">
+                    <legend className="mb-1 text-[11.5px] font-bold tracking-[0.11em] text-ink-500 uppercase">
+                      Cómo aceptas el aporte
+                    </legend>
+                    <p className="mb-3 text-[13.5px] leading-relaxed text-ink-500">
+                      El cobro por la app siempre está activo — a ti te llega
+                      completo, sin gestionar nada. Lo demás lo decides tú.
+                    </p>
+                    <div className="grid gap-1.5">
+                      <div className="flex items-start gap-3 rounded-[14px] border border-ink-900 bg-ink-50 px-4 py-3">
+                        <span
+                          aria-hidden
+                          className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-[6px] border-2 border-ink-900 bg-ink-900 text-white"
+                        >
+                          <Icon name="check" className="size-3" />
+                        </span>
+                        <span className="min-w-0">
+                          <span className="block text-[15px] font-semibold">
+                            En la app — Yappy o tarjeta, siempre
+                          </span>
+                          <span className="block text-[12.5px] leading-snug text-ink-500">
+                            El pasajero paga al confirmar, el cobro ya está
+                            hecho antes de salir, y tu aporte te llega completo
+                            — la tarifa la paga él.
+                          </span>
+                        </span>
+                      </div>
+                      {(
+                        [
+                          [
+                            "yappy",
+                            "Yappy directo a tu número",
+                            "Te lo manda él mismo, el día del viaje.",
+                          ],
+                          [
+                            "efectivo",
+                            "Efectivo en la mano",
+                            "Como toda la vida. Si prefieres no manejar plata, desmárcalo.",
+                          ],
+                        ] as const
+                      ).map(([method, title, body]) => {
+                        const active = acceptsOutside.includes(method);
+                        return (
+                          <button
+                            key={method}
+                            type="button"
+                            aria-pressed={active}
+                            onClick={() => toggle(method)}
+                            className={`flex items-start gap-3 rounded-[14px] border px-4 py-3 text-left transition-colors ${
+                              active
+                                ? "border-ink-900 bg-ink-50"
+                                : "border-ink-200 hover:border-accent"
+                            }`}
+                          >
+                            <span
+                              aria-hidden
+                              className={`mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-[6px] border-2 ${
+                                active
+                                  ? "border-ink-900 bg-ink-900 text-white"
+                                  : "border-ink-200"
+                              }`}
+                            >
+                              {active && (
+                                <Icon name="check" className="size-3" />
+                              )}
+                            </span>
+                            <span className="min-w-0">
+                              <span
+                                className={`block text-[15px] ${active ? "font-semibold" : ""}`}
+                              >
+                                {title}
+                              </span>
+                              <span className="block text-[12.5px] leading-snug text-ink-500">
+                                {body}
+                              </span>
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                    {acceptsOutside.length === 0 && (
+                      <p className="mt-2.5 rounded-[12px] bg-accent-soft px-4 py-3 text-[13px] leading-relaxed text-accent-ink">
+                        Solo por la app: nadie te paga en la mano, todo llega
+                        cobrado y con comprobante. Los pasajeros lo verán antes
+                        de reservar.
+                      </p>
+                    )}
+                  </fieldset>
+                );
+              })()}
             </>
           )}
 
@@ -869,7 +991,15 @@ export function PublishFlow() {
                 Continuar
               </Button>
             ) : session ? (
-              <Button className="ml-auto" onClick={() => setPublished(true)}>
+              <Button
+                className="ml-auto"
+                onClick={() => {
+                  // Le choix de cobro devient le réglage du compte : la
+                  // prochaine publication part de là.
+                  updateSession({ acceptsOutside });
+                  setPublished(true);
+                }}
+              >
                 Publicar el viaje
               </Button>
             ) : (

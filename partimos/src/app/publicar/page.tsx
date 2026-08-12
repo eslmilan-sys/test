@@ -51,6 +51,9 @@ export default function PublicarPage() {
               igual. La gasolina cuesta lo mismo vayas solo o acompañado.
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
+              <ButtonLink href="/publicar/nuevo" variant="onDark" size="lg">
+                Publicar mi viaje
+              </ButtonLink>
               <ButtonLink href="#calculadora" variant="onDark" size="lg">
                 Calcular mi aporte
               </ButtonLink>
@@ -88,6 +91,81 @@ export default function PublicarPage() {
                   </li>
                 ))}
               </ol>
+            </Container>
+          </section>
+
+          {/* LA SÉCURITÉ DU COBRO, côté conducteur d'abord : c'est lui
+              qu'il faut convaincre — sans carros publiés il n'y a pas de
+              plateforme. Quatre garanties concrètes, pas des slogans. */}
+          <section className="py-12 md:py-16">
+            <Container>
+              <h2 className="mb-2 max-w-[22ch] text-[clamp(24px,4vw,34px)] font-extrabold">
+                El cobro, asegurado antes de salir
+              </h2>
+              <p className="mb-8 max-w-[58ch] text-[15.5px] leading-relaxed text-ink-500">
+                Manejar ya es poner el carro, la gasolina y el volante. Cobrar
+                no debería ser otro trabajo.
+              </p>
+              <div className="grid gap-3.5 min-[680px]:grid-cols-2 min-[1000px]:grid-cols-4">
+                <div className="rounded-[18px] border border-ink-200 p-5.5">
+                  <span className="mb-3.5 flex size-10.5 items-center justify-center rounded-xl bg-ink-50 text-ink-900">
+                    <Icon name="shield" className="size-5.5" />
+                  </span>
+                  <h3 className="mb-1.5 font-display text-[16.5px] font-bold">
+                    Sales con el cobro ya hecho
+                  </h3>
+                  <p className="text-sm leading-relaxed text-ink-500">
+                    Si el pasajero pagó en la app, su aporte quedó cobrado al
+                    confirmar el puesto. No hay «te pago llegando», no hay
+                    vueltos, no hay excusas.
+                  </p>
+                </div>
+                <div className="rounded-[18px] border border-ink-200 p-5.5">
+                  <span className="mb-3.5 flex size-10.5 items-center justify-center rounded-xl bg-ink-50 text-ink-900">
+                    <Icon name="cash" className="size-5.5" />
+                  </span>
+                  <h3 className="mb-1.5 font-display text-[16.5px] font-bold">
+                    Tu aporte llega completo
+                  </h3>
+                  <p className="text-sm leading-relaxed text-ink-500">
+                    La tarifa de servicio la paga el pasajero que elige el
+                    cobro en la app — de lo tuyo no se descuenta nada, nunca.
+                    Y si no viaja, las reglas de cancelación te cubren.
+                  </p>
+                </div>
+                <div className="rounded-[18px] border border-ink-200 p-5.5">
+                  <span className="mb-3.5 flex size-10.5 items-center justify-center rounded-xl bg-ink-50 text-ink-900">
+                    <Icon name="check" className="size-5.5" />
+                  </span>
+                  <h3 className="mb-1.5 font-display text-[16.5px] font-bold">
+                    Tú eliges cómo te pagan
+                  </h3>
+                  <p className="text-sm leading-relaxed text-ink-500">
+                    En la app siempre; Yappy directo y efectivo, solo si tú los
+                    aceptas. Puedes manejar «solo por la app» y no tocar plata
+                    en todo el viaje.
+                  </p>
+                </div>
+                <div className="rounded-[18px] border border-ink-200 p-5.5">
+                  <span className="mb-3.5 flex size-10.5 items-center justify-center rounded-xl bg-ink-50 text-ink-900">
+                    <Icon name="id" className="size-5.5" />
+                  </span>
+                  <h3 className="mb-1.5 font-display text-[16.5px] font-bold">
+                    Sabes a quién llevas
+                  </h3>
+                  <p className="text-sm leading-relaxed text-ink-500">
+                    Nadie reserva sin cédula verificada. Ves el perfil y las
+                    calificaciones antes de aceptar, y su número solo se
+                    comparte con reserva confirmada.
+                  </p>
+                </div>
+              </div>
+              <p className="mt-5 max-w-[70ch] text-[13.5px] leading-relaxed text-ink-500">
+                ¿Y el pasajero? Las mismas garantías al revés: cobro protegido
+                con la tarifa a la vista, comprobante, reembolso según las
+                reglas de cancelación — y jamás le pedimos la tarjeta fuera de
+                la app.
+              </p>
             </Container>
           </section>
 

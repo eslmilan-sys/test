@@ -521,11 +521,53 @@ function PayPrefRow() {
         value={value}
         onChange={(channel) => updateSession({ payPref: channel })}
       />
-      <p className="mt-2.5 text-[12.5px] leading-snug text-ink-500">
-        ¿Manejas? Da igual cómo pague el pasajero: tu aporte te llega
-        completo, sin descuentos — la tarifa de servicio la paga quien elige
-        el cobro en la app.
-      </p>
+      <div className="mt-4 border-t border-ink-200 pt-3.5">
+        <p className="text-[14.5px] font-semibold">
+          Si manejas: cómo aceptas el aporte
+        </p>
+        <p className="mb-2.5 text-[12.5px] leading-snug text-ink-500">
+          El cobro por la app siempre está activo — te llega completo, la
+          tarifa la paga el pasajero. Lo de afuera lo decides tú.
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {(
+            [
+              ["yappy", "Yappy directo a mi número"],
+              ["efectivo", "Efectivo en la mano"],
+            ] as const
+          ).map(([method, label]) => {
+            const accepted = session?.acceptsOutside ?? ["yappy", "efectivo"];
+            const active = accepted.includes(method);
+            return (
+              <button
+                key={method}
+                type="button"
+                aria-pressed={active}
+                onClick={() =>
+                  updateSession({
+                    acceptsOutside: active
+                      ? accepted.filter((m) => m !== method)
+                      : [...accepted, method],
+                  })
+                }
+                className={`rounded-full border-[1.5px] px-3.5 py-2 text-[13.5px] font-semibold transition-colors ${
+                  active
+                    ? "border-ink-900 bg-ink-900 text-white"
+                    : "border-ink-200 text-ink-500 hover:border-accent"
+                }`}
+              >
+                {label}
+              </button>
+            );
+          })}
+        </div>
+        {(session?.acceptsOutside ?? ["yappy", "efectivo"]).length === 0 && (
+          <p className="mt-2 text-[12.5px] leading-snug text-ink-500">
+            Solo por la app: nadie te paga en la mano y todo queda con
+            comprobante.
+          </p>
+        )}
+      </div>
     </div>
   );
 }

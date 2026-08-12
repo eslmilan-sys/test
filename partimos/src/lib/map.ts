@@ -15,12 +15,14 @@
 
 import { ALL_CITIES, CORRIDORS, type City } from "./corridors";
 
-/** Cadre de la zone couverte, avec une marge pour les étiquettes. */
+/** Cadre de la zone couverte, avec une marge pour les étiquettes. Il a
+ *  grandi avec le réseau : Changuinola à l'ouest-nord, Chepo à l'est,
+ *  Pedasí au sud — tout le pays desservi tient dedans. */
 const BOUNDS = {
-  minLng: -82.9,
-  maxLng: -79.2,
-  minLat: 7.55,
-  maxLat: 9.25,
+  minLng: -82.95,
+  maxLng: -78.9,
+  minLat: 7.4,
+  maxLat: 9.55,
 };
 
 const WIDTH = 1000;

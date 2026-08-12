@@ -24,6 +24,11 @@ export type City = {
    *  positionnent les villes sur la carte schématique. */
   lat: number;
   lng: number;
+  /** Étiquetée sur la carte d'ensemble. Les ~30 villes desservies y
+   *  tiendraient pas : seules les majeures s'affichent, les autres se
+   *  choisissent en écrivant — et apparaissent sur la carte une fois
+   *  choisies. */
+  isMajor?: boolean;
 };
 
 export type Corridor = {
@@ -58,6 +63,7 @@ export const CITIES = {
     province: "Panamá",
     lat: 8.9824,
     lng: -79.5199,
+    isMajor: true,
   },
   chitre: {
     slug: "chitre",
@@ -66,6 +72,7 @@ export const CITIES = {
     province: "Herrera",
     lat: 7.9614,
     lng: -80.4297,
+    isMajor: true,
   },
   lasTablas: {
     slug: "las-tablas",
@@ -74,6 +81,7 @@ export const CITIES = {
     province: "Los Santos",
     lat: 7.7667,
     lng: -80.2833,
+    isMajor: true,
   },
   david: {
     slug: "david",
@@ -82,6 +90,7 @@ export const CITIES = {
     province: "Chiriquí",
     lat: 8.4333,
     lng: -82.4333,
+    isMajor: true,
   },
   santiago: {
     slug: "santiago",
@@ -90,6 +99,7 @@ export const CITIES = {
     province: "Veraguas",
     lat: 8.1,
     lng: -80.9833,
+    isMajor: true,
   },
   penonome: {
     slug: "penonome",
@@ -98,6 +108,7 @@ export const CITIES = {
     province: "Coclé",
     lat: 8.5194,
     lng: -80.3572,
+    isMajor: true,
   },
   coronado: {
     slug: "coronado",
@@ -106,6 +117,7 @@ export const CITIES = {
     province: "Panamá Oeste",
     lat: 8.5333,
     lng: -79.95,
+    isMajor: true,
   },
   chorrera: {
     slug: "la-chorrera",
@@ -114,6 +126,209 @@ export const CITIES = {
     province: "Panamá Oeste",
     lat: 8.8803,
     lng: -79.7833,
+    isMajor: true,
+  },
+
+  /* ── Panamá Oeste y Coclé, sobre la Panamericana ──────────────────── */
+  arraijan: {
+    slug: "arraijan",
+    name: "Arraiján",
+    shortName: "Arraiján",
+    province: "Panamá Oeste",
+    lat: 8.9553,
+    lng: -79.6633,
+  },
+  capira: {
+    slug: "capira",
+    name: "Capira",
+    shortName: "Capira",
+    province: "Panamá Oeste",
+    lat: 8.7592,
+    lng: -79.8825,
+  },
+  chame: {
+    slug: "chame",
+    name: "Chame",
+    shortName: "Chame",
+    province: "Panamá Oeste",
+    lat: 8.5762,
+    lng: -79.8879,
+  },
+  sanCarlos: {
+    slug: "san-carlos",
+    name: "San Carlos",
+    shortName: "San Carlos",
+    province: "Panamá Oeste",
+    lat: 8.4726,
+    lng: -79.9575,
+  },
+  rioHato: {
+    slug: "rio-hato",
+    name: "Río Hato",
+    shortName: "Río Hato",
+    province: "Coclé",
+    lat: 8.3781,
+    lng: -80.1672,
+  },
+  anton: {
+    slug: "anton",
+    name: "Antón",
+    shortName: "Antón",
+    province: "Coclé",
+    lat: 8.3925,
+    lng: -80.2603,
+  },
+  nata: {
+    slug: "nata",
+    name: "Natá",
+    shortName: "Natá",
+    province: "Coclé",
+    lat: 8.3333,
+    lng: -80.5167,
+  },
+  aguadulce: {
+    slug: "aguadulce",
+    name: "Aguadulce",
+    shortName: "Aguadulce",
+    province: "Coclé",
+    lat: 8.2422,
+    lng: -80.5442,
+  },
+  elValle: {
+    slug: "el-valle",
+    name: "El Valle de Antón",
+    shortName: "El Valle",
+    province: "Coclé",
+    lat: 8.6,
+    lng: -80.1272,
+  },
+
+  /* ── Azuero ───────────────────────────────────────────────────────── */
+  parita: {
+    slug: "parita",
+    name: "Parita",
+    shortName: "Parita",
+    province: "Herrera",
+    lat: 8.0011,
+    lng: -80.5217,
+  },
+  losSantos: {
+    slug: "los-santos",
+    name: "La Villa de Los Santos",
+    shortName: "Los Santos",
+    province: "Los Santos",
+    lat: 7.9358,
+    lng: -80.4194,
+  },
+  guarare: {
+    slug: "guarare",
+    name: "Guararé",
+    shortName: "Guararé",
+    province: "Los Santos",
+    lat: 7.8158,
+    lng: -80.2847,
+  },
+  pedasi: {
+    slug: "pedasi",
+    name: "Pedasí",
+    shortName: "Pedasí",
+    province: "Los Santos",
+    lat: 7.5289,
+    lng: -80.0247,
+  },
+
+  /* ── Veraguas y Chiriquí ──────────────────────────────────────────── */
+  sona: {
+    slug: "sona",
+    name: "Soná",
+    shortName: "Soná",
+    province: "Veraguas",
+    lat: 8.0119,
+    lng: -81.3211,
+  },
+  tole: {
+    slug: "tole",
+    name: "Tolé",
+    shortName: "Tolé",
+    province: "Chiriquí",
+    lat: 8.2333,
+    lng: -81.6667,
+  },
+  lasLajas: {
+    slug: "las-lajas",
+    name: "Las Lajas",
+    shortName: "Las Lajas",
+    province: "Chiriquí",
+    lat: 8.2436,
+    lng: -81.8703,
+  },
+  laConcepcion: {
+    slug: "la-concepcion",
+    name: "La Concepción (Bugaba)",
+    shortName: "La Concepción",
+    province: "Chiriquí",
+    lat: 8.5121,
+    lng: -82.6194,
+  },
+  pasoCanoas: {
+    slug: "paso-canoas",
+    name: "Paso Canoas",
+    shortName: "Paso Canoas",
+    province: "Chiriquí",
+    lat: 8.5333,
+    lng: -82.8383,
+  },
+  boquete: {
+    slug: "boquete",
+    name: "Boquete",
+    shortName: "Boquete",
+    province: "Chiriquí",
+    lat: 8.7803,
+    lng: -82.4408,
+    isMajor: true,
+  },
+  volcan: {
+    slug: "volcan",
+    name: "Volcán",
+    shortName: "Volcán",
+    province: "Chiriquí",
+    lat: 8.7681,
+    lng: -82.6394,
+  },
+
+  /* ── Colón, el este y Bocas ───────────────────────────────────────── */
+  colon: {
+    slug: "colon",
+    name: "Colón",
+    shortName: "Colón",
+    province: "Colón",
+    lat: 9.3592,
+    lng: -79.9014,
+    isMajor: true,
+  },
+  chepo: {
+    slug: "chepo",
+    name: "Chepo",
+    shortName: "Chepo",
+    province: "Panamá Este",
+    lat: 9.1706,
+    lng: -79.1017,
+  },
+  almirante: {
+    slug: "almirante",
+    name: "Almirante",
+    shortName: "Almirante",
+    province: "Bocas del Toro",
+    lat: 9.3,
+    lng: -82.4028,
+  },
+  changuinola: {
+    slug: "changuinola",
+    name: "Changuinola",
+    shortName: "Changuinola",
+    province: "Bocas del Toro",
+    lat: 9.4319,
+    lng: -82.5182,
   },
 } as const satisfies Record<string, City>;
 
@@ -197,6 +412,133 @@ const ROAD = {
     km: 285,
     tollCents: 300,
     pickupPoints: ["Las Tablas — entrada del pueblo"],
+  },
+
+  /* Les villes ajoutées avec l'extension du réseau. Leur km est le cumul
+     depuis Panamá SUR LEUR PROPRE chemin — documentaire : la synthèse
+     des rutas (`buildRoute`) ne lit que les TRONÇONS (ROAD_EDGES) et les
+     pickupPoints ci-dessous. Points de rencontre : des repères publics
+     que tout le monde connaît — entrées de pueblo, parques, cruces —
+     jamais un terminal de buses (règle maison). */
+  arraijan: {
+    km: 20,
+    tollCents: 100,
+    pickupPoints: ["Arraiján — entrada por la Panamericana", "Arraiján — el parque central"],
+  },
+  capira: {
+    km: 54,
+    tollCents: 200,
+    pickupPoints: ["Capira — entrada del pueblo", "Capira — sobre la Panamericana"],
+  },
+  chame: {
+    km: 72,
+    tollCents: 200,
+    pickupPoints: ["Chame — cruce de la Panamericana", "Chame — entrada del pueblo"],
+  },
+  "san-carlos": {
+    km: 95,
+    tollCents: 200,
+    pickupPoints: ["San Carlos — entrada del pueblo", "Las Uvas — cruce hacia El Valle"],
+  },
+  "rio-hato": {
+    km: 115,
+    tollCents: 200,
+    pickupPoints: ["Río Hato — sobre la Panamericana", "Río Hato — entrada de la base"],
+  },
+  anton: {
+    km: 130,
+    tollCents: 200,
+    pickupPoints: ["Antón — entrada del pueblo", "Antón — el parque central"],
+  },
+  nata: {
+    km: 175,
+    tollCents: 300,
+    pickupPoints: ["Natá — entrada del pueblo", "Natá — la basílica, sobre la vía"],
+  },
+  aguadulce: {
+    km: 190,
+    tollCents: 300,
+    pickupPoints: ["Aguadulce — cruce de la Panamericana", "Aguadulce — el parque central"],
+  },
+  "el-valle": {
+    km: 123,
+    tollCents: 200,
+    pickupPoints: ["El Valle — el mercado", "El Valle — entrada del pueblo"],
+  },
+  parita: {
+    km: 235,
+    tollCents: 300,
+    pickupPoints: ["Parita — entrada del pueblo", "Parita — sobre la vía de Divisa"],
+  },
+  "los-santos": {
+    km: 255,
+    tollCents: 300,
+    pickupPoints: ["La Villa de Los Santos — entrada del pueblo", "Los Santos — el parque central"],
+  },
+  guarare: {
+    km: 275,
+    tollCents: 300,
+    pickupPoints: ["Guararé — entrada del pueblo", "Guararé — sobre la vía nacional"],
+  },
+  pedasi: {
+    km: 327,
+    tollCents: 300,
+    pickupPoints: ["Pedasí — entrada del pueblo", "Pedasí — el parque central"],
+  },
+  sona: {
+    km: 300,
+    tollCents: 300,
+    pickupPoints: ["Soná — entrada del pueblo", "Soná — el parque central"],
+  },
+  tole: {
+    km: 320,
+    tollCents: 300,
+    pickupPoints: ["Tolé — cruce de la Panamericana"],
+  },
+  "las-lajas": {
+    km: 365,
+    tollCents: 300,
+    pickupPoints: ["Las Lajas — cruce de la Panamericana", "Las Lajas — entrada del pueblo"],
+  },
+  "la-concepcion": {
+    km: 465,
+    tollCents: 300,
+    pickupPoints: ["La Concepción — el parque central", "La Concepción — cruce hacia Volcán"],
+  },
+  "paso-canoas": {
+    km: 490,
+    tollCents: 300,
+    pickupPoints: ["Paso Canoas — entrada por la Panamericana"],
+  },
+  boquete: {
+    km: 478,
+    tollCents: 300,
+    pickupPoints: ["Boquete — el parque central", "Boquete — entrada del pueblo"],
+  },
+  volcan: {
+    km: 497,
+    tollCents: 300,
+    pickupPoints: ["Volcán — el parque central", "Volcán — cruce principal"],
+  },
+  colon: {
+    km: 80,
+    tollCents: 250,
+    pickupPoints: ["Colón — Cuatro Altos", "Sabanitas — sobre la Transístmica"],
+  },
+  chepo: {
+    km: 60,
+    tollCents: 0,
+    pickupPoints: ["Chepo — entrada del pueblo", "Chepo — sobre la vía Panamericana este"],
+  },
+  almirante: {
+    km: 605,
+    tollCents: 300,
+    pickupPoints: ["Almirante — entrada del pueblo"],
+  },
+  changuinola: {
+    km: 627,
+    tollCents: 300,
+    pickupPoints: ["Changuinola — el parque central", "Changuinola — entrada por la vía de Almirante"],
   },
 } as const satisfies Record<
   string,
@@ -446,14 +788,47 @@ const ROAD_EDGES: {
   km: number;
   tollCents: number;
 }[] = [
-  { a: "panama-city", b: "la-chorrera", km: 37, tollCents: 200 },
-  { a: "la-chorrera", b: "coronado", km: 48, tollCents: 0 },
-  { a: "coronado", b: "penonome", km: 60, tollCents: 100 },
-  { a: "penonome", b: DIVISA, km: 70, tollCents: 0 },
+  /* Panamericana ouest — le tronc. Les cumuls historiques sont
+     préservés au kilomètre : Chorrera 37, Coronado 85, Penonomé 145,
+     Divisa 215, Santiago 250, David 440. Les péages restent tous près
+     de la capitale (cumuls 200 à Chorrera, 300 à Penonomé). */
+  { a: "panama-city", b: "arraijan", km: 20, tollCents: 100 },
+  { a: "arraijan", b: "la-chorrera", km: 17, tollCents: 100 },
+  { a: "la-chorrera", b: "capira", km: 17, tollCents: 0 },
+  { a: "capira", b: "chame", km: 18, tollCents: 0 },
+  { a: "chame", b: "coronado", km: 13, tollCents: 0 },
+  { a: "coronado", b: "san-carlos", km: 10, tollCents: 0 },
+  { a: "san-carlos", b: "rio-hato", km: 20, tollCents: 0 },
+  { a: "rio-hato", b: "anton", km: 15, tollCents: 0 },
+  { a: "anton", b: "penonome", km: 15, tollCents: 100 },
+  { a: "penonome", b: "nata", km: 30, tollCents: 0 },
+  { a: "nata", b: "aguadulce", km: 15, tollCents: 0 },
+  { a: "aguadulce", b: DIVISA, km: 25, tollCents: 0 },
   { a: DIVISA, b: "santiago", km: 35, tollCents: 0 },
-  { a: "santiago", b: "david", km: 190, tollCents: 0 },
-  { a: DIVISA, b: "chitre", km: 35, tollCents: 0 },
-  { a: "chitre", b: "las-tablas", km: 35, tollCents: 0 },
+  { a: "santiago", b: "tole", km: 70, tollCents: 0 },
+  { a: "tole", b: "las-lajas", km: 45, tollCents: 0 },
+  { a: "las-lajas", b: "david", km: 75, tollCents: 0 },
+  { a: "david", b: "la-concepcion", km: 25, tollCents: 0 },
+  { a: "la-concepcion", b: "paso-canoas", km: 25, tollCents: 0 },
+
+  /* La fourche d'Azuero, à Divisa. */
+  { a: DIVISA, b: "parita", km: 20, tollCents: 0 },
+  { a: "parita", b: "chitre", km: 15, tollCents: 0 },
+  { a: "chitre", b: "los-santos", km: 5, tollCents: 0 },
+  { a: "los-santos", b: "guarare", km: 20, tollCents: 0 },
+  { a: "guarare", b: "las-tablas", km: 10, tollCents: 0 },
+  { a: "las-tablas", b: "pedasi", km: 42, tollCents: 0 },
+
+  /* Les embranchements. */
+  { a: "san-carlos", b: "el-valle", km: 28, tollCents: 0 },
+  { a: "santiago", b: "sona", km: 50, tollCents: 0 },
+  { a: "david", b: "boquete", km: 38, tollCents: 0 },
+  { a: "la-concepcion", b: "volcan", km: 32, tollCents: 0 },
+  { a: "panama-city", b: "colon", km: 80, tollCents: 250 },
+  { a: "panama-city", b: "chepo", km: 60, tollCents: 0 },
+  /* Bocas : la route de la Fortuna, David → Almirante, puis la côte. */
+  { a: "david", b: "almirante", km: 165, tollCents: 0 },
+  { a: "almirante", b: "changuinola", km: 22, tollCents: 0 },
 ];
 
 /** Le chemin de nœuds entre deux villes. Le réseau est un arbre : le
@@ -499,11 +874,6 @@ export function buildRoute(
 ): Corridor | null {
   if (!fromSlug || !toSlug || fromSlug === toSlug) return null;
 
-  const predefined = CORRIDORS.find(
-    (c) => c.origin.slug === fromSlug && c.destination.slug === toSlug,
-  );
-  if (predefined) return predefined;
-
   const origin = ALL_CITIES.find((c) => c.slug === fromSlug);
   const destination = ALL_CITIES.find((c) => c.slug === toSlug);
   if (!origin || !destination) return null;
@@ -537,6 +907,17 @@ export function buildRoute(
       pickupPoints: [...ROAD[slug as keyof typeof ROAD].pickupPoints],
     });
   }
+
+  /* Une paire prédéfinie garde son identité (slug, page /viajes,
+     éditorial) mais reçoit les waypoints DENSES du réseau : le
+     conducteur Panamá → Chitré doit se voir proposer Natá, Aguadulce ou
+     Parita comme paradas, pas seulement les quatre villes historiques.
+     Les corridors du référentiel, eux, ne bougent pas — les pages SEO
+     et les viajes de démonstration continuent de les lire tels quels. */
+  const predefined = CORRIDORS.find(
+    (c) => c.origin.slug === fromSlug && c.destination.slug === toSlug,
+  );
+  if (predefined) return { ...predefined, waypoints };
 
   const crossed = waypoints.slice(1, -1).map((w) => w.name);
   return {

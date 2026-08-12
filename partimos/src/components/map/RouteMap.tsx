@@ -123,7 +123,13 @@ export function RouteMap({
           </g>
         )}
 
-        {MAP_CITIES.map((city) => {
+        {/* ~30 villes desservies, mais une carte lisible : seules les
+            majeures s'étiquettent. Une ville mineure choisie (au clavier,
+            dans la liste) apparaît dès qu'elle est sélectionnée. */}
+        {MAP_CITIES.filter(
+          (c) =>
+            c.isMajor || c.slug === originSlug || c.slug === destinationSlug,
+        ).map((city) => {
           const isOrigin = city.slug === originSlug;
           const isDestination = city.slug === destinationSlug;
           const selected = isOrigin || isDestination;
