@@ -10,7 +10,7 @@ export function Pago() {
   return (
     <Section id="pago">
       <SectionTitle className="max-w-[18ch]">
-        Le pagas a la persona, no a una app
+        Le pagas a la persona — en la mano o por la app
       </SectionTitle>
       <Lead>
         No hay carrito, no hay checkout, no hay plata retenida. El aporte va de

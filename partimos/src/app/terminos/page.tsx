@@ -37,8 +37,27 @@ export default function TerminosPage() {
         </li>
         <li>No emplea, contrata ni dirige a los conductores.</li>
         <li>No asigna viajes, no impone rutas y no fija horarios.</li>
-        <li>No cobra al pasajero, no retiene dinero y no cobra comisión.</li>
+        <li>
+          No cobra nada al conductor: su aporte le llega completo, siempre.
+        </li>
       </ul>
+
+      <h2>2 bis. El pago — dos vías, a elección del pasajero</h2>
+      <p>
+        <b>Afuera (sin tarifa).</b> El pasajero le paga directamente al
+        conductor el día del viaje, en efectivo o por Yappy a su número.
+        Partimos no interviene en esa transacción.
+      </p>
+      <p>
+        <b>En la app (con tarifa de servicio).</b> Como opción, el pasajero
+        puede pagar por la plataforma con tarjeta o Yappy. En ese caso
+        Partimos cobra al pasajero una tarifa de servicio fija del 3.5% del
+        aporte, que remunera el servicio digital de reserva: cobro protegido,
+        comprobante, soporte y reembolsos según las reglas de cancelación.
+        Esta tarifa nunca se descuenta del aporte del conductor, nunca varía
+        con la demanda y no constituye un cobro por el transporte. El aporte
+        cobrado por la plataforma se transfiere íntegro al conductor.
+      </p>
 
       <h2>3. El aporte por puesto</h2>
       <p>

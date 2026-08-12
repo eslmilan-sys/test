@@ -45,6 +45,25 @@ export const PRICE_RULE = {
 /** Péage moyen retenu par le calculateur public, en centimes. */
 export const AVERAGE_TOLL_CENTS = 300;
 
+/**
+ * TARIFA DE SERVICIO — le paiement EN LIGNE, optionnel.
+ *
+ * Elle rémunère le service de réservation (cobro protégé, comprobante,
+ * remboursements selon les règles d'annulation), PAS le transport :
+ * c'est la distinction qui garde le partage de frais intact. Trois
+ * garde-fous structurels :
+ *   · elle se cobra AU PASSAGER, en sus — l'aporte du conducteur ne
+ *     bouge pas d'un centime et reste sous le tope (R1) ;
+ *   · payer AFUERA (efectivo, Yappy directo) reste toujours possible et
+ *     coûte 0 — la tarifa n'est jamais un péage obligatoire ;
+ *   · pourcentage FIXE — il ne suit ni la demande ni la date (R3).
+ */
+export const SERVICE_FEE_PCT = 3.5;
+
+export function serviceFeeCents(totalCents: number): number {
+  return Math.round((totalCents * SERVICE_FEE_PCT) / 100);
+}
+
 export type PriceBreakdown = {
   /** Coût total estimé du trajet, détour inclus. */
   costTotalCents: number;

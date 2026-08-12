@@ -7,7 +7,9 @@ import { PlacePicker } from "@/components/ui/PlacePicker";
 import { Icon } from "@/components/ui/Icon";
 import { AuthDialog } from "@/components/site/AuthDialog";
 import { useSession } from "@/lib/session";
-import { formatUsd, type VehicleCategory } from "@/lib/pricing";
+import { formatUsd,
+  serviceFeeCents,
+  SERVICE_FEE_PCT, type VehicleCategory } from "@/lib/pricing";
 import { quoteDetour } from "@/lib/detour";
 import { bookingDisclaimer } from "@/lib/content";
 
@@ -64,6 +66,12 @@ export function BookingPanel({
      particuliers : le conducteur accepte ou refuse. */
   const [offerOpen, setOfferOpen] = useState(false);
   const [offerCents, setOfferCents] = useState<number | null>(null);
+  /* Deux façons de payer, au choix du passager. AFUERA (efectivo ou
+     Yappy directo au conducteur) reste la voie par défaut et gratuite.
+     EN LA APP (tarjeta ou Yappy), une tarifa de servicio de 3,5 % se
+     ajoute — elle paie la réservation protégée, PAS le transport : le
+     conducteur reçoit son aporte complet dans les deux cas. */
+  const [payChannel, setPayChannel] = useState<"afuera" | "app">("afuera");
 
   const isCustom = stopIndex === stops.length;
   const quote = quoteDetour(baseKm, tollCents, extraKm, category, seatsOffered);
@@ -73,6 +81,8 @@ export function BookingPanel({
      réel, ils ne se négocient pas. */
   const unitCents = isCustom ? baseCents + quote.extraCents : baseCents;
   const totalCents = unitCents * seats;
+  const feeCents = payChannel === "app" ? serviceFeeCents(totalCents) : 0;
+  const chargedCents = totalCents + feeCents;
   const blocked = isCustom && !quote.accepted;
   /* Une offre ou un point proposé retirent la réservation instantanée :
      il y a une décision humaine à prendre de l'autre côté. */
@@ -101,9 +111,25 @@ export function BookingPanel({
           </p>
         )}
         <p className="rounded-[14px] bg-ink-50 px-4 py-3 text-[13.5px] leading-relaxed text-ink-500">
-          <b className="font-semibold text-ink-900">No pagaste nada aquí.</b> Le
-          entregas {formatUsd(totalCents)} a {driverName} el día del viaje, en
-          efectivo o por Yappy.
+          {payChannel === "app" ? (
+            <>
+              <b className="font-semibold text-ink-900">
+                Pago en la app: {formatUsd(chargedCents)}
+              </b>{" "}
+              ({formatUsd(totalCents)} de aporte + {formatUsd(feeCents)} de
+              tarifa). {driverName} recibe su aporte completo. En esta
+              demostración no se cobró nada: el cobro en línea se activa
+              cuando el procesador esté conectado.
+            </>
+          ) : (
+            <>
+              <b className="font-semibold text-ink-900">
+                No pagaste nada aquí.
+              </b>{" "}
+              Le entregas {formatUsd(totalCents)} a {driverName} el día del
+              viaje, en efectivo o por Yappy.
+            </>
+          )}
         </p>
       </aside>
     );
@@ -281,6 +307,78 @@ export function BookingPanel({
         )}
       </div>
 
+      <fieldset className="mb-4">
+        <legend className="mb-1.5 text-[11.5px] font-bold tracking-[0.11em] text-ink-500 uppercase">
+          Cómo pagas
+        </legend>
+        <div className="grid gap-1.5">
+          <label
+            className={`flex cursor-pointer items-start gap-2.5 rounded-[12px] border px-3.5 py-2.5 transition-colors ${
+              payChannel === "afuera"
+                ? "border-ink-900 bg-ink-50"
+                : "border-ink-200 hover:border-accent"
+            }`}
+          >
+            <input
+              type="radio"
+              name="pago"
+              checked={payChannel === "afuera"}
+              onChange={() => setPayChannel("afuera")}
+              className="sr-only"
+            />
+            <span
+              aria-hidden
+              className={`mt-1 size-3.5 shrink-0 rounded-full border-[3px] ${
+                payChannel === "afuera"
+                  ? "border-ink-900 bg-white"
+                  : "border-ink-200"
+              }`}
+            />
+            <span className="min-w-0">
+              <span className="block text-[14.5px] font-semibold">
+                Afuera: efectivo o Yappy directo
+              </span>
+              <span className="block text-[12.5px] leading-snug text-ink-500">
+                Le pagas en la mano el día del viaje. Sin tarifa.
+              </span>
+            </span>
+          </label>
+          <label
+            className={`flex cursor-pointer items-start gap-2.5 rounded-[12px] border px-3.5 py-2.5 transition-colors ${
+              payChannel === "app"
+                ? "border-ink-900 bg-ink-50"
+                : "border-ink-200 hover:border-accent"
+            }`}
+          >
+            <input
+              type="radio"
+              name="pago"
+              checked={payChannel === "app"}
+              onChange={() => setPayChannel("app")}
+              className="sr-only"
+            />
+            <span
+              aria-hidden
+              className={`mt-1 size-3.5 shrink-0 rounded-full border-[3px] ${
+                payChannel === "app"
+                  ? "border-ink-900 bg-white"
+                  : "border-ink-200"
+              }`}
+            />
+            <span className="min-w-0">
+              <span className="block text-[14.5px] font-semibold">
+                En la app: tarjeta o Yappy
+              </span>
+              <span className="block text-[12.5px] leading-snug text-ink-500">
+                Cobro protegido, comprobante y reembolso según las reglas de
+                cancelación. Tarifa de servicio del {SERVICE_FEE_PCT}% — la
+                pagas tú, el conductor recibe su aporte completo.
+              </span>
+            </span>
+          </label>
+        </div>
+      </fieldset>
+
       <dl className="mb-4 border-t border-ink-200 pt-3.5 text-[14.5px]">
         <div className="flex justify-between gap-3 py-1">
           <dt className="text-ink-500">
@@ -290,13 +388,19 @@ export function BookingPanel({
           <dd className="tnum font-semibold">{formatUsd(totalCents)}</dd>
         </div>
         <div className="flex justify-between gap-3 py-1">
-          <dt className="text-ink-500">Comisión de Partimos</dt>
-          <dd className="tnum font-semibold">$0.00</dd>
+          <dt className="text-ink-500">
+            {payChannel === "app"
+              ? `Tarifa de servicio (${SERVICE_FEE_PCT}%)`
+              : "Tarifa de servicio"}
+          </dt>
+          <dd className="tnum font-semibold">{formatUsd(feeCents)}</dd>
         </div>
         <div className="flex justify-between gap-3 border-t border-ink-200 py-2">
-          <dt className="font-semibold">Le entregas al conductor</dt>
+          <dt className="font-semibold">
+            {payChannel === "app" ? "Pagas en la app" : "Le entregas al conductor"}
+          </dt>
           <dd className="tnum font-display text-[18px] font-bold">
-            {formatUsd(totalCents)}
+            {formatUsd(payChannel === "app" ? chargedCents : totalCents)}
           </dd>
         </div>
       </dl>

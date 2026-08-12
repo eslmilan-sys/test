@@ -24,10 +24,18 @@ jamais 100 % de son coût. Retirer le `+1` casse tout le modèle.
 Autorité finale : la contrainte `CHECK price_within_cap` en base, pas le code
 applicatif.
 
-**R2 — La plateforme ne touche jamais l'argent.**
-Pas de carte, pas de séquestre, pas de commission. Le passager paie le
-conducteur directement, le jour du trajet. Si tu ajoutes un paiement en ligne,
-la plateforme vend un transport et il lui faut un permis qu'elle n'a pas.
+**R2 — La plateforme ne touche jamais l'aporte du conducteur.**
+(Amendée le 2026-08-12 par décision du propriétaire.) Le paiement EN LIGNE
+existe désormais comme OPTION du passager : tarjeta ou Yappy dans l'app, avec
+une tarifa de servicio FIXE de 3,5 % cobrée au passager — elle rémunère le
+service digital de réservation (cobro protégé, comprobante, remboursements),
+jamais le transport. Trois invariants inviolables : le conducteur reçoit son
+aporte COMPLET (la tarifa est en sus, jamais déduite) ; payer AFUERA
+(efectivo, Yappy directo) reste toujours disponible et gratuit ; le
+pourcentage ne varie jamais (ni demande, ni date, ni rareté). Autorité :
+contraintes `fee_only_in_app` et `fee_is_fixed_pct` (migration 0009).
+Ne jamais : déduire la tarifa de l'aporte, la rendre obligatoire, ou la
+faire varier.
 
 **R3 — Le prix ne suit jamais la demande.**
 `computePriceCap()` ne prend en entrée ni date, ni disponibilité, ni compteur.
@@ -94,7 +102,7 @@ La retenue n'est versée au conducteur que si le siège n'est pas revendu
 
 ## À ne jamais faire
 
-- Ajouter un paiement par carte, un séquestre ou une commission
+- Déduire quoi que ce soit de l'aporte du conducteur, ou rendre le paiement en ligne obligatoire
 - Retirer le `+1` du diviseur
 - Faire varier le prix selon la demande ou la rareté
 - Stocker des images de cédula

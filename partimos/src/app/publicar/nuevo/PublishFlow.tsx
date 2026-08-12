@@ -868,8 +868,9 @@ export function PublishFlow() {
         </div>
 
         <p className="mt-4 text-center text-[12.5px] leading-relaxed text-ink-500">
-          Publicar es gratis. Partimos no cobra comisión y no interviene en el
-          pago: el aporte te llega completo, de mano del pasajero.
+          Publicar es gratis y tu aporte te llega completo — en la mano, o
+          por la app si el pasajero eligió pagar en línea (la tarifa de
+          servicio la paga él, nunca tú).
         </p>
       </div>
     </Container>

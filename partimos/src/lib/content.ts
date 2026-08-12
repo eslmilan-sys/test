@@ -13,10 +13,13 @@
 export const LEGAL_FOOTER =
   "Partimos es una plataforma de contacto entre particulares que comparten " +
   "los gastos de un viaje que el conductor ya iba a realizar. No presta " +
-  "servicios de transporte, no emplea conductores, no fija precios de pasaje " +
-  "y no interviene en el pago entre las partes. El aporte por puesto está " +
-  "limitado al reparto del costo real del recorrido entre todos los ocupantes " +
-  "del vehículo, incluido el conductor.";
+  "servicios de transporte, no emplea conductores y no fija precios de " +
+  "pasaje. El aporte por puesto está limitado al reparto del costo real del " +
+  "recorrido entre todos los ocupantes del vehículo, incluido el conductor, " +
+  "y le llega completo al conductor. Si el pasajero elige pagar en línea, " +
+  "Partimos cobra una tarifa de servicio fija por la reserva protegida — " +
+  "un servicio digital opcional, nunca un cobro por el transporte: pagar " +
+  "directo al conductor, sin tarifa, está siempre disponible.";
 
 /** Affiché à côté du montant, sur l'écran de réservation. */
 export function bookingDisclaimer(driverName: string) {
@@ -28,7 +31,7 @@ export type Faq = { q: string; a: string };
 export const GENERAL_FAQ: Faq[] = [
   {
     q: "¿Cómo y cuándo pago?",
-    a: "Le pagas directo al conductor el día del viaje, en efectivo o por Yappy a su número. Partimos no cobra por adelantado, no retiene tu plata y no participa en la transacción. Reservar en la plataforma es gratis.",
+    a: "Como prefieras. Afuera: le pagas directo al conductor el día del viaje, en efectivo o por Yappy a su número, sin tarifa. O en la app: tarjeta o Yappy, con una tarifa de servicio del 3.5% que paga la reserva protegida — comprobante, soporte y reembolso según las reglas de cancelación. En los dos casos el conductor recibe su aporte completo.",
   },
   {
     q: "¿Cuándo veo el número del conductor?",
@@ -68,7 +71,7 @@ export const HELP_FAQ: Faq[] = [
   },
   {
     q: "¿Partimos cobra comisión?",
-    a: "No. Ni al pasajero ni al conductor. La plataforma pone en contacto a las dos personas y ahí termina su papel.",
+    a: "Al conductor, nunca: su aporte le llega completo. Al pasajero, solo si elige pagar en línea: una tarifa de servicio fija del 3.5% por la reserva protegida. Pagar afuera, directo al conductor, no cuesta nada y siempre está disponible.",
   },
   {
     q: "¿Guardan mi cédula?",
