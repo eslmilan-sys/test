@@ -21,11 +21,15 @@ export function DriverCta() {
                 mismo viaje ahora mismo.
               </p>
               <div className="flex flex-wrap gap-3">
-                <ButtonLink href="/publicar" size="lg">
+                {/* Le bouton d'ACTION va au formulaire, pas à la page
+                    vitrine : « Publicar » qui atterrit sur de l'explication
+                    déroute. La vitrine garde son lien, nommé pour ce
+                    qu'elle est. */}
+                <ButtonLink href="/publicar/nuevo" size="lg">
                   Publicar mi viaje
                 </ButtonLink>
-                <ButtonLink href="/#como" variant="secondary" size="lg">
-                  Ver cómo funciona
+                <ButtonLink href="/publicar" variant="secondary" size="lg">
+                  Cómo funciona para conductores
                 </ButtonLink>
               </div>
             </div>

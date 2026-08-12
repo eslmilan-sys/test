@@ -55,7 +55,7 @@ export function StickyCta({ watch = "#buscar" }: { watch?: string }) {
       inert={!visible}
     >
       <ButtonLink
-        href="/publicar"
+        href="/publicar/nuevo"
         variant="secondary"
         size="sm"
         className="basis-[42%]"

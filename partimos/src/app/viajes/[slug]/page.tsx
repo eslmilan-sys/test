@@ -413,7 +413,11 @@ export default async function CorridorPage({ params }: Params) {
                 <ButtonLink href="/#buscar" size="lg">
                   Buscar puesto
                 </ButtonLink>
-                <ButtonLink href="/publicar" variant="secondary" size="lg">
+                <ButtonLink
+                  href={`/publicar/nuevo?ruta=${corridor.slug}`}
+                  variant="secondary"
+                  size="lg"
+                >
                   Publicar este viaje
                 </ButtonLink>
               </div>

@@ -9,7 +9,7 @@ import {
   mapCity,
 } from "@/lib/map";
 import { MAPBOX_TOKEN, panamaOverviewUrl } from "@/lib/mapbox";
-import { CORRIDORS } from "@/lib/corridors";
+import { CORRIDORS, type Corridor } from "@/lib/corridors";
 
 /**
  * Carte des corridors — sélection de l'origine et de la destination.
@@ -26,6 +26,10 @@ type Props = {
   onPick: (slug: string) => void;
   /** Ce que le prochain clic va renseigner. */
   picking: "origin" | "destination";
+  /** La ruta active, prédéfinie OU synthétisée par `buildRoute` : c'est
+   *  elle qui dessine le tracé. Sans elle, on retombe sur la recherche
+   *  d'un lien prédéfini — le comportement historique des autres cartes. */
+  route?: Corridor;
   className?: string;
 };
 
@@ -34,6 +38,7 @@ export function RouteMap({
   destinationSlug,
   onPick,
   picking,
+  route,
   className = "",
 }: Props) {
   const id = useId();
@@ -43,6 +48,18 @@ export function RouteMap({
   const activeLink = MAP_LINKS.find(
     (l) => l.from.slug === originSlug && l.to.slug === destinationSlug,
   );
+  const activeCorridor =
+    route ??
+    (activeLink
+      ? CORRIDORS.find((c) => c.slug === activeLink.slug)
+      : undefined);
+  /* Le tracé du repli SVG : la chaîne des villes traversées, par paires
+   *  successives — le même chemin que l'image dessinerait. */
+  const fallbackChain = activeCorridor
+    ? activeCorridor.waypoints
+        .map((w) => mapCity(w.citySlug))
+        .filter((c): c is NonNullable<typeof c> => Boolean(c))
+    : [];
 
   return (
     <div className={`relative ${className}`}>
@@ -52,11 +69,7 @@ export function RouteMap({
           sont vraies dans les deux cas. */}
       {MAPBOX_TOKEN && (
         <img
-          src={panamaOverviewUrl(
-            activeLink
-              ? CORRIDORS.find((c) => c.slug === activeLink.slug)
-              : undefined,
-          )}
+          src={panamaOverviewUrl(activeCorridor)}
           alt=""
           aria-hidden
           width={MAP_VIEWBOX.width}
@@ -97,14 +110,16 @@ export function RouteMap({
               />
             ))}
 
-            {activeLink && (
-              <path
-                d={linkPath(activeLink.from, activeLink.to)}
-                stroke={`url(#${id}-active)`}
-                strokeWidth={5}
-                className="[stroke-dasharray:1000] [stroke-dashoffset:0] motion-safe:animate-[draw_0.7s_ease-out]"
-              />
-            )}
+            {fallbackChain.length >= 2 &&
+              fallbackChain.slice(0, -1).map((cityA, i) => (
+                <path
+                  key={`${cityA.slug}-${fallbackChain[i + 1].slug}`}
+                  d={linkPath(cityA, fallbackChain[i + 1])}
+                  stroke={`url(#${id}-active)`}
+                  strokeWidth={5}
+                  className="[stroke-dasharray:1000] [stroke-dashoffset:0] motion-safe:animate-[draw_0.7s_ease-out]"
+                />
+              ))}
           </g>
         )}
 

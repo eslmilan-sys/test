@@ -425,6 +425,140 @@ export function corridorCap(
 export const ALL_CITIES: City[] = Object.values(CITIES);
 
 /**
+ * LE RÉSEAU ROUTIER EN TRONÇONS ÉLÉMENTAIRES
+ *
+ * Il n'y a PAS de « rutas cerradas » : toutes les villes desservies sont
+ * reliées par la Panamericana et la fourche d'Azuero à Divisa. Un
+ * conducteur peut donc publier N'IMPORTE QUELLE paire — Las Tablas →
+ * David compris — et l'itinéraire s'arme tout seul en chaînant les
+ * tronçons. Les km et les péages par tronçon reproduisent exactement les
+ * cumuls de ROAD (les péages se paient tous près de la capitale : une
+ * ruta qui ne s'en approche pas n'en facture aucun).
+ *
+ * « divisa » est le nœud de la fourche : un vrai croisement, pas une
+ * ville desservie — il route, il n'apparaît jamais comme parada.
+ */
+const DIVISA = "divisa";
+
+const ROAD_EDGES: {
+  a: string;
+  b: string;
+  km: number;
+  tollCents: number;
+}[] = [
+  { a: "panama-city", b: "la-chorrera", km: 37, tollCents: 200 },
+  { a: "la-chorrera", b: "coronado", km: 48, tollCents: 0 },
+  { a: "coronado", b: "penonome", km: 60, tollCents: 100 },
+  { a: "penonome", b: DIVISA, km: 70, tollCents: 0 },
+  { a: DIVISA, b: "santiago", km: 35, tollCents: 0 },
+  { a: "santiago", b: "david", km: 190, tollCents: 0 },
+  { a: DIVISA, b: "chitre", km: 35, tollCents: 0 },
+  { a: "chitre", b: "las-tablas", km: 35, tollCents: 0 },
+];
+
+/** Le chemin de nœuds entre deux villes. Le réseau est un arbre : le
+ *  chemin simple est unique, un parcours en largeur suffit. */
+function roadPath(fromSlug: string, toSlug: string): string[] | null {
+  const previous = new Map<string, string>([[fromSlug, fromSlug]]);
+  const queue = [fromSlug];
+  while (queue.length > 0) {
+    const node = queue.shift()!;
+    if (node === toSlug) {
+      const path = [node];
+      let cursor = node;
+      while (cursor !== fromSlug) {
+        cursor = previous.get(cursor)!;
+        path.unshift(cursor);
+      }
+      return path;
+    }
+    for (const edge of ROAD_EDGES) {
+      const next = edge.a === node ? edge.b : edge.b === node ? edge.a : null;
+      if (next && !previous.has(next)) {
+        previous.set(next, node);
+        queue.push(next);
+      }
+    }
+  }
+  return null;
+}
+
+/**
+ * LA RUTA ENTRE DEUX VILLES QUELCONQUES — toujours.
+ *
+ * Un corridor prédéfini existe ? On le rend tel quel : il porte sa page
+ * SEO et son éditorial. Sinon, on le SYNTHÉTISE depuis le réseau : mêmes
+ * villes, mêmes km, mêmes péages, mêmes points de prise en charge — la
+ * seule chose qui manque est la page /viajes dédiée, et l'appelant le
+ * sait via `getCorridor(slug)`. La formule de prix ne change pas d'un
+ * iota : elle reçoit des km et des péages, d'où qu'ils viennent.
+ */
+export function buildRoute(
+  fromSlug: string,
+  toSlug: string,
+): Corridor | null {
+  if (!fromSlug || !toSlug || fromSlug === toSlug) return null;
+
+  const predefined = CORRIDORS.find(
+    (c) => c.origin.slug === fromSlug && c.destination.slug === toSlug,
+  );
+  if (predefined) return predefined;
+
+  const origin = ALL_CITIES.find((c) => c.slug === fromSlug);
+  const destination = ALL_CITIES.find((c) => c.slug === toSlug);
+  if (!origin || !destination) return null;
+
+  const path = roadPath(fromSlug, toSlug);
+  if (!path) return null;
+
+  // Cumuls le long du chemin, nœud par nœud — Divisa cumule mais ne
+  // devient jamais un waypoint.
+  let km = 0;
+  let tollCents = 0;
+  const waypoints: Waypoint[] = [];
+  for (let i = 0; i < path.length; i++) {
+    if (i > 0) {
+      const edge = ROAD_EDGES.find(
+        (e) =>
+          (e.a === path[i - 1] && e.b === path[i]) ||
+          (e.b === path[i - 1] && e.a === path[i]),
+      )!;
+      km += edge.km;
+      tollCents += edge.tollCents;
+    }
+    const slug = path[i];
+    if (slug === DIVISA) continue;
+    const city = ALL_CITIES.find((c) => c.slug === slug)!;
+    waypoints.push({
+      citySlug: slug,
+      name: city.shortName,
+      km,
+      tollCents,
+      pickupPoints: [...ROAD[slug as keyof typeof ROAD].pickupPoints],
+    });
+  }
+
+  const crossed = waypoints.slice(1, -1).map((w) => w.name);
+  return {
+    slug: `${fromSlug}-${toSlug}`,
+    origin,
+    destination,
+    distanceKm: km,
+    tollCents,
+    // Le rythme moyen observé sur les corridors du réseau (~0,9 min/km),
+    // arrondi aux 5 minutes — une estimation, affichée comme telle.
+    typicalDurationMin: Math.round((km * 0.9) / 5) * 5,
+    isPriority: false,
+    pickupPoints: [...ROAD[fromSlug as keyof typeof ROAD].pickupPoints],
+    intro:
+      crossed.length > 0
+        ? `Ruta armada al momento: sigue la carretera y pasa por ${crossed.join(", ")}. Marca las paradas que te quedan de paso y tu viaje sale en más búsquedas.`
+        : "Ruta armada al momento sobre la carretera que une las dos ciudades.",
+    waypoints,
+  };
+}
+
+/**
  * Corridors qui traversent les deux villes, dans le bon sens.
  *
  * C'est la requête qui change tout : Penonomé → Santiago n'est le corridor de

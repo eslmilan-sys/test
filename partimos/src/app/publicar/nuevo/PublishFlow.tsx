@@ -11,7 +11,7 @@ import { CityCombobox } from "@/components/ui/CityCombobox";
 import { PlacePicker } from "@/components/ui/PlacePicker";
 import { AuthDialog } from "@/components/site/AuthDialog";
 import { carsOf, useSession } from "@/lib/session";
-import { CORRIDORS, ALL_CITIES, getCorridor } from "@/lib/corridors";
+import { buildRoute, getCorridor } from "@/lib/corridors";
 import {
   computePriceCap,
   formatUsd,
@@ -64,10 +64,9 @@ export function PublishFlow() {
      ?desde=&hacia= (la carte de la première page). Les deux comptent :
      c'est le bug qui empêchait le saut d'étape — la carte envoyait
      desde/hacia et le flux ne lisait que ruta. */
-  const presetPair = CORRIDORS.find(
-    (c) =>
-      c.origin.slug === params.get("desde") &&
-      c.destination.slug === params.get("hacia"),
+  const presetPair = buildRoute(
+    params.get("desde") ?? "",
+    params.get("hacia") ?? "",
   );
   const preset = getCorridor(params.get("ruta") ?? "") ?? presetPair;
   /* Route déjà choisie ? On ne la redemande pas : l'étape Ruta est
@@ -127,9 +126,10 @@ export function PublishFlow() {
     : null;
   const carRate = carL100 !== null ? rateFromConsumption(carL100) : null;
 
-  const corridor = CORRIDORS.find(
-    (c) => c.origin.slug === from && c.destination.slug === to,
-  );
+  /* N'IMPORTE QUELLE paire de villes marche : la ruta s'arme toute seule
+     sur le réseau routier (corridor prédéfini quand il existe, synthèse
+     par tronçons sinon). Il n'y a pas de « rutas cerradas ». */
+  const corridor = buildRoute(from, to);
   const cap = corridor
     ? computePriceCap(
         corridor.distanceKm,
@@ -191,12 +191,17 @@ export function PublishFlow() {
             >
               Ver mis viajes
             </Link>
-            <Link
-              href={`/viajes/${corridor.slug}`}
-              className="rounded-[14px] border-[1.5px] border-ink-200 px-5 py-3 font-display text-[15px] font-bold"
-            >
-              Ver la ruta
-            </Link>
+            {/* La page /viajes n'existe que pour les corridors éditoriaux ;
+                une ruta synthétisée n'a pas de page dédiée — pas de lien
+                mort. */}
+            {getCorridor(corridor.slug) && (
+              <Link
+                href={`/viajes/${corridor.slug}`}
+                className="rounded-[14px] border-[1.5px] border-ink-200 px-5 py-3 font-display text-[15px] font-bold"
+              >
+                Ver la ruta
+              </Link>
+            )}
           </div>
           {isDemo && (
             <p className="mt-5 text-[12.5px] text-ink-500">
@@ -236,8 +241,8 @@ export function PublishFlow() {
                 ¿Por dónde vas?
               </h1>
               <p className="mb-5 text-[14.5px] leading-relaxed text-ink-500">
-                Escoge tu salida y tu destino. Solo puedes publicar en las rutas
-                que ya están abiertas.
+                Escoge tu salida y tu destino — cualquier par de ciudades. La
+                ruta se arma sola, con sus paradas en el camino.
               </p>
 
               {/* Les deux listes D'ABORD, la carte en dessous : écrire sa
@@ -292,6 +297,7 @@ export function PublishFlow() {
                 <RouteMap
                   originSlug={from}
                   destinationSlug={to}
+                  route={corridor ?? undefined}
                   picking={picking}
                   onPick={(slug) => {
                     if (picking === "origin") {
@@ -307,12 +313,23 @@ export function PublishFlow() {
                   }}
                 />
               </div>
-              {!corridor && from && to && (
-                <p className="mt-3 rounded-[12px] bg-danger-soft px-4 py-3 text-[13.5px] text-danger">
-                  Esa ruta todavía no está abierta.{" "}
-                  {ALL_CITIES.find((c) => c.slug === from)?.shortName} →{" "}
-                  {ALL_CITIES.find((c) => c.slug === to)?.shortName} no tiene
-                  corredor. Escribe a hola@partimos.com y la abrimos.
+              {corridor && (
+                <p className="tnum mt-3 rounded-[12px] bg-ink-50 px-4 py-3 text-[13.5px] leading-relaxed text-ink-500">
+                  <b className="font-semibold text-ink-900">
+                    {corridor.origin.shortName} → {corridor.destination.shortName}
+                  </b>
+                  {" — "}
+                  {corridor.distanceKm} km
+                  {corridor.waypoints.length > 2 && (
+                    <>
+                      , pasando por{" "}
+                      {corridor.waypoints
+                        .slice(1, -1)
+                        .map((w) => w.name)
+                        .join(", ")}
+                    </>
+                  )}
+                  . En el siguiente paso marcas dónde puedes parar.
                 </p>
               )}
             </>
