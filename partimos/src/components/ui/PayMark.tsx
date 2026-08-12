@@ -23,6 +23,27 @@
  * reproduit tel qu'il est, il ne se réinterprète pas.
  */
 
+/** Une carte bancaire générique — puce et bande, aucune marque de réseau.
+ *  Elle existe depuis que le paiement dans l'app accepte la tarjeta. */
+export function TarjetaMark({ className = "size-5" }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.9}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      <rect x="2" y="5" width="20" height="14" rx="2.5" />
+      <path d="M2 9.6h20" />
+      <path d="M5.5 14.6h4" strokeWidth={1.6} />
+    </svg>
+  );
+}
+
 /** Un billet ET une pièce. Aucune marque, donc dessinable sans réserve. */
 export function CashMark({ className = "size-5" }: { className?: string }) {
   return (
@@ -114,9 +135,12 @@ export function YappyMark({ className = "" }: { className?: string }) {
 }
 
 /**
- * La paire, partout où l'on explique le paiement.
+ * Le trio, partout où l'on explique le paiement — dans l'ORDRE de la
+ * maison : Yappy d'abord (recommandé, tarifa la plus basse), la tarjeta
+ * ensuite, l'efectivo en dernier. Le cash reste possible, il n'ouvre
+ * plus la marche.
  *
- * Les deux puces sont sur fond BLANC même dans la section sombre : une marque
+ * Les puces sont sur fond BLANC même dans la section sombre : une marque
  * tierce garde ses couleurs, et l'orange de Yappy sur le brun de la section
  * deviendrait illisible. Un fond blanc est aussi la façon dont un logo se pose
  * partout ailleurs — sur un terminal, sur une vitrine.
@@ -125,15 +149,19 @@ export function PayMarks() {
   return (
     <ul className="flex flex-wrap items-center justify-center gap-2.5">
       <li className="flex items-center gap-2.5 rounded-[12px] border border-ink-200 bg-white px-4 py-2.5 text-ink-900">
-        <CashMark className="size-5 shrink-0 text-ink-600" />
-        <span className="text-[13.5px] font-semibold">
-          Efectivo el día del viaje
+        <YappyMark />
+        <span className="text-[13.5px] font-semibold text-ink-600">
+          en la app o a su número
         </span>
       </li>
       <li className="flex items-center gap-2.5 rounded-[12px] border border-ink-200 bg-white px-4 py-2.5 text-ink-900">
-        <YappyMark />
-        <span className="text-[13.5px] font-semibold text-ink-600">
-          a su número
+        <TarjetaMark className="size-5 shrink-0 text-ink-600" />
+        <span className="text-[13.5px] font-semibold">Tarjeta en la app</span>
+      </li>
+      <li className="flex items-center gap-2.5 rounded-[12px] border border-ink-200 bg-white px-4 py-2.5 text-ink-900">
+        <CashMark className="size-5 shrink-0 text-ink-600" />
+        <span className="text-[13.5px] font-semibold">
+          Efectivo el día del viaje
         </span>
       </li>
     </ul>

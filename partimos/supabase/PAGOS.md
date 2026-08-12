@@ -1,14 +1,18 @@
 # Pago en línea — Yappy + tarjeta, sur Supabase
 
-Décision produit (2026-08-12) : le passager choisit — **afuera**
-(efectivo/Yappy directo, gratuit) ou **en la app** (tarjeta ou Yappy,
-tarifa de servicio **3,5 %** cobrée au passager). Le conducteur reçoit
-son aporte **complet** dans les deux cas. La doctrine : la tarifa
-rémunère le service digital de réservation, jamais le transport —
-c'est le modèle BlaBlaCar, et c'est ce qui garde le partage de frais
-intact. ⚠️ Fais valider cette structure par un avocat panaméen avant le
-premier cobro réel — les CGU (`/terminos`) sont déjà rédigées dans ce
-sens.
+Décision produit (2026-08-12, amendée le même jour) : trois canaux,
+présentés partout dans cet ordre — **Yappy dans l'app** (recommandé,
+tarifa de servicio **2,5 %**), **tarjeta dans l'app** (tarifa **5 %**),
+**efectivo** en dernier (gratuit, toujours disponible). La tarifa est
+fixe PAR CANAL parce qu'elle suit le coût du canal : Yappy commerçant
+coûte ~1 %, un processeur carte ~3,5–4 % — la marge du service (~1,5 pt)
+est la même sur les deux canaux en ligne, et le canal recommandé est
+aussi le moins cher pour le passager. Le conducteur reçoit son aporte
+**complet** dans les trois cas. La doctrine : la tarifa rémunère le
+service digital de réservation, jamais le transport — c'est le modèle
+BlaBlaCar, et c'est ce qui garde le partage de frais intact. ⚠️ Fais
+valider cette structure par un avocat panaméen avant le premier cobro
+réel — les CGU (`/terminos`) sont déjà rédigées dans ce sens.
 
 ## Architecture (identique à Didit : les secrets vivent dans Supabase)
 
@@ -29,8 +33,10 @@ navigateur ── JWT ──▶ pago-crear (Edge Function)
 Le schéma 0001 avait tout prévu : `payments` (avec `provider_order_id`
 pour le Botón de Pago Yappy), `payout_batches`, `ledger_entries`
 (comptes `passenger_escrow`, `driver_payable`, `platform_revenue`,
-`psp_fees`). La migration 0009 ajoute le canal choisi et grave les deux
-garde-fous en contraintes : tarifa nulle hors app, tarifa = 3,5 % fixe.
+`psp_fees`). La migration 0009 ajoute le canal choisi, la 0010 grave la
+tarifa par canal en contrainte : 0 hors app, 2,5 % Yappy, 5 % tarjeta —
+et le moyen favori (`profiles.preferred_pay_channel`), choisi à
+l'inscription, qui présélectionne le canal à la réservation.
 
 ## 1. Yappy — le Botón de Pago ⛔ (tes comptes)
 
@@ -77,7 +83,8 @@ clé secrète, redirige vers leur page, leur webhook signé confirme.
   anti-rejeu ; écriture idempotente par `UNIQUE (provider,
   provider_ref)` (déjà dans 0001).
 - Montants recalculés CÔTÉ SERVEUR dans `pago-crear` depuis la base
-  (aporte de la réservation + 3,5 %) — jamais reçus du client.
+  (aporte de la réservation + la tarifa du canal : 2,5 % Yappy, 5 %
+  tarjeta) — jamais reçus du client.
 - Remboursements : suivre les règles d'annulation existantes (100 % à
   +24 h, aporte entre 24 h et 2 h, 50 % retenu en deçà) — le cobro en
   ligne les rend enfin exécutables automatiquement.
@@ -92,7 +99,10 @@ versement. À automatiser plus tard — la table ne change pas.
 
 ## 5. Ce que le site montre déjà
 
-Le panneau de réservation propose les deux canaux avec le calcul
-transparent (aporte + tarifa 3,5 % = total), les CGU ont la clause
-« El pago — dos vías », et le mode démonstration dit clairement
-qu'aucun cobro réel n'a lieu tant que le processeur n'est pas branché.
+Le panneau de réservation propose les trois canaux dans l'ordre (Yappy
+recommandé, tarjeta, efectivo en dernier) avec le calcul transparent
+(aporte + tarifa du canal = total) et un bouton « Pagar con Yappy » aux
+couleurs de la marque — le futur Botón de Pago. Les CGU ont la clause
+« El pago — tres vías », le favori se choisit à l'inscription et dans
+Mi cuenta, et le mode démonstration dit clairement qu'aucun cobro réel
+n'a lieu tant que le processeur n'est pas branché.

@@ -14,6 +14,7 @@ import {
   type VerificationState,
 } from "@/lib/didit";
 import { connectLinkedIn, hasLinkedIn } from "@/lib/linkedin";
+import { PayChannelPicker } from "@/components/ui/PayChannelPicker";
 import {
   CAR_MAKES,
   CAR_YEARS,
@@ -181,6 +182,8 @@ export function AccountSpace() {
               <Field label="Ciudad" value="Sin definir" />
               <Field label="Sobre mí" value="Sin definir" />
             </dl>
+
+            <PayPrefRow />
 
             <LinkedInRow />
 
@@ -493,6 +496,38 @@ async function shrinkPhoto(file: File): Promise<string> {
   canvas.height = Math.round(img.height * scale);
   canvas.getContext("2d")!.drawImage(img, 0, 0, canvas.width, canvas.height);
   return canvas.toDataURL("image/jpeg", 0.72);
+}
+
+/**
+ * Le moyen de paiement favori — choisi à l'inscription, modifiable ici.
+ *
+ * Il présélectionne le canal à la réservation, rien de plus : les trois
+ * moyens restent proposés à chaque reserva, et l'efectivo reste gratuit
+ * (R2). Pour qui conduit, la note dit l'essentiel : quel que soit le
+ * canal du passager, l'aporte arrive complet.
+ */
+function PayPrefRow() {
+  const { session, updateSession } = useSession();
+  const value = session?.payPref ?? "yappy";
+  return (
+    <div className="mt-4 rounded-[14px] border border-ink-200 px-4 py-3">
+      <p className="text-[14.5px] font-semibold">Cómo prefieres pagar</p>
+      <p className="mb-3 text-[12.5px] leading-snug text-ink-500">
+        Preseleccionamos este medio al reservar. Los tres siguen disponibles
+        en cada viaje.
+      </p>
+      <PayChannelPicker
+        idBase="cuenta-pago"
+        value={value}
+        onChange={(channel) => updateSession({ payPref: channel })}
+      />
+      <p className="mt-2.5 text-[12.5px] leading-snug text-ink-500">
+        ¿Manejas? Da igual cómo pague el pasajero: tu aporte te llega
+        completo, sin descuentos — la tarifa de servicio la paga quien elige
+        el cobro en la app.
+      </p>
+    </div>
+  );
 }
 
 /**

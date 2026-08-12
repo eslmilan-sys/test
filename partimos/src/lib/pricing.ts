@@ -54,14 +54,29 @@ export const AVERAGE_TOLL_CENTS = 300;
  * garde-fous structurels :
  *   · elle se cobra AU PASSAGER, en sus — l'aporte du conducteur ne
  *     bouge pas d'un centime et reste sous le tope (R1) ;
- *   · payer AFUERA (efectivo, Yappy directo) reste toujours possible et
- *     coûte 0 — la tarifa n'est jamais un péage obligatoire ;
- *   · pourcentage FIXE — il ne suit ni la demande ni la date (R3).
+ *   · payer EFECTIVO (ou Yappy directo au conducteur) reste toujours
+ *     possible et coûte 0 — la tarifa n'est jamais un péage obligatoire ;
+ *   · pourcentage FIXE PAR CANAL — il reflète le coût du canal (Yappy
+ *     commerçant ~1 %, processeur carte ~3,5–4 %), jamais la demande,
+ *     la date ni la rareté (R3). Yappy est moins cher PARCE QU'IL coûte
+ *     moins cher — c'est aussi pourquoi il se recommande en premier.
  */
-export const SERVICE_FEE_PCT = 3.5;
+export type PayChannel = "yappy" | "tarjeta" | "efectivo";
 
-export function serviceFeeCents(totalCents: number): number {
-  return Math.round((totalCents * SERVICE_FEE_PCT) / 100);
+/** L'ordre d'affichage partout : le recommandé d'abord, le cash en dernier. */
+export const PAY_CHANNELS: PayChannel[] = ["yappy", "tarjeta", "efectivo"];
+
+export const SERVICE_FEE_PCT: Record<PayChannel, number> = {
+  yappy: 2.5,
+  tarjeta: 5,
+  efectivo: 0,
+};
+
+export function serviceFeeCents(
+  totalCents: number,
+  channel: PayChannel,
+): number {
+  return Math.round((totalCents * SERVICE_FEE_PCT[channel]) / 100);
 }
 
 export type PriceBreakdown = {

@@ -2,6 +2,7 @@
 
 import { useCallback, useMemo, useSyncExternalStore } from "react";
 import { isSupabaseConfigured } from "./supabase";
+import type { PayChannel } from "./pricing";
 
 /**
  * SESSION
@@ -52,6 +53,10 @@ export type Session = {
   /** Les carros enregistrés. À la publication on choisit lequel ; s'il
    *  n'y en a qu'un, c'est lui d'office. */
   cars?: SavedCar[] | null;
+  /** Moyen de paiement favori, choisi à l'inscription et modifiable dans
+   *  Mi cuenta. Il présélectionne le canal à la réservation — il ne
+   *  l'impose jamais : les trois restent visibles à chaque reserva. */
+  payPref?: PayChannel | null;
 };
 
 /** La liste des carros, quel que soit l'âge de la session. */
@@ -112,7 +117,12 @@ export function useSession() {
   }, [raw]);
 
   const signIn = useCallback(
-    (contact: string, firstName = "Tú", lastName = "") => {
+    (
+      contact: string,
+      firstName = "Tú",
+      lastName = "",
+      payPref: PayChannel | null = null,
+    ) => {
       const next: Session = {
         contact,
         firstName,
@@ -121,6 +131,7 @@ export function useSession() {
         isVerified: false,
         affiliation: null,
         since: new Date().toISOString(),
+        payPref,
       };
       try {
         window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));

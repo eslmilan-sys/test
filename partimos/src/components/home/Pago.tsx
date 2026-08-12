@@ -10,12 +10,12 @@ export function Pago() {
   return (
     <Section id="pago">
       <SectionTitle className="max-w-[18ch]">
-        Le pagas a la persona — en la mano o por la app
+        Le pagas a la persona — por la app o en la mano
       </SectionTitle>
       <Lead>
-        En la mano el día del viaje, sin tarifa — o en la app con cobro
-        protegido, si prefieres. En los dos casos el conductor recibe su
-        aporte completo.
+        Yappy o tarjeta en la app, con cobro protegido y la tarifa a la
+        vista — o efectivo el día del viaje, sin tarifa. En los tres casos
+        el conductor recibe su aporte completo.
       </Lead>
 
       {/* UN SEUL BLOC, PAS TROIS.
@@ -65,8 +65,8 @@ export function Pago() {
         <div className="mt-5 grid gap-2 text-[14px] leading-snug text-ink-500 sm:grid-cols-2 sm:gap-7">
           <p>
             <b className="font-display font-bold text-ink-900">Pasajero</b> —
-            apartas tu puesto gratis. Pagas en la mano, o en la app si
-            prefieres el cobro protegido.
+            apartas tu puesto gratis. Pagas por Yappy o tarjeta en la app, o
+            en la mano si prefieres el efectivo.
           </p>
           <p className="sm:text-right">
             <b className="font-display font-bold text-ink-900">Conductor</b> —

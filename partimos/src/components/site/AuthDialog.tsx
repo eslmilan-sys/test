@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
 import { getSupabase, isSupabaseConfigured } from "@/lib/supabase";
 import { useSession } from "@/lib/session";
+import { PayChannelPicker } from "@/components/ui/PayChannelPicker";
+import type { PayChannel } from "@/lib/pricing";
 
 /**
  * INSCRIPTION ET CONNEXION
@@ -47,6 +49,10 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
   const [lastName, setLastName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
+  /* Le favori se choisit dès l'inscription — Yappy présélectionné, comme
+     partout : c'est le canal recommandé. Il ne fait que préremplir la
+     réservation, les trois moyens y restent toujours proposés. */
+  const [payPref, setPayPref] = useState<PayChannel>("yappy");
   const [code, setCode] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
@@ -177,6 +183,7 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
                       channel === "phone" ? e164 : email.trim(),
                       firstName.trim(),
                       lastName.trim(),
+                      payPref,
                     )
                   }
                   className="mt-4 w-full rounded-[14px] bg-ink-900 px-5 py-3.5 font-display text-[16px] font-bold text-white transition-colors hover:bg-ink-800"
@@ -232,23 +239,38 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
               </div>
 
               {mode === "register" && (
-                <div className="grid grid-cols-2 gap-3">
-                  <Field
-                    id={`${id}-first`}
-                    label="Nombre"
-                    value={firstName}
-                    onChange={setFirstName}
-                    autoComplete="given-name"
-                    autoFocus
-                  />
-                  <Field
-                    id={`${id}-last`}
-                    label="Apellido"
-                    value={lastName}
-                    onChange={setLastName}
-                    autoComplete="family-name"
-                  />
-                </div>
+                <>
+                  <div className="grid grid-cols-2 gap-3">
+                    <Field
+                      id={`${id}-first`}
+                      label="Nombre"
+                      value={firstName}
+                      onChange={setFirstName}
+                      autoComplete="given-name"
+                      autoFocus
+                    />
+                    <Field
+                      id={`${id}-last`}
+                      label="Apellido"
+                      value={lastName}
+                      onChange={setLastName}
+                      autoComplete="family-name"
+                    />
+                  </div>
+                  <div>
+                    <span className="mb-1.5 block text-[11.5px] font-bold tracking-[0.11em] text-ink-500 uppercase">
+                      Cómo prefieres pagar
+                    </span>
+                    <PayChannelPicker
+                      idBase={`${id}-pago`}
+                      value={payPref}
+                      onChange={setPayPref}
+                    />
+                    <p className="mt-1.5 text-[12px] leading-snug text-ink-500">
+                      Lo cambias cuando quieras. En cada reserva ves los tres.
+                    </p>
+                  </div>
+                </>
               )}
 
               <div

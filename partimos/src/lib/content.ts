@@ -31,7 +31,7 @@ export type Faq = { q: string; a: string };
 export const GENERAL_FAQ: Faq[] = [
   {
     q: "¿Cómo y cuándo pago?",
-    a: "Como prefieras. Afuera: le pagas directo al conductor el día del viaje, en efectivo o por Yappy a su número, sin tarifa. O en la app: tarjeta o Yappy, con una tarifa de servicio del 3.5% que paga la reserva protegida — comprobante, soporte y reembolso según las reglas de cancelación. En los dos casos el conductor recibe su aporte completo.",
+    a: "Como prefieras, en este orden: Yappy en la app (recomendado, tarifa de servicio del 2.5%), tarjeta en la app (tarifa del 5%, por una pasarela certificada) o efectivo en la mano el día del viaje, sin tarifa. La tarifa paga la reserva protegida — comprobante, soporte y reembolso según las reglas de cancelación. En los tres casos el conductor recibe su aporte completo.",
   },
   {
     q: "¿Cuándo veo el número del conductor?",
@@ -71,7 +71,7 @@ export const HELP_FAQ: Faq[] = [
   },
   {
     q: "¿Partimos cobra comisión?",
-    a: "Al conductor, nunca: su aporte le llega completo. Al pasajero, solo si elige pagar en línea: una tarifa de servicio fija del 3.5% por la reserva protegida. Pagar afuera, directo al conductor, no cuesta nada y siempre está disponible.",
+    a: "Al conductor, nunca: su aporte le llega completo. Al pasajero, solo si elige pagar en la app: una tarifa de servicio fija por canal — 2.5% con Yappy, 5% con tarjeta — por la reserva protegida. Es fija porque sigue el costo del canal, nunca la demanda. Pagar en efectivo, directo al conductor, no cuesta nada y siempre está disponible.",
   },
   {
     q: "¿Guardan mi cédula?",

@@ -42,20 +42,32 @@ export default function TerminosPage() {
         </li>
       </ul>
 
-      <h2>2 bis. El pago — dos vías, a elección del pasajero</h2>
+      <h2>2 bis. El pago — tres vías, a elección del pasajero</h2>
       <p>
-        <b>Afuera (sin tarifa).</b> El pasajero le paga directamente al
-        conductor el día del viaje, en efectivo o por Yappy a su número.
-        Partimos no interviene en esa transacción.
+        <b>Yappy en la app (tarifa de servicio del 2.5%).</b> El pasajero
+        paga por la plataforma mediante el Botón de Pago Yappy. Es la vía
+        recomendada y la de tarifa más baja.
       </p>
       <p>
-        <b>En la app (con tarifa de servicio).</b> Como opción, el pasajero
-        puede pagar por la plataforma con tarjeta o Yappy. En ese caso
-        Partimos cobra al pasajero una tarifa de servicio fija del 3.5% del
-        aporte, que remunera el servicio digital de reserva: cobro protegido,
-        comprobante, soporte y reembolsos según las reglas de cancelación.
-        Esta tarifa nunca se descuenta del aporte del conductor, nunca varía
-        con la demanda y no constituye un cobro por el transporte. El aporte
+        <b>Tarjeta en la app (tarifa de servicio del 5%).</b> El pasajero
+        paga por la plataforma con tarjeta, a través de una pasarela
+        certificada; los datos de la tarjeta nunca pasan por los servidores
+        de Partimos.
+      </p>
+      <p>
+        <b>Efectivo (sin tarifa).</b> El pasajero le paga directamente al
+        conductor el día del viaje, en efectivo o por Yappy a su número.
+        Partimos no interviene en esa transacción y esta vía permanece
+        siempre disponible y gratuita.
+      </p>
+      <p>
+        La tarifa de servicio remunera el servicio digital de reserva —
+        cobro protegido, comprobante, soporte y reembolsos según las reglas
+        de cancelación — y se cobra únicamente al pasajero que elige pagar
+        en la app. Es fija por canal: refleja el costo de procesar cada
+        medio de pago y nunca varía con la demanda, la fecha ni la
+        disponibilidad de puestos. Nunca se descuenta del aporte del
+        conductor y no constituye un cobro por el transporte. El aporte
         cobrado por la plataforma se transfiere íntegro al conductor.
       </p>
 
@@ -80,10 +92,14 @@ export default function TerminosPage() {
 
       <h2>4. El pago</h2>
       <p>
-        El pago ocurre entre el pasajero y el conductor, directamente, el día
-        del viaje, en efectivo o por transferencia entre particulares. Partimos
-        no procesa pagos, no guarda datos bancarios y no interviene en la
-        transacción. Reservar en la plataforma no cuesta nada.
+        El pago del aporte se hace por la vía que el pasajero elige entre las
+        tres de la cláusula 2 bis. Cuando paga en la app, Partimos procesa el
+        cobro a través de proveedores certificados y transfiere el aporte
+        íntegro al conductor; los datos de tarjeta viven en la pasarela,
+        nunca en Partimos. Cuando paga en efectivo, la transacción ocurre
+        entre el pasajero y el conductor y Partimos no interviene. Reservar
+        no cuesta nada: la tarifa de servicio solo existe si el pasajero
+        elige el cobro en la app, y se muestra antes de confirmar.
       </p>
 
       <h2>5. Obligaciones del conductor</h2>

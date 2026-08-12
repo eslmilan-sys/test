@@ -82,7 +82,7 @@ const STEPS: Step[] = [
 const FAQ: Faq[] = [
   {
     q: "¿Puedo pagar con tarjeta en la app?",
-    a: "Sí, si quieres. Al reservar eliges: pagar afuera (efectivo o Yappy directo al conductor, sin tarifa) o en la app con tarjeta o Yappy, con una tarifa de servicio fija del 3.5% que paga la reserva protegida — comprobante, soporte y reembolso según las reglas de cancelación. El conductor recibe su aporte completo en los dos casos.",
+    a: "Sí, si quieres. Al reservar eliges entre tres: Yappy en la app (recomendado, tarifa de servicio del 2.5%), tarjeta en la app (tarifa del 5%) o efectivo en la mano, sin tarifa. La tarifa paga la reserva protegida — comprobante, soporte y reembolso según las reglas de cancelación. El conductor recibe su aporte completo en los tres casos.",
   },
   {
     q: "¿Y si el conductor me quiere cobrar más el día del viaje?",
@@ -94,7 +94,7 @@ const FAQ: Faq[] = [
   },
   {
     q: "¿Qué pasa si no aparezco?",
-    a: "Si pagaste afuera, no hay plata retenida ni reembolso que pedir. Si pagaste en la app, el reembolso sigue las reglas de cancelación: completo con más de 24 horas, el aporte entre 24 y 2 horas, y con menos de 2 horas se retiene la mitad. Del otro lado hay alguien que te esperó: dos ausencias sin avisar y dejas de poder reservar por un tiempo.",
+    a: "Si pagaste en efectivo, no hay plata retenida ni reembolso que pedir. Si pagaste en la app — Yappy o tarjeta —, el reembolso sigue las reglas de cancelación: completo con más de 24 horas, el aporte entre 24 y 2 horas, y con menos de 2 horas se retiene la mitad. Del otro lado hay alguien que te esperó: dos ausencias sin avisar y dejas de poder reservar por un tiempo.",
   },
   {
     q: "¿El precio sube si reservo el último puesto?",

@@ -7,9 +7,15 @@ import { PlacePicker } from "@/components/ui/PlacePicker";
 import { Icon } from "@/components/ui/Icon";
 import { AuthDialog } from "@/components/site/AuthDialog";
 import { useSession } from "@/lib/session";
-import { formatUsd,
+import {
+  formatUsd,
   serviceFeeCents,
-  SERVICE_FEE_PCT, type VehicleCategory } from "@/lib/pricing";
+  PAY_CHANNELS,
+  SERVICE_FEE_PCT,
+  type PayChannel,
+  type VehicleCategory,
+} from "@/lib/pricing";
+import { CashMark, TarjetaMark, YappyBubbles } from "@/components/ui/PayMark";
 import { quoteDetour } from "@/lib/detour";
 import { bookingDisclaimer } from "@/lib/content";
 
@@ -17,9 +23,9 @@ import { bookingDisclaimer } from "@/lib/content";
  * Panneau de réservation.
  *
  * Trois choses doivent tenir ensemble sans que l'utilisateur ait à chercher :
- * le montant, le point de prise en charge, et le fait que RIEN n'est prélevé
- * ici. La dernière est celle qui rassure le plus dans un modèle sans paiement
- * en ligne, donc elle est écrite à côté du bouton, pas en bas de page.
+ * le montant, le point de prise en charge, et le canal de paiement avec sa
+ * tarifa affichée AVANT le bouton — jamais découverte après. L'ordre des
+ * canaux est celui de la maison : Yappy (recommandé), tarjeta, efectivo.
  *
  * La connexion est demandée AU MOMENT de réserver, pas à l'entrée du site :
  * on laisse chercher, comparer et calculer sans compte. Un mur de connexion
@@ -66,12 +72,14 @@ export function BookingPanel({
      particuliers : le conducteur accepte ou refuse. */
   const [offerOpen, setOfferOpen] = useState(false);
   const [offerCents, setOfferCents] = useState<number | null>(null);
-  /* Deux façons de payer, au choix du passager. AFUERA (efectivo ou
-     Yappy directo au conducteur) reste la voie par défaut et gratuite.
-     EN LA APP (tarjeta ou Yappy), une tarifa de servicio de 3,5 % se
-     ajoute — elle paie la réservation protégée, PAS le transport : le
-     conducteur reçoit son aporte complet dans les deux cas. */
-  const [payChannel, setPayChannel] = useState<"afuera" | "app">("afuera");
+  /* Trois façons de payer, dans l'ordre de la maison : Yappy d'abord
+     (recommandé — tarifa la plus basse), la tarjeta ensuite, l'efectivo
+     en dernier. La tarifa de servicio paie la réservation protégée, PAS
+     le transport : le conducteur reçoit son aporte complet dans tous les
+     cas, et l'efectivo reste gratuit (R2). Le favori du compte
+     présélectionne ; tant que l'utilisateur n'a pas cliqué, on suit sa
+     préférence — dérivée, pas copiée, pour éviter tout setState en effet. */
+  const [channelChoice, setChannelChoice] = useState<PayChannel | null>(null);
 
   const isCustom = stopIndex === stops.length;
   const quote = quoteDetour(baseKm, tollCents, extraKm, category, seatsOffered);
@@ -81,7 +89,9 @@ export function BookingPanel({
      réel, ils ne se négocient pas. */
   const unitCents = isCustom ? baseCents + quote.extraCents : baseCents;
   const totalCents = unitCents * seats;
-  const feeCents = payChannel === "app" ? serviceFeeCents(totalCents) : 0;
+  const payChannel: PayChannel = channelChoice ?? session?.payPref ?? "yappy";
+  const inApp = payChannel !== "efectivo";
+  const feeCents = serviceFeeCents(totalCents, payChannel);
   const chargedCents = totalCents + feeCents;
   const blocked = isCustom && !quote.accepted;
   /* Une offre ou un point proposé retirent la réservation instantanée :
@@ -111,15 +121,21 @@ export function BookingPanel({
           </p>
         )}
         <p className="rounded-[14px] bg-ink-50 px-4 py-3 text-[13.5px] leading-relaxed text-ink-500">
-          {payChannel === "app" ? (
+          {inApp ? (
             <>
               <b className="font-semibold text-ink-900">
-                Pago en la app: {formatUsd(chargedCents)}
+                {payChannel === "yappy" ? "Pago por Yappy" : "Pago con tarjeta"}
+                {needsDriverOk ? " al confirmar" : ""}: {formatUsd(chargedCents)}
               </b>{" "}
               ({formatUsd(totalCents)} de aporte + {formatUsd(feeCents)} de
-              tarifa). {driverName} recibe su aporte completo. En esta
-              demostración no se cobró nada: el cobro en línea se activa
-              cuando el procesador esté conectado.
+              tarifa).{" "}
+              {needsDriverOk &&
+                `El cobro sale solo si ${driverName} acepta. `}
+              {driverName} recibe su aporte completo. En esta demostración no
+              se cobró nada:{" "}
+              {payChannel === "yappy"
+                ? "el Botón de Pago Yappy se activa cuando el comercio esté conectado."
+                : "el cobro con tarjeta se activa cuando la pasarela esté conectada."}
             </>
           ) : (
             <>
@@ -127,7 +143,7 @@ export function BookingPanel({
                 No pagaste nada aquí.
               </b>{" "}
               Le entregas {formatUsd(totalCents)} a {driverName} el día del
-              viaje, en efectivo o por Yappy.
+              viaje, en efectivo o por Yappy a su número.
             </>
           )}
         </p>
@@ -312,70 +328,64 @@ export function BookingPanel({
           Cómo pagas
         </legend>
         <div className="grid gap-1.5">
-          <label
-            className={`flex cursor-pointer items-start gap-2.5 rounded-[12px] border px-3.5 py-2.5 transition-colors ${
-              payChannel === "afuera"
-                ? "border-ink-900 bg-ink-50"
-                : "border-ink-200 hover:border-accent"
-            }`}
-          >
-            <input
-              type="radio"
-              name="pago"
-              checked={payChannel === "afuera"}
-              onChange={() => setPayChannel("afuera")}
-              className="sr-only"
-            />
-            <span
-              aria-hidden
-              className={`mt-1 size-3.5 shrink-0 rounded-full border-[3px] ${
-                payChannel === "afuera"
-                  ? "border-ink-900 bg-white"
-                  : "border-ink-200"
-              }`}
-            />
-            <span className="min-w-0">
-              <span className="block text-[14.5px] font-semibold">
-                Afuera: efectivo o Yappy directo
-              </span>
-              <span className="block text-[12.5px] leading-snug text-ink-500">
-                Le pagas en la mano el día del viaje. Sin tarifa.
-              </span>
-            </span>
-          </label>
-          <label
-            className={`flex cursor-pointer items-start gap-2.5 rounded-[12px] border px-3.5 py-2.5 transition-colors ${
-              payChannel === "app"
-                ? "border-ink-900 bg-ink-50"
-                : "border-ink-200 hover:border-accent"
-            }`}
-          >
-            <input
-              type="radio"
-              name="pago"
-              checked={payChannel === "app"}
-              onChange={() => setPayChannel("app")}
-              className="sr-only"
-            />
-            <span
-              aria-hidden
-              className={`mt-1 size-3.5 shrink-0 rounded-full border-[3px] ${
-                payChannel === "app"
-                  ? "border-ink-900 bg-white"
-                  : "border-ink-200"
-              }`}
-            />
-            <span className="min-w-0">
-              <span className="block text-[14.5px] font-semibold">
-                En la app: tarjeta o Yappy
-              </span>
-              <span className="block text-[12.5px] leading-snug text-ink-500">
-                Cobro protegido, comprobante y reembolso según las reglas de
-                cancelación. Tarifa de servicio del {SERVICE_FEE_PCT}% — la
-                pagas tú, el conductor recibe su aporte completo.
-              </span>
-            </span>
-          </label>
+          {PAY_CHANNELS.map((channel) => {
+            const active = payChannel === channel;
+            return (
+              <label
+                key={channel}
+                className={`flex cursor-pointer items-start gap-2.5 rounded-[12px] border px-3.5 py-2.5 transition-colors ${
+                  active
+                    ? "border-ink-900 bg-ink-50"
+                    : "border-ink-200 hover:border-accent"
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="pago"
+                  checked={active}
+                  onChange={() => setChannelChoice(channel)}
+                  className="sr-only"
+                />
+                <span
+                  aria-hidden
+                  className={`mt-1 size-3.5 shrink-0 rounded-full border-[3px] ${
+                    active ? "border-ink-900 bg-white" : "border-ink-200"
+                  }`}
+                />
+                <span className="min-w-0 flex-1">
+                  <span className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[14.5px] font-semibold">
+                    {channel === "yappy" ? (
+                      <>
+                        <YappyBubbles className="h-4 w-auto" />
+                        Yappy en la app
+                        <span className="rounded-full bg-action px-2 py-0.5 text-[10.5px] font-bold tracking-[0.06em] text-ink-900 uppercase">
+                          Recomendado
+                        </span>
+                      </>
+                    ) : channel === "tarjeta" ? (
+                      <>
+                        <TarjetaMark className="size-4.5 text-ink-600" />
+                        Tarjeta en la app
+                      </>
+                    ) : (
+                      <>
+                        <CashMark className="size-4.5 text-ink-600" />
+                        Efectivo el día del viaje
+                      </>
+                    )}
+                  </span>
+                  <span className="block text-[12.5px] leading-snug text-ink-500">
+                    {channel === "yappy" &&
+                      `Cobro protegido, comprobante y reembolso según las reglas de cancelación. Tarifa de servicio del ${SERVICE_FEE_PCT.yappy}% — la más baja.`}
+                    {channel === "tarjeta" &&
+                      `Cobro protegido por una pasarela certificada — tu tarjeta nunca pasa por nuestros servidores. Tarifa de servicio del ${SERVICE_FEE_PCT.tarjeta}%.`}
+                    {channel === "efectivo" &&
+                      "Le pagas en la mano (o Yappy directo a su número). Sin tarifa, pero también sin cobro protegido ni comprobante."}
+                  </span>
+                </span>
+              </label>
+            );
+          })}
         </div>
       </fieldset>
 
@@ -389,31 +399,58 @@ export function BookingPanel({
         </div>
         <div className="flex justify-between gap-3 py-1">
           <dt className="text-ink-500">
-            {payChannel === "app"
-              ? `Tarifa de servicio (${SERVICE_FEE_PCT}%)`
+            {inApp
+              ? `Tarifa de servicio (${SERVICE_FEE_PCT[payChannel]}%)`
               : "Tarifa de servicio"}
           </dt>
           <dd className="tnum font-semibold">{formatUsd(feeCents)}</dd>
         </div>
         <div className="flex justify-between gap-3 border-t border-ink-200 py-2">
           <dt className="font-semibold">
-            {payChannel === "app" ? "Pagas en la app" : "Le entregas al conductor"}
+            {inApp ? "Pagas en la app" : "Le entregas al conductor"}
           </dt>
           <dd className="tnum font-display text-[18px] font-bold">
-            {formatUsd(payChannel === "app" ? chargedCents : totalCents)}
+            {formatUsd(inApp ? chargedCents : totalCents)}
           </dd>
         </div>
       </dl>
 
+      {/* Le bouton dit ce qu'il fait. Yappy a SON bouton — le bleu marine
+          de la marque, les deux bulles — c'est le Botón de Pago que le
+          passager retrouvera dans son app. Quand le conducteur doit encore
+          accepter, on ne « paie » pas : on demande, le cobro part après
+          son OK. */}
       {session ? (
-        <Button
-          size="lg"
-          full
-          disabled={blocked}
-          onClick={() => setBooked(true)}
-        >
-          {needsDriverOk ? "Pedir el puesto" : "Reservar mi puesto"}
-        </Button>
+        needsDriverOk || !inApp ? (
+          <Button
+            size="lg"
+            full
+            disabled={blocked}
+            onClick={() => setBooked(true)}
+          >
+            {needsDriverOk ? "Pedir el puesto" : "Reservar mi puesto"}
+          </Button>
+        ) : (
+          <button
+            disabled={blocked}
+            onClick={() => setBooked(true)}
+            className={`inline-flex w-full items-center justify-center gap-2.5 rounded-[14px] px-7 py-4 font-display text-[17px] font-bold text-white transition-opacity hover:opacity-90 disabled:pointer-events-none disabled:opacity-50 ${
+              payChannel === "yappy" ? "bg-[#17529e]" : "bg-ink-900"
+            }`}
+          >
+            {payChannel === "yappy" ? (
+              <>
+                <YappyBubbles className="h-5 w-auto" />
+                Pagar con Yappy · {formatUsd(chargedCents)}
+              </>
+            ) : (
+              <>
+                <TarjetaMark className="size-5" />
+                Pagar con tarjeta · {formatUsd(chargedCents)}
+              </>
+            )}
+          </button>
+        )
       ) : (
         <AuthDialog
           trigger={
@@ -439,7 +476,7 @@ export function BookingPanel({
       />
 
       <p className="mt-3 text-center text-[12.5px] leading-relaxed text-ink-500">
-        Reservar es gratis y no pide tarjeta.
+        Sin cobros escondidos: lo que ves aquí es exactamente lo que pagas.
       </p>
 
       <p className="mt-4 rounded-[14px] bg-ink-50 px-4 py-3 text-[13px] leading-relaxed text-ink-500">

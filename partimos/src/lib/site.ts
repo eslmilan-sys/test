@@ -9,7 +9,7 @@ export const SITE = {
      Ne dit plus « este fin de semana » — il part des voitures tous les
      jours, et la page d'accueil l'annonce depuis longtemps. */
   description:
-    "Comparte carro entre Ciudad de Panamá y el interior. Te recogen cerca, vas sentado todo el camino y le pagas directo al conductor. Reservar es gratis.",
+    "Comparte carro entre Ciudad de Panamá y el interior. Te recogen cerca y pagas como prefieras: Yappy, tarjeta o efectivo. Reservar es gratis.",
 } as const;
 
 export function canonical(path = "/") {

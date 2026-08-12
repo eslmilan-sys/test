@@ -41,14 +41,14 @@ export const metadata: Metadata = {
     locale: "es_PA",
     title: "Partimos — Alguien ya va para allá",
     description:
-      "Te recogen cerca, vas sentado todo el camino y le pagas directo al conductor. Sin comisión.",
+      "Te recogen cerca, vas sentado todo el camino y pagas como prefieras: Yappy, tarjeta o efectivo. El aporte le llega completo al conductor.",
     url: canonical("/"),
   },
   twitter: {
     card: "summary_large_image",
     title: "Partimos — Alguien ya va para allá",
     description:
-      "Te recogen cerca, vas sentado todo el camino y le pagas directo al conductor. Sin comisión.",
+      "Te recogen cerca, vas sentado todo el camino y pagas como prefieras: Yappy, tarjeta o efectivo. El aporte le llega completo al conductor.",
   },
   robots: { index: true, follow: true },
 };

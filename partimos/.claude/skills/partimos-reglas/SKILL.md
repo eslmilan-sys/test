@@ -25,17 +25,20 @@ Autorité finale : la contrainte `CHECK price_within_cap` en base, pas le code
 applicatif.
 
 **R2 — La plateforme ne touche jamais l'aporte du conducteur.**
-(Amendée le 2026-08-12 par décision du propriétaire.) Le paiement EN LIGNE
-existe désormais comme OPTION du passager : tarjeta ou Yappy dans l'app, avec
-une tarifa de servicio FIXE de 3,5 % cobrée au passager — elle rémunère le
+(Amendée le 2026-08-12 par décision du propriétaire, deux fois.) Le paiement
+EN LIGNE existe comme OPTION du passager, avec trois canaux présentés dans
+CET ORDRE : Yappy dans l'app (recommandé), tarjeta dans l'app, efectivo en
+dernier. La tarifa de servicio est FIXE PAR CANAL — 2,5 % Yappy, 5 %
+tarjeta, 0 efectivo — parce qu'elle suit le coût du canal (Yappy commerçant
+~1 %, processeur carte ~3,5–4 %), jamais la demande. Elle rémunère le
 service digital de réservation (cobro protégé, comprobante, remboursements),
 jamais le transport. Trois invariants inviolables : le conducteur reçoit son
-aporte COMPLET (la tarifa est en sus, jamais déduite) ; payer AFUERA
-(efectivo, Yappy directo) reste toujours disponible et gratuit ; le
-pourcentage ne varie jamais (ni demande, ni date, ni rareté). Autorité :
-contraintes `fee_only_in_app` et `fee_is_fixed_pct` (migration 0009).
+aporte COMPLET (la tarifa est en sus, jamais déduite) ; payer en EFECTIVO
+(ou Yappy directo au conducteur) reste toujours disponible et gratuit ;
+aucun pourcentage ne varie avec la demande, la date ou la rareté. Autorité :
+contraintes `fee_only_in_app` (0009) et `fee_is_fixed_pct` par canal (0010).
 Ne jamais : déduire la tarifa de l'aporte, la rendre obligatoire, ou la
-faire varier.
+faire varier autrement que par canal.
 
 **R3 — Le prix ne suit jamais la demande.**
 `computePriceCap()` ne prend en entrée ni date, ni disponibilité, ni compteur.
