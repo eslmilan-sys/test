@@ -228,10 +228,17 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
     <Dialog.Root onOpenChange={(open) => !open && reset()}>
       <Dialog.Trigger asChild>{trigger}</Dialog.Trigger>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-[110] bg-night-950/55 motion-safe:animate-[fade-in_0.18s_ease-out]" />
-        <Dialog.Content className="fixed top-1/2 left-1/2 z-[120] max-h-[92vh] w-[calc(100vw-28px)] max-w-[440px] -translate-x-1/2 -translate-y-1/2 overflow-x-hidden overflow-y-auto rounded-[26px] glass liquid [--glass-alpha:0.93] p-6 shadow-float motion-safe:animate-[sheet-in_0.22s_cubic-bezier(0.2,0.9,0.3,1)]">
+        {/* Un moment décisif se joue sur une surface presque OPAQUE : le
+            verre subtil vaut pour les objets qui survolent du contenu
+            qu'on veut encore deviner — pas pour un formulaire d'entrée.
+            L'arrière-plan se floute et s'assombrit ; la carte, elle, est
+            solide et lisible. */}
+        <Dialog.Overlay className="fixed inset-0 z-[110] bg-night-950/65 backdrop-blur-[6px] motion-safe:animate-[fade-in_0.18s_ease-out]" />
+        <Dialog.Content className="fixed top-1/2 left-1/2 z-[120] w-[calc(100vw-28px)] max-w-[440px] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-[26px] glass liquid [--glass-alpha:0.98] shadow-float motion-safe:animate-[sheet-in_0.22s_cubic-bezier(0.2,0.9,0.3,1)]">
+          <div className="relative max-h-[88vh] overflow-y-auto rounded-[26px] p-6">
           {/* Le motif de la maison : UN rectangle ambre incliné, glissé
-              sous le coin du titre. */}
+              sous le coin du titre — clippé par la carte, jamais
+              débordant du coin arrondi. */}
           <span
             aria-hidden
             className="pointer-events-none absolute -top-6 -left-7 size-24 rotate-[-9deg] rounded-[22px] bg-[linear-gradient(135deg,#fde68a,#f59e0b_58%,#d97706)] opacity-25"
@@ -300,38 +307,10 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
             </>
           ) : step === "identity" ? (
             <div className="relative">
-              {/* 1 — Un toque. */}
-              <div className="grid grid-cols-2 gap-2">
-                <button
-                  type="button"
-                  onClick={() => social("google")}
-                  disabled={busy}
-                  className="flex items-center justify-center gap-2.5 rounded-[14px] border border-ink-200 bg-white/80 px-3 py-3 text-[14.5px] font-semibold transition-colors hover:border-accent disabled:opacity-60"
-                >
-                  <GoogleMark />
-                  Google
-                </button>
-                <button
-                  type="button"
-                  onClick={() => social("apple")}
-                  disabled={busy}
-                  className="flex items-center justify-center gap-2.5 rounded-[14px] border border-ink-200 bg-white/80 px-3 py-3 text-[14.5px] font-semibold transition-colors hover:border-accent disabled:opacity-60"
-                >
-                  <AppleMark />
-                  Apple
-                </button>
-              </div>
-
-              <div
-                aria-hidden
-                className="my-4 flex items-center gap-3 text-[12px] font-semibold tracking-[0.08em] text-ink-500 uppercase"
-              >
-                <span className="h-px flex-1 bg-ink-200" />
-                o con un código
-                <span className="h-px flex-1 bg-ink-200" />
-              </div>
-
-              {/* 2 — Le code, par le canal qu'on préfère. */}
+              {/* L'ordre raconte le parcours : d'abord QUI tu es (entrer
+                  ou créer), puis TES DONNÉES, puis le bouton — et en bas,
+                  comme dans tous les écrans d'auth bien élevés, la voie
+                  express « o continúa con » Google / Apple. */}
               <form
                 onSubmit={submitIdentity}
                 noValidate
@@ -483,25 +462,55 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
                 <Button type="submit" size="lg" full disabled={busy}>
                   {busy ? "Mandando…" : "Mandarme el código"}
                 </Button>
-
-                <p className="text-center text-[12px] leading-relaxed text-ink-500">
-                  Al continuar aceptas los{" "}
-                  <a
-                    href="/terminos"
-                    className="font-semibold text-accent-ink hover:underline"
-                  >
-                    términos de uso
-                  </a>{" "}
-                  y el{" "}
-                  <a
-                    href="/privacidad"
-                    className="font-semibold text-accent-ink hover:underline"
-                  >
-                    aviso de privacidad
-                  </a>
-                  .
-                </p>
               </form>
+
+              <div
+                aria-hidden
+                className="my-4 flex items-center gap-3 text-[12px] font-semibold tracking-[0.08em] text-ink-500 uppercase"
+              >
+                <span className="h-px flex-1 bg-ink-200" />
+                o continúa con
+                <span className="h-px flex-1 bg-ink-200" />
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => social("google")}
+                  disabled={busy}
+                  className="flex items-center justify-center gap-2.5 rounded-[14px] border border-ink-200 bg-white px-3 py-3 text-[14.5px] font-semibold transition-colors hover:border-accent disabled:opacity-60"
+                >
+                  <GoogleMark />
+                  Google
+                </button>
+                <button
+                  type="button"
+                  onClick={() => social("apple")}
+                  disabled={busy}
+                  className="flex items-center justify-center gap-2.5 rounded-[14px] border border-ink-200 bg-white px-3 py-3 text-[14.5px] font-semibold transition-colors hover:border-accent disabled:opacity-60"
+                >
+                  <AppleMark />
+                  Apple
+                </button>
+              </div>
+
+              <p className="mt-4 text-center text-[12px] leading-relaxed text-ink-500">
+                Al continuar aceptas los{" "}
+                <a
+                  href="/terminos"
+                  className="font-semibold text-accent-ink hover:underline"
+                >
+                  términos de uso
+                </a>{" "}
+                y el{" "}
+                <a
+                  href="/privacidad"
+                  className="font-semibold text-accent-ink hover:underline"
+                >
+                  aviso de privacidad
+                </a>
+                .
+              </p>
             </div>
           ) : (
             <form onSubmit={verify} noValidate className="flex flex-col gap-4">
@@ -588,24 +597,10 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
             </p>
           )}
 
-          {step === "identity" && (
-            <div className="relative mt-5 border-t border-ink-200 pt-4">
-              <p className="mb-2 text-[13px] font-semibold text-ink-900">
-                Después, si quieres
-              </p>
-              <ul className="grid gap-2 text-[13px] leading-relaxed text-ink-500">
-                <li className="flex items-start gap-2.5">
-                  <Icon name="id" className="mt-0.5 size-4 shrink-0" />
-                  Verificar tu cédula — hace falta para reservar y publicar
-                </li>
-                <li className="flex items-start gap-2.5">
-                  <Icon name="shield" className="mt-0.5 size-4 shrink-0" />
-                  Conectar LinkedIn o tu correo de trabajo — te da una insignia
-                  y un filtro, no privilegios
-                </li>
-              </ul>
-            </div>
-          )}
+          {/* Le bloc « Después, si quieres » (cédula, LinkedIn) a quitté
+              ce dialogue : un moment d'entrée ne supporte pas le bruit.
+              Ces explications vivent dans Mi cuenta, où on les lit. */}
+          </div>
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>
