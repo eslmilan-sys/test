@@ -102,10 +102,11 @@ export default function SeguridadPage() {
                     Lo que no hacemos
                   </h2>
                   <p className="text-[15px] leading-relaxed text-ink-500">
-                    No guardamos imágenes de cédula ni números de documento. No
-                    pedimos tarjeta de crédito, porque no manejamos pagos. No
-                    vendemos datos. Y no usamos tu número para publicidad: solo
-                    para avisarte de los viajes que buscaste.
+                    No guardamos imágenes de cédula ni números de documento.
+                    No guardamos números de tarjeta: si pagas en la app, la
+                    procesa una pasarela certificada y a nosotros nunca nos
+                    llega. No vendemos datos. Y no usamos tu número para
+                    publicidad: solo para avisarte de los viajes que buscaste.
                   </p>
                 </div>
               </div>

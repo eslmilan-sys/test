@@ -47,8 +47,9 @@ export default function PrivacidadPage() {
           hace un proveedor certificado y nosotros recibimos solo el resultado.
         </li>
         <li>
-          <b>Datos bancarios ni de tarjetas.</b> No procesamos pagos, así que no
-          hay nada que guardar.
+          <b>Números de tarjeta.</b> Si pagas en la app, la tarjeta la procesa
+          una pasarela de pago certificada y nunca llega a nuestros servidores.
+          Nosotros guardamos solo el estado del cobro y su referencia.
         </li>
         <li>
           <b>Tu ubicación en segundo plano.</b> Solo se comparte cuando tú

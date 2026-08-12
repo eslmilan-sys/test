@@ -13,8 +13,9 @@ export function Pago() {
         Le pagas a la persona — en la mano o por la app
       </SectionTitle>
       <Lead>
-        No hay carrito, no hay checkout, no hay plata retenida. El aporte va de
-        tu mano a la del conductor, el día del viaje.
+        En la mano el día del viaje, sin tarifa — o en la app con cobro
+        protegido, si prefieres. En los dos casos el conductor recibe su
+        aporte completo.
       </Lead>
 
       {/* UN SEUL BLOC, PAS TROIS.
@@ -25,9 +26,16 @@ export function Pago() {
           en une ligne — de ta main à la sienne — et ce qui circule dessus est
           posé juste en dessous. Le trait est ambre comme partout ailleurs sur
           le site : le vert de marque ne sert qu'au logo. */}
-      {/* Section CLAIRE : une seule nuit par page (Historias), sinon tunnel.
-          Le verre reste où il a un dégradé à flouter — pas ici. */}
-      <div className="mt-8 rounded-[20px] border border-ink-200 bg-white px-5 py-6 shadow-card sm:px-7">
+      {/* Section CLAIRE : une seule nuit par page (Historias). Le plateau
+          passe au verre — même matériau que la carte de recherche — avec
+          UN rectangle ambre glissé sous son coin : le motif du site, à
+          dose homéopathique. */}
+      <div className="relative mt-8">
+        <span
+          aria-hidden
+          className="absolute -top-4 -right-5 size-20 rotate-[8deg] rounded-[20px] bg-[linear-gradient(135deg,#fde68a,#f59e0b_58%,#d97706)] opacity-80"
+        />
+      <div className="glass liquid relative rounded-[20px] px-5 py-6 [--glass-alpha:0.88] sm:px-7">
         <div className="grid grid-cols-[auto_1fr_auto] items-center gap-x-3 sm:gap-x-5">
           <span className="flex size-12 items-center justify-center rounded-full bg-action font-display text-[18px] font-bold text-ink-900">
             Tú
@@ -57,7 +65,8 @@ export function Pago() {
         <div className="mt-5 grid gap-2 text-[14px] leading-snug text-ink-500 sm:grid-cols-2 sm:gap-7">
           <p>
             <b className="font-display font-bold text-ink-900">Pasajero</b> —
-            apartas tu puesto en la app. Ahí no pagas nada.
+            apartas tu puesto gratis. Pagas en la mano, o en la app si
+            prefieres el cobro protegido.
           </p>
           <p className="sm:text-right">
             <b className="font-display font-bold text-ink-900">Conductor</b> —
@@ -65,11 +74,12 @@ export function Pago() {
           </p>
         </div>
       </div>
+      </div>
 
-      {/* Deux encarts, deux registres : ce qui se passe / ce qui ne se passe
-          jamais. Le second est le seul endroit du site où le corail apparaît. */}
+      {/* Deux encarts, deux registres : comment ça marche / comment ne pas
+          se faire avoir. Le corail reste réservé à l'avertissement. */}
       <div className="mt-6.5 grid gap-3.5 md:grid-cols-2">
-        <div className="flex items-start gap-3.5 rounded-[18px] border border-ink-200 bg-white px-5.5 py-5 shadow-card">
+        <div className="glass flex items-start gap-3.5 rounded-[18px] px-5.5 py-5 [--glass-alpha:0.82]">
           <span className="flex size-8 shrink-0 items-center justify-center rounded-[10px] bg-ink-100">
             <Icon name="phone" className="size-4.5" />
           </span>
@@ -95,12 +105,13 @@ export function Pago() {
           </span>
           <div>
             <h3 className="mb-1.5 font-display text-[17px] font-bold">
-              No pedimos tarjeta de crédito
+              Solo pagamos por canales oficiales
             </h3>
             <p className="text-[14.5px] leading-relaxed text-ink-500">
-              Nunca. No guardamos datos bancarios porque no manejamos pagos. Si
-              alguna vez una página te pide tarjeta a nombre de Partimos, no es
-              nuestra.
+              El único lugar donde Partimos cobra es dentro de la app, al
+              reservar, con su tarifa a la vista. Si alguien te pide tarjeta o
+              un pago por WhatsApp, correo o cualquier otra página a nombre de
+              Partimos, no somos nosotros — repórtalo.
             </p>
           </div>
         </div>

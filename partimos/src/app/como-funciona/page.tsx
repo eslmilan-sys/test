@@ -53,7 +53,7 @@ const STEPS: Step[] = [
     icon: "chat",
     when: "Ahora",
     title: "Reservas tu puesto",
-    body: "Reservar no cuesta y no pide tarjeta. Es un compromiso entre dos personas, no una compra. Al confirmar, se te desbloquea el número del conductor.",
+    body: "Reservar es gratis. Pagas como prefieras: en la mano el día del viaje, o en la app con cobro protegido. Al confirmar, se te desbloquea el número del conductor.",
     money: "No pagas nada",
   },
   {
@@ -81,8 +81,8 @@ const STEPS: Step[] = [
 
 const FAQ: Faq[] = [
   {
-    q: "¿Por qué no puedo pagar con tarjeta en la app?",
-    a: "Porque Partimos no maneja pagos. Si la plataforma cobrara y luego le pasara la plata al conductor, estaría vendiendo un transporte, y eso necesita un permiso que ni ella ni los conductores tienen. Aquí solo se ponen en contacto dos personas que van al mismo sitio y comparten los gastos del carro.",
+    q: "¿Puedo pagar con tarjeta en la app?",
+    a: "Sí, si quieres. Al reservar eliges: pagar afuera (efectivo o Yappy directo al conductor, sin tarifa) o en la app con tarjeta o Yappy, con una tarifa de servicio fija del 3.5% que paga la reserva protegida — comprobante, soporte y reembolso según las reglas de cancelación. El conductor recibe su aporte completo en los dos casos.",
   },
   {
     q: "¿Y si el conductor me quiere cobrar más el día del viaje?",
@@ -90,11 +90,11 @@ const FAQ: Faq[] = [
   },
   {
     q: "¿Puedo pagarle antes por Yappy?",
-    a: "Puedes, si los dos están de acuerdo, pero no hace falta y no lo recomendamos para un primer viaje. Lo normal es pagar al subirte o al llegar.",
+    a: "Directo al conductor, puedes si los dos están de acuerdo — pero para adelantar plata con alguien que no conoces, mejor usa el pago en la app: queda comprobante y el reembolso es automático si el viaje se cancela.",
   },
   {
     q: "¿Qué pasa si no aparezco?",
-    a: "Como no hay plata retenida, no hay reembolso que pedir. Pero del otro lado hay alguien que te esperó: dos ausencias sin avisar y dejas de poder reservar por un tiempo. Avisar cuanto antes no tiene ninguna consecuencia.",
+    a: "Si pagaste afuera, no hay plata retenida ni reembolso que pedir. Si pagaste en la app, el reembolso sigue las reglas de cancelación: completo con más de 24 horas, el aporte entre 24 y 2 horas, y con menos de 2 horas se retiene la mitad. Del otro lado hay alguien que te esperó: dos ausencias sin avisar y dejas de poder reservar por un tiempo.",
   },
   {
     q: "¿El precio sube si reservo el último puesto?",
@@ -182,10 +182,10 @@ export default function ComoFuncionaPage() {
                 </h2>
                 <ul className="grid gap-2.5">
                   {[
-                    "Un número de tarjeta",
-                    "Una cuenta bancaria",
-                    "Un pago por adelantado",
-                    "Una comisión de servicio",
+                    "Tu tarjeta por WhatsApp, correo o llamada",
+                    "Un pago fuera de la app o de la mano al conductor",
+                    "Una comisión al conductor",
+                    "Tu cédula — la ve solo el verificador certificado",
                   ].map((item) => (
                     <li
                       key={item}
@@ -200,9 +200,9 @@ export default function ComoFuncionaPage() {
                   ))}
                 </ul>
                 <p className="mt-4 max-w-[46ch] text-[13.5px] leading-relaxed text-ink-500">
-                  Si alguna página te pide una tarjeta a nombre de Partimos, no
-                  es nuestra. No tenemos ni pasarela de pago ni datos bancarios
-                  que guardar.
+                  El único cobro de Partimos ocurre dentro de la app, al
+                  reservar, con la tarifa a la vista. Cualquier otro cobro a
+                  nombre de Partimos es un fraude: repórtalo.
                 </p>
               </div>
 
