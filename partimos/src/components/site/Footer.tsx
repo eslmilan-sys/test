@@ -50,7 +50,7 @@ export function Footer() {
                 Partimos
               </span>
             </Link>
-            <p className="mt-3.5 max-w-[32ch] text-sm leading-relaxed">
+            <p className="mt-3.5 max-w-[32ch] text-sm leading-snug">
               Viajes compartidos entre particulares en Panamá. Alguien ya va
               para allá.
             </p>
@@ -100,7 +100,10 @@ export function Footer() {
 
         {/* Mention légale obligatoire sur toutes les pages (§8 du brief). */}
         <div className="flex flex-wrap items-start justify-between gap-5 border-t border-white/12 pt-6">
-          <p className="max-w-[70ch] text-[12.5px] leading-relaxed text-night-300">
+          {/* Interligne resserré : un pavé légal en 12,5 px avec un
+              interligne « relaxed » prenait plus de place que le contenu
+              utile du footer. « snug » reste lisible à cette taille. */}
+          <p className="max-w-[70ch] text-[12.5px] leading-snug text-night-300">
             {LEGAL_FOOTER}
           </p>
           <span className="text-[12.5px] whitespace-nowrap">
