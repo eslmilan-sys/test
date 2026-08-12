@@ -62,6 +62,16 @@ export type Session = {
    *  n'a rien à gérer) ; ici il déclare s'il prend aussi le Yappy directo
    *  et/ou l'efectivo en main. Vide = « solo por la app ». */
   acceptsOutside?: ("yappy" | "efectivo")[] | null;
+  /** La RUTINA : le trajet qui revient chaque semaine. C'est l'habitude
+   *  qui rend la plateforme vitale — un clic pour republier ou pour
+   *  chercher, et la base du matching récurrent (migration 0012). */
+  routine?: {
+    from: string;
+    to: string;
+    /** Jours ISO : 1 = lundi … 7 = dimanche. */
+    days: number[];
+    hour: string;
+  } | null;
 };
 
 /** La liste des carros, quel que soit l'âge de la session. */

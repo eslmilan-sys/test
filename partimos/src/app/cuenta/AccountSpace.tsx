@@ -15,6 +15,8 @@ import {
 } from "@/lib/didit";
 import { connectLinkedIn, hasLinkedIn } from "@/lib/linkedin";
 import { PayChannelPicker } from "@/components/ui/PayChannelPicker";
+import { ALL_CITIES, buildRoute } from "@/lib/corridors";
+import { computePriceCap, formatUsd } from "@/lib/pricing";
 import {
   CAR_MAKES,
   CAR_YEARS,
@@ -143,19 +145,22 @@ export function AccountSpace() {
         className="rounded-[20px] border border-ink-200 bg-white p-5 sm:p-6"
       >
         {tab === "viajes" && (
-          <Empty
-            icon="route"
-            title="Todavía no tienes viajes"
-            body="Cuando reserves un puesto o publiques un viaje, aparecen aquí con la hora, el punto de recogida y el número de la otra persona."
-            actions={
-              <>
-                <ButtonLink href="/buscar">Buscar un viaje</ButtonLink>
-                <ButtonLink href="/publicar/nuevo" variant="secondary">
-                  Publicar un viaje
-                </ButtonLink>
-              </>
-            }
-          />
+          <>
+            <RutinaCard />
+            <Empty
+              icon="route"
+              title="Todavía no tienes viajes"
+              body="Cuando reserves un puesto o publiques un viaje, aparecen aquí con la hora, el punto de recogida y el número de la otra persona."
+              actions={
+                <>
+                  <ButtonLink href="/buscar">Buscar un viaje</ButtonLink>
+                  <ButtonLink href="/publicar/nuevo" variant="secondary">
+                    Publicar un viaje
+                  </ButtonLink>
+                </>
+              }
+            />
+          </>
         )}
 
         {tab === "perfil" && (
@@ -496,6 +501,206 @@ async function shrinkPhoto(file: File): Promise<string> {
   canvas.height = Math.round(img.height * scale);
   canvas.getContext("2d")!.drawImage(img, 0, 0, canvas.width, canvas.height);
   return canvas.toDataURL("image/jpeg", 0.72);
+}
+
+/**
+ * LA RUTINA — le trajet qui revient chaque semaine.
+ *
+ * C'est le mécanisme d'habitude : on déclare une fois « La Chorrera →
+ * Panamá, lunes a viernes, 6:15 » et la plateforme le retient. Pour un
+ * conducteur, la carte fait le calcul qui séduit : combien il RÉCUPÈRE
+ * par mois en publiant cette rutina — « recuperas », jamais « ganas »
+ * (R5), et le chiffre sort du tope, donc du coût réel, avec « hasta »
+ * parce qu'il suppose les puestos llenos.
+ */
+const DAY_CHIPS = [
+  [1, "L"],
+  [2, "M"],
+  [3, "X"],
+  [4, "J"],
+  [5, "V"],
+  [6, "S"],
+  [7, "D"],
+] as const;
+
+function RutinaCard() {
+  const { session, updateSession } = useSession();
+  const routine = session?.routine ?? null;
+  const [editing, setEditing] = useState(false);
+  const [from, setFrom] = useState(routine?.from ?? "panama-city");
+  const [to, setTo] = useState(routine?.to ?? "coronado");
+  const [days, setDays] = useState<number[]>(routine?.days ?? [1, 2, 3, 4, 5]);
+  const [hour, setHour] = useState(routine?.hour ?? "06:15");
+
+  const shown = editing ? { from, to, days, hour } : routine;
+  const route = shown ? buildRoute(shown.from, shown.to) : null;
+
+  /* L'estimation : le tope du carro enregistré (ou la catégorie
+     estándar), 3 puestos, × jours par semaine × 4,3 semaines. */
+  const car = carsOf(session)[0];
+  const carRef = car ? findCar(car.make, car.model) : null;
+  const rate = carRef
+    ? rateFromConsumption(agedConsumption(carRef.l100, car!.year))
+    : null;
+  const cap = route
+    ? computePriceCap(route.distanceKm, route.tollCents, rate ?? "standard", 3)
+    : null;
+  const monthlyCents =
+    cap && shown ? Math.round(cap.maxPriceCents * 3 * shown.days.length * 4.3) : 0;
+
+  const cityName = (slug: string) =>
+    ALL_CITIES.find((c) => c.slug === slug)?.shortName ?? slug;
+
+  return (
+    <div className="mb-6 rounded-[16px] border border-ink-200 p-4 sm:p-5">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h3 className="font-display text-[16.5px] font-bold">Tu rutina</h3>
+        {routine && !editing && (
+          <button
+            onClick={() => setEditing(true)}
+            className="text-[13px] font-semibold text-accent-ink hover:underline"
+          >
+            Cambiar
+          </button>
+        )}
+      </div>
+
+      {!routine && !editing ? (
+        <>
+          <p className="mt-1 mb-3 text-[14px] leading-relaxed text-ink-500">
+            El viaje que haces cada semana, declarado una vez: lo publicas o
+            lo buscas con un toque, y te avisamos cuando salga un puesto.
+          </p>
+          <button
+            onClick={() => setEditing(true)}
+            className="rounded-[12px] border-[1.5px] border-ink-200 px-4 py-2.5 text-[14px] font-bold transition-colors hover:border-accent hover:text-accent-ink"
+          >
+            Crear mi rutina
+          </button>
+        </>
+      ) : editing ? (
+        <div className="mt-3">
+          <div className="grid gap-2 sm:grid-cols-2">
+            <select
+              value={from}
+              onChange={(e) => setFrom(e.target.value)}
+              aria-label="Salgo de"
+              className={accountSelect()}
+            >
+              {ALL_CITIES.map((c) => (
+                <option key={c.slug} value={c.slug}>
+                  {c.shortName}
+                </option>
+              ))}
+            </select>
+            <select
+              value={to}
+              onChange={(e) => setTo(e.target.value)}
+              aria-label="Voy a"
+              className={accountSelect()}
+            >
+              {ALL_CITIES.map((c) => (
+                <option key={c.slug} value={c.slug}>
+                  {c.shortName}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
+            {DAY_CHIPS.map(([value, label]) => {
+              const active = days.includes(value);
+              return (
+                <button
+                  key={value}
+                  type="button"
+                  aria-pressed={active}
+                  onClick={() =>
+                    setDays((d) =>
+                      active
+                        ? d.filter((x) => x !== value)
+                        : [...d, value].sort(),
+                    )
+                  }
+                  className={`flex size-9 items-center justify-center rounded-full border-[1.5px] text-[13.5px] font-bold transition-colors ${
+                    active
+                      ? "border-ink-900 bg-ink-900 text-white"
+                      : "border-ink-200 text-ink-500 hover:border-accent"
+                  }`}
+                >
+                  {label}
+                </button>
+              );
+            })}
+            <input
+              type="time"
+              value={hour}
+              onChange={(e) => setHour(e.target.value)}
+              aria-label="Hora de salida"
+              className="tnum ml-1 rounded-[10px] border-[1.5px] border-ink-200 px-2.5 py-1.5 text-[14px] font-semibold focus:border-accent focus:outline-none"
+            />
+          </div>
+          <div className="mt-3.5 flex gap-2.5">
+            <button
+              disabled={from === to || days.length === 0}
+              onClick={() => {
+                updateSession({ routine: { from, to, days, hour } });
+                setEditing(false);
+              }}
+              className="rounded-[12px] bg-ink-900 px-4 py-2.5 text-[14px] font-bold text-white transition-colors hover:bg-ink-800 disabled:opacity-50"
+            >
+              Guardar
+            </button>
+            <button
+              onClick={() => setEditing(false)}
+              className="rounded-[12px] border-[1.5px] border-ink-200 px-4 py-2.5 text-[14px] font-bold transition-colors hover:border-accent"
+            >
+              Cancelar
+            </button>
+          </div>
+        </div>
+      ) : (
+        routine &&
+        route && (
+          <>
+            <p className="tnum mt-1 text-[15px] font-semibold">
+              {cityName(routine.from)} → {cityName(routine.to)}
+              <span className="ml-2 font-normal text-ink-500">
+                {routine.days
+                  .map((d) => DAY_CHIPS.find(([v]) => v === d)?.[1])
+                  .join(" ")}{" "}
+                · {routine.hour}
+              </span>
+            </p>
+            {monthlyCents > 0 && (
+              <p className="tnum mt-2 rounded-[12px] bg-accent-soft px-4 py-3 text-[13.5px] leading-relaxed text-accent-ink">
+                Publicando esta rutina recuperas hasta{" "}
+                <b className="font-display text-[16px] font-bold">
+                  {formatUsd(monthlyCents, { compact: true })}
+                </b>{" "}
+                al mes de gasolina y peajes — con 3 puestos llenos, al tope de{" "}
+                {carRef ? `tu ${carRef.make} ${carRef.model}` : "un carro estándar"}
+                . Nunca más que eso: es reparto de costos, no un ingreso.
+              </p>
+            )}
+            <div className="mt-3 flex flex-wrap gap-2.5">
+              <Link
+                href={`/publicar/nuevo?desde=${routine.from}&hacia=${routine.to}`}
+                className="rounded-[12px] bg-ink-900 px-4 py-2.5 text-[14px] font-bold text-white transition-colors hover:bg-ink-800"
+              >
+                Publicar mi rutina
+              </Link>
+              <Link
+                href={`/buscar?desde=${routine.from}&hacia=${routine.to}`}
+                className="rounded-[12px] border-[1.5px] border-ink-200 px-4 py-2.5 text-[14px] font-bold transition-colors hover:border-accent hover:text-accent-ink"
+              >
+                Buscar puesto
+              </Link>
+            </div>
+          </>
+        )
+      )}
+    </div>
+  );
 }
 
 /**
