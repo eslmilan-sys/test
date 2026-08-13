@@ -508,49 +508,9 @@
     }
   }
 
-  /* ---- LE RECTANGLE-CARRO DU HERO ----
-     L'objet ambre sous la carte de recherche est le seul élément
-     « véhicule » de la page : il dérive lentement de gauche à droite,
-     comme un carro qui roule — course courte, cadence lente, jamais de
-     rebond : c'est la frontière entre un objet vivant et un gadget.
-     Deux couches pour deux moteurs : l'enveloppe avance AVEC le
-     défilement (timeline native, comme la parallaxe), l'intérieur
-     flotte en continu. Deux transforms sur deux nœuds — jamais deux
-     animations sur le même. */
-  @media (prefers-reduced-motion: no-preference) {
-    .carro-flota {
-      animation: carro-flota 5.2s ease-in-out infinite alternate;
-    }
-  }
-  @supports (animation-timeline: scroll()) {
-    @media (prefers-reduced-motion: no-preference) {
-      .carro-avanza {
-        animation: carro-avanza linear both;
-        animation-timeline: scroll(root block);
-        animation-range: 0 560px;
-      }
-    }
-  }
-  @keyframes carro-flota {
-    from {
-      transform: rotate(10deg) translateX(-5px);
-    }
-    to {
-      transform: rotate(8.5deg) translateX(8px);
-    }
-  }
-  /* La course va jusqu'au BORD DROIT du conteneur, pas jusqu'au milieu :
-     on anime `left` en pourcentage (impossible avec translateX, dont le
-     % se réfère à l'élément lui-même). Fin de course symétrique du
-     départ : il dépasse à droite de ce qu'il dépassait à gauche. */
-  @keyframes carro-avanza {
-    to {
-      /* Fin de course au bord droit de la carte, débord contenu DANS la
-         marge de page (0,75 rem < 1,25 rem de gouttière) : rien ne
-         dépasse jamais du viewport. */
-      left: calc(100% - 5.25rem);
-    }
-  }
+  /* Le rectangle-carro du hero est redevenu IMMOBILE (décision du
+     propriétaire) : les animations .carro-flota / .carro-avanza et
+     leurs keyframes ont été retirées. */
 
   .nav-pill {
     --glass-alpha: 0.6;
