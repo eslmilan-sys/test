@@ -299,3 +299,33 @@ test("un trajet plein sur son tronçon central reste réservable ailleurs", () =
   const across = findSegment(stops, "panama-city", "david")!;
   assert.equal(across && matchFor(trip, across)!.seatsFree, 0);
 });
+
+/**
+ * L'HEURE DE DÉPART NE DÉPEND PAS DE LA MACHINE.
+ *
+ * Le bug vécu : la carte de recherche (calculée dans le navigateur
+ * panaméen) annonçait 23:15, la page du viaje — prérendue par un serveur
+ * en UTC — affichait 18:15 pour le MÊME viaje. Les horaires s'ancrent
+ * donc sur Panamá (−05:00) et le même instant sort des deux côtés.
+ */
+test("les horaires sont ancrés à Panamá, quel que soit le fuseau du runtime", () => {
+  const trip = buildTripsFor("panama-chitre", DATE).find(
+    (t) => t.id === `panama-chitre-${DATE}-0`,
+  )!;
+  // Le viaje 0 part à 23:15 heure de Panamá — soit 04:15 UTC le lendemain.
+  assert.equal(trip.departureAt, `${DATE}T04:15:00.000Z`.replace(DATE, "2031-03-15"));
+
+  for (const trip of buildTripsFor("panama-chitre", DATE)) {
+    const hourUtc = new Date(trip.departureAt).getUTCHours();
+    const hourPanama = (hourUtc + 24 - 5) % 24;
+    assert.ok(
+      Number.isInteger(hourPanama) && hourPanama >= 0 && hourPanama < 24,
+      trip.id,
+    );
+    // Les minutes restent celles du tirage : 00, 15, 30 ou 45.
+    assert.ok(
+      [0, 15, 30, 45].includes(new Date(trip.departureAt).getUTCMinutes()),
+      trip.id,
+    );
+  }
+});

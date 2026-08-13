@@ -320,10 +320,10 @@ function CarPanel() {
                   <img
                     src={c.photoDataUrl}
                     alt={`${c.make} ${c.model} ${c.color}`}
-                    className="h-16 w-24 rounded-[14px] border border-ink-200 object-cover"
+                    className="h-16 w-24 rounded-[10px] border border-ink-200 object-cover"
                   />
                 ) : (
-                  <span className="flex h-16 w-24 items-center justify-center rounded-[14px] bg-ink-50 text-ink-500">
+                  <span className="flex h-16 w-24 items-center justify-center rounded-[10px] bg-ink-50 text-ink-500">
                     <Icon name="car" className="size-6" />
                   </span>
                 )}
@@ -705,7 +705,7 @@ function RutinaCard() {
     ALL_CITIES.find((c) => c.slug === slug)?.shortName ?? slug;
 
   return (
-    <div className="mb-6 rounded-[14px] border border-ink-200 p-4 sm:p-5">
+    <div className="mb-6 rounded-[20px] border border-ink-200 p-4 sm:p-5">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h3 className="font-display text-[16.5px] font-bold">Tu rutina</h3>
         {routine && !editing && (

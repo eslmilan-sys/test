@@ -42,7 +42,7 @@ export function GlassIcon({
 }) {
   const box = size === "sm" ? "size-10" : "size-12";
   const glyph = size === "sm" ? "size-[18px]" : "size-[22px]";
-  const rect = size === "sm" ? "size-7 rounded-[10px]" : "size-8 rounded-[10px]";
+  const rect = `${size === "sm" ? "size-7" : "size-8"} rounded-[10px]`;
   return (
     <span
       aria-hidden

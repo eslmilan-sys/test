@@ -169,6 +169,11 @@ const VEHICLES: Trip["vehicle"][] = DEMO_CARS.map((c) => {
 /** Heures de départ typiques : tôt le matin, midi, fin d'après-midi, nuit. */
 const DEPARTURE_HOURS = [5, 6, 8, 11, 14, 16, 17, 19, 21];
 
+/** Panamá vit à UTC−5 toute l'année (pas d'heure d'été). Les horaires de
+ *  la démonstration s'ancrent dessus pour que le serveur de build et le
+ *  navigateur parlent du même instant. */
+export const PANAMA_UTC_OFFSET = "-05:00";
+
 /** Empreinte stable d'une chaîne. Remplace un générateur aléatoire. */
 function hash(input: string): number {
   let h = 2166136261;
@@ -255,8 +260,15 @@ function buildTrip(corridor: Corridor, date: string, index: number): Trip {
      et le site semblait mort. Les autres suivent le tirage. */
   const hour = index === 0 ? 23 : DEPARTURE_HOURS[(seed >> 11) % DEPARTURE_HOURS.length];
   const minute = index === 0 ? 15 : [0, 15, 30, 45][(seed >> 14) % 4];
+  /* L'HEURE EST ANCRÉE À PANAMÁ, pas au fuseau de la machine.
+     Sans le décalage explicite, `new Date("…T23:15:00")` se lit dans le
+     fuseau du runtime : au prérendu statique (serveur en UTC) le viaje
+     partait à 23:15 UTC, et le navigateur panaméen l'affichait à 18:15 —
+     la carte de recherche (calculée dans le navigateur) disait 23:15 et
+     la page du viaje 18:15, pour le MÊME viaje. Panamá n'a pas d'heure
+     d'été : −05:00 toute l'année. */
   const departure = new Date(
-    `${date}T${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}:00`,
+    `${date}T${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}:00${PANAMA_UTC_OFFSET}`,
   );
   const arrival = new Date(
     departure.getTime() + corridor.typicalDurationMin * 60_000,
