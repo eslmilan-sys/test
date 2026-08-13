@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Section, Eyebrow, SectionTitle } from "@/components/site/Section";
 import { Icon, type IconName } from "@/components/ui/Icon";
-import { GlassIcon, type GlassTone } from "@/components/ui/GlassIcon";
+import { GlassIcon } from "@/components/ui/GlassIcon";
 import { Photo } from "@/components/ui/Photo";
 import { PHOTOS } from "@/lib/photos";
 
@@ -51,7 +51,7 @@ export function TrustCard({
   body: string;
 }) {
   return (
-    <div className="rounded-[18px] border border-ink-200 bg-white p-5.5 transition-[border-color,transform] duration-200 hover:-translate-y-0.5 hover:border-accent">
+    <div className="rounded-[20px] border border-ink-200 bg-white p-5.5 transition-[border-color,transform] duration-200 hover:-translate-y-0.5 hover:border-accent">
       <GlassIcon name={icon} size="sm" className="mb-3.5" />
       <h3 className="mb-1.5 font-display text-[16.5px] font-bold tracking-[-0.015em]">
         {title}
@@ -72,7 +72,7 @@ export function Confianza() {
       <div className="mt-9 grid gap-3.5 min-[900px]:grid-cols-[1.15fr_1fr]">
         {/* La carte maîtresse : photo, argument principal, et la seule chose
             que les gens retiennent vraiment — ce qu'on ne garde PAS. */}
-        <article className="relative flex min-h-[380px] flex-col justify-end overflow-hidden rounded-[24px] bg-night-900 p-7 text-white">
+        <article className="relative flex min-h-[380px] flex-col justify-end overflow-hidden rounded-[20px] bg-night-900 p-7 text-white">
           <Photo
             photo={PHOTOS.carroLleno}
             sizes="(min-width: 900px) 600px, 100vw"
@@ -97,21 +97,21 @@ export function Confianza() {
         </article>
 
         <div className="grid gap-3.5">
-          {rest.map((item, i) => (
+          {rest.map((item) => (
             <div
               key={item.title}
-              className="flex items-start gap-4 rounded-[18px] border border-ink-200 bg-white p-5 transition-[border-color] hover:border-accent"
+              className="flex items-start gap-4 rounded-[20px] border border-ink-200 bg-white p-5 transition-[border-color] hover:border-accent"
             >
               <GlassIcon
                 name={item.icon}
-                tone={(["sky", "green", "amber"] as GlassTone[])[i % 3]}
+                tone="sky"
                 size="sm"
               />
               <div className="min-w-0">
                 <h3 className="mb-1 font-display text-[16.5px] font-bold tracking-[-0.015em]">
                   {item.title}
                 </h3>
-                <p className="text-[14px] leading-relaxed text-ink-500">
+                <p className="text-[14.5px] leading-relaxed text-ink-500">
                   {item.body}
                 </p>
               </div>

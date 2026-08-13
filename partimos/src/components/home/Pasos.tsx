@@ -1,6 +1,6 @@
 import { Section, SectionTitle, Lead } from "@/components/site/Section";
 import { type IconName } from "@/components/ui/Icon";
-import { GlassIcon, type GlassTone } from "@/components/ui/GlassIcon";
+import { GlassIcon } from "@/components/ui/GlassIcon";
 
 /**
  * COMMENT ÇA MARCHE — une route, pas trois cartes.
@@ -74,7 +74,7 @@ export function Pasos() {
             <div className="min-w-0 pt-2 min-[860px]:pt-0">
               <GlassIcon
                 name={paso.icon}
-                tone={(["amber", "sky", "green"] as GlassTone[])[index % 3]}
+                tone="amber"
                 className="mb-3 ml-2.5"
               />
               <h3 className="mb-2 font-display text-[19px] font-bold tracking-[-0.02em]">

@@ -50,7 +50,7 @@ export function PickupPicker({
 
   return (
     <div className="rounded-[20px] border border-ink-200 bg-white p-5">
-      <h3 className="mb-1.5 font-display text-[18px] font-bold tracking-[-0.02em]">
+      <h3 className="mb-1.5 font-display text-[19px] font-bold tracking-[-0.02em]">
         ¿Dónde te recogemos?
       </h3>
       <p className="mb-4 text-[13.5px] leading-relaxed text-ink-500">
@@ -74,7 +74,7 @@ export function PickupPicker({
                 type="button"
                 aria-pressed={active}
                 onClick={() => setSelected(index)}
-                className={`flex w-full items-start gap-3.5 rounded-[12px] py-2.5 pr-3 pl-0 text-left transition-colors ${
+                className={`flex w-full items-start gap-3.5 rounded-[14px] py-2.5 pr-3 pl-0 text-left transition-colors ${
                   active ? "bg-ink-50" : "hover:bg-ink-50/60"
                 }`}
               >
@@ -95,7 +95,7 @@ export function PickupPicker({
                     {stop}
                   </span>
                   {proposal && (
-                    <span className="block text-[13px] leading-snug text-ink-500">
+                    <span className="block text-[13.5px] leading-snug text-ink-500">
                       El conductor decide si le queda de paso
                     </span>
                   )}
@@ -107,7 +107,7 @@ export function PickupPicker({
       </ol>
 
       {isCustom ? (
-        <div className="rounded-[16px] bg-ink-50 p-4">
+        <div className="rounded-[14px] bg-ink-50 p-4">
           <label
             htmlFor="pickup-custom"
             className="mb-1.5 block text-[11.5px] font-bold tracking-[0.11em] text-ink-500 uppercase"
@@ -120,7 +120,7 @@ export function PickupPicker({
             value={custom}
             onChange={(e) => setCustom(e.target.value)}
             placeholder="Ej. Vía Israel, frente al parque"
-            className="mb-4 w-full rounded-[12px] border border-ink-200 bg-white px-3.5 py-2.5 text-[15px] font-medium focus:border-accent focus:outline-none"
+            className="mb-4 w-full rounded-[14px] border border-ink-200 bg-white px-3.5 py-2.5 text-[15px] font-medium focus:border-accent focus:outline-none"
           />
 
           <div className="mb-1.5 flex items-baseline justify-between">
@@ -130,7 +130,7 @@ export function PickupPicker({
             >
               Cuánto se desvía
             </label>
-            <b className="tnum font-display text-[16px] font-bold">
+            <b className="tnum font-display text-[16.5px] font-bold">
               +{extraKm.toFixed(1)} km
             </b>
           </div>
@@ -151,7 +151,7 @@ export function PickupPicker({
           >
             {quote.accepted ? (
               <>
-                <dl className="text-[14px]">
+                <dl className="text-[14.5px]">
                   <div className="flex justify-between gap-3 py-1">
                     <dt className="text-ink-500">Aporte de la ruta</dt>
                     <dd className="tnum font-semibold">
@@ -181,7 +181,7 @@ export function PickupPicker({
                 </p>
               </>
             ) : (
-              <p className="flex items-start gap-2.5 text-[14px] leading-relaxed text-danger">
+              <p className="flex items-start gap-2.5 text-[14.5px] leading-relaxed text-danger">
                 <Icon name="cross" className="mt-0.5 size-4 shrink-0" />
                 {quote.reason}
               </p>
@@ -189,7 +189,7 @@ export function PickupPicker({
           </div>
         </div>
       ) : (
-        <p className="rounded-[16px] bg-ink-50 px-4 py-3.5 text-[14px] leading-relaxed text-ink-500">
+        <p className="rounded-[14px] bg-ink-50 px-4 py-3.5 text-[14.5px] leading-relaxed text-ink-500">
           Este punto está en el camino del conductor, así que no cambia nada:
           aportas{" "}
           <b className="tnum font-semibold text-ink-900">
@@ -199,7 +199,7 @@ export function PickupPicker({
         </p>
       )}
 
-      <p className="mt-3.5 text-[12px] leading-relaxed text-ink-500">
+      <p className="mt-3.5 text-[12.5px] leading-relaxed text-ink-500">
         Un desvío se rechaza si pasa del {DETOUR_LIMITS.maxExtraKmPct} % del
         kilometraje o de {DETOUR_LIMITS.maxExtraMinutes} minutos. Si la hora de
         llegada se mueve más de {DETOUR_LIMITS.notifyPassengersAfterMinutes}{" "}

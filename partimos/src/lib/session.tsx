@@ -78,6 +78,29 @@ export type Session = {
   /** Tous les viajes publiés (démo : dans le navigateur). C'est sur eux
    *  que le compteur « recuperas hasta » s'empile. */
   published?: PublishedTrip[];
+  /** Les puestos réservés côté passager — ce que « Mis viajes » liste
+   *  en premier. Sans lui, réserver était un geste sans lendemain. */
+  bookings?: Booking[];
+};
+
+/** Une reserva del pasajero — en démonstration elle vit dans le navigateur.
+ *  `pendiente` = le conducteur doit encore répondre (24 h) ; `confirmado` =
+ *  le puesto est acquis. Avec Supabase, la table `bookings` prendra le
+ *  relais avec les mêmes états. */
+export type Booking = {
+  tripId: string;
+  from: string;
+  to: string;
+  /** ISO complet de la montée — la date ET l'heure sortent de lui. */
+  boardingAt: string;
+  seats: number;
+  totalCents: number;
+  feeCents: number;
+  channel: PayChannel;
+  driverName: string;
+  /** Point de recogida choisi ou proposé. */
+  point: string;
+  status: "pendiente" | "confirmado";
 };
 
 export type PublishedTrip = {

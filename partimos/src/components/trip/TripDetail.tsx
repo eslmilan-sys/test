@@ -71,7 +71,7 @@ export function TripDetail({
           <h1 className="mb-1 font-display text-[clamp(24px,4.6vw,32px)] leading-tight font-extrabold tracking-[-0.035em]">
             {segment.from.name} → {segment.to.name}
           </h1>
-          <p className="tnum mb-5 text-[14px] text-ink-500">
+          <p className="tnum mb-5 text-[14.5px] text-ink-500">
             {segment.km} km · {formatDuration(durationMin)} de camino
             {match.isPartial && (
               <>
@@ -93,10 +93,12 @@ export function TripDetail({
               const isBoarding = index === segment.fromIndex;
               const isDropping = index === segment.toIndex;
 
+              const passesAt = timeAt(trip, corridor, stop.km);
               return (
                 <Stop
                   key={stop.citySlug}
-                  time={formatTime(timeAt(trip, corridor, stop.km))}
+                  time={formatTime(passesAt)}
+                  nextDay={crossesMidnight(trip.departureAt, passesAt)}
                   title={stop.name}
                   detail={
                     isBoarding
@@ -130,7 +132,7 @@ export function TripDetail({
 
         {/* --- Comment se calcule le montant --- */}
         <section className="rounded-[20px] border border-ink-200 bg-white p-5 sm:p-6">
-          <h2 className="mb-4 font-display text-[18px] font-bold">
+          <h2 className="mb-4 font-display text-[19px] font-bold">
             De dónde sale ese monto
           </h2>
           <dl className="text-[14.5px]">
@@ -153,7 +155,7 @@ export function TripDetail({
               {formatUsd(match.priceCents)}
             </Row>
           </dl>
-          <p className="mt-3 text-[13px] leading-relaxed text-ink-500">
+          <p className="mt-3 text-[13.5px] leading-relaxed text-ink-500">
             {match.isPartial
               ? `Pagas los kilómetros que viajas, no el viaje completo de ${trip.driver.firstName}. `
               : ""}
@@ -171,6 +173,9 @@ export function TripDetail({
         key={`${trip.id}-${segment.fromIndex}-${segment.toIndex}`}
         tripId={trip.id}
         initialPoint={params.get("punto") ?? ""}
+        fromSlug={segment.from.citySlug}
+        toSlug={segment.to.citySlug}
+        boardingAt={match.boardingAt}
         driverName={trip.driver.firstName}
         priceCents={match.priceCents}
         seatsLeft={match.seatsFree}
@@ -190,6 +195,15 @@ export function TripDetail({
   );
 }
 
+/** Vrai quand l'heure de passage tombe le LENDEMAIN du départ (viajes de
+ *  nuit) : sans le marqueur « +1 », un 00:45 sous un 23:15 se lit comme
+ *  la veille et l'horaire paraît cassé. Comparaison en heure LOCALE. */
+function crossesMidnight(departureAt: string, at: string): boolean {
+  return (
+    new Date(at).toDateString() !== new Date(departureAt).toDateString()
+  );
+}
+
 /** Heure de passage à un kilomètre du corridor — même règle que la recherche. */
 function timeAt(trip: Trip, corridor: Corridor, km: number): string {
   const minutes = Math.round(
@@ -202,11 +216,14 @@ function timeAt(trip: Trip, corridor: Corridor, km: number): string {
 
 function Stop({
   time,
+  nextDay = false,
   title,
   detail,
   tone,
 }: {
   time: string;
+  /** L'heure tombe le lendemain du départ — viaje de nuit. */
+  nextDay?: boolean;
   title: string;
   detail: string;
   tone: "start" | "end" | "on" | "off";
@@ -229,11 +246,16 @@ function Stop({
   return (
     <li className="flex gap-4">
       <span
-        className={`tnum w-[50px] shrink-0 pt-0.5 text-right font-display text-[16px] font-bold sm:w-[58px] ${
+        className={`tnum w-[50px] shrink-0 pt-0.5 text-right font-display text-[16.5px] font-bold sm:w-[58px] ${
           off ? "text-ink-500" : ""
         }`}
       >
         {time}
+        {nextDay && (
+          <span className="block text-[10px] leading-none font-bold tracking-[0.08em] text-ink-400 uppercase">
+            +1 día
+          </span>
+        )}
       </span>
       <span
         aria-hidden
@@ -241,7 +263,7 @@ function Stop({
       />
       <span className="min-w-0 flex-1 pb-3">
         <span
-          className={`block font-display text-[16px] ${
+          className={`block font-display text-[16.5px] ${
             off ? "font-semibold text-ink-500" : "font-bold"
           }`}
         >

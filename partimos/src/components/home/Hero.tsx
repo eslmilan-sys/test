@@ -54,13 +54,13 @@ const PROOF: {
   },
   {
     icon: "car",
-    tone: "sky",
+    tone: "amber",
     title: "Vas sentado y con espacio",
     detail: "Tu maleta atrás, sin transbordos",
   },
   {
     icon: "id",
-    tone: "green",
+    tone: "amber",
     title: "Sabes quién maneja",
     detail: "Cédula verificada",
   },
@@ -115,7 +115,7 @@ export function Hero() {
             </div>
 
             <div className="para-cerca">
-              <p className="enter enter-2 max-w-[44ch] text-[16.5px] leading-[1.38] font-light text-ink-600 md:text-[18px]">
+              <p className="enter enter-2 max-w-[44ch] text-[16.5px] leading-[1.38] font-light text-ink-600 md:text-[19px]">
                 Partimos junta a quien maneja con quien va para el mismo lado —
                 de bajada al interior o de vuelta a la ciudad. Reservas sin
                 pagar nada y haces el camino sentado, con una sola parada: la
@@ -136,7 +136,7 @@ export function Hero() {
                 qu'elle ne racontait. */}
             <span
               aria-hidden
-              className="absolute -top-5 -left-6 size-24 rotate-[10deg] rounded-[24px] bg-[linear-gradient(135deg,#fde68a,#f59e0b_58%,#d97706)] opacity-90"
+              className="absolute -top-5 -left-6 size-24 rotate-[10deg] rounded-[20px] bg-[linear-gradient(135deg,#fde68a,#f59e0b_58%,#d97706)] opacity-90"
             />
             <div className="relative">
               <SearchCard />
@@ -159,10 +159,10 @@ export function Hero() {
                   size="sm"
                   className="mb-3 ml-2.5"
                 />
-                <b className="block font-display text-[15.5px] leading-tight font-bold tracking-[-0.02em] md:text-[17px]">
+                <b className="block font-display text-[15px] leading-tight font-bold tracking-[-0.02em] md:text-[17px]">
                   {item.title}
                 </b>
-                <span className="mt-1 block text-[13px] font-light text-ink-500">
+                <span className="mt-1 block text-[13.5px] font-light text-ink-500">
                   {item.detail}
                 </span>
               </li>

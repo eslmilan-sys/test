@@ -18,7 +18,7 @@ function ResultsSkeleton() {
     <div aria-hidden>
       <div className="border-b border-ink-200 bg-white py-3">
         <div className="mx-auto w-full max-w-[1120px] px-5">
-          <div className="h-[62px] rounded-[16px] border-[1.5px] border-ink-200" />
+          <div className="h-[62px] rounded-[14px] border-[1.5px] border-ink-200" />
         </div>
       </div>
       <div className="mx-auto w-full max-w-[1120px] px-5 pt-6">
@@ -27,7 +27,7 @@ function ResultsSkeleton() {
         <div className="mb-5 h-[38px] w-64 rounded-full bg-white" />
         <div className="grid gap-3">
           {[0, 1, 2].map((i) => (
-            <div key={i} className="h-[152px] rounded-[18px] bg-white" />
+            <div key={i} className="h-[152px] rounded-[20px] bg-white" />
           ))}
         </div>
       </div>

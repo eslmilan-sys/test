@@ -205,7 +205,7 @@ export function PublishFlow() {
   if (published && corridor && cap) {
     return (
       <Container className="pt-10">
-        <div className="mx-auto max-w-[560px] rounded-[24px] border border-ink-200 bg-white p-7 text-center">
+        <div className="mx-auto max-w-[560px] rounded-[20px] border border-ink-200 bg-white p-7 text-center">
           <span className="mx-auto mb-4 flex size-14 items-center justify-center rounded-full bg-ink-900 text-white">
             <Icon name="check" className="size-6" />
           </span>
@@ -293,7 +293,7 @@ export function PublishFlow() {
           ))}
         </ol>
 
-        <div className="glass liquid rounded-[22px] p-5 sm:p-6 [--glass-alpha:0.88]">
+        <div className="glass liquid rounded-[20px] p-5 sm:p-6 [--glass-alpha:0.88]">
           {step === 0 && (
             <>
               {/* LE raccourci : republier son dernier viaje sans rien
@@ -347,7 +347,7 @@ export function PublishFlow() {
                   d'œil. Avant, la carte seule portait tout, avec un état
                   « je choisis l'origine ou la destination ? » invisible —
                   c'était le point où l'on s'emmêlait. */}
-              <div className="relative mb-3 rounded-[18px] border border-ink-200 bg-white">
+              <div className="relative mb-3 rounded-[20px] border border-ink-200 bg-white">
                 <CityCombobox
                   id="pub-desde"
                   label="Desde"
@@ -390,7 +390,7 @@ export function PublishFlow() {
                 </div>
               </div>
 
-              <div className="rounded-[16px] border border-ink-200 bg-ink-50/60 p-3">
+              <div className="rounded-[14px] border border-ink-200 bg-ink-50/60 p-3">
                 <RouteMap
                   originSlug={from}
                   destinationSlug={to}
@@ -411,7 +411,7 @@ export function PublishFlow() {
                 />
               </div>
               {corridor && (
-                <p className="tnum mt-3 rounded-[12px] bg-ink-50 px-4 py-3 text-[13.5px] leading-relaxed text-ink-500">
+                <p className="tnum mt-3 rounded-[14px] bg-ink-50 px-4 py-3 text-[13.5px] leading-relaxed text-ink-500">
                   <b className="font-semibold text-ink-900">
                     {corridor.origin.shortName} → {corridor.destination.shortName}
                   </b>
@@ -490,7 +490,7 @@ export function PublishFlow() {
                   la coche. C'est l'API qui redessine — un échange de src,
                   zéro bibliothèque. */}
               {MAPBOX_TOKEN && (
-                <figure className="glass liquid mb-6 overflow-hidden rounded-[16px] p-2 [--glass-alpha:0.8]">
+                <figure className="glass liquid mb-6 overflow-hidden rounded-[14px] p-2 [--glass-alpha:0.82]">
                   {/* eslint-disable-next-line @next/next/no-img-element -- image statique Mapbox, dynamique par src */}
                   <img
                     src={corridorStopsMapUrl(corridor, cityStops)}
@@ -499,9 +499,9 @@ export function PublishFlow() {
                     height={300}
                     loading="lazy"
                     decoding="async"
-                    className="h-auto w-full rounded-[11px] object-cover"
+                    className="h-auto w-full rounded-[10px] object-cover"
                   />
-                  <figcaption className="px-2 pt-1.5 pb-0.5 text-[12px] text-ink-500">
+                  <figcaption className="px-2 pt-1.5 pb-0.5 text-[12.5px] text-ink-500">
                     Azul: sales · Verde: llegas · Ámbar: donde aceptas parar y
                     recoger — se dibujan al marcar.
                   </figcaption>
@@ -579,7 +579,7 @@ export function PublishFlow() {
                     </button>
                   )}
                   <p
-                    className="mt-3 rounded-[12px] bg-accent-soft px-4 py-3 text-[13.5px] leading-relaxed text-accent-ink"
+                    className="mt-3 rounded-[14px] bg-accent-soft px-4 py-3 text-[13.5px] leading-relaxed text-accent-ink"
                     aria-live="polite"
                   >
                     {pairCount === 1 ? (
@@ -642,7 +642,7 @@ export function PublishFlow() {
                   );
                 })}
               </div>
-              <p className="mt-3 text-[13px] text-ink-500">
+              <p className="mt-3 text-[13.5px] text-ink-500">
                 {stops.length}/{PRICE_RULE.maxStops} paradas · si un pasajero
                 propone otro punto, tú decides si te queda de paso.
               </p>
@@ -666,7 +666,7 @@ export function PublishFlow() {
                   <select
                     value={date}
                     onChange={(e) => setDate(e.target.value)}
-                    className="w-full cursor-pointer rounded-[12px] border border-ink-200 px-3.5 py-2.5 text-[15px] font-semibold focus:border-accent focus:outline-none"
+                    className="w-full cursor-pointer rounded-[14px] border border-ink-200 px-3.5 py-2.5 text-[15px] font-semibold focus:border-accent focus:outline-none"
                   >
                     {days.map((d) => (
                       <option key={d.value} value={d.value}>
@@ -683,7 +683,7 @@ export function PublishFlow() {
                     type="time"
                     value={hour}
                     onChange={(e) => setHour(e.target.value)}
-                    className="tnum w-full rounded-[12px] border border-ink-200 px-3.5 py-2.5 text-[15px] font-semibold focus:border-accent focus:outline-none"
+                    className="tnum w-full rounded-[14px] border border-ink-200 px-3.5 py-2.5 text-[15px] font-semibold focus:border-accent focus:outline-none"
                   />
                 </label>
               </div>
@@ -796,7 +796,7 @@ export function PublishFlow() {
                         setUseSavedCar(false);
                         setPriceCents(null);
                       }}
-                      className="text-[13px] font-semibold text-accent-ink hover:underline"
+                      className="text-[13.5px] font-semibold text-accent-ink hover:underline"
                     >
                       Usar otro
                     </button>
@@ -811,7 +811,7 @@ export function PublishFlow() {
                           setUseSavedCar(true);
                           setPriceCents(null);
                         }}
-                        className="mb-2 text-[13px] font-semibold text-accent-ink hover:underline"
+                        className="mb-2 text-[13.5px] font-semibold text-accent-ink hover:underline"
                       >
                         ← Volver a mi carro registrado ({savedCar.make}{" "}
                         {savedCar.model})
@@ -875,7 +875,7 @@ export function PublishFlow() {
                 </div>
 
                 {pickerCar && carL100 !== null && carRate !== null && (
-                  <p className="tnum mt-2.5 rounded-[12px] bg-ink-50 px-3.5 py-2.5 text-[13px] leading-relaxed text-ink-500">
+                  <p className="tnum mt-2.5 rounded-[14px] bg-ink-50 px-3.5 py-2.5 text-[13.5px] leading-relaxed text-ink-500">
                     <b className="font-semibold text-ink-900">
                       {pickerCar.make} {pickerCar.model} {carYear}
                     </b>
@@ -891,7 +891,7 @@ export function PublishFlow() {
 
                 {carMake === "otro" && (
                   <div className="mt-2.5">
-                    <p className="mb-2 text-[13px] text-ink-500">
+                    <p className="mb-2 text-[13.5px] text-ink-500">
                       Sin problema — elige la categoría que más se parece:
                     </p>
                     <div className="flex flex-wrap gap-2">
@@ -928,7 +928,7 @@ export function PublishFlow() {
                 estricta: es lo que separa compartir gastos de cobrar un pasaje.
               </p>
 
-              <div className="rounded-[18px] bg-ink-50 p-5">
+              <div className="rounded-[20px] bg-ink-50 p-5">
                 <p className="text-center text-[11.5px] font-bold tracking-[0.13em] text-ink-500 uppercase">
                   Aporte por puesto
                 </p>
@@ -945,7 +945,7 @@ export function PublishFlow() {
                   aria-label="Aporte por puesto"
                   className="mt-3 h-1.5 w-full cursor-pointer appearance-none rounded-full bg-ink-200 [&::-moz-range-thumb]:size-6 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-4 [&::-moz-range-thumb]:border-accent [&::-moz-range-thumb]:bg-white [&::-webkit-slider-thumb]:size-6 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-4 [&::-webkit-slider-thumb]:border-accent [&::-webkit-slider-thumb]:bg-white"
                 />
-                <p className="tnum mt-1 flex justify-between text-[12px] text-ink-500">
+                <p className="tnum mt-1 flex justify-between text-[12.5px] text-ink-500">
                   <span>Gratis</span>
                   <span>Tope {formatUsd(cap.maxPriceCents)}</span>
                 </p>
@@ -1069,7 +1069,7 @@ export function PublishFlow() {
                       })}
                     </div>
                     {acceptsOutside.length === 0 && (
-                      <p className="mt-2.5 rounded-[12px] bg-accent-soft px-4 py-3 text-[13px] leading-relaxed text-accent-ink">
+                      <p className="mt-2.5 rounded-[14px] bg-accent-soft px-4 py-3 text-[13.5px] leading-relaxed text-accent-ink">
                         Solo por la app: nadie te paga en la mano, todo llega
                         cobrado y con comprobante. Los pasajeros lo verán antes
                         de reservar.
@@ -1135,7 +1135,7 @@ export function PublishFlow() {
             ) : (
               <AuthDialog
                 trigger={
-                  <button className="ml-auto inline-flex items-center justify-center rounded-[14px] bg-ink-900 px-5.5 py-3.5 font-display text-[16px] font-bold text-white transition-colors hover:bg-ink-800">
+                  <button className="ml-auto inline-flex items-center justify-center rounded-[14px] bg-ink-900 px-5.5 py-3.5 font-display text-[16.5px] font-bold text-white transition-colors hover:bg-ink-800">
                     Conectarme y publicar
                   </button>
                 }
@@ -1156,7 +1156,7 @@ export function PublishFlow() {
 
 function carSelect() {
   return [
-    "w-full appearance-none rounded-[12px] border-[1.5px] border-ink-200 bg-white",
+    "w-full appearance-none rounded-[14px] border-[1.5px] border-ink-200 bg-white",
     "px-3.5 py-2.5 text-[14.5px] font-semibold text-ink-900 transition-colors",
     "hover:border-accent focus:border-accent focus:outline-none",
     "disabled:cursor-not-allowed disabled:opacity-50",
@@ -1165,7 +1165,7 @@ function carSelect() {
 
 function pill(active: boolean) {
   return [
-    "rounded-[12px] border-[1.5px] px-4 py-2.5 text-[14.5px] font-semibold transition-colors",
+    "rounded-[14px] border-[1.5px] px-4 py-2.5 text-[14.5px] font-semibold transition-colors",
     active
       ? "border-ink-900 bg-ink-900 text-white"
       : "border-ink-200 text-ink-500 hover:border-accent hover:text-accent-ink",

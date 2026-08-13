@@ -36,9 +36,9 @@ function nextDays(count = SEARCH_HORIZON_DAYS) {
 }
 
 const FIELD_LABEL =
-  "block text-[10.5px] font-bold tracking-[0.11em] text-ink-500 uppercase";
+  "block text-[11.5px] font-bold tracking-[0.11em] text-ink-500 uppercase";
 const FIELD_INPUT =
-  "w-full cursor-pointer appearance-none border-none bg-transparent py-px text-[16px] font-semibold text-ink-900 focus:outline-none";
+  "w-full cursor-pointer appearance-none border-none bg-transparent py-px text-[16.5px] font-semibold text-ink-900 focus:outline-none";
 
 export function SearchCard() {
   const router = useRouter();
@@ -98,21 +98,21 @@ export function SearchCard() {
   const routine = session?.routine ?? null;
 
   return (
-    <div className="glass liquid rounded-[22px] p-2.5 shadow-float [--glass-alpha:0.82]">
+    <div className="glass liquid rounded-[20px] p-2.5 shadow-float [--glass-alpha:0.82]">
       {/* La voie express, pour qui a une rutina : la carte de recherche
           reste, mais le raccourci passe devant — c'est lui qui réduit le
           temps-jusqu'au-viaje à deux taps. */}
       {routine && (
         <Link
           href="/ya"
-          className="mx-3 mt-2.5 flex items-center gap-2.5 rounded-[13px] bg-ink-900 px-4 py-3 text-white transition-colors hover:bg-ink-800"
+          className="mx-3 mt-2.5 flex items-center gap-2.5 rounded-[14px] bg-ink-900 px-4 py-3 text-white transition-colors hover:bg-ink-800"
         >
           <Icon name="route" className="size-4.5 shrink-0" />
-          <span className="min-w-0 flex-1 text-[14px] font-semibold">
+          <span className="min-w-0 flex-1 text-[14.5px] font-semibold">
             Tu rutina:{" "}
             {ALL_CITIES.find((c) => c.slug === routine.from)?.shortName} →{" "}
             {ALL_CITIES.find((c) => c.slug === routine.to)?.shortName}
-            <span className="block text-[12px] font-normal text-white/70">
+            <span className="block text-[12.5px] font-normal text-white/70">
               Tu próximo puesto ya está buscado
             </span>
           </span>
@@ -136,7 +136,7 @@ export function SearchCard() {
               type="button"
               aria-pressed={mode === value}
               onClick={() => setMode(value)}
-              className={`flex-1 rounded-[9px] px-3 py-2.5 text-[13.5px] font-semibold whitespace-nowrap transition-colors ${
+              className={`flex-1 rounded-[10px] px-3 py-2.5 text-[13.5px] font-semibold whitespace-nowrap transition-colors ${
                 mode === value
                   ? "bg-white text-ink-900 shadow-[0_1px_4px_rgb(14_42_53/0.12)]"
                   : "text-ink-500 hover:text-ink-900"
@@ -165,7 +165,7 @@ export function SearchCard() {
               type="button"
               aria-pressed={showMap === value}
               onClick={() => setShowMap(value)}
-              className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[13px] font-semibold transition-colors ${
+              className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[13.5px] font-semibold transition-colors ${
                 showMap === value
                   ? "bg-ink-900 text-white"
                   : "text-ink-500 hover:bg-ink-50"
@@ -199,6 +199,10 @@ export function SearchCard() {
           />
         </div>
 
+        {/* La fecha et les puestos ne nourrissent QUE la recherche : en mode
+            « Ofrezco », les montrer promettait un formulaire qui n'existait
+            pas — le flux de publication pose ses propres questions (audit C3). */}
+        {mode === "buscar" && (
         <div className="flex border-t border-ink-200">
           <div className="flex flex-1 items-center gap-3 rounded-[14px] px-3.5 py-3 transition-colors hover:bg-ink-50">
             <Icon
@@ -244,13 +248,14 @@ export function SearchCard() {
             </div>
           </div>
         </div>
+        )}
 
         {/* La carte n'est pas un extra caché derrière un lien : c'est l'autre
             façon de renseigner les deux mêmes champs. Elle mérite donc une
             place égale, et elle montre d'un coup d'œil ce que couvre la
             plateforme — ce que sept lignes de liste ne diront jamais. */}
         {showMap && (
-          <div className="mt-2 rounded-[18px] border border-ink-200 bg-ink-50/70 p-3">
+          <div className="mt-2 rounded-[20px] border border-ink-200 bg-ink-50/70 p-3">
             <RouteMap
               originSlug={from}
               destinationSlug={to}
@@ -281,8 +286,17 @@ export function SearchCard() {
         </Button>
 
         <p className="px-1.5 pt-3 pb-1 text-center text-[12.5px] text-ink-500">
-          Buscar y reservar es <b className="text-ink-900">gratis</b>. Le pagas
-          directo a la persona.
+          {mode === "buscar" ? (
+            <>
+              Buscar y reservar es <b className="text-ink-900">gratis</b>. Le
+              pagas directo a la persona.
+            </>
+          ) : (
+            <>
+              Un minuto, cuatro pasos: tu ruta ya va puesta y la app calcula
+              el aporte máximo por puesto.
+            </>
+          )}
         </p>
       </form>
 

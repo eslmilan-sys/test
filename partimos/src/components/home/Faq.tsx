@@ -22,7 +22,7 @@ export function FaqList({ items }: { items: FaqItem[] }) {
               className="absolute top-1/2 right-2 size-2.5 -translate-y-[70%] rotate-45 border-r-[2.5px] border-b-[2.5px] border-accent transition-transform duration-200 group-open:-translate-y-[30%] group-open:rotate-225"
             />
           </summary>
-          <p className="max-w-[66ch] pr-3 pb-5.5 text-[15.5px] leading-relaxed text-ink-500">
+          <p className="max-w-[66ch] pr-3 pb-5.5 text-[15px] leading-relaxed text-ink-500">
             {item.a}
           </p>
         </details>

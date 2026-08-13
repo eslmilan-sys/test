@@ -40,7 +40,7 @@ export function Corredores() {
             <h2 className="font-display text-[clamp(28px,4.2vw,40px)] leading-[1.08] font-extrabold tracking-[-0.03em]">
               Las seis rutas abiertas
             </h2>
-            <p className="mt-3 text-[15.5px] leading-relaxed text-ink-500">
+            <p className="mt-3 text-[15px] leading-relaxed text-ink-500">
               Conectan Ciudad de Panamá con el interior, y cada una tiene su
               vuelta con página propia. El tope se calcula con un carro estándar
               y tres puestos — con menos puestos sube, porque hay menos gente
@@ -101,7 +101,7 @@ export function Corredores() {
                     </span>
 
                     <span className="text-right">
-                      <span className="tnum block font-display text-[21px] leading-none font-extrabold tracking-[-0.03em] text-action-ink">
+                      <span className="tnum block font-display text-[22px] leading-none font-extrabold tracking-[-0.03em] text-action-ink">
                         {formatUsd(cap.maxPriceCents)}
                       </span>
                       <span className="mt-1 block text-[11.5px] text-ink-500">

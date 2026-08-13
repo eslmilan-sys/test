@@ -37,7 +37,7 @@ export function Pago() {
         />
       <div className="glass liquid relative rounded-[20px] px-5 py-6 [--glass-alpha:0.88] sm:px-7">
         <div className="grid grid-cols-[auto_1fr_auto] items-center gap-x-3 sm:gap-x-5">
-          <span className="flex size-12 items-center justify-center rounded-full bg-action font-display text-[18px] font-bold text-ink-900">
+          <span className="flex size-12 items-center justify-center rounded-full bg-action font-display text-[19px] font-bold text-ink-900">
             Tú
           </span>
           {/* Le trait s'étire, la pointe non : un carré SVG pivoté ne se
@@ -52,7 +52,7 @@ export function Pago() {
               <path d="M2 0.5 L10 6 L2 11.5 Z" fill="currentColor" />
             </svg>
           </span>
-          <span className="flex size-12 items-center justify-center rounded-full bg-action font-display text-[18px] font-bold text-ink-900">
+          <span className="flex size-12 items-center justify-center rounded-full bg-action font-display text-[19px] font-bold text-ink-900">
             A
           </span>
         </div>
@@ -62,7 +62,7 @@ export function Pago() {
           <PayMarks />
         </div>
 
-        <div className="mt-5 grid gap-2 text-[14px] leading-snug text-ink-500 sm:grid-cols-2 sm:gap-7">
+        <div className="mt-5 grid gap-2 text-[14.5px] leading-snug text-ink-500 sm:grid-cols-2 sm:gap-7">
           <p>
             <b className="font-display font-bold text-ink-900">Pasajero</b> —
             apartas tu puesto gratis. Pagas por Yappy o tarjeta en la app, o
@@ -79,7 +79,7 @@ export function Pago() {
       {/* Deux encarts, deux registres : comment ça marche / comment ne pas
           se faire avoir. Le corail reste réservé à l'avertissement. */}
       <div className="mt-6.5 grid gap-3.5 md:grid-cols-2">
-        <div className="glass flex items-start gap-3.5 rounded-[18px] px-5.5 py-5 [--glass-alpha:0.82]">
+        <div className="glass flex items-start gap-3.5 rounded-[20px] px-5.5 py-5 [--glass-alpha:0.82]">
           <span className="flex size-8 shrink-0 items-center justify-center rounded-[10px] bg-ink-100">
             <Icon name="phone" className="size-4.5" />
           </span>
@@ -93,13 +93,13 @@ export function Pago() {
               puesto — antes no, para que nadie reciba llamadas de quien no va a
               viajar con él.
             </p>
-            <span className="tnum mt-2.5 inline-flex items-center gap-2 rounded-[9px] bg-ink-100 px-3 py-1.5 text-[13.5px] font-semibold">
+            <span className="tnum mt-2.5 inline-flex items-center gap-2 rounded-[10px] bg-ink-100 px-3 py-1.5 text-[13.5px] font-semibold">
               Ana M. · +507 6XXX-4471
             </span>
           </div>
         </div>
 
-        <div className="flex items-start gap-3.5 rounded-[18px] border border-danger/30 bg-danger-soft px-5.5 py-5">
+        <div className="flex items-start gap-3.5 rounded-[20px] border border-danger/30 bg-danger-soft px-5.5 py-5">
           <span className="flex size-8 shrink-0 items-center justify-center rounded-[10px] bg-danger/15 text-danger">
             <Icon name="cross" className="size-4" />
           </span>

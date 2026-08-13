@@ -145,7 +145,7 @@ export function AvisameForm({
               }}
               aria-invalid={state === "error"}
               aria-describedby={state === "error" ? `${id}-error` : undefined}
-              className={`tnum w-full border-none bg-transparent text-[16px] font-semibold focus:outline-none ${
+              className={`tnum w-full border-none bg-transparent text-[16.5px] font-semibold focus:outline-none ${
                 onDark
                   ? "text-white placeholder:text-night-300"
                   : "text-ink-900 placeholder:text-ink-500"

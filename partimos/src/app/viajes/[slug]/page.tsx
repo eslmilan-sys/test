@@ -151,7 +151,7 @@ export default async function CorridorPage({ params }: Params) {
           <Container>
             <nav
               aria-label="Ruta de navegación"
-              className="mb-5 text-[13px] text-night-300"
+              className="mb-5 text-[13.5px] text-night-300"
             >
               <ol className="flex flex-wrap items-center gap-1.5">
                 <li>
@@ -186,7 +186,7 @@ export default async function CorridorPage({ params }: Params) {
             {/* Les chiffres sur un plateau de verre, pas derrière un filet :
                 même matière que le plateau de paiement de l'accueil — le
                 verre est le langage des objets posés sur la nuit. */}
-            <dl className="glass-noche mt-7 grid grid-cols-2 gap-x-5 gap-y-4 rounded-[18px] border border-white/20 px-5 py-5 min-[760px]:grid-cols-4">
+            <dl className="glass-noche mt-7 grid grid-cols-2 gap-x-5 gap-y-4 rounded-[20px] border border-white/20 px-5 py-5 min-[760px]:grid-cols-4">
               <Stat label="Distancia" value={`${corridor.distanceKm} km`} />
               <Stat
                 label="Tiempo de camino"
@@ -218,7 +218,7 @@ export default async function CorridorPage({ params }: Params) {
                   {trips.map((trip) => (
                     <li
                       key={trip.id}
-                      className="flex items-center gap-3.5 rounded-[15px] border border-ink-200 px-4.5 py-4"
+                      className="flex items-center gap-3.5 rounded-[14px] border border-ink-200 px-4.5 py-4"
                     >
                       <span
                         aria-hidden
@@ -227,7 +227,7 @@ export default async function CorridorPage({ params }: Params) {
                         {trip.driverFirstName.charAt(0)}
                       </span>
                       <span className="min-w-0 flex-1">
-                        <b className="block font-display text-[15.5px] font-bold">
+                        <b className="block font-display text-[15px] font-bold">
                           {trip.driverFirstName}{" "}
                           {trip.driverLastInitial
                             ? `${trip.driverLastInitial}.`
@@ -255,7 +255,7 @@ export default async function CorridorPage({ params }: Params) {
                 </ul>
               ) : (
                 <div className="max-w-[560px] rounded-[20px] border border-ink-200 bg-ink-50 p-6">
-                  <p className="mb-4 text-[15.5px] leading-relaxed text-ink-500">
+                  <p className="mb-4 text-[15px] leading-relaxed text-ink-500">
                     Nadie ha publicado esta ruta todavía. Déjanos tu número: le
                     avisamos a los conductores que hacen{" "}
                     {corridor.origin.shortName} →{" "}
@@ -283,14 +283,14 @@ export default async function CorridorPage({ params }: Params) {
                   <h2 className="mb-4 text-[clamp(24px,4vw,34px)] font-extrabold">
                     Cómo se calcula el tope
                   </h2>
-                  <p className="mb-6 max-w-[46ch] text-[15.5px] leading-relaxed text-ink-500">
+                  <p className="mb-6 max-w-[46ch] text-[15px] leading-relaxed text-ink-500">
                     El costo real del recorrido se reparte entre todos los
                     ocupantes del carro, incluido el conductor. Nadie gana
                     plata: el conductor recupera una parte de lo que iba a
                     gastar igual.
                   </p>
 
-                  <dl className="rounded-[18px] border border-ink-200 bg-white p-5 text-[14.5px]">
+                  <dl className="rounded-[20px] border border-ink-200 bg-white p-5 text-[14.5px]">
                     <CalcRow label={`${corridor.distanceKm} km × $0.25/km`}>
                       {formatUsd(Math.round(corridor.distanceKm * 25))}
                     </CalcRow>
@@ -317,7 +317,7 @@ export default async function CorridorPage({ params }: Params) {
                     </CalcRow>
                   </dl>
 
-                  <p className="mt-4 text-[13px] leading-relaxed text-ink-500">
+                  <p className="mt-4 text-[13.5px] leading-relaxed text-ink-500">
                     El «+1» del divisor es el conductor. Por eso, aunque lleve
                     el carro lleno, siempre termina poniendo parte del viaje de
                     su bolsillo — y por eso esto es compartir gastos y no cobrar
@@ -342,10 +342,10 @@ export default async function CorridorPage({ params }: Params) {
                       height={440}
                       loading="lazy"
                       decoding="async"
-                      className="mb-6 w-full rounded-[18px] border border-ink-200 shadow-card"
+                      className="mb-6 w-full rounded-[20px] border border-ink-200 shadow-card"
                     />
                   )}
-                  <p className="mb-6 max-w-[46ch] text-[15.5px] leading-relaxed text-ink-500">
+                  <p className="mb-6 max-w-[46ch] text-[15px] leading-relaxed text-ink-500">
                     Los conductores de esta ruta suelen pasar por aquí. Máximo
                     cuatro paradas por viaje, y ninguna en una terminal.
                   </p>
@@ -355,12 +355,12 @@ export default async function CorridorPage({ params }: Params) {
                     tollCents={corridor.tollCents}
                   />
 
-                  <div className="mt-5 flex items-start gap-3.5 rounded-[18px] border border-ink-200 bg-white px-5 py-4.5">
+                  <div className="mt-5 flex items-start gap-3.5 rounded-[20px] border border-ink-200 bg-white px-5 py-4.5">
                     <Icon
                       name="car"
                       className="mt-0.5 size-5 shrink-0 text-action-ink"
                     />
-                    <p className="text-[14px] leading-relaxed text-ink-500">
+                    <p className="text-[14.5px] leading-relaxed text-ink-500">
                       <b className="font-semibold text-ink-900">
                         Te recogen y te dejan
                       </b>
@@ -453,7 +453,7 @@ function Stat({
       <dd className="tnum font-display text-[22px] font-bold tracking-[-0.02em]">
         {value}
       </dd>
-      {hint && <dd className="text-[12px] text-night-200">{hint}</dd>}
+      {hint && <dd className="text-[12.5px] text-night-200">{hint}</dd>}
     </div>
   );
 }

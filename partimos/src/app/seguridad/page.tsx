@@ -78,7 +78,7 @@ export default function SeguridadPage() {
               <div className="grid gap-x-10 gap-y-8 min-[860px]:grid-cols-2">
                 {DETAILS.map((item) => (
                   <div key={item.title}>
-                    <h3 className="mb-2 font-display text-[18px] font-bold tracking-[-0.02em]">
+                    <h3 className="mb-2 font-display text-[19px] font-bold tracking-[-0.02em]">
                       {item.title}
                     </h3>
                     <p className="max-w-[52ch] text-[15px] leading-relaxed text-ink-500">
@@ -98,7 +98,7 @@ export default function SeguridadPage() {
                   className="mt-0.5 size-6 shrink-0 text-ink-500"
                 />
                 <div>
-                  <h2 className="mb-2 font-display text-[18px] font-bold">
+                  <h2 className="mb-2 font-display text-[19px] font-bold">
                     Lo que no hacemos
                   </h2>
                   <p className="text-[15px] leading-relaxed text-ink-500">

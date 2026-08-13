@@ -3,7 +3,6 @@
 import Link from "next/link";
 import * as Dialog from "@radix-ui/react-dialog";
 import { Icon } from "@/components/ui/Icon";
-import { ButtonLink } from "@/components/ui/Button";
 import { AuthDialog } from "./AuthDialog";
 import { NAV_SECTIONS } from "./navigation";
 
@@ -64,7 +63,7 @@ export function MobileMenu() {
                 key={section.title}
                 className="mb-2 border-b border-ink-200/60 pb-2 last:mb-0 last:border-0 last:pb-0"
               >
-                <h3 className="px-3 pt-2 pb-1.5 text-[11px] font-bold tracking-[0.16em] text-ink-400 uppercase">
+                <h3 className="px-3 pt-2 pb-1.5 text-[11.5px] font-bold tracking-[0.16em] text-ink-400 uppercase">
                   {section.title}
                 </h3>
                 <ul>
@@ -73,7 +72,7 @@ export function MobileMenu() {
                       <Dialog.Close asChild>
                         <Link
                           href={link.href}
-                          className="flex items-center gap-3.5 rounded-[12px] px-3 py-3 text-[16px] font-semibold tracking-[-0.01em] transition-colors hover:bg-ink-50"
+                          className="flex items-center gap-3.5 rounded-[14px] px-3 py-3 text-[16.5px] font-semibold tracking-[-0.01em] transition-colors hover:bg-ink-50"
                         >
                           <Icon
                             name={link.icon}
@@ -89,10 +88,10 @@ export function MobileMenu() {
             ))}
           </nav>
 
+          {/* Un seul geste au pied du menu : se connecter. « Buscar viaje »
+              doublait la première entrée de la liste (audit B5) — un menu
+              qui répète sa propre première ligne se lit comme un bug. */}
           <div className="flex flex-col gap-2.5 border-t border-ink-200 px-5 py-4">
-            <ButtonLink href="/ya" full>
-              Buscar viaje
-            </ButtonLink>
             <AuthDialog
               trigger={
                 <button className="w-full rounded-[14px] border-[1.5px] border-ink-200 px-5 py-3 font-display text-[15px] font-bold transition-colors hover:border-accent hover:text-accent-ink">

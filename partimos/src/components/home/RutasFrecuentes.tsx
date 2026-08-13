@@ -51,13 +51,13 @@ export function RutasFrecuentes() {
           <li key={`${row.from}-${row.to}`}>
             <Link
               href={`/buscar?desde=${row.from}&hacia=${row.to}`}
-              className="group flex items-center gap-3.5 rounded-[16px] border border-ink-200 bg-white px-4.5 py-3.5 transition-[border-color,transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:border-accent hover:shadow-card"
+              className="group flex items-center gap-3.5 rounded-[14px] border border-ink-200 bg-white px-4.5 py-3.5 transition-[border-color,transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:border-accent hover:shadow-card"
             >
               <span className="min-w-0 flex-1">
-                <span className="block truncate font-display text-[16px] font-bold tracking-[-0.02em]">
+                <span className="block truncate font-display text-[16.5px] font-bold tracking-[-0.02em]">
                   {row.fromCity.shortName} → {row.toCity.shortName}
                 </span>
-                <span className="tnum block text-[13px] text-ink-500">
+                <span className="tnum block text-[13.5px] text-ink-500">
                   desde {formatUsd(row.min!, { compact: true })} por puesto
                 </span>
               </span>
@@ -70,7 +70,7 @@ export function RutasFrecuentes() {
         ))}
       </ul>
 
-      <p className="mt-4 text-[13px] leading-relaxed text-ink-500">
+      <p className="mt-4 text-[13.5px] leading-relaxed text-ink-500">
         El «desde» sale de la misma fórmula que todo lo demás: el costo real
         del carro más sobrio, repartido con el carro lleno. Nunca sube por
         demanda.

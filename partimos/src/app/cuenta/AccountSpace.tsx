@@ -6,7 +6,13 @@ import { Container } from "@/components/site/Section";
 import { Icon, type IconName } from "@/components/ui/Icon";
 import { ButtonLink } from "@/components/ui/Button";
 import { AuthDialog } from "@/components/site/AuthDialog";
-import { carsOf, useSession, type PublishedTrip, type SavedCar } from "@/lib/session";
+import {
+  carsOf,
+  useSession,
+  type Booking,
+  type PublishedTrip,
+  type SavedCar,
+} from "@/lib/session";
 import {
   getVerificationState,
   isSupabaseConfigured,
@@ -17,7 +23,8 @@ import { connectLinkedIn, hasLinkedIn } from "@/lib/linkedin";
 import { PayChannelPicker } from "@/components/ui/PayChannelPicker";
 import { ALL_CITIES, buildRoute } from "@/lib/corridors";
 import { computePriceCap, formatUsd } from "@/lib/pricing";
-import { formatDayLabel } from "@/lib/trips";
+import { formatDayLabel, formatTime, localIso } from "@/lib/trips";
+import { RutinaDaysPicker, DAY_CHIPS } from "@/components/ui/RutinaDays";
 import {
   CAR_MAKES,
   CAR_YEARS,
@@ -54,7 +61,7 @@ export function AccountSpace() {
   if (!session) {
     return (
       <Container className="pt-10">
-        <div className="mx-auto max-w-[520px] rounded-[24px] border border-ink-200 bg-white p-7">
+        <div className="mx-auto max-w-[520px] rounded-[20px] border border-ink-200 bg-white p-7">
           <h1 className="mb-2 font-display text-[26px] font-extrabold tracking-[-0.03em]">
             Tu cuenta
           </h1>
@@ -83,7 +90,7 @@ export function AccountSpace() {
               </button>
             }
           />
-          <p className="mt-4 text-center text-[13px] text-ink-500">
+          <p className="mt-4 text-center text-[13.5px] text-ink-500">
             Buscar viajes y calcular el aporte no necesita cuenta.
           </p>
         </div>
@@ -96,7 +103,7 @@ export function AccountSpace() {
       <div className="mb-5 flex flex-wrap items-center gap-4 rounded-[20px] border border-ink-200 bg-white p-5">
         <span
           aria-hidden
-          className="flex size-14 shrink-0 items-center justify-center rounded-full font-display text-[21px] font-bold text-ink-50 bg-ink-900"
+          className="flex size-14 shrink-0 items-center justify-center rounded-full font-display text-[22px] font-bold text-ink-50 bg-ink-900"
         >
           {session.firstName.charAt(0)}
         </span>
@@ -108,7 +115,7 @@ export function AccountSpace() {
         </div>
         <button
           onClick={signOut}
-          className="rounded-[12px] border-[1.5px] border-ink-200 px-4 py-2.5 text-[14px] font-semibold transition-colors hover:border-accent hover:text-accent-ink"
+          className="rounded-[14px] border-[1.5px] border-ink-200 px-4 py-2.5 text-[14.5px] font-semibold transition-colors hover:border-accent hover:text-accent-ink"
         >
           Salir
         </button>
@@ -127,7 +134,7 @@ export function AccountSpace() {
             aria-controls={`panel-${t.id}`}
             id={`tab-${t.id}`}
             onClick={() => setTab(t.id)}
-            className={`flex shrink-0 items-center gap-2 rounded-full border-[1.5px] px-4 py-2.5 text-[14px] font-semibold transition-colors ${
+            className={`flex shrink-0 items-center gap-2 rounded-full border-[1.5px] px-4 py-2.5 text-[14.5px] font-semibold transition-colors ${
               tab === t.id
                 ? "border-ink-900 bg-ink-900 text-white"
                 : "border-ink-200 bg-white text-ink-500 hover:border-accent"
@@ -148,22 +155,27 @@ export function AccountSpace() {
         {tab === "viajes" && (
           <>
             <RutinaCard />
+            {(session.bookings?.length ?? 0) > 0 && (
+              <BookingsList bookings={session.bookings!} />
+            )}
             {(session.published?.length ?? 0) > 0 ? (
               <PublishedList published={session.published!} />
             ) : (
-              <Empty
-                icon="route"
-                title="Todavía no tienes viajes"
-                body="Cuando reserves un puesto o publiques un viaje, aparecen aquí con la hora, el punto de recogida y el número de la otra persona."
-                actions={
-                  <>
-                    <ButtonLink href="/buscar">Buscar un viaje</ButtonLink>
-                    <ButtonLink href="/publicar/nuevo" variant="secondary">
-                      Publicar un viaje
-                    </ButtonLink>
-                  </>
-                }
-              />
+              (session.bookings?.length ?? 0) === 0 && (
+                <Empty
+                  icon="route"
+                  title="Todavía no tienes viajes"
+                  body="Cuando reserves un puesto o publiques un viaje, aparecen aquí con la hora, el punto de recogida y el número de la otra persona."
+                  actions={
+                    <>
+                      <ButtonLink href="/ya">Buscar un viaje</ButtonLink>
+                      <ButtonLink href="/publicar/nuevo" variant="secondary">
+                        Publicar un viaje
+                      </ButtonLink>
+                    </>
+                  }
+                />
+              )
             )}
           </>
         )}
@@ -197,7 +209,7 @@ export function AccountSpace() {
 
             <LinkedInRow />
 
-            <p className="mt-4 text-[13px] leading-relaxed text-ink-500">
+            <p className="mt-4 text-[13.5px] leading-relaxed text-ink-500">
               Tu celular queda oculto hasta que tengas una reserva confirmada.
               Es una regla de la base de datos, no de la pantalla.
             </p>
@@ -285,7 +297,7 @@ function CarPanel() {
       <h2 className="mb-1.5 font-display text-[19px] font-bold">
         {cars.length === 1 ? "Mi carro" : "Mis carros"}
       </h2>
-      <p className="mb-4 text-[14px] leading-relaxed text-ink-500">
+      <p className="mb-4 text-[14.5px] leading-relaxed text-ink-500">
         Se registran una vez y quedan listos para publicar. Al publicar eliges
         cuál llevas; si tienes uno solo, va ese. El modelo y el año fijan tu
         costo por kilómetro.
@@ -301,25 +313,25 @@ function CarPanel() {
             return (
               <li
                 key={`${c.make}-${c.model}-${c.year}-${i}`}
-                className="flex flex-wrap items-center gap-4 rounded-[16px] border border-ink-200 px-4 py-3.5"
+                className="flex flex-wrap items-center gap-4 rounded-[14px] border border-ink-200 px-4 py-3.5"
               >
                 {c.photoDataUrl ? (
                   /* eslint-disable-next-line @next/next/no-img-element -- data URL locale */
                   <img
                     src={c.photoDataUrl}
                     alt={`${c.make} ${c.model} ${c.color}`}
-                    className="h-16 w-24 rounded-[12px] border border-ink-200 object-cover"
+                    className="h-16 w-24 rounded-[14px] border border-ink-200 object-cover"
                   />
                 ) : (
-                  <span className="flex h-16 w-24 items-center justify-center rounded-[12px] bg-ink-50 text-ink-500">
+                  <span className="flex h-16 w-24 items-center justify-center rounded-[14px] bg-ink-50 text-ink-500">
                     <Icon name="car" className="size-6" />
                   </span>
                 )}
                 <div className="min-w-0 flex-1">
-                  <p className="text-[15.5px] font-semibold">
+                  <p className="text-[15px] font-semibold">
                     {c.make} {c.model} {c.year}
                   </p>
-                  <p className="tnum text-[13px] text-ink-500 capitalize">
+                  <p className="tnum text-[13.5px] text-ink-500 capitalize">
                     {c.color}
                     {cRate !== null &&
                       ` · $${(cRate / 100).toFixed(2)} por km`}
@@ -327,7 +339,7 @@ function CarPanel() {
                 </div>
                 <button
                   onClick={() => saveCars(cars.filter((_, j) => j !== i))}
-                  className="text-[13px] font-semibold text-ink-500 transition-colors hover:text-danger"
+                  className="text-[13.5px] font-semibold text-ink-500 transition-colors hover:text-danger"
                 >
                   Quitar
                 </button>
@@ -397,11 +409,11 @@ function CarPanel() {
             onChange={(e) => setColor(e.target.value)}
             placeholder="Color (gris, blanco…)"
             aria-label="Color del carro"
-            className="mt-2 w-full rounded-[12px] border-[1.5px] border-ink-200 px-3.5 py-2.5 text-[14.5px] font-semibold placeholder:font-normal placeholder:text-ink-400 focus:border-accent focus:outline-none sm:max-w-[calc((100%-1rem)/3)]"
+            className="mt-2 w-full rounded-[14px] border-[1.5px] border-ink-200 px-3.5 py-2.5 text-[14.5px] font-semibold placeholder:font-normal placeholder:text-ink-400 focus:border-accent focus:outline-none sm:max-w-[calc((100%-1rem)/3)]"
           />
 
           {ref && l100 !== null && rate !== null && (
-            <p className="tnum mt-2.5 rounded-[12px] bg-ink-50 px-3.5 py-2.5 text-[13px] leading-relaxed text-ink-500">
+            <p className="tnum mt-2.5 rounded-[14px] bg-ink-50 px-3.5 py-2.5 text-[13.5px] leading-relaxed text-ink-500">
               <b className="font-semibold text-ink-900">
                 {make} {model} {year}
               </b>
@@ -415,7 +427,7 @@ function CarPanel() {
           )}
 
           <div className="mt-4">
-            <p className="mb-2 text-[13px] font-semibold text-ink-900">
+            <p className="mb-2 text-[13.5px] font-semibold text-ink-900">
               Foto del carro
             </p>
             <div className="flex flex-wrap items-center gap-3">
@@ -424,14 +436,14 @@ function CarPanel() {
                 <img
                   src={photo}
                   alt="Foto elegida de tu carro"
-                  className="h-24 w-36 rounded-[12px] border border-ink-200 object-cover"
+                  className="h-24 w-36 rounded-[14px] border border-ink-200 object-cover"
                 />
               ) : (
-                <span className="flex h-24 w-36 items-center justify-center rounded-[12px] border-2 border-dashed border-ink-200 text-ink-400">
+                <span className="flex h-24 w-36 items-center justify-center rounded-[14px] border-2 border-dashed border-ink-200 text-ink-400">
                   <Icon name="car" className="size-7" />
                 </span>
               )}
-              <label className="cursor-pointer rounded-[12px] border-[1.5px] border-ink-200 px-4 py-2.5 text-[13.5px] font-semibold transition-colors hover:border-accent hover:text-accent-ink">
+              <label className="cursor-pointer rounded-[14px] border-[1.5px] border-ink-200 px-4 py-2.5 text-[13.5px] font-semibold transition-colors hover:border-accent hover:text-accent-ink">
                 {photoBusy
                   ? "Procesando…"
                   : photo
@@ -476,7 +488,7 @@ function CarPanel() {
 
 function accountSelect() {
   return [
-    "w-full appearance-none rounded-[12px] border-[1.5px] border-ink-200 bg-white",
+    "w-full appearance-none rounded-[14px] border-[1.5px] border-ink-200 bg-white",
     "px-3.5 py-2.5 text-[14.5px] font-semibold text-ink-900 transition-colors",
     "hover:border-accent focus:border-accent focus:outline-none",
     "disabled:cursor-not-allowed disabled:opacity-50",
@@ -506,6 +518,68 @@ async function shrinkPhoto(file: File): Promise<string> {
   canvas.height = Math.round(img.height * scale);
   canvas.getContext("2d")!.drawImage(img, 0, 0, canvas.width, canvas.height);
   return canvas.toDataURL("image/jpeg", 0.72);
+}
+
+/**
+ * LES PUESTOS RÉSERVÉS — la moitié passager de « Mis viajes ».
+ *
+ * Chaque reserva arrive ici À L'INSTANT où le panneau de réservation
+ * l'écrit, avec son état : `pendiente` (le conducteur a 24 h pour
+ * répondre) ou `confirmado`. La ligne renvoie vers la page du viaje —
+ * l'endroit où tout se recoordonne.
+ */
+function BookingsList({ bookings }: { bookings: Booking[] }) {
+  const cityName = (slug: string) =>
+    ALL_CITIES.find((c) => c.slug === slug)?.shortName ?? slug;
+  return (
+    <div className="mb-6">
+      <h3 className="mb-2.5 font-display text-[16.5px] font-bold">
+        Tus puestos reservados
+      </h3>
+      <ul className="grid gap-2.5">
+        {bookings.map((b, i) => (
+          <li key={`${b.tripId}-${b.boardingAt}-${i}`}>
+            <Link
+              href={`/viaje/${b.tripId}?desde=${b.from}&hacia=${b.to}`}
+              className="flex flex-wrap items-center gap-x-4 gap-y-1.5 rounded-[14px] border border-ink-200 px-4 py-3 transition-colors hover:border-accent"
+            >
+              <span className="min-w-0 flex-1">
+                <span className="block text-[15px] font-semibold">
+                  {cityName(b.from)} → {cityName(b.to)}
+                </span>
+                <span className="tnum block text-[12.5px] text-ink-500">
+                  {formatDayLabel(localIso(new Date(b.boardingAt)))} ·{" "}
+                  {formatTime(b.boardingAt)} · {b.seats}{" "}
+                  {b.seats === 1 ? "puesto" : "puestos"} · con {b.driverName}
+                </span>
+                <span className="block truncate text-[12.5px] text-ink-500">
+                  Te recoge: {b.point}
+                </span>
+              </span>
+              <span
+                className={`rounded-full px-2.5 py-1 text-[11.5px] font-bold whitespace-nowrap ${
+                  b.status === "confirmado"
+                    ? "bg-ink-900 text-white"
+                    : "bg-accent-soft text-accent-ink"
+                }`}
+              >
+                {b.status === "confirmado"
+                  ? "Confirmado"
+                  : "Esperando respuesta"}
+              </span>
+              <span className="tnum font-display text-[16.5px] font-bold">
+                {formatUsd(b.totalCents + b.feeCents)}
+              </span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+      <p className="mt-2.5 text-[12.5px] leading-snug text-ink-500">
+        «Esperando respuesta» significa que el conductor tiene 24 horas para
+        aceptar. Te avisamos apenas decida — y el cobro sale solo si acepta.
+      </p>
+    </div>
+  );
 }
 
 /**
@@ -543,8 +617,8 @@ function PublishedList({ published }: { published: PublishedTrip[] }) {
 
   return (
     <div>
-      <div className="mb-4 rounded-[16px] bg-accent-soft px-5 py-4">
-        <p className="text-[12px] font-bold tracking-[0.12em] text-accent-ink uppercase">
+      <div className="mb-4 rounded-[14px] bg-accent-soft px-5 py-4">
+        <p className="text-[12.5px] font-bold tracking-[0.12em] text-accent-ink uppercase">
           Recuperas hasta
         </p>
         <p className="tnum font-display text-[32px] leading-tight font-extrabold tracking-[-0.03em] text-accent-ink">
@@ -573,7 +647,7 @@ function PublishedList({ published }: { published: PublishedTrip[] }) {
                   ` · ${RECURRENCE_LABEL[p.recurrence]}`}
               </span>
             </span>
-            <span className="tnum font-display text-[16px] font-bold">
+            <span className="tnum font-display text-[16.5px] font-bold">
               {formatUsd(p.priceCents)}
             </span>
           </li>
@@ -602,16 +676,6 @@ function PublishedList({ published }: { published: PublishedTrip[] }) {
  * (R5), et le chiffre sort du tope, donc du coût réel, avec « hasta »
  * parce qu'il suppose les puestos llenos.
  */
-const DAY_CHIPS = [
-  [1, "L"],
-  [2, "M"],
-  [3, "X"],
-  [4, "J"],
-  [5, "V"],
-  [6, "S"],
-  [7, "D"],
-] as const;
-
 function RutinaCard() {
   const { session, updateSession } = useSession();
   const routine = session?.routine ?? null;
@@ -641,7 +705,7 @@ function RutinaCard() {
     ALL_CITIES.find((c) => c.slug === slug)?.shortName ?? slug;
 
   return (
-    <div className="mb-6 rounded-[16px] border border-ink-200 p-4 sm:p-5">
+    <div className="mb-6 rounded-[14px] border border-ink-200 p-4 sm:p-5">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h3 className="font-display text-[16.5px] font-bold">Tu rutina</h3>
         {routine && !editing && (
@@ -656,7 +720,7 @@ function RutinaCard() {
               setHour(routine.hour);
               setEditing(true);
             }}
-            className="text-[13px] font-semibold text-accent-ink hover:underline"
+            className="text-[13.5px] font-semibold text-accent-ink hover:underline"
           >
             Cambiar
           </button>
@@ -665,13 +729,13 @@ function RutinaCard() {
 
       {!routine && !editing ? (
         <>
-          <p className="mt-1 mb-3 text-[14px] leading-relaxed text-ink-500">
+          <p className="mt-1 mb-3 text-[14.5px] leading-relaxed text-ink-500">
             El viaje que haces cada semana, declarado una vez: lo publicas o
             lo buscas con un toque, y te avisamos cuando salga un puesto.
           </p>
           <button
             onClick={() => setEditing(true)}
-            className="rounded-[12px] border-[1.5px] border-ink-200 px-4 py-2.5 text-[14px] font-bold transition-colors hover:border-accent hover:text-accent-ink"
+            className="rounded-[14px] border-[1.5px] border-ink-200 px-4 py-2.5 text-[14.5px] font-bold transition-colors hover:border-accent hover:text-accent-ink"
           >
             Crear mi rutina
           </button>
@@ -704,37 +768,12 @@ function RutinaCard() {
               ))}
             </select>
           </div>
-          <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
-            {DAY_CHIPS.map(([value, label]) => {
-              const active = days.includes(value);
-              return (
-                <button
-                  key={value}
-                  type="button"
-                  aria-pressed={active}
-                  onClick={() =>
-                    setDays((d) =>
-                      active
-                        ? d.filter((x) => x !== value)
-                        : [...d, value].sort(),
-                    )
-                  }
-                  className={`flex size-9 items-center justify-center rounded-full border-[1.5px] text-[13.5px] font-bold transition-colors ${
-                    active
-                      ? "border-ink-900 bg-ink-900 text-white"
-                      : "border-ink-200 text-ink-500 hover:border-accent"
-                  }`}
-                >
-                  {label}
-                </button>
-              );
-            })}
-            <input
-              type="time"
-              value={hour}
-              onChange={(e) => setHour(e.target.value)}
-              aria-label="Hora de salida"
-              className="tnum ml-1 rounded-[10px] border-[1.5px] border-ink-200 px-2.5 py-1.5 text-[14px] font-semibold focus:border-accent focus:outline-none"
+          <div className="mt-2.5">
+            <RutinaDaysPicker
+              days={days}
+              hour={hour}
+              onDays={setDays}
+              onHour={setHour}
             />
           </div>
           <div className="mt-3.5 flex gap-2.5">
@@ -744,13 +783,13 @@ function RutinaCard() {
                 updateSession({ routine: { from, to, days, hour } });
                 setEditing(false);
               }}
-              className="rounded-[12px] bg-ink-900 px-4 py-2.5 text-[14px] font-bold text-white transition-colors hover:bg-ink-800 disabled:opacity-50"
+              className="rounded-[14px] bg-ink-900 px-4 py-2.5 text-[14.5px] font-bold text-white transition-colors hover:bg-ink-800 disabled:opacity-50"
             >
               Guardar
             </button>
             <button
               onClick={() => setEditing(false)}
-              className="rounded-[12px] border-[1.5px] border-ink-200 px-4 py-2.5 text-[14px] font-bold transition-colors hover:border-accent"
+              className="rounded-[14px] border-[1.5px] border-ink-200 px-4 py-2.5 text-[14.5px] font-bold transition-colors hover:border-accent"
             >
               Cancelar
             </button>
@@ -770,9 +809,9 @@ function RutinaCard() {
               </span>
             </p>
             {monthlyCents > 0 && (
-              <p className="tnum mt-2 rounded-[12px] bg-accent-soft px-4 py-3 text-[13.5px] leading-relaxed text-accent-ink">
+              <p className="tnum mt-2 rounded-[14px] bg-accent-soft px-4 py-3 text-[13.5px] leading-relaxed text-accent-ink">
                 Publicando esta rutina recuperas hasta{" "}
-                <b className="font-display text-[16px] font-bold">
+                <b className="font-display text-[16.5px] font-bold">
                   {formatUsd(monthlyCents, { compact: true })}
                 </b>{" "}
                 al mes de gasolina y peajes — con 3 puestos llenos, al tope de{" "}
@@ -783,13 +822,13 @@ function RutinaCard() {
             <div className="mt-3 flex flex-wrap gap-2.5">
               <Link
                 href={`/publicar/nuevo?desde=${routine.from}&hacia=${routine.to}`}
-                className="rounded-[12px] bg-ink-900 px-4 py-2.5 text-[14px] font-bold text-white transition-colors hover:bg-ink-800"
+                className="rounded-[14px] bg-ink-900 px-4 py-2.5 text-[14.5px] font-bold text-white transition-colors hover:bg-ink-800"
               >
                 Publicar mi rutina
               </Link>
               <Link
                 href={`/buscar?desde=${routine.from}&hacia=${routine.to}`}
-                className="rounded-[12px] border-[1.5px] border-ink-200 px-4 py-2.5 text-[14px] font-bold transition-colors hover:border-accent hover:text-accent-ink"
+                className="rounded-[14px] border-[1.5px] border-ink-200 px-4 py-2.5 text-[14.5px] font-bold transition-colors hover:border-accent hover:text-accent-ink"
               >
                 Buscar puesto
               </Link>
@@ -916,7 +955,7 @@ function LinkedInRow() {
         <p className="text-[14.5px] font-semibold">
           LinkedIn
           {connected && (
-            <span className="ml-2 rounded-full bg-ink-900 px-2 py-0.5 text-[11px] font-bold text-white">
+            <span className="ml-2 rounded-full bg-ink-900 px-2 py-0.5 text-[11.5px] font-bold text-white">
               Conectado
             </span>
           )}
@@ -937,7 +976,7 @@ function LinkedInRow() {
           <button
             onClick={connect}
             disabled={busy}
-            className="rounded-[12px] border-[1.5px] border-ink-200 px-4 py-2 text-[13.5px] font-semibold transition-colors hover:border-accent hover:text-accent-ink disabled:opacity-60"
+            className="rounded-[14px] border-[1.5px] border-ink-200 px-4 py-2 text-[13.5px] font-semibold transition-colors hover:border-accent hover:text-accent-ink disabled:opacity-60"
           >
             {busy ? "Abriendo…" : "Conectar"}
           </button>
@@ -1021,11 +1060,11 @@ function VerificacionPanel({ sessionVerified }: { sessionVerified: boolean }) {
           <button
             onClick={launch}
             disabled={launching}
-            className="rounded-[14px] bg-ink-900 px-6 py-3.5 font-display text-[15.5px] font-bold text-white transition-colors hover:bg-ink-800 disabled:opacity-60"
+            className="rounded-[14px] bg-ink-900 px-6 py-3.5 font-display text-[15px] font-bold text-white transition-colors hover:bg-ink-800 disabled:opacity-60"
           >
             {launching ? "Abriendo…" : "Verificar mi cédula"}
           </button>
-          <p className="mt-3 text-[13px] leading-relaxed text-ink-500">
+          <p className="mt-3 text-[13.5px] leading-relaxed text-ink-500">
             Te lleva al recorrido seguro de Didit: foto de la cédula y una
             selfie, dos minutos. Al terminar vuelves aquí.
             {status === "rejected" &&
@@ -1092,7 +1131,7 @@ function Field({
       <dt className="text-[13.5px] text-ink-500">{label}</dt>
       <dd className="text-right">
         <span className="block text-[15px] font-semibold">{value}</span>
-        {note && <span className="block text-[12px] text-ink-500">{note}</span>}
+        {note && <span className="block text-[12.5px] text-ink-500">{note}</span>}
       </dd>
     </div>
   );
@@ -1124,7 +1163,7 @@ function Status({
             {done ? " — completado" : " — pendiente"}
           </span>
         </span>
-        <span className="block text-[13px] leading-snug text-ink-500">
+        <span className="block text-[13.5px] leading-snug text-ink-500">
           {detail}
         </span>
       </span>

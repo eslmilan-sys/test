@@ -63,7 +63,7 @@ export function PayChannelPicker({
         <label
           key={channel}
           htmlFor={`${idBase}-${channel}`}
-          className={`flex cursor-pointer flex-col items-center gap-1 rounded-[12px] border px-2 py-2.5 text-center transition-colors ${
+          className={`flex cursor-pointer flex-col items-center gap-1 rounded-[14px] border px-2 py-2.5 text-center transition-colors ${
             value === channel
               ? "border-ink-900 bg-ink-50"
               : "border-ink-200 hover:border-accent"
@@ -80,7 +80,7 @@ export function PayChannelPicker({
           <span className="flex h-5 items-center">
             <ChannelMark channel={channel} />
           </span>
-          <span className="text-[13px] leading-none font-semibold">
+          <span className="text-[13.5px] leading-none font-semibold">
             {PAY_CHANNEL_LABELS[channel]}
             {channel === "yappy" && (
               <span className="mt-1 block text-[10px] font-bold tracking-[0.08em] text-accent-ink uppercase">
@@ -88,7 +88,7 @@ export function PayChannelPicker({
               </span>
             )}
           </span>
-          <span className="text-[11px] leading-tight text-ink-500">
+          <span className="text-[11.5px] leading-tight text-ink-500">
             {NOTES[channel]}
           </span>
         </label>

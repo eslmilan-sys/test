@@ -46,7 +46,7 @@ export function TripCard({ match }: { match: TripMatch }) {
   return (
     <Link
       href={`/viaje/${trip.id}?desde=${segment.from.citySlug}&hacia=${segment.to.citySlug}`}
-      className="group block rounded-[18px] border border-ink-200 bg-white p-4 transition-[border-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:border-accent hover:shadow-card sm:p-5"
+      className="group block rounded-[20px] border border-ink-200 bg-white p-4 transition-[border-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:border-accent hover:shadow-card sm:p-5"
     >
       <div className="flex gap-4">
         {/* Échelle de temps */}
@@ -61,19 +61,27 @@ export function TripCard({ match }: { match: TripMatch }) {
           />
           <span className="tnum font-display text-[17px] font-bold">
             {formatTime(match.droppingAt)}
+            {/* Viaje de nuit : sans « +1 », un 00:40 sous un 23:15 se lit
+                comme une heure d'avant le départ. */}
+            {new Date(match.droppingAt).toDateString() !==
+              new Date(match.boardingAt).toDateString() && (
+              <span className="block text-center text-[10px] leading-none font-bold tracking-[0.08em] text-ink-400 uppercase">
+                +1 día
+              </span>
+            )}
           </span>
         </div>
 
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
-              <p className="truncate font-display text-[16px] font-bold tracking-[-0.015em]">
+              <p className="truncate font-display text-[16.5px] font-bold tracking-[-0.015em]">
                 {segment.from.name}
               </p>
               <p className="tnum mb-1.5 text-[12.5px] text-ink-500">
                 {formatDuration(durationMin)} de camino
               </p>
-              <p className="truncate font-display text-[16px] font-bold tracking-[-0.015em]">
+              <p className="truncate font-display text-[16.5px] font-bold tracking-[-0.015em]">
                 {segment.to.name}
               </p>
             </div>
@@ -96,7 +104,7 @@ export function TripCard({ match }: { match: TripMatch }) {
           <div className="mt-3.5 flex flex-wrap items-center gap-x-3 gap-y-2 border-t border-ink-200 pt-3.5">
             <span
               aria-hidden
-              className="flex size-8 shrink-0 items-center justify-center rounded-full bg-ink-900 font-display text-[13px] font-bold text-ink-50"
+              className="flex size-8 shrink-0 items-center justify-center rounded-full bg-ink-900 font-display text-[13.5px] font-bold text-ink-50"
             >
               {trip.driver.initial}
             </span>
@@ -144,7 +152,9 @@ function Chip({
 }) {
   const styles = {
     plain: "bg-ink-50 text-ink-600",
-    brand: "bg-accent-soft text-accent-ink",
+    /* La distinction se dit en AMBRE — la couleur d'action de la maison.
+       Le bleu la faisait ressembler à un lien : couleur orpheline (audit B4). */
+    brand: "bg-action-soft text-action-ink",
     // Le seul état qui mérite d'être signalé par une couleur : il change
     // la décision (réserver maintenant ou pas).
     urgent: "bg-danger-soft text-danger",

@@ -170,13 +170,13 @@ export function CityCombobox({
           className={`size-[19px] shrink-0 border-[3px] ${
             tone === "origin"
               ? "rounded-full border-accent"
-              : "rounded-[5px] border-brand-green-deep"
+              : "rounded-[6px] border-brand-green-deep"
           }`}
         />
         <div className="min-w-0 flex-1">
           <label
             htmlFor={id}
-            className="block text-[10.5px] font-bold tracking-[0.11em] text-ink-500 uppercase"
+            className="block text-[11.5px] font-bold tracking-[0.11em] text-ink-500 uppercase"
           >
             {label}
           </label>
@@ -221,7 +221,7 @@ export function CityCombobox({
                 }
               }
             }}
-            className="w-full border-none bg-transparent py-px text-[16px] font-semibold text-ink-900 placeholder:font-medium placeholder:text-ink-500 focus:outline-none"
+            className="w-full border-none bg-transparent py-px text-[16.5px] font-semibold text-ink-900 placeholder:font-medium placeholder:text-ink-500 focus:outline-none"
           />
         </div>
         <Icon
@@ -240,7 +240,7 @@ export function CityCombobox({
             {results.length === 0 &&
               placeResults.length === 0 &&
               remoteResults.length === 0 && (
-              <Command.Empty className="px-3 py-3 text-[14px] text-ink-500">
+              <Command.Empty className="px-3 py-3 text-[14.5px] text-ink-500">
                 Todavía no llegamos a esa ciudad. Escríbela igual y te avisamos
                 cuando abramos la ruta.
               </Command.Empty>
@@ -298,7 +298,7 @@ export function CityCombobox({
                   <span className="block truncate font-semibold">
                     {r.name}
                   </span>
-                  <span className="block truncate text-[12px] text-ink-500">
+                  <span className="block truncate text-[12.5px] text-ink-500">
                     {r.context}
                   </span>
                 </span>

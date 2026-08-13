@@ -98,7 +98,7 @@ export function Calculadora({
 
   return (
     <div
-      className={`rounded-[24px] border border-ink-200 bg-white ${compact ? "p-5" : "p-6.5"} shadow-lift`}
+      className={`rounded-[20px] border border-ink-200 bg-white ${compact ? "p-5" : "p-6.5"} shadow-lift`}
     >
       <h3 className="mb-1.5 font-display text-xl font-bold tracking-[-0.02em]">
         ¿Cuánto pueden aportar?
@@ -170,7 +170,7 @@ export function Calculadora({
         </div>
       </fieldset>
 
-      <div className="rounded-[18px] bg-ink-50 p-5" aria-live="polite">
+      <div className="rounded-[20px] bg-ink-50 p-5" aria-live="polite">
         <div className="mb-3.5 border-b border-dashed border-ink-200 pb-4 text-center">
           <p className="text-[11.5px] font-bold tracking-[0.13em] text-ink-500 uppercase">
             Tope por puesto
@@ -178,7 +178,7 @@ export function Calculadora({
           <p className="tnum font-display text-5xl leading-tight font-extrabold tracking-[-0.045em] text-action-deep">
             {formatUsd(tope)}
           </p>
-          <p className="text-[13px] text-ink-500">
+          <p className="text-[13.5px] text-ink-500">
             Puedes pedir menos, nunca más
           </p>
         </div>
@@ -195,7 +195,7 @@ export function Calculadora({
         </dl>
       </div>
 
-      <p className="mt-4 border-t border-ink-200 pt-3.5 text-[13px] leading-relaxed text-ink-500">
+      <p className="mt-4 border-t border-ink-200 pt-3.5 text-[13.5px] leading-relaxed text-ink-500">
         Incluye gasolina, peajes y desgaste, más un margen del 10 % por los
         desvíos de recogida.{" "}
         <b className="font-semibold text-ink-900">
@@ -209,7 +209,7 @@ export function Calculadora({
 
 function pillClass(active: boolean) {
   return [
-    "rounded-[11px] border-[1.5px] px-4 py-2.5 text-[14.5px] font-semibold transition-colors",
+    "rounded-[10px] border-[1.5px] px-4 py-2.5 text-[14.5px] font-semibold transition-colors",
     active
       ? "border-ink-900 bg-ink-900 text-white"
       : "border-ink-200 text-ink-500 hover:border-accent hover:text-accent-ink",

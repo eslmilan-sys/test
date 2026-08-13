@@ -48,8 +48,8 @@ const VARIANTS: Record<Variant, string> = {
 };
 
 const SIZES: Record<Size, string> = {
-  sm: "px-4 py-2.5 text-[14.5px] rounded-[11px]",
-  md: "px-5.5 py-3.5 text-[16px]",
+  sm: "px-4 py-2.5 text-[14.5px] rounded-[10px]",
+  md: "px-5.5 py-3.5 text-[16.5px]",
   lg: "px-7 py-4 text-[17px]",
 };
 

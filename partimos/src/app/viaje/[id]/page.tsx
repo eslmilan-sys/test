@@ -41,7 +41,7 @@ export default async function TripPage({ params }: Params) {
       <Container className="pt-5">
         <nav
           aria-label="Ruta de navegación"
-          className="mb-4 text-[13px] text-ink-500"
+          className="mb-4 text-[13.5px] text-ink-500"
         >
           <Link
             href={`/buscar?desde=${corridor.origin.slug}&hacia=${corridor.destination.slug}&fecha=${date}`}
@@ -58,13 +58,13 @@ export default async function TripPage({ params }: Params) {
         <Suspense fallback={<DetailSkeleton />}>
           <TripDetail trip={trip} corridor={corridor}>
             <section className="rounded-[20px] border border-ink-200 bg-white p-5 sm:p-6">
-              <h2 className="mb-4 font-display text-[18px] font-bold">
+              <h2 className="mb-4 font-display text-[19px] font-bold">
                 Quién maneja
               </h2>
               <div className="flex items-center gap-4">
                 <span
                   aria-hidden
-                  className="flex size-14 shrink-0 items-center justify-center rounded-full font-display text-[21px] font-bold text-ink-50 bg-ink-900"
+                  className="flex size-14 shrink-0 items-center justify-center rounded-full font-display text-[22px] font-bold text-ink-50 bg-ink-900"
                 >
                   {trip.driver.initial}
                 </span>
@@ -133,7 +133,7 @@ function Badge({
   children: React.ReactNode;
 }) {
   return (
-    <li className="flex items-center gap-2.5 text-[14px] text-ink-600">
+    <li className="flex items-center gap-2.5 text-[14.5px] text-ink-600">
       <Icon name={icon} className="size-4.5 shrink-0 text-ink-500" />
       {children}
     </li>

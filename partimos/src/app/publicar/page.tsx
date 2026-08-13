@@ -71,7 +71,7 @@ export default function PublicarPage() {
                 {STEPS.map((step, index) => (
                   <li
                     key={step.title}
-                    className="relative overflow-hidden rounded-[18px] border border-ink-200 p-5.5"
+                    className="relative overflow-hidden rounded-[20px] border border-ink-200 p-5.5"
                   >
                     <span
                       aria-hidden
@@ -102,12 +102,12 @@ export default function PublicarPage() {
               <h2 className="mb-2 max-w-[22ch] text-[clamp(24px,4vw,34px)] font-extrabold">
                 El cobro, asegurado antes de salir
               </h2>
-              <p className="mb-8 max-w-[58ch] text-[15.5px] leading-relaxed text-ink-500">
+              <p className="mb-8 max-w-[58ch] text-[15px] leading-relaxed text-ink-500">
                 Manejar ya es poner el carro, la gasolina y el volante. Cobrar
                 no debería ser otro trabajo.
               </p>
               <div className="grid gap-3.5 min-[680px]:grid-cols-2 min-[1000px]:grid-cols-4">
-                <div className="rounded-[18px] border border-ink-200 p-5.5">
+                <div className="rounded-[20px] border border-ink-200 p-5.5">
                   <span className="mb-3.5 flex size-10.5 items-center justify-center rounded-xl bg-ink-50 text-ink-900">
                     <Icon name="shield" className="size-5.5" />
                   </span>
@@ -120,7 +120,7 @@ export default function PublicarPage() {
                     vueltos, no hay excusas.
                   </p>
                 </div>
-                <div className="rounded-[18px] border border-ink-200 p-5.5">
+                <div className="rounded-[20px] border border-ink-200 p-5.5">
                   <span className="mb-3.5 flex size-10.5 items-center justify-center rounded-xl bg-ink-50 text-ink-900">
                     <Icon name="cash" className="size-5.5" />
                   </span>
@@ -133,7 +133,7 @@ export default function PublicarPage() {
                     Y si no viaja, las reglas de cancelación te cubren.
                   </p>
                 </div>
-                <div className="rounded-[18px] border border-ink-200 p-5.5">
+                <div className="rounded-[20px] border border-ink-200 p-5.5">
                   <span className="mb-3.5 flex size-10.5 items-center justify-center rounded-xl bg-ink-50 text-ink-900">
                     <Icon name="check" className="size-5.5" />
                   </span>
@@ -146,7 +146,7 @@ export default function PublicarPage() {
                     en todo el viaje.
                   </p>
                 </div>
-                <div className="rounded-[18px] border border-ink-200 p-5.5">
+                <div className="rounded-[20px] border border-ink-200 p-5.5">
                   <span className="mb-3.5 flex size-10.5 items-center justify-center rounded-xl bg-ink-50 text-ink-900">
                     <Icon name="id" className="size-5.5" />
                   </span>
@@ -180,7 +180,7 @@ export default function PublicarPage() {
                   <h2 className="mb-4 max-w-[20ch] text-[clamp(24px,4vw,34px)] font-extrabold">
                     Por qué hay un tope
                   </h2>
-                  <div className="max-w-[50ch] space-y-4 text-[15.5px] leading-relaxed text-ink-500">
+                  <div className="max-w-[50ch] space-y-4 text-[15px] leading-relaxed text-ink-500">
                     <p>
                       Compartir los gastos de un viaje que ya ibas a hacer es
                       una cosa. Cobrar un pasaje es otra, y para eso hace falta
@@ -202,8 +202,8 @@ export default function PublicarPage() {
                     </p>
                   </div>
 
-                  <div className="mt-6 rounded-[18px] border border-ink-200 bg-white px-5 py-4.5">
-                    <p className="text-[14px] leading-relaxed text-ink-500">
+                  <div className="mt-6 rounded-[20px] border border-ink-200 bg-white px-5 py-4.5">
+                    <p className="text-[14.5px] leading-relaxed text-ink-500">
                       <b className="font-semibold text-ink-900">
                         Si alguien te pide un desvío
                       </b>

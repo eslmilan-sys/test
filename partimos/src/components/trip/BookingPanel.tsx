@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Button } from "@/components/ui/Button";
-import { ChatSheet } from "./ChatSheet";
 import { PlacePicker } from "@/components/ui/PlacePicker";
 import { Icon } from "@/components/ui/Icon";
 import { AuthDialog } from "@/components/site/AuthDialog";
@@ -48,6 +48,11 @@ type Props = {
   /** Adresse exacte venue de /ya (?punto=) : présélectionne « Propongo
    *  mi punto » avec le texte déjà écrit. */
   initialPoint?: string;
+  /** Identité du segment réservé — c'est elle qui entre dans la reserva
+   *  de « Mis viajes » : d'où à où, et l'ISO de la montée. */
+  fromSlug: string;
+  toSlug: string;
+  boardingAt: string;
 };
 
 export function BookingPanel({
@@ -63,8 +68,11 @@ export function BookingPanel({
   seatsOffered,
   instantBooking,
   initialPoint = "",
+  fromSlug,
+  toSlug,
+  boardingAt,
 }: Props) {
-  const { session, isDemo } = useSession();
+  const { session, isDemo, updateSession } = useSession();
   const [seats, setSeats] = useState(1);
   /* L'adresse exacte peut arriver de /ya (?punto=) : elle présélectionne
      « Propongo mi punto » avec le texte déjà écrit — l'utilisateur qui a
@@ -107,13 +115,36 @@ export function BookingPanel({
      il y a une décision humaine à prendre de l'autre côté. */
   const needsDriverOk = !instantBooking || isCustom || activeOffer;
 
+  /* Réserver ÉCRIT : la reserva entre en session et « Mis viajes » la
+     liste avec son état. Avant ça, « Pedir mi puesto » était un geste
+     sans lendemain — le trou de logique n° 1 de l'audit. */
+  function confirmBooking() {
+    const booking = {
+      tripId,
+      from: fromSlug,
+      to: toSlug,
+      boardingAt,
+      seats,
+      totalCents,
+      feeCents,
+      channel: payChannel,
+      driverName,
+      point: isCustom ? customPoint || "Punto propuesto" : stops[stopIndex],
+      status: (needsDriverOk ? "pendiente" : "confirmado") as
+        | "pendiente"
+        | "confirmado",
+    };
+    updateSession({ bookings: [...(session?.bookings ?? []), booking] });
+    setBooked(true);
+  }
+
   if (booked) {
     return (
       <aside className="rounded-[20px] border border-ink-200 bg-white p-6 min-[900px]:sticky min-[900px]:top-[80px]">
         <span className="mb-3 flex size-11 items-center justify-center rounded-full bg-ink-900 text-white">
           <Icon name="check" className="size-5" />
         </span>
-        <h2 className="mb-2 font-display text-[20px] font-bold">
+        <h2 className="mb-2 font-display text-[19px] font-bold">
           {needsDriverOk ? "Solicitud enviada" : "Puesto confirmado"}
         </h2>
         <p className="mb-4 text-[14.5px] leading-relaxed text-ink-500">
@@ -124,7 +155,7 @@ export function BookingPanel({
             : `Ya tienes tu puesto. Te compartimos el número de ${driverName} para que coordinen la hora y el punto exacto.`}
         </p>
         {!needsDriverOk && (
-          <p className="tnum mb-4 inline-flex items-center gap-2 rounded-[10px] bg-ink-50 px-3 py-2 text-[14px] font-semibold">
+          <p className="tnum mb-4 inline-flex items-center gap-2 rounded-[10px] bg-ink-50 px-3 py-2 text-[14.5px] font-semibold">
             <Icon name="phone" className="size-4" />
             {driverName} · +507 6XXX-4471
           </p>
@@ -156,6 +187,16 @@ export function BookingPanel({
             </>
           )}
         </p>
+        {/* La boucle se referme ICI : la reserva vient d'entrer en session,
+            « Mis viajes » la liste — et on le dit, sinon la fonctionnalité
+            n'existe pas pour l'utilisateur. */}
+        <Link
+          href="/cuenta"
+          className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-[14px] border-[1.5px] border-ink-200 px-5 py-3 font-display text-[15px] font-bold transition-colors hover:border-accent hover:text-accent-ink"
+        >
+          Ver en Mis viajes
+          <Icon name="arrowRight" className="size-4" />
+        </Link>
       </aside>
     );
   }
@@ -168,7 +209,7 @@ export function BookingPanel({
         </span>
         <span className="text-[13.5px] text-ink-500">por puesto</span>
       </div>
-      <p className="mt-1 mb-5 text-[13px] text-ink-500">
+      <p className="mt-1 mb-5 text-[13.5px] text-ink-500">
         {seatsLeft === 1 ? "Queda 1 puesto" : `Quedan ${seatsLeft} puestos`} ·{" "}
         {instantBooking ? "Reserva al instante" : "El conductor confirma"}
       </p>
@@ -180,7 +221,7 @@ export function BookingPanel({
         <select
           value={seats}
           onChange={(e) => setSeats(Number(e.target.value))}
-          className="w-full cursor-pointer rounded-[12px] border border-ink-200 px-3.5 py-2.5 text-[15px] font-semibold focus:border-accent focus:outline-none"
+          className="w-full cursor-pointer rounded-[14px] border border-ink-200 px-3.5 py-2.5 text-[15px] font-semibold focus:border-accent focus:outline-none"
         >
           {Array.from({ length: seatsLeft }, (_, i) => i + 1).map((n) => (
             <option key={n} value={n}>
@@ -198,7 +239,7 @@ export function BookingPanel({
           {[...stops, "Propongo mi punto"].map((stop, index) => (
             <label
               key={stop}
-              className={`flex cursor-pointer items-center gap-2.5 rounded-[12px] border px-3.5 py-2.5 text-[14.5px] transition-colors ${
+              className={`flex cursor-pointer items-center gap-2.5 rounded-[14px] border px-3.5 py-2.5 text-[14.5px] transition-colors ${
                 stopIndex === index
                   ? "border-ink-900 bg-ink-50 font-semibold"
                   : "border-ink-200 hover:border-accent"
@@ -236,18 +277,18 @@ export function BookingPanel({
               onChange={setCustomPoint}
               placeholder="Ej. Multiplaza, Vía Israel, frente al parque…"
             />
-            <p className="mt-1.5 text-[12px] leading-snug text-ink-500">
+            <p className="mt-1.5 text-[12.5px] leading-snug text-ink-500">
               {`${driverName} decide si le queda de paso — el recorrido es suyo.`}
             </p>
           </div>
           <div className="mb-1 flex items-baseline justify-between">
             <label
               htmlFor="book-km"
-              className="text-[12px] font-semibold text-ink-500"
+              className="text-[12.5px] font-semibold text-ink-500"
             >
               Cuánto se desvía
             </label>
-            <b className="tnum text-[14px]">+{extraKm.toFixed(1)} km</b>
+            <b className="tnum text-[14.5px]">+{extraKm.toFixed(1)} km</b>
           </div>
           <input
             id="book-km"
@@ -297,11 +338,11 @@ export function BookingPanel({
             <div className="mb-1 flex items-baseline justify-between">
               <label
                 htmlFor="book-oferta"
-                className="text-[12px] font-semibold text-ink-500"
+                className="text-[12.5px] font-semibold text-ink-500"
               >
                 Tu oferta por puesto
               </label>
-              <b className="tnum text-[16px]">
+              <b className="tnum text-[16.5px]">
                 {formatUsd(offerCents ?? priceCents)}
               </b>
             </div>
@@ -342,7 +383,7 @@ export function BookingPanel({
             return (
               <label
                 key={channel}
-                className={`flex cursor-pointer items-start gap-2.5 rounded-[12px] border px-3.5 py-2.5 transition-colors ${
+                className={`flex cursor-pointer items-start gap-2.5 rounded-[14px] border px-3.5 py-2.5 transition-colors ${
                   active
                     ? "border-ink-900 bg-ink-50"
                     : "border-ink-200 hover:border-accent"
@@ -367,7 +408,7 @@ export function BookingPanel({
                       <>
                         <YappyBubbles className="h-4 w-auto" />
                         Yappy en la app
-                        <span className="rounded-full bg-action px-2 py-0.5 text-[10.5px] font-bold tracking-[0.06em] text-ink-900 uppercase">
+                        <span className="rounded-full bg-action px-2 py-0.5 text-[11.5px] font-bold tracking-[0.06em] text-ink-900 uppercase">
                           Recomendado
                         </span>
                       </>
@@ -418,7 +459,7 @@ export function BookingPanel({
           <dt className="font-semibold">
             {inApp ? "Pagas en la app" : "Le entregas al conductor"}
           </dt>
-          <dd className="tnum font-display text-[18px] font-bold">
+          <dd className="tnum font-display text-[19px] font-bold">
             {formatUsd(inApp ? chargedCents : totalCents)}
           </dd>
         </div>
@@ -435,14 +476,14 @@ export function BookingPanel({
             size="lg"
             full
             disabled={blocked}
-            onClick={() => setBooked(true)}
+            onClick={confirmBooking}
           >
             {needsDriverOk ? "Pedir el puesto" : "Reservar mi puesto"}
           </Button>
         ) : (
           <button
             disabled={blocked}
-            onClick={() => setBooked(true)}
+            onClick={confirmBooking}
             className={`inline-flex w-full items-center justify-center gap-2.5 rounded-[14px] px-7 py-4 font-display text-[17px] font-bold text-white transition-opacity hover:opacity-90 disabled:pointer-events-none disabled:opacity-50 ${
               payChannel === "yappy" ? "bg-[#17529e]" : "bg-ink-900"
             }`}
@@ -473,27 +514,20 @@ export function BookingPanel({
         />
       )}
 
-      <ChatSheet
-        tripId={tripId}
-        driverName={driverName}
-        trigger={
-          <button className="mt-2.5 inline-flex w-full items-center justify-center gap-2 rounded-[14px] border-[1.5px] border-ink-200 px-5 py-3 font-display text-[15px] font-bold transition-colors hover:border-accent hover:text-accent-ink">
-            <Icon name="chat" className="size-4.5" />
-            Preguntar a {driverName}
-          </button>
-        }
-      />
-
+      {/* Pas de « pregúntale al conductor » AVANT de réserver — décision du
+          propriétaire : un canal ouvert avant la reserva, c'est la porte à
+          « mejor te pago afuera ». Le contact (número, coordination) arrive
+          APRÈS la réservation, quand le viaje existe dans la plataforma. */}
       <p className="mt-3 text-center text-[12.5px] leading-relaxed text-ink-500">
         Sin cobros escondidos: lo que ves aquí es exactamente lo que pagas.
       </p>
 
-      <p className="mt-4 rounded-[14px] bg-ink-50 px-4 py-3 text-[13px] leading-relaxed text-ink-500">
+      <p className="mt-4 rounded-[14px] bg-ink-50 px-4 py-3 text-[13.5px] leading-relaxed text-ink-500">
         {bookingDisclaimer(driverName)}
       </p>
 
       {isDemo && (
-        <p className="mt-3 text-center text-[12px] text-ink-500">
+        <p className="mt-3 text-center text-[12.5px] text-ink-500">
           Modo demostración: no se crea ninguna cuenta ni reserva real.
         </p>
       )}

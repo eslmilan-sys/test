@@ -227,8 +227,8 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
             en haut (là où vivent la marque et le titre), il descend vers
             la nuit — c'est la lumière des bonnes cartes sombres, et ça
             différencie naturellement la tête du corps. */}
-        <Dialog.Content className="fixed top-1/2 left-1/2 z-[140] w-[calc(100vw-24px)] max-w-[420px] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-[30px] border border-white/12 bg-[linear-gradient(168deg,#1d475f_0%,#0e2534_46%,#06141d_100%)] text-white shadow-float backdrop-blur-xl motion-safe:animate-[sheet-in_0.22s_cubic-bezier(0.2,0.9,0.3,1)]">
-          <div className="relative max-h-[90vh] overflow-y-auto rounded-[30px] px-6 pt-8 pb-6">
+        <Dialog.Content className="fixed top-1/2 left-1/2 z-[140] w-[calc(100vw-24px)] max-w-[420px] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-[28px] border border-white/12 bg-[linear-gradient(168deg,#1d475f_0%,#0e2534_46%,#06141d_100%)] text-white shadow-float backdrop-blur-xl motion-safe:animate-[sheet-in_0.22s_cubic-bezier(0.2,0.9,0.3,1)]">
+          <div className="relative max-h-[90vh] overflow-y-auto rounded-[28px] px-6 pt-8 pb-6">
             {/* La lueur de la maison : UN rectangle ambre incliné, fondu
                 dans la nuit derrière le titre. */}
             <span
@@ -261,7 +261,7 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
               Partimos
             </p>
 
-            <Dialog.Title className="mx-auto mt-3 max-w-[16ch] text-center font-display text-[27px] leading-[1.12] font-extrabold tracking-[-0.03em]">
+            <Dialog.Title className="mx-auto mt-3 max-w-[16ch] text-center font-display text-[26px] leading-[1.12] font-extrabold tracking-[-0.03em]">
               {step === "code"
                 ? "Escribe tu código"
                 : step === "done"
@@ -282,7 +282,7 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
 
             {step === "done" ? (
               <>
-                <div className="rounded-[18px] border border-white/12 bg-white/8 px-5 py-4">
+                <div className="rounded-[20px] border border-white/12 bg-white/8 px-5 py-4">
                   <p className="text-[13.5px] leading-snug text-night-200">
                     <b className="font-semibold text-white">
                       Modo demostración.
@@ -301,7 +301,7 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
                         lastName.trim(),
                       )
                     }
-                    className="mt-4 w-full rounded-full bg-white px-5 py-3.5 font-display text-[16px] font-bold text-ink-900 transition-colors hover:bg-ink-50"
+                    className="mt-4 w-full rounded-full bg-white px-5 py-3.5 font-display text-[16.5px] font-bold text-ink-900 transition-colors hover:bg-ink-50"
                   >
                     Continuar como {firstName.trim() || "invitado"}
                   </button>
@@ -315,7 +315,7 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
                 <form
                   onSubmit={submitIdentity}
                   noValidate
-                  className="flex flex-col gap-3.5 rounded-[22px] border border-white/10 bg-white/[0.06] p-4"
+                  className="flex flex-col gap-3.5 rounded-[20px] border border-white/10 bg-white/[0.06] p-4"
                 >
                   {mode === "register" && (
                     <div className="grid grid-cols-2 gap-2.5">
@@ -368,7 +368,7 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
                           name="phone"
                           className="size-4.5 shrink-0 text-night-200"
                         />
-                        <span className="tnum shrink-0 text-[15.5px] font-semibold text-night-200">
+                        <span className="tnum shrink-0 text-[15px] font-semibold text-night-200">
                           +507
                         </span>
                         <input
@@ -379,7 +379,7 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
                           placeholder="6123-4567"
                           value={phone}
                           onChange={(e) => setPhone(e.target.value)}
-                          className="tnum w-full border-none bg-transparent text-[15.5px] font-semibold text-white placeholder:text-white/35 focus:outline-none"
+                          className="tnum w-full border-none bg-transparent text-[15px] font-semibold text-white placeholder:text-white/35 focus:outline-none"
                         />
                       </label>
                     ) : (
@@ -417,7 +417,7 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
                           type="button"
                           aria-pressed={codeVia === value}
                           onClick={() => setCodeVia(value)}
-                          className={`rounded-full border px-3 py-1.5 text-[13px] font-semibold transition-colors ${
+                          className={`rounded-full border px-3 py-1.5 text-[13.5px] font-semibold transition-colors ${
                             codeVia === value
                               ? "border-white bg-white text-ink-900"
                               : "border-white/15 bg-white/5 text-night-200 hover:border-white/35"
@@ -432,7 +432,7 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
                   <button
                     type="submit"
                     disabled={busy}
-                    className="mt-1 w-full rounded-full bg-white px-5 py-3.5 font-display text-[16px] font-bold text-ink-900 transition-colors hover:bg-ink-50 disabled:opacity-50"
+                    className="mt-1 w-full rounded-full bg-white px-5 py-3.5 font-display text-[16.5px] font-bold text-ink-900 transition-colors hover:bg-ink-50 disabled:opacity-50"
                   >
                     {busy ? "Mandando…" : "Mandarme el código"}
                   </button>
@@ -562,7 +562,7 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
                 <button
                   type="submit"
                   disabled={busy}
-                  className="w-full rounded-full bg-white px-5 py-3.5 font-display text-[16px] font-bold text-ink-900 transition-colors hover:bg-ink-50 disabled:opacity-50"
+                  className="w-full rounded-full bg-white px-5 py-3.5 font-display text-[16.5px] font-bold text-ink-900 transition-colors hover:bg-ink-50 disabled:opacity-50"
                 >
                   {busy ? "Verificando…" : "Confirmar"}
                 </button>
@@ -592,7 +592,7 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
             {error && (
               <p
                 role="alert"
-                className="mt-3 text-center text-[13px] font-medium text-[#FF9C90]"
+                className="mt-3 text-center text-[13.5px] font-medium text-[#FF9C90]"
               >
                 {error}
               </p>
@@ -654,7 +654,7 @@ function NightField({
           autoComplete={autoComplete}
           placeholder={placeholder}
           autoFocus={autoFocus}
-          className="w-full border-none bg-transparent text-[15.5px] font-semibold text-white placeholder:text-white/35 focus:outline-none"
+          className="w-full border-none bg-transparent text-[15px] font-semibold text-white placeholder:text-white/35 focus:outline-none"
         />
       </span>
     </label>

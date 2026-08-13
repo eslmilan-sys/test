@@ -17,10 +17,10 @@ export function RutaCard({ slug }: { slug: string }) {
   return (
     <Link
       href={`/viajes/${corridor.slug}`}
-      className="group flex items-center gap-3.5 rounded-[15px] border border-ink-200 px-4.5 py-4 transition-colors hover:border-accent hover:bg-ink-50"
+      className="group flex items-center gap-3.5 rounded-[14px] border border-ink-200 px-4.5 py-4 transition-colors hover:border-accent hover:bg-ink-50"
     >
       <span className="min-w-0 flex-1">
-        <b className="block font-display text-[15.5px] font-bold tracking-[-0.015em]">
+        <b className="block font-display text-[15px] font-bold tracking-[-0.015em]">
           {corridor.origin.shortName} → {corridor.destination.shortName}
         </b>
         <span className="tnum text-[12.5px] text-ink-500">
@@ -32,7 +32,7 @@ export function RutaCard({ slug }: { slug: string }) {
         <b className="tnum block font-display text-base font-bold">
           {formatUsd(cap.maxPriceCents, { compact: true })}
         </b>
-        <span className="block text-[10.5px] tracking-wide text-ink-500 uppercase">
+        <span className="block text-[11.5px] tracking-wide text-ink-500 uppercase">
           Tope
         </span>
       </span>

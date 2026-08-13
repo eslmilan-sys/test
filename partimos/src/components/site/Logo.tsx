@@ -49,7 +49,7 @@ export function Logo({
       aria-label="Partimos — inicio"
     >
       <LogoMark gradientId={gradientId} dotColor={dotColor} />
-      <span className="font-display text-[21px] font-extrabold tracking-[-0.03em]">
+      <span className="font-display text-[22px] font-extrabold tracking-[-0.03em]">
         Partimos
       </span>
     </Link>

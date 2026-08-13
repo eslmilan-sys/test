@@ -19,6 +19,7 @@ import {
 import { agedConsumption, findCar, rateFromConsumption } from "@/lib/cars";
 import { saveLastSearch, useHydrated, useLastSearch } from "@/lib/lastsearch";
 import { CityCombobox } from "@/components/ui/CityCombobox";
+import { DAY_CHIPS, RutinaDaysPicker } from "@/components/ui/RutinaDays";
 
 /**
  * /ya — LA RECHERCHE EXPRESS, pour tout le monde.
@@ -35,16 +36,6 @@ import { CityCombobox } from "@/components/ui/CityCombobox";
  * Guárdalo ») — pour celui qui y va tous les jours. Quand elle existe,
  * la page s'ouvre directement sur SON puesto, déjà cherché.
  */
-
-const DAY_CHIPS = [
-  [1, "L"],
-  [2, "M"],
-  [3, "X"],
-  [4, "J"],
-  [5, "V"],
-  [6, "S"],
-  [7, "D"],
-] as const;
 
 /** Jour ISO (1 = lundi … 7 = dimanche) d'une date locale. */
 function isoDay(d: Date): number {
@@ -70,7 +61,12 @@ export function YaExpress() {
 
   return (
     <Container className="pt-8 pb-16">
-      <div className="mx-auto max-w-[560px]">
+      {/* Une colonne de téléphone sur téléphone ; sur bureau, la recherche
+          à gauche et les résultats à droite — la colonne de 560 px qui
+          flottait seule dans 1280 px était le point C2 de l'audit. */}
+      <div
+        className={`mx-auto max-w-[560px] ${showRoutine ? "" : "min-[1000px]:max-w-[1040px]"}`}
+      >
         <h1 className="mb-1.5 font-display text-[clamp(28px,6vw,38px)] leading-[1.05] font-extrabold tracking-[-0.03em]">
           Tu próximo viaje
         </h1>
@@ -88,7 +84,7 @@ export function YaExpress() {
           <>
             <ExpressSearch />
             {routine && (
-              <p className="mt-4 text-center text-[13px] text-ink-500">
+              <p className="mt-4 text-center text-[13.5px] text-ink-500">
                 <button
                   onClick={() => setOneOff(false)}
                   className="font-semibold text-accent-ink hover:underline"
@@ -135,12 +131,12 @@ function ExpressSearch() {
   const matches = hydrated && valid ? searchTrips(from, to, date, seats) : [];
 
   return (
-    <>
-      <div className="glass liquid rounded-[22px] p-4 [--glass-alpha:0.92] sm:p-5">
+    <div className="min-[1000px]:grid min-[1000px]:grid-cols-[minmax(0,440px)_minmax(0,1fr)] min-[1000px]:items-start min-[1000px]:gap-x-6">
+      <div className="glass liquid rounded-[20px] p-4 [--glass-alpha:0.88] min-[1000px]:col-start-1 min-[1000px]:row-start-1 sm:p-5">
         {/* Le VRAI chercheur — villes, lieux connus, adresses, PH via le
             géocodeur : on tape SON point exact, la ville se résout toute
             seule, et l'adresse suit jusqu'à la réservation. */}
-        <div className="rounded-[16px] border border-ink-200 bg-white">
+        <div className="rounded-[14px] border border-ink-200 bg-white">
           <CityCombobox
             id="ya-desde"
             label="Desde"
@@ -187,7 +183,11 @@ function ExpressSearch() {
           </p>
         )}
 
-        <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
+        {/* Deux rangées VOULUES : dates puis personas. Sur 390 px, une
+            seule rangée cassait au « 4 », qui tombait seul à la ligne —
+            un wrap accidentel se lit comme un bug, deux rangées se
+            lisent comme un choix. */}
+        <div className="mt-2.5 flex items-center gap-1.5">
           {([0, 1] as const).map((offset) => (
             <button
               key={offset}
@@ -203,8 +203,9 @@ function ExpressSearch() {
               {offset === 0 ? "Hoy" : "Mañana"}
             </button>
           ))}
-          <span aria-hidden className="mx-1 h-5 w-px bg-ink-200" />
-          <Icon name="users" aria-hidden className="size-4 text-ink-400" />
+        </div>
+        <div className="mt-2 flex items-center gap-1.5">
+          <Icon name="users" aria-hidden className="mr-0.5 size-4 text-ink-400" />
           {[1, 2, 3, 4].map((n) => (
             <button
               key={n}
@@ -228,7 +229,7 @@ function ExpressSearch() {
       </div>
 
       {/* Les résultats, tout de suite. */}
-      <div className="mt-4">
+      <div className="mt-4 min-[1000px]:col-start-2 min-[1000px]:row-span-2 min-[1000px]:row-start-1 min-[1000px]:mt-0">
         {matches.length > 0 ? (
           <>
             <ExpressCard
@@ -251,7 +252,7 @@ function ExpressSearch() {
                 ))}
               </div>
             )}
-            <p className="mt-3 text-center text-[13px] text-ink-500">
+            <p className="mt-3 text-center text-[13.5px] text-ink-500">
               <Link
                 href={`/buscar?desde=${from}&hacia=${to}&fecha=${date}&puestos=${seats}`}
                 className="font-semibold text-accent-ink hover:underline"
@@ -263,10 +264,10 @@ function ExpressSearch() {
         ) : !hydrated ? (
           <div
             aria-hidden
-            className="h-[210px] animate-pulse rounded-[22px] border border-ink-200 bg-white"
+            className="h-[210px] animate-pulse rounded-[20px] border border-ink-200 bg-white"
           />
         ) : valid ? (
-          <div className="rounded-[18px] border border-ink-200 bg-white px-5 py-4">
+          <div className="rounded-[20px] border border-ink-200 bg-white px-5 py-4">
             <p className="text-[14.5px] leading-relaxed text-ink-500">
               Nada {when === 0 ? "para hoy" : "para mañana"} en esa ruta
               {seats > 1 && (
@@ -290,7 +291,7 @@ function ExpressSearch() {
                   setSeatsChoice(1);
                   saveLastSearch({ from, to, seats: 1 });
                 }}
-                className="mt-3 rounded-[12px] border-[1.5px] border-ink-200 px-4 py-2.5 text-[13.5px] font-bold transition-colors hover:border-accent hover:text-accent-ink"
+                className="mt-3 rounded-[14px] border-[1.5px] border-ink-200 px-4 py-2.5 text-[13.5px] font-bold transition-colors hover:border-accent hover:text-accent-ink"
               >
                 Probar con 1 persona
               </button>
@@ -301,11 +302,11 @@ function ExpressSearch() {
 
       {/* L'automatisation, en OPTION — pour celui qui y va tous les
           jours. Jamais exigée, jamais en travers du chemin. */}
-      <div className="mt-8 rounded-[18px] border border-ink-200 bg-white p-5">
+      <div className="mt-8 rounded-[20px] border border-ink-200 bg-white p-5 min-[1000px]:col-start-1 min-[1000px]:row-start-2 min-[1000px]:mt-4">
         {!savingRoutine ? (
           <div className="flex flex-wrap items-center gap-3">
             <Icon name="route" className="size-5 shrink-0 text-ink-500" />
-            <p className="min-w-0 flex-1 text-[14px] leading-snug text-ink-500">
+            <p className="min-w-0 flex-1 text-[14.5px] leading-snug text-ink-500">
               <b className="font-semibold text-ink-900">
                 ¿Este viaje lo haces seguido?
               </b>{" "}
@@ -315,14 +316,14 @@ function ExpressSearch() {
             {session ? (
               <button
                 onClick={() => setSavingRoutine(true)}
-                className="rounded-[12px] border-[1.5px] border-ink-200 px-4 py-2.5 text-[13.5px] font-bold transition-colors hover:border-accent hover:text-accent-ink"
+                className="rounded-[14px] border-[1.5px] border-ink-200 px-4 py-2.5 text-[13.5px] font-bold transition-colors hover:border-accent hover:text-accent-ink"
               >
                 Guardar rutina
               </button>
             ) : (
               <AuthDialog
                 trigger={
-                  <button className="rounded-[12px] border-[1.5px] border-ink-200 px-4 py-2.5 text-[13.5px] font-bold transition-colors hover:border-accent hover:text-accent-ink">
+                  <button className="rounded-[14px] border-[1.5px] border-ink-200 px-4 py-2.5 text-[13.5px] font-bold transition-colors hover:border-accent hover:text-accent-ink">
                     Crear cuenta y guardarlo
                   </button>
                 }
@@ -340,7 +341,7 @@ function ExpressSearch() {
           />
         )}
       </div>
-    </>
+    </div>
   );
 }
 
@@ -360,51 +361,21 @@ function RoutineDays({
   const [hour, setHour] = useState("06:15");
   return (
     <div>
-      <p className="mb-2.5 text-[14px] font-semibold">
+      <p className="mb-2.5 text-[14.5px] font-semibold">
         {cityName(from)} → {cityName(to)} — ¿qué días y a qué hora?
       </p>
-      <div className="flex flex-wrap items-center gap-1.5">
-        {DAY_CHIPS.map(([value, label]) => {
-          const active = days.includes(value);
-          return (
-            <button
-              key={value}
-              type="button"
-              aria-pressed={active}
-              onClick={() =>
-                setDays((d) =>
-                  active ? d.filter((x) => x !== value) : [...d, value].sort(),
-                )
-              }
-              className={`flex size-9 items-center justify-center rounded-full border-[1.5px] text-[13.5px] font-bold transition-colors ${
-                active
-                  ? "border-ink-900 bg-ink-900 text-white"
-                  : "border-ink-200 text-ink-500 hover:border-accent"
-              }`}
-            >
-              {label}
-            </button>
-          );
-        })}
-        <input
-          type="time"
-          value={hour}
-          onChange={(e) => setHour(e.target.value)}
-          aria-label="Hora habitual"
-          className="tnum ml-1 rounded-[10px] border-[1.5px] border-ink-200 px-2.5 py-1.5 text-[14px] font-semibold focus:border-accent focus:outline-none"
-        />
-      </div>
+      <RutinaDaysPicker days={days} hour={hour} onDays={setDays} onHour={setHour} />
       <div className="mt-3 flex gap-2.5">
         <button
           disabled={days.length === 0}
           onClick={() => onSave(days, hour)}
-          className="rounded-[12px] bg-ink-900 px-4 py-2.5 text-[14px] font-bold text-white transition-colors hover:bg-ink-800 disabled:opacity-50"
+          className="rounded-[14px] bg-ink-900 px-4 py-2.5 text-[14.5px] font-bold text-white transition-colors hover:bg-ink-800 disabled:opacity-50"
         >
           Guardar
         </button>
         <button
           onClick={onCancel}
-          className="rounded-[12px] border-[1.5px] border-ink-200 px-4 py-2.5 text-[14px] font-bold transition-colors hover:border-accent"
+          className="rounded-[14px] border-[1.5px] border-ink-200 px-4 py-2.5 text-[14.5px] font-bold transition-colors hover:border-accent"
         >
           Ahora no
         </button>
@@ -463,7 +434,7 @@ function RoutineHero({
       {!hydrated ? (
         <div
           aria-hidden
-          className="h-[210px] animate-pulse rounded-[22px] border border-ink-200 bg-white"
+          className="h-[210px] animate-pulse rounded-[20px] border border-ink-200 bg-white"
         />
       ) : found.matches.length > 0 ? (
         <>
@@ -492,7 +463,7 @@ function RoutineHero({
         </div>
       )}
 
-      <p className="mt-4 text-center text-[13px] text-ink-500">
+      <p className="mt-4 text-center text-[13.5px] text-ink-500">
         <Link
           href="/cuenta"
           className="font-semibold text-accent-ink hover:underline"
@@ -519,13 +490,13 @@ function RoutineHero({
       <div className="relative mt-8">
         <span
           aria-hidden
-          className="absolute -top-3 -left-4 size-16 rotate-[-8deg] rounded-[16px] bg-[linear-gradient(135deg,#fde68a,#f59e0b_58%,#d97706)] opacity-70"
+          className="absolute -top-3 -left-4 size-16 rotate-[-8deg] rounded-[14px] bg-[linear-gradient(135deg,#fde68a,#f59e0b_58%,#d97706)] opacity-70"
         />
         <div className="glass relative rounded-[20px] p-5 [--glass-alpha:0.88]">
-          <h2 className="mb-1 font-display text-[18px] font-bold">
+          <h2 className="mb-1 font-display text-[19px] font-bold">
             ¿Manejas tú ese camino?
           </h2>
-          <p className="mb-3 text-[14px] leading-relaxed text-ink-500">
+          <p className="mb-3 text-[14.5px] leading-relaxed text-ink-500">
             Publica tu rutina en un toque
             {monthlyCents > 0 && (
               <>
@@ -541,7 +512,7 @@ function RoutineHero({
           </p>
           <Link
             href={`/publicar/nuevo?desde=${routine.from}&hacia=${routine.to}`}
-            className="inline-flex rounded-[13px] border-[1.5px] border-ink-200 bg-white px-5 py-2.5 font-display text-[15px] font-bold transition-colors hover:border-accent hover:text-accent-ink"
+            className="inline-flex rounded-[14px] border-[1.5px] border-ink-200 bg-white px-5 py-2.5 font-display text-[15px] font-bold transition-colors hover:border-accent hover:text-accent-ink"
           >
             Publicar mi rutina
           </Link>
@@ -576,7 +547,7 @@ function ExpressCard({
     return (
       <Link
         href={href}
-        className="flex items-center gap-3.5 rounded-[15px] border border-ink-200 bg-white px-4 py-3 transition-colors hover:border-accent"
+        className="flex items-center gap-3.5 rounded-[14px] border border-ink-200 bg-white px-4 py-3 transition-colors hover:border-accent"
       >
         <span className="tnum font-display text-[17px] font-bold">
           {formatTime(boardingAt)}
@@ -586,7 +557,7 @@ function ExpressCard({
           {trip.vehicle.make} {trip.vehicle.model} · {seatsFree}{" "}
           {seatsFree === 1 ? "puesto" : "puestos"}
         </span>
-        <span className="tnum font-display text-[16px] font-bold">
+        <span className="tnum font-display text-[16.5px] font-bold">
           {formatUsd(priceCents, { compact: true })}
         </span>
       </Link>
@@ -594,7 +565,7 @@ function ExpressCard({
   }
 
   return (
-    <div className="glass liquid relative rounded-[22px] p-5 [--glass-alpha:0.92] sm:p-6">
+    <div className="glass liquid relative rounded-[20px] p-5 [--glass-alpha:0.88] sm:p-6">
       <p className="mb-3 flex items-center gap-2 text-[11.5px] font-bold tracking-[0.13em] text-ink-500 uppercase">
         <span aria-hidden className="size-1.5 rounded-full bg-brand-green" />
         {seats > 1 ? `${seats} puestos` : "Tu puesto"} para{" "}
@@ -611,8 +582,8 @@ function ExpressCard({
           </span>
         </p>
       </div>
-      <p className="tnum mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-[14px] text-ink-600">
-        <span className="flex size-8 items-center justify-center rounded-full bg-ink-900 font-display text-[13px] font-bold text-ink-50">
+      <p className="tnum mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-[14.5px] text-ink-600">
+        <span className="flex size-8 items-center justify-center rounded-full bg-ink-900 font-display text-[13.5px] font-bold text-ink-50">
           {trip.driver.initial}
         </span>
         {trip.driver.firstName} {trip.driver.lastInitial}.

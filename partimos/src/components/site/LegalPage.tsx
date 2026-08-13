@@ -25,7 +25,7 @@ export function LegalPage({
             <h1 className="mb-4 max-w-[18ch] text-[clamp(30px,5.6vw,44px)] leading-[1.05] font-extrabold tracking-[-0.04em]">
               {title}
             </h1>
-            <p className="max-w-[56ch] text-[16px] leading-relaxed text-night-200">
+            <p className="max-w-[56ch] text-[16.5px] leading-relaxed text-night-200">
               {intro}
             </p>
             <p className="mt-5 text-[12.5px] tracking-wide text-night-300 uppercase">
@@ -36,7 +36,7 @@ export function LegalPage({
 
         <div className="py-12 md:py-16">
           <Container>
-            <div className="max-w-[68ch] [&_h2]:mt-9 [&_h2]:mb-3 [&_h2]:font-display [&_h2]:text-[20px] [&_h2]:font-bold [&_h2]:first:mt-0 [&_li]:mb-1.5 [&_p]:mb-4 [&_p]:text-[15.5px] [&_p]:leading-relaxed [&_p]:text-ink-500 [&_ul]:mb-4 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:text-[15.5px] [&_ul]:leading-relaxed [&_ul]:text-ink-500">
+            <div className="max-w-[68ch] [&_h2]:mt-9 [&_h2]:mb-3 [&_h2]:font-display [&_h2]:text-[19px] [&_h2]:font-bold [&_h2]:first:mt-0 [&_li]:mb-1.5 [&_p]:mb-4 [&_p]:text-[15px] [&_p]:leading-relaxed [&_p]:text-ink-500 [&_ul]:mb-4 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:text-[15px] [&_ul]:leading-relaxed [&_ul]:text-ink-500">
               {children}
             </div>
           </Container>
@@ -54,8 +54,8 @@ export function LegalPage({
  */
 export function PendingLegalReview() {
   return (
-    <div className="mb-8 rounded-[16px] border border-ink-200 bg-ink-50 px-5 py-4">
-      <p className="text-[14px] leading-relaxed text-ink-500">
+    <div className="mb-8 rounded-[14px] border border-ink-200 bg-ink-50 px-5 py-4">
+      <p className="text-[14.5px] leading-relaxed text-ink-500">
         <b className="font-semibold text-ink-900">
           Borrador pendiente de revisión.
         </b>{" "}

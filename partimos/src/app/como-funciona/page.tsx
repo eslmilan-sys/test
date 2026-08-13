@@ -159,10 +159,10 @@ export default function ComoFuncionaPage() {
                           {step.money}
                         </span>
                       </p>
-                      <h2 className="mb-1.5 font-display text-[20px] font-bold tracking-[-0.02em]">
+                      <h2 className="mb-1.5 font-display text-[19px] font-bold tracking-[-0.02em]">
                         {step.title}
                       </h2>
-                      <p className="max-w-[58ch] text-[15.5px] leading-relaxed text-ink-500">
+                      <p className="max-w-[58ch] text-[15px] leading-relaxed text-ink-500">
                         {step.body}
                       </p>
                     </div>
@@ -210,7 +210,7 @@ export default function ComoFuncionaPage() {
                 <h2 className="mb-4 max-w-[20ch] text-[clamp(24px,4vw,34px)] font-extrabold">
                   Cuánto se aporta, y por qué ese monto
                 </h2>
-                <div className="max-w-[50ch] space-y-4 text-[15.5px] leading-relaxed text-ink-500">
+                <div className="max-w-[50ch] space-y-4 text-[15px] leading-relaxed text-ink-500">
                   <p>
                     El costo real del recorrido — gasolina, peajes y desgaste,
                     más un margen del 10 % por los desvíos de recogida — se

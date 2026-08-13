@@ -116,7 +116,7 @@ export function YappyBubbles({ className = "h-5" }: { className?: string }) {
 export function YappyWord({ className = "" }: { className?: string }) {
   return (
     <span
-      className={`font-display text-[16px] leading-none font-extrabold tracking-[-0.035em] ${className}`}
+      className={`font-display text-[16.5px] leading-none font-extrabold tracking-[-0.035em] ${className}`}
       style={{ color: "#17529e" }}
     >
       yappy
@@ -148,17 +148,17 @@ export function YappyMark({ className = "" }: { className?: string }) {
 export function PayMarks() {
   return (
     <ul className="flex flex-wrap items-center justify-center gap-2.5">
-      <li className="flex items-center gap-2.5 rounded-[12px] border border-ink-200 bg-white px-4 py-2.5 text-ink-900">
+      <li className="flex items-center gap-2.5 rounded-[14px] border border-ink-200 bg-white px-4 py-2.5 text-ink-900">
         <YappyMark />
         <span className="text-[13.5px] font-semibold text-ink-600">
           en la app o a su número
         </span>
       </li>
-      <li className="flex items-center gap-2.5 rounded-[12px] border border-ink-200 bg-white px-4 py-2.5 text-ink-900">
+      <li className="flex items-center gap-2.5 rounded-[14px] border border-ink-200 bg-white px-4 py-2.5 text-ink-900">
         <TarjetaMark className="size-5 shrink-0 text-ink-600" />
         <span className="text-[13.5px] font-semibold">Tarjeta en la app</span>
       </li>
-      <li className="flex items-center gap-2.5 rounded-[12px] border border-ink-200 bg-white px-4 py-2.5 text-ink-900">
+      <li className="flex items-center gap-2.5 rounded-[14px] border border-ink-200 bg-white px-4 py-2.5 text-ink-900">
         <CashMark className="size-5 shrink-0 text-ink-600" />
         <span className="text-[13.5px] font-semibold">
           Efectivo el día del viaje

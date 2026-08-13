@@ -163,7 +163,7 @@ function Card({ story }: { story: Story }) {
   return (
     <Link
       href={story.href}
-      className={`group relative flex aspect-[4/5] flex-col justify-end overflow-hidden rounded-[24px] p-6 text-white transition-transform duration-300 hover:-translate-y-1 ${
+      className={`group relative flex aspect-[4/5] flex-col justify-end overflow-hidden rounded-[20px] p-6 text-white transition-transform duration-300 hover:-translate-y-1 ${
         photo ? "bg-night-900" : "glass-noche border border-white/20"
       }`}
     >
@@ -191,10 +191,10 @@ function Card({ story }: { story: Story }) {
         <span className="mb-2 block text-[11.5px] font-bold tracking-[0.14em] text-white/70 uppercase">
           {story.eyebrow}
         </span>
-        <span className="mb-2 block font-display text-[23px] leading-[1.1] font-extrabold tracking-[-0.03em]">
+        <span className="mb-2 block font-display text-[22px] leading-[1.1] font-extrabold tracking-[-0.03em]">
           {story.title}
         </span>
-        <span className="block text-[14px] leading-relaxed text-white/80">
+        <span className="block text-[14.5px] leading-relaxed text-white/80">
           {story.body}
         </span>
         <span className="mt-4 inline-flex size-9 items-center justify-center rounded-full bg-white/15 backdrop-blur-sm transition-colors group-hover:bg-white group-hover:text-ink-900">

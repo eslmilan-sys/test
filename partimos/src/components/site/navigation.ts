@@ -59,16 +59,14 @@ export const NAV_SECTIONS: NavSection[] = [
         hint: "Cuatro pasos, menos de un minuto",
         icon: "car",
       },
+      /* UNE entrée d'explication, pas deux : « Cómo funciona » et
+         « Calcular el aporte » menaient à la même page — deux libellés
+         pour une porte font croire à deux pages (audit B5). La
+         calculadora vit dans /publicar, la page l'annonce elle-même. */
       {
         href: "/publicar",
-        label: "Cómo funciona para conductores",
-        hint: "Por qué hay un tope y de dónde sale",
-        icon: "compass",
-      },
-      {
-        href: "/publicar#calculadora",
-        label: "Calcular el aporte",
-        hint: "Cuánto se puede pedir por puesto",
+        label: "Cuánto recuperas y cómo",
+        hint: "El tope del aporte, con la calculadora",
         icon: "compass",
       },
     ],

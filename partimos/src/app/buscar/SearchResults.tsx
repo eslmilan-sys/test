@@ -163,7 +163,7 @@ export function SearchResults() {
 
       <Container className="pt-6">
         {!isSupabaseConfigured && (
-          <p className="mb-4 flex items-start gap-2.5 rounded-[14px] border border-ink-200 bg-white px-4 py-3 text-[13px] leading-relaxed text-ink-500">
+          <p className="mb-4 flex items-start gap-2.5 rounded-[14px] border border-ink-200 bg-white px-4 py-3 text-[13.5px] leading-relaxed text-ink-500">
             <Icon name="bell" className="mt-0.5 size-4 shrink-0" />
             <span>
               <b className="font-semibold text-ink-900">Viajes de ejemplo.</b>{" "}
@@ -176,13 +176,13 @@ export function SearchResults() {
 
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h1 className="font-display text-[20px] font-bold tracking-[-0.02em]">
+            <h1 className="font-display text-[19px] font-bold tracking-[-0.02em]">
               {serving.length > 0
                 ? `${visible.length} ${visible.length === 1 ? "viaje" : "viajes"} · ${formatDayLabel(criteria.date)}`
                 : "Sin resultados"}
             </h1>
             {hasPartial && (
-              <p className="mt-0.5 text-[13px] text-ink-500">
+              <p className="mt-0.5 text-[13.5px] text-ink-500">
                 Incluye conductores que pasan por {toCity?.shortName} camino a
                 otro lado.
               </p>
@@ -250,7 +250,7 @@ export function SearchResults() {
 
             {nearbyDays.length > 0 && (
               <div className="mb-5">
-                <p className="mb-2 text-[13px] font-semibold text-ink-900">
+                <p className="mb-2 text-[13.5px] font-semibold text-ink-900">
                   Sí hay viajes estos días:
                 </p>
                 <div className="flex flex-wrap gap-2">
@@ -258,7 +258,7 @@ export function SearchResults() {
                     <button
                       key={day.date}
                       onClick={() => apply({ ...criteria, date: day.date })}
-                      className="rounded-[12px] border border-ink-200 px-3.5 py-2 text-[13.5px] font-semibold transition-colors hover:border-accent hover:text-accent-ink"
+                      className="rounded-[14px] border border-ink-200 px-3.5 py-2 text-[13.5px] font-semibold transition-colors hover:border-accent hover:text-accent-ink"
                     >
                       {formatDayLabel(day.date)} · {day.count}
                     </button>

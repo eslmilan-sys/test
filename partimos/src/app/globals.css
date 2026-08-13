@@ -935,10 +935,14 @@
      l'utilisateur a demandé moins d'animations. */
   @supports (animation-timeline: view()) {
     @media (prefers-reduced-motion: no-preference) {
+      /* La plage est COURTE et démarre dès le premier pixel visible : la
+         section doit être nette AVANT que l'œil n'arrive sur elle. La
+         plage d'avant (entry 8% → cover 26%) laissait des pans de page
+         fantômes au milieu de l'écran (audit C1). */
       .reveal {
         animation: reveal-in linear both;
         animation-timeline: view();
-        animation-range: entry 8% cover 26%;
+        animation-range: cover 0% cover 16%;
       }
     }
   }
@@ -946,7 +950,7 @@
   @keyframes reveal-in {
     from {
       opacity: 0;
-      transform: translateY(14px);
+      transform: translateY(10px);
     }
     to {
       opacity: 1;

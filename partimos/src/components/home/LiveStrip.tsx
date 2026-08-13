@@ -75,7 +75,7 @@ function Card({
         {trip.initial}
       </span>
       <span>
-        <span className="block text-[13px] font-semibold text-ink-900">
+        <span className="block text-[13.5px] font-semibold text-ink-900">
           {trip.route}
         </span>
         <span className="block text-[11.5px] text-ink-500">{trip.when}</span>

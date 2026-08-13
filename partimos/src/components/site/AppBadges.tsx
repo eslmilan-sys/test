@@ -30,7 +30,7 @@ function Badge({
   big: string;
 }) {
   return (
-    <span className="relative inline-flex items-center gap-2.5 rounded-[13px] border border-white/15 bg-white/8 px-4 py-2.5 text-left">
+    <span className="relative inline-flex items-center gap-2.5 rounded-[14px] border border-white/15 bg-white/8 px-4 py-2.5 text-left">
       <svg
         viewBox={viewBox}
         aria-hidden
@@ -39,7 +39,7 @@ function Badge({
         <path d={path} />
       </svg>
       <span className="leading-tight">
-        <span className="block text-[10.5px] text-night-300">{small}</span>
+        <span className="block text-[11.5px] text-night-300">{small}</span>
         <span className="block font-display text-[15px] font-bold text-ink-50">
           {big}
         </span>
@@ -54,7 +54,7 @@ function Badge({
 export function AppBadges() {
   return (
     <div className="mt-5">
-      <p className="mb-2.5 text-[13px] text-night-300">
+      <p className="mb-2.5 text-[13.5px] text-night-300">
         La app viene en camino para iOS y Android — mientras tanto, el sitio
         hace todo desde el navegador.
       </p>

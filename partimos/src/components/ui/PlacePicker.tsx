@@ -131,7 +131,7 @@ export function PlacePicker({
       >
         {label}
       </label>
-      <div className="flex items-center gap-2.5 rounded-[12px] border-[1.5px] border-ink-200 bg-white px-3.5 py-2.5 transition-colors focus-within:border-accent">
+      <div className="flex items-center gap-2.5 rounded-[14px] border-[1.5px] border-ink-200 bg-white px-3.5 py-2.5 transition-colors focus-within:border-accent">
         <Icon name="pin" className="size-4 shrink-0 text-ink-400" />
         <input
           id={id}
@@ -188,7 +188,7 @@ export function PlacePicker({
                 className="flex cursor-pointer items-baseline justify-between gap-3 rounded-[10px] px-3 py-2.5 text-[14.5px] data-[selected=true]:bg-ink-50"
               >
                 <span className="font-semibold">{p.name}</span>
-                <span className="shrink-0 text-[12px] text-ink-500">
+                <span className="shrink-0 text-[12.5px] text-ink-500">
                   {KIND_LABELS[p.kind]}
                 </span>
               </Command.Item>
@@ -224,7 +224,7 @@ export function PlacePicker({
                   className="flex cursor-pointer items-baseline justify-between gap-3 rounded-[10px] px-3 py-2.5 text-[14.5px] data-[selected=true]:bg-ink-50"
                 >
                   <span className="font-semibold">{r.name}</span>
-                  <span className="min-w-0 shrink truncate text-[12px] text-ink-500">
+                  <span className="min-w-0 shrink truncate text-[12.5px] text-ink-500">
                     {r.context}
                   </span>
                 </Command.Item>
@@ -241,7 +241,7 @@ export function PlacePicker({
               <span className="font-semibold">
                 Usar «{query.trim()}» tal cual
               </span>
-              <span className="shrink-0 text-[12px] text-ink-500">
+              <span className="shrink-0 text-[12.5px] text-ink-500">
                 Punto libre
               </span>
             </Command.Item>
