@@ -545,7 +545,10 @@
      départ : il dépasse à droite de ce qu'il dépassait à gauche. */
   @keyframes carro-avanza {
     to {
-      left: calc(100% - 4.5rem);
+      /* Fin de course au bord droit de la carte, débord contenu DANS la
+         marge de page (0,75 rem < 1,25 rem de gouttière) : rien ne
+         dépasse jamais du viewport. */
+      left: calc(100% - 5.25rem);
     }
   }
 
@@ -570,21 +573,10 @@
     -webkit-tap-highlight-color: transparent;
   }
 
-  @media (prefers-reduced-motion: no-preference) {
-    body {
-      animation: respiración 36s ease infinite;
-    }
-  }
-
-  @keyframes respiración {
-    0%,
-    100% {
-      background-position: 0% 50%;
-    }
-    50% {
-      background-position: 100% 50%;
-    }
-  }
+  /* La « respiración » du fond est retirée : sur téléphone, un dégradé
+     qui dérive donne l'impression que la PAGE bouge (retour propriétaire).
+     Le fond est immobile — le mouvement appartient aux objets qui en ont
+     une raison (le carro du hero), jamais à la toile de fond. */
 
   html {
     scroll-behavior: smooth;
@@ -592,6 +584,10 @@
        de sa hauteur réelle : une constante en dur se désynchronise dès qu'on
        touche à la barre, et le bug ne se voit qu'en cliquant une ancre. */
     scroll-padding-top: calc(var(--nav-space) + 0.5rem);
+    /* `clip` et non `hidden` : hidden crée un conteneur de défilement
+       qu'iOS laisse « panner » au doigt — c'était le site qui bougeait
+       latéralement de quelques pixels. clip interdit tout déplacement. */
+    overflow-x: clip;
   }
 
   body {
@@ -610,7 +606,7 @@
     font-size: 16.5px;
     line-height: 1.55;
     -webkit-font-smoothing: antialiased;
-    overflow-x: hidden;
+    overflow-x: clip;
   }
 
   h1,

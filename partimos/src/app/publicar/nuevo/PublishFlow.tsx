@@ -45,6 +45,19 @@ import {
 
 const STEPS = ["Ruta", "Paradas", "Hora y puestos", "Aporte"] as const;
 
+/**
+ * LE BUG DE LA VILLE QUI NE CHANGE PAS : l'état du flux s'initialise
+ * depuis l'URL UNE fois. Arriver depuis l'accueil avec Coronado, revenir,
+ * repartir avec une autre ville — même instance, vieilles valeurs, et les
+ * paradas ne bougent pas. La clé remonte le composant à chaque nouvelle
+ * combinaison de paramètres : nouvel itinéraire, état neuf.
+ */
+export function PublishFlowKeyed() {
+  const params = useSearchParams();
+  const key = `${params.get("ruta") ?? ""}|${params.get("desde") ?? ""}|${params.get("hacia") ?? ""}`;
+  return <PublishFlow key={key} />;
+}
+
 function nextDays(count = 14) {
   const today = new Date();
   return Array.from({ length: count }, (_, i) => {

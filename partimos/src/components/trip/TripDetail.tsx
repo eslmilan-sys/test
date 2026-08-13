@@ -164,6 +164,11 @@ export function TripDetail({
       </div>
 
       <BookingPanel
+        /* La clé purge l'état du panneau (place choisie, « confirmé »,
+           offre) quand on change de viaje OU de segment : en navigation
+           SPA, React réutiliserait l'instance et l'état suivrait — le
+           même mal que le formulaire de publication. */
+        key={`${trip.id}-${segment.fromIndex}-${segment.toIndex}`}
         tripId={trip.id}
         driverName={trip.driver.firstName}
         priceCents={match.priceCents}

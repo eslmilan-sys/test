@@ -646,7 +646,16 @@ function RutinaCard() {
         <h3 className="font-display text-[16.5px] font-bold">Tu rutina</h3>
         {routine && !editing && (
           <button
-            onClick={() => setEditing(true)}
+            onClick={() => {
+              /* Réamorcer depuis la rutina COURANTE : l'état local date
+                 du montage, la rutina a pu changer depuis (/ya, autre
+                 onglet) — même famille que le bug de publication. */
+              setFrom(routine.from);
+              setTo(routine.to);
+              setDays(routine.days);
+              setHour(routine.hour);
+              setEditing(true);
+            }}
             className="text-[13px] font-semibold text-accent-ink hover:underline"
           >
             Cambiar

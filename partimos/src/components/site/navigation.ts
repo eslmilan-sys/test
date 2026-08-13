@@ -26,6 +26,12 @@ export const NAV_SECTIONS: NavSection[] = [
     title: "Viajar",
     links: [
       {
+        href: "/ya",
+        label: "Tu próximo viaje",
+        hint: "Tu rutina, ya buscada — dos taps y listo",
+        icon: "route",
+      },
+      {
         href: "/buscar",
         label: "Buscar un viaje",
         hint: "Quién sale hoy, a qué hora y por cuánto",
