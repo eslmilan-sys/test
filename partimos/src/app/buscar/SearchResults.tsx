@@ -11,7 +11,7 @@ import { AvisameForm } from "@/components/AvisameForm";
 import { Icon } from "@/components/ui/Icon";
 import { ButtonLink } from "@/components/ui/Button";
 import { CORRIDORS, ALL_CITIES, corridorsServing } from "@/lib/corridors";
-import { searchTrips, formatDayLabel } from "@/lib/trips";
+import { searchTrips, formatDayLabel, localIso } from "@/lib/trips";
 import { isSupabaseConfigured } from "@/lib/supabase";
 
 /**
@@ -39,7 +39,7 @@ export function SearchResults() {
   const router = useRouter();
   const params = useSearchParams();
 
-  const today = useMemo(() => new Date().toISOString().slice(0, 10), []);
+  const today = useMemo(() => localIso(), []);
   const criteria = {
     from: params.get("desde") ?? "panama-city",
     to: params.get("hacia") ?? "chitre",
@@ -115,7 +115,7 @@ export function SearchResults() {
       .map((offset) => {
         const d = new Date(`${criteria.date}T12:00:00`);
         d.setDate(d.getDate() + offset);
-        const iso = d.toISOString().slice(0, 10);
+        const iso = localIso(d);
         if (iso < today) return null;
         const count = searchTrips(
           criteria.from,

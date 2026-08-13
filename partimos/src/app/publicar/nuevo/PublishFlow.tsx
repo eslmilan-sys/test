@@ -20,7 +20,7 @@ import {
   PRICE_RULE,
   type VehicleCategory,
 } from "@/lib/pricing";
-import { formatDayLabel, servedPairCount } from "@/lib/trips";
+import { formatDayLabel, localIso, servedPairCount } from "@/lib/trips";
 import { MAPBOX_TOKEN, corridorStopsMapUrl } from "@/lib/mapbox";
 import {
   CAR_MAKES,
@@ -64,7 +64,7 @@ function nextDays(count = 14) {
   return Array.from({ length: count }, (_, i) => {
     const d = new Date(today);
     d.setDate(today.getDate() + i);
-    const value = d.toISOString().slice(0, 10);
+    const value = localIso(d);
     return { value, label: formatDayLabel(value) };
   });
 }

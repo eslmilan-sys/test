@@ -13,10 +13,11 @@ import {
   formatTime,
   formatDayLabel,
   SEARCH_HORIZON_DAYS,
+  localIso,
   type TripMatch,
 } from "@/lib/trips";
 import { agedConsumption, findCar, rateFromConsumption } from "@/lib/cars";
-import { saveLastSearch, useLastSearch } from "@/lib/lastsearch";
+import { saveLastSearch, useHydrated, useLastSearch } from "@/lib/lastsearch";
 import { CityCombobox } from "@/components/ui/CityCombobox";
 
 /**
@@ -53,7 +54,7 @@ function isoDay(d: Date): number {
 function isoDate(offsetDays: number): string {
   const d = new Date();
   d.setDate(d.getDate() + offsetDays);
-  return d.toISOString().slice(0, 10);
+  return localIso(d);
 }
 
 const cityName = (slug: string) =>
@@ -127,8 +128,11 @@ function ExpressSearch() {
   const valid = from !== to;
   const date = isoDate(when);
   /* Les résultats se calculent EN RENDANT — pas de bouton, pas
-     d'attente : choisir, c'est chercher. */
-  const matches = valid ? searchTrips(from, to, date, seats) : [];
+     d'attente : choisir, c'est chercher. La barrière d'hydratation les
+     retient dans le HTML prérendu : ils dépendent de l'heure réelle, le
+     build ne peut pas la connaître (erreur React 418 sinon). */
+  const hydrated = useHydrated();
+  const matches = hydrated && valid ? searchTrips(from, to, date, seats) : [];
 
   return (
     <>
@@ -256,11 +260,22 @@ function ExpressSearch() {
               </Link>
             </p>
           </>
+        ) : !hydrated ? (
+          <div
+            aria-hidden
+            className="h-[210px] animate-pulse rounded-[22px] border border-ink-200 bg-white"
+          />
         ) : valid ? (
           <div className="rounded-[18px] border border-ink-200 bg-white px-5 py-4">
             <p className="text-[14.5px] leading-relaxed text-ink-500">
               Nada {when === 0 ? "para hoy" : "para mañana"} en esa ruta
-              todavía.{" "}
+              {seats > 1 && (
+                <b className="font-semibold text-ink-900">
+                  {" "}
+                  con {seats} puestos juntos
+                </b>
+              )}
+              .{" "}
               <Link
                 href={`/buscar?desde=${from}&hacia=${to}`}
                 className="font-semibold text-accent-ink hover:underline"
@@ -269,6 +284,17 @@ function ExpressSearch() {
               </Link>{" "}
               — o pon la alerta ahí y te avisamos.
             </p>
+            {seats > 1 && (
+              <button
+                onClick={() => {
+                  setSeatsChoice(1);
+                  saveLastSearch({ from, to, seats: 1 });
+                }}
+                className="mt-3 rounded-[12px] border-[1.5px] border-ink-200 px-4 py-2.5 text-[13.5px] font-bold transition-colors hover:border-accent hover:text-accent-ink"
+              >
+                Probar con 1 persona
+              </button>
+            )}
           </div>
         ) : null}
       </div>
@@ -398,15 +424,16 @@ function RoutineHero({
 }) {
   const { session } = useSession();
 
+  const hydrated = useHydrated();
   let found: { date: string | null; matches: TripMatch[] } = {
     date: null,
     matches: [],
   };
-  for (let i = 0; i < SEARCH_HORIZON_DAYS; i++) {
+  for (let i = 0; hydrated && i < SEARCH_HORIZON_DAYS; i++) {
     const d = new Date();
     d.setDate(d.getDate() + i);
     if (!routine.days.includes(isoDay(d))) continue;
-    const date = d.toISOString().slice(0, 10);
+    const date = localIso(d);
     const matches = searchTrips(routine.from, routine.to, date);
     if (matches.length > 0) {
       found = { date, matches };
@@ -433,7 +460,12 @@ function RoutineHero({
 
   return (
     <>
-      {found.matches.length > 0 ? (
+      {!hydrated ? (
+        <div
+          aria-hidden
+          className="h-[210px] animate-pulse rounded-[22px] border border-ink-200 bg-white"
+        />
+      ) : found.matches.length > 0 ? (
         <>
           <ExpressCard match={found.matches[0]} date={found.date!} hero />
           {found.matches.length > 1 && (

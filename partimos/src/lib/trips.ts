@@ -224,17 +224,25 @@ function buildTrip(corridor: Corridor, date: string, index: number): Trip {
   const seed = hash(`${corridor.slug}|${date}|${index}`);
   const driver = DRIVERS[seed % DRIVERS.length];
   const vehicle = VEHICLES[(seed >> 3) % VEHICLES.length];
-  const seatsOffered = 2 + ((seed >> 5) % 3);
+  /* Le trajet 0 de chaque corridor/jour offre TOUJOURS 4 puestos libres
+     (voir plus bas : zéro reserva). Sans cette garantie, chercher « 4
+     personas » vidait la démo entière — vécu par le propriétaire comme
+     « il n'y a plus aucun viaje ». La démo doit toujours avoir une
+     réponse. */
+  const seatsOffered = index === 0 ? 4 : 2 + ((seed >> 5) % 3);
 
   const servedStops = pickServedStops(
     corridor,
     hash(`paradas|${corridor.slug}|${date}|${index}`),
   );
-  const holds = buildHolds(
-    servedStops.length,
-    seatsOffered,
-    hash(`reservas|${corridor.slug}|${date}|${index}`),
-  );
+  const holds =
+    index === 0
+      ? []
+      : buildHolds(
+          servedStops.length,
+          seatsOffered,
+          hash(`reservas|${corridor.slug}|${date}|${index}`),
+        );
   const seatsTaken =
     seatsOffered -
     seatsFreeOnSegment(seatsOffered, holds, {
@@ -242,8 +250,11 @@ function buildTrip(corridor: Corridor, date: string, index: number): Trip {
       toIndex: servedStops.length - 1,
     });
 
-  const hour = DEPARTURE_HOURS[(seed >> 11) % DEPARTURE_HOURS.length];
-  const minute = [0, 15, 30, 45][(seed >> 14) % 4];
+  /* Le trajet 0 part TARD (23 h 15) : c'est lui qui garde la démo
+     vivante en soirée — sans lui, après 21 h « Hoy » se vidait partout
+     et le site semblait mort. Les autres suivent le tirage. */
+  const hour = index === 0 ? 23 : DEPARTURE_HOURS[(seed >> 11) % DEPARTURE_HOURS.length];
+  const minute = index === 0 ? 15 : [0, 15, 30, 45][(seed >> 14) % 4];
   const departure = new Date(
     `${date}T${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}:00`,
   );
@@ -372,7 +383,9 @@ export const SEARCH_HORIZON_DAYS = 10;
 export function demoTripIds(days = SEARCH_HORIZON_DAYS + 2): string[] {
   const ids: string[] = [];
   const today = new Date();
-  for (let d = 0; d < days; d++) {
+  /* d = -1 : la veille du jour UTC du build. Un visiteur de Panamá en
+     soirée vit encore « hier » au sens UTC — ses fiches doivent exister. */
+  for (let d = -1; d < days; d++) {
     const date = new Date(today);
     date.setDate(today.getDate() + d);
     const iso = date.toISOString().slice(0, 10);
@@ -495,6 +508,16 @@ export function servedPairCount(stopCount: number): number {
   return (stopCount * (stopCount - 1)) / 2;
 }
 
+/**
+ * La date d'aujourd'hui DE L'UTILISATEUR — jamais celle d'UTC.
+ * `toISOString()` rend la date UTC : à 20 h à Panamá (UTC−5) c'est déjà
+ * « demain », et tout le site se décalait d'un jour le soir. Toute
+ * construction de date de recherche passe par ici.
+ */
+export function localIso(d: Date = new Date()): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
 export function formatTime(iso: string): string {
   return new Intl.DateTimeFormat("es-PA", {
     hour: "2-digit",
@@ -504,8 +527,8 @@ export function formatTime(iso: string): string {
 }
 
 export function formatDayLabel(date: string): string {
-  const today = new Date().toISOString().slice(0, 10);
-  const tomorrow = new Date(Date.now() + 86_400_000).toISOString().slice(0, 10);
+  const today = localIso();
+  const tomorrow = localIso(new Date(Date.now() + 86_400_000));
   if (date === today) return "Hoy";
   if (date === tomorrow) return "Mañana";
   const label = new Intl.DateTimeFormat("es-PA", {

@@ -7,7 +7,7 @@ import { CityCombobox } from "@/components/ui/CityCombobox";
 import { RouteMap } from "@/components/map/RouteMap";
 import { Button } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
-import { formatDayLabel, SEARCH_HORIZON_DAYS } from "@/lib/trips";
+import { formatDayLabel, localIso, SEARCH_HORIZON_DAYS } from "@/lib/trips";
 
 /**
  * Résumé de recherche collant, ouvrant une feuille d'édition.
@@ -26,7 +26,7 @@ function nextDays(count = SEARCH_HORIZON_DAYS) {
   for (let i = 0; i < count; i++) {
     const d = new Date(today);
     d.setDate(today.getDate() + i);
-    const value = d.toISOString().slice(0, 10);
+    const value = localIso(d);
     out.push({ value, label: formatDayLabel(value) });
   }
   return out;

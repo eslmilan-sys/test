@@ -75,3 +75,19 @@ export function saveLastSearch(next: LastSearch): void {
 export function useLastSearch(): LastSearch | null {
   return useSyncExternalStore(subscribe, snapshot, () => null);
 }
+
+/**
+ * Vrai après l'hydratation, faux dans le HTML prérendu. Pour le contenu
+ * qui dépend de l'HEURE (résultats de recherche « hoy ») : le HTML du
+ * build et le premier rendu client ne peuvent pas coïncider — on rend
+ * un squelette côté serveur et le vrai contenu dès l'hydratation, sans
+ * effet ni setState (React 19 friendly).
+ */
+const noopSubscribe = () => () => {};
+export function useHydrated(): boolean {
+  return useSyncExternalStore(
+    noopSubscribe,
+    () => true,
+    () => false,
+  );
+}

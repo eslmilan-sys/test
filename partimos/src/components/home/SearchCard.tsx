@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
 import { CityCombobox } from "@/components/ui/CityCombobox";
 import { RouteMap } from "@/components/map/RouteMap";
-import { SEARCH_HORIZON_DAYS } from "@/lib/trips";
+import { localIso, SEARCH_HORIZON_DAYS } from "@/lib/trips";
 import { saveLastSearch, useLastSearch } from "@/lib/lastsearch";
 
 /** L'horizon de recherche, libellé en espagnol du Panama. */
@@ -19,7 +19,7 @@ function nextDays(count = SEARCH_HORIZON_DAYS) {
   for (let i = 0; i < count; i++) {
     const d = new Date(today);
     d.setDate(today.getDate() + i);
-    const value = d.toISOString().slice(0, 10);
+    const value = localIso(d);
     const label =
       i === 0
         ? "Hoy"
