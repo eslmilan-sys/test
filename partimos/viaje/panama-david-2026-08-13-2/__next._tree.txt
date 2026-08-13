@@ -1,4 +1,4 @@
-:HL["/test/partimos/_next/static/chunks/375icxiaa90j1.css","style"]
+:HL["/test/partimos/_next/static/chunks/1zlrvywugpu13.css","style"]
 :HL["/test/partimos/_next/static/media/67af958a78cfd7ea-s.p.1lywp3x9jvm8e.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
 :HL["/test/partimos/_next/static/media/f141b5b7abe57afc-s.p.380f-mwhk0aej.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
-0:{"tree":{"name":"","param":null,"prefetchHints":4112,"slots":{"children":{"name":"viaje","param":null,"prefetchHints":4160,"slots":{"children":{"name":"id","param":{"type":"d","key":"panama-david-2026-08-13-2","siblings":[]},"prefetchHints":4192,"slots":{"children":{"name":"__PAGE__","param":null,"prefetchHints":4256,"slots":null}}}}}}},"staleTime":300,"buildId":"7XOIDIQsYw80aPHf6wUOk"}
+0:{"tree":{"name":"","param":null,"prefetchHints":4112,"slots":{"children":{"name":"viaje","param":null,"prefetchHints":4160,"slots":{"children":{"name":"id","param":{"type":"d","key":"panama-david-2026-08-13-2","siblings":[]},"prefetchHints":4192,"slots":{"children":{"name":"__PAGE__","param":null,"prefetchHints":4256,"slots":null}}}}}}},"staleTime":300,"buildId":"m3v0vDbDuXLJ4X5OpmOoK"}
