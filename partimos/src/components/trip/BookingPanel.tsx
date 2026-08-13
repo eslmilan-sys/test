@@ -45,6 +45,9 @@ type Props = {
   citySlug: string;
   seatsOffered: number;
   instantBooking: boolean;
+  /** Adresse exacte venue de /ya (?punto=) : présélectionne « Propongo
+   *  mi punto » avec le texte déjà écrit. */
+  initialPoint?: string;
 };
 
 export function BookingPanel({
@@ -59,11 +62,17 @@ export function BookingPanel({
   category,
   seatsOffered,
   instantBooking,
+  initialPoint = "",
 }: Props) {
   const { session, isDemo } = useSession();
   const [seats, setSeats] = useState(1);
-  const [stopIndex, setStopIndex] = useState(0);
-  const [customPoint, setCustomPoint] = useState("");
+  /* L'adresse exacte peut arriver de /ya (?punto=) : elle présélectionne
+     « Propongo mi punto » avec le texte déjà écrit — l'utilisateur qui a
+     tapé son PH une fois ne le retape jamais. */
+  const [stopIndex, setStopIndex] = useState(
+    initialPoint ? stops.length : 0,
+  );
+  const [customPoint, setCustomPoint] = useState(initialPoint);
   const [extraKm, setExtraKm] = useState(5);
   const [booked, setBooked] = useState(false);
   /* L'offre du passager : MOINS que l'aporte publié, jamais plus. Offrir

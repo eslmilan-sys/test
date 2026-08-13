@@ -17,6 +17,7 @@ import {
 } from "@/lib/trips";
 import { agedConsumption, findCar, rateFromConsumption } from "@/lib/cars";
 import { saveLastSearch, useLastSearch } from "@/lib/lastsearch";
+import { CityCombobox } from "@/components/ui/CityCombobox";
 
 /**
  * /ya — LA RECHERCHE EXPRESS, pour tout le monde.
@@ -117,6 +118,11 @@ function ExpressSearch() {
   const seats = seatsChoice ?? last?.seats ?? 1;
   const [when, setWhen] = useState<0 | 1>(0);
   const [savingRoutine, setSavingRoutine] = useState(false);
+  /* L'adresse EXACTE tapée (PH, mall, coin de rue) : la recherche se
+     fait par ville, mais le lieu voyage avec — il devient le point de
+     recogida proposé au conducteur, prérempli sur la page du viaje. */
+  const [exactFrom, setExactFrom] = useState("");
+  const [exactTo, setExactTo] = useState("");
 
   const valid = from !== to;
   const date = isoDate(when);
@@ -127,38 +133,55 @@ function ExpressSearch() {
   return (
     <>
       <div className="glass liquid rounded-[22px] p-4 [--glass-alpha:0.92] sm:p-5">
-        <div className="grid grid-cols-2 gap-2">
-          {(
-            [
-              ["Desde", from, setFromChoice, to],
-              ["Hacia", to, setToChoice, from],
-            ] as const
-          ).map(([label, value, set, other]) => (
-            <label key={label} className="block">
-              <span className="mb-1 block text-[11px] font-bold tracking-[0.11em] text-ink-500 uppercase">
-                {label}
-              </span>
-              <select
-                value={value}
-                onChange={(e) => {
-                  set(e.target.value);
-                  saveLastSearch({
-                    from: label === "Desde" ? e.target.value : from,
-                    to: label === "Hacia" ? e.target.value : to,
-                    seats,
-                  });
-                }}
-                className="w-full appearance-none rounded-[12px] border-[1.5px] border-ink-200 bg-white px-3 py-2.5 text-[15px] font-semibold focus:border-accent focus:outline-none"
-              >
-                {ALL_CITIES.map((c) => (
-                  <option key={c.slug} value={c.slug} disabled={c.slug === other}>
-                    {c.shortName}
-                  </option>
-                ))}
-              </select>
-            </label>
-          ))}
+        {/* Le VRAI chercheur — villes, lieux connus, adresses, PH via le
+            géocodeur : on tape SON point exact, la ville se résout toute
+            seule, et l'adresse suit jusqu'à la réservation. */}
+        <div className="rounded-[16px] border border-ink-200 bg-white">
+          <CityCombobox
+            id="ya-desde"
+            label="Desde"
+            value={from}
+            exclude={to}
+            tone="origin"
+            onChange={(slug) => {
+              setFromChoice(slug);
+              saveLastSearch({ from: slug, to, seats });
+            }}
+            onPlace={(place) => setExactFrom(place)}
+          />
+          <div className="border-t border-ink-200">
+            <CityCombobox
+              id="ya-hacia"
+              label="Hacia"
+              value={to}
+              exclude={from}
+              tone="destination"
+              onChange={(slug) => {
+                setToChoice(slug);
+                saveLastSearch({ from, to: slug, seats });
+              }}
+              onPlace={(place) => setExactTo(place)}
+            />
+          </div>
         </div>
+        {(exactFrom || exactTo) && (
+          <p className="tnum mt-2 px-1 text-[12.5px] leading-snug text-ink-500">
+            {exactFrom && (
+              <>
+                Te recogen por{" "}
+                <b className="font-semibold text-ink-900">«{exactFrom}»</b>
+                {" — se lo proponemos al conductor."}
+              </>
+            )}
+            {exactFrom && exactTo && " "}
+            {exactTo && (
+              <>
+                Llegas por{" "}
+                <b className="font-semibold text-ink-900">«{exactTo}»</b>.
+              </>
+            )}
+          </p>
+        )}
 
         <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
           {([0, 1] as const).map((offset) => (
@@ -204,7 +227,13 @@ function ExpressSearch() {
       <div className="mt-4">
         {matches.length > 0 ? (
           <>
-            <ExpressCard match={matches[0]} date={date} seats={seats} hero />
+            <ExpressCard
+              match={matches[0]}
+              date={date}
+              seats={seats}
+              punto={exactFrom}
+              hero
+            />
             {matches.length > 1 && (
               <div className="mt-3 grid gap-2">
                 {matches.slice(1, 4).map((m) => (
@@ -213,6 +242,7 @@ function ExpressSearch() {
                     match={m}
                     date={date}
                     seats={seats}
+                    punto={exactFrom}
                   />
                 ))}
               </div>
@@ -495,15 +525,20 @@ function ExpressCard({
   match,
   date,
   seats = 1,
+  punto = "",
   hero = false,
 }: {
   match: TripMatch;
   date: string;
   seats?: number;
+  /** L'adresse exacte tapée : préremplit « Propongo mi punto ». */
+  punto?: string;
   hero?: boolean;
 }) {
   const { trip, segment, priceCents, seatsFree, boardingAt } = match;
-  const href = `/viaje/${trip.id}?desde=${segment.from.citySlug}&hacia=${segment.to.citySlug}`;
+  const href =
+    `/viaje/${trip.id}?desde=${segment.from.citySlug}&hacia=${segment.to.citySlug}` +
+    (punto ? `&punto=${encodeURIComponent(punto)}` : "");
 
   if (!hero) {
     return (

@@ -170,6 +170,7 @@ export function TripDetail({
            même mal que le formulaire de publication. */
         key={`${trip.id}-${segment.fromIndex}-${segment.toIndex}`}
         tripId={trip.id}
+        initialPoint={params.get("punto") ?? ""}
         driverName={trip.driver.firstName}
         priceCents={match.priceCents}
         seatsLeft={match.seatsFree}

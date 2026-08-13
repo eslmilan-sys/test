@@ -40,6 +40,10 @@ type Props = {
   /** Ville à exclure — on ne va pas d'une ville à elle-même. */
   exclude?: string;
   tone?: "origin" | "destination";
+  /** Le LIEU précis choisi (PH, mall, adresse) en plus de sa ville — ou
+   *  "" quand une ville nue est choisie. C'est ce qui permet à /ya de
+   *  porter l'adresse exacte jusqu'au point de recogida proposé. */
+  onPlace?: (place: string, citySlug: string) => void;
 };
 
 export function CityCombobox({
@@ -49,6 +53,7 @@ export function CityCombobox({
   onChange,
   exclude,
   tone = "origin",
+  onPlace,
 }: Props) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -153,6 +158,7 @@ export function CityCombobox({
       return;
     }
     onChange(city.slug);
+    onPlace?.(r.name, city.slug);
     setOpen(false);
   };
 
@@ -204,9 +210,11 @@ export function CityCombobox({
                 e.preventDefault();
                 if (results[0]) {
                   onChange(results[0].slug);
+                  onPlace?.("", results[0].slug);
                   setOpen(false);
                 } else if (placeResults[0]) {
                   onChange(placeResults[0].citySlug);
+                  onPlace?.(placeResults[0].name, placeResults[0].citySlug);
                   setOpen(false);
                 } else if (remoteResults[0]) {
                   void pickRemote(remoteResults[0]);
@@ -244,6 +252,7 @@ export function CityCombobox({
                 onMouseDown={(e) => e.preventDefault()}
                 onSelect={() => {
                   onChange(city.slug);
+                  onPlace?.("", city.slug);
                   setOpen(false);
                 }}
                 className="flex cursor-pointer items-baseline justify-between gap-3 rounded-[10px] px-3 py-2.5 text-[15px] data-[selected=true]:bg-ink-50"
@@ -265,6 +274,7 @@ export function CityCombobox({
                   onMouseDown={(e) => e.preventDefault()}
                   onSelect={() => {
                     onChange(place.citySlug);
+                    onPlace?.(place.name, place.citySlug);
                     setOpen(false);
                   }}
                   className="flex cursor-pointer items-baseline justify-between gap-3 rounded-[10px] px-3 py-2.5 text-[15px] data-[selected=true]:bg-ink-50"
