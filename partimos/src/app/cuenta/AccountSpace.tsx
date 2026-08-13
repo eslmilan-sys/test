@@ -6,7 +6,7 @@ import { Container } from "@/components/site/Section";
 import { Icon, type IconName } from "@/components/ui/Icon";
 import { ButtonLink } from "@/components/ui/Button";
 import { AuthDialog } from "@/components/site/AuthDialog";
-import { carsOf, useSession, type SavedCar } from "@/lib/session";
+import { carsOf, useSession, type PublishedTrip, type SavedCar } from "@/lib/session";
 import {
   getVerificationState,
   isSupabaseConfigured,
@@ -17,6 +17,7 @@ import { connectLinkedIn, hasLinkedIn } from "@/lib/linkedin";
 import { PayChannelPicker } from "@/components/ui/PayChannelPicker";
 import { ALL_CITIES, buildRoute } from "@/lib/corridors";
 import { computePriceCap, formatUsd } from "@/lib/pricing";
+import { formatDayLabel } from "@/lib/trips";
 import {
   CAR_MAKES,
   CAR_YEARS,
@@ -147,19 +148,23 @@ export function AccountSpace() {
         {tab === "viajes" && (
           <>
             <RutinaCard />
-            <Empty
-              icon="route"
-              title="Todavía no tienes viajes"
-              body="Cuando reserves un puesto o publiques un viaje, aparecen aquí con la hora, el punto de recogida y el número de la otra persona."
-              actions={
-                <>
-                  <ButtonLink href="/buscar">Buscar un viaje</ButtonLink>
-                  <ButtonLink href="/publicar/nuevo" variant="secondary">
-                    Publicar un viaje
-                  </ButtonLink>
-                </>
-              }
-            />
+            {(session.published?.length ?? 0) > 0 ? (
+              <PublishedList published={session.published!} />
+            ) : (
+              <Empty
+                icon="route"
+                title="Todavía no tienes viajes"
+                body="Cuando reserves un puesto o publiques un viaje, aparecen aquí con la hora, el punto de recogida y el número de la otra persona."
+                actions={
+                  <>
+                    <ButtonLink href="/buscar">Buscar un viaje</ButtonLink>
+                    <ButtonLink href="/publicar/nuevo" variant="secondary">
+                      Publicar un viaje
+                    </ButtonLink>
+                  </>
+                }
+              />
+            )}
           </>
         )}
 
@@ -501,6 +506,90 @@ async function shrinkPhoto(file: File): Promise<string> {
   canvas.height = Math.round(img.height * scale);
   canvas.getContext("2d")!.drawImage(img, 0, 0, canvas.width, canvas.height);
   return canvas.toDataURL("image/jpeg", 0.72);
+}
+
+/**
+ * LES VIAJES PUBLIÉS + LE COMPTEUR QUI S'EMPILE.
+ *
+ * Chaque publication ajoute sa ligne, et le bandeau du haut fait la
+ * somme du mois : un viaje récurrent pèse chaque occurrence (diario
+ * ×30, semanal ×4,3, mensual ×1). Le chiffre est un « hasta » — le
+ * prix demandé × puestos offerts, s'ils se llenan — jamais une
+ * promesse : c'est ce que le conducteur RÉCUPÈRE de ce qu'il allait
+ * dépenser (R5).
+ */
+const OCCURRENCES_PER_MONTH = {
+  "una-vez": 1,
+  diario: 30,
+  semanal: 4.3,
+  mensual: 1,
+} as const;
+
+const RECURRENCE_LABEL = {
+  "una-vez": "",
+  diario: "cada día",
+  semanal: "cada semana",
+  mensual: "cada mes",
+} as const;
+
+function PublishedList({ published }: { published: PublishedTrip[] }) {
+  const cityName = (slug: string) =>
+    ALL_CITIES.find((c) => c.slug === slug)?.shortName ?? slug;
+  const monthlyCents = published.reduce(
+    (sum, p) =>
+      sum + p.priceCents * p.seats * OCCURRENCES_PER_MONTH[p.recurrence],
+    0,
+  );
+
+  return (
+    <div>
+      <div className="mb-4 rounded-[16px] bg-accent-soft px-5 py-4">
+        <p className="text-[12px] font-bold tracking-[0.12em] text-accent-ink uppercase">
+          Recuperas hasta
+        </p>
+        <p className="tnum font-display text-[32px] leading-tight font-extrabold tracking-[-0.03em] text-accent-ink">
+          {formatUsd(Math.round(monthlyCents), { compact: true })}
+          <span className="text-[15px] font-bold"> al mes</span>
+        </p>
+        <p className="text-[12.5px] leading-snug text-accent-ink/80">
+          De gasolina y peajes, con los puestos llenos al aporte que pediste.
+          Nunca más que eso: es reparto de costos, no un ingreso.
+        </p>
+      </div>
+      <ul className="grid gap-2.5">
+        {published.map((p, i) => (
+          <li
+            key={`${p.from}-${p.to}-${p.date}-${i}`}
+            className="flex flex-wrap items-center gap-x-4 gap-y-1 rounded-[14px] border border-ink-200 px-4 py-3"
+          >
+            <span className="min-w-0 flex-1">
+              <span className="block text-[15px] font-semibold">
+                {cityName(p.from)} → {cityName(p.to)}
+              </span>
+              <span className="tnum block text-[12.5px] text-ink-500">
+                {formatDayLabel(p.date)} · {p.hour} · {p.seats}{" "}
+                {p.seats === 1 ? "puesto" : "puestos"}
+                {p.recurrence !== "una-vez" &&
+                  ` · ${RECURRENCE_LABEL[p.recurrence]}`}
+              </span>
+            </span>
+            <span className="tnum font-display text-[16px] font-bold">
+              {formatUsd(p.priceCents)}
+            </span>
+          </li>
+        ))}
+      </ul>
+      <div className="mt-4 flex flex-wrap gap-3">
+        <ButtonLink href="/publicar/nuevo" variant="secondary">
+          Publicar otro viaje
+        </ButtonLink>
+      </div>
+      <p className="mt-3 text-[12.5px] leading-snug text-ink-500">
+        Modo demostración: estos viajes viven en tu navegador. Con la base
+        conectada, aquí verás también las reservas recibidas, viaje por viaje.
+      </p>
+    </div>
+  );
 }
 
 /**

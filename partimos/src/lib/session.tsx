@@ -72,6 +72,24 @@ export type Session = {
     days: number[];
     hour: string;
   } | null;
+  /** Le dernier viaje publié — la matière du bouton « repetir » : on ne
+   *  redemande jamais ce qu'on sait déjà. */
+  lastPublish?: PublishedTrip | null;
+  /** Tous les viajes publiés (démo : dans le navigateur). C'est sur eux
+   *  que le compteur « recuperas hasta » s'empile. */
+  published?: PublishedTrip[];
+};
+
+export type PublishedTrip = {
+  from: string;
+  to: string;
+  cityStops: string[];
+  pickups: string[];
+  date: string;
+  hour: string;
+  seats: number;
+  recurrence: "una-vez" | "diario" | "semanal" | "mensual";
+  priceCents: number;
 };
 
 /** La liste des carros, quel que soit l'âge de la session. */

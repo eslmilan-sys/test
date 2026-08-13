@@ -1,8 +1,10 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ALL_CITIES, buildRoute, CORRIDORS } from "@/lib/corridors";
+import { useSession } from "@/lib/session";
 import { Button } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
 import { CityCombobox } from "@/components/ui/CityCombobox";
@@ -40,6 +42,7 @@ const FIELD_INPUT =
 
 export function SearchCard() {
   const router = useRouter();
+  const { session } = useSession();
   const days = useMemo(() => nextDays(), []);
 
   const [mode, setMode] = useState<"buscar" | "ofrecer">("buscar");
@@ -94,9 +97,30 @@ export function SearchCard() {
 
   const fromCity = ALL_CITIES.find((c) => c.slug === from);
   const toCity = ALL_CITIES.find((c) => c.slug === to);
+  const routine = session?.routine ?? null;
 
   return (
     <div className="glass liquid rounded-[22px] p-2.5 shadow-float [--glass-alpha:0.82]">
+      {/* La voie express, pour qui a une rutina : la carte de recherche
+          reste, mais le raccourci passe devant — c'est lui qui réduit le
+          temps-jusqu'au-viaje à deux taps. */}
+      {routine && (
+        <Link
+          href="/ya"
+          className="mx-3 mt-2.5 flex items-center gap-2.5 rounded-[13px] bg-ink-900 px-4 py-3 text-white transition-colors hover:bg-ink-800"
+        >
+          <Icon name="route" className="size-4.5 shrink-0" />
+          <span className="min-w-0 flex-1 text-[14px] font-semibold">
+            Tu rutina:{" "}
+            {ALL_CITIES.find((c) => c.slug === routine.from)?.shortName} →{" "}
+            {ALL_CITIES.find((c) => c.slug === routine.to)?.shortName}
+            <span className="block text-[12px] font-normal text-white/70">
+              Tu próximo puesto ya está buscado
+            </span>
+          </span>
+          <Icon name="arrowRight" className="size-4 shrink-0" />
+        </Link>
+      )}
       <div className="px-3 pt-2.5 pb-2">
         <div
           role="group"

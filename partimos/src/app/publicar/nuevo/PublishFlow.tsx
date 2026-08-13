@@ -272,6 +272,44 @@ export function PublishFlow() {
         <div className="glass liquid rounded-[22px] p-5 sm:p-6 [--glass-alpha:0.88]">
           {step === 0 && (
             <>
+              {/* LE raccourci : republier son dernier viaje sans rien
+                  resaisir — route, paradas, recogidas, hora, puestos et
+                  récurrence reviennent ; seule la DATE reste à choisir
+                  (l'étape où l'on atterrit). L'aporte se recalcule au
+                  tope du moment — jamais copié aveuglément. */}
+              {!preset && session?.lastPublish && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    const last = session.lastPublish!;
+                    setFrom(last.from);
+                    setTo(last.to);
+                    setCityStops(last.cityStops);
+                    setStops(last.pickups);
+                    setHour(last.hour);
+                    setSeats(last.seats);
+                    setRecurrence(last.recurrence);
+                    setPriceCents(null);
+                    setStep(2);
+                  }}
+                  className="mb-5 flex w-full items-center gap-3 rounded-[14px] bg-ink-900 px-4 py-3.5 text-left text-white transition-colors hover:bg-ink-800"
+                >
+                  <Icon name="route" className="size-5 shrink-0" />
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-[15px] font-semibold">
+                      Repetir mi último viaje
+                    </span>
+                    <span className="tnum block text-[12.5px] text-white/70">
+                      {ALL_CITIES.find((c) => c.slug === session.lastPublish!.from)?.shortName}{" "}
+                      → {ALL_CITIES.find((c) => c.slug === session.lastPublish!.to)?.shortName}{" "}
+                      · {session.lastPublish.hour} · {session.lastPublish.seats}{" "}
+                      {session.lastPublish.seats === 1 ? "puesto" : "puestos"} —
+                      solo eliges la fecha
+                    </span>
+                  </span>
+                  <Icon name="arrowRight" className="size-4 shrink-0" />
+                </button>
+              )}
               <h1 className="mb-1.5 font-display text-[24px] font-extrabold tracking-[-0.03em]">
                 ¿Por dónde vas?
               </h1>
@@ -1023,9 +1061,25 @@ export function PublishFlow() {
               <Button
                 className="ml-auto"
                 onClick={() => {
-                  // Le choix de cobro devient le réglage du compte : la
-                  // prochaine publication part de là.
-                  updateSession({ acceptsOutside });
+                  /* Le choix de cobro devient le réglage du compte, et le
+                     viaje entier devient la matière du « repetir » : la
+                     prochaine publication ne redemande rien. */
+                  const snapshot = {
+                    from,
+                    to,
+                    cityStops,
+                    pickups: stops,
+                    date,
+                    hour,
+                    seats,
+                    recurrence,
+                    priceCents: price,
+                  };
+                  updateSession({
+                    acceptsOutside,
+                    lastPublish: snapshot,
+                    published: [...(session?.published ?? []), snapshot],
+                  });
                   setPublished(true);
                 }}
               >
