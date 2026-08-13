@@ -53,7 +53,7 @@ const STORIES: Story[] = [
     eyebrow: "La ciudad",
     title: "Salir de la ciudad sin dar vueltas",
     body: "Costa del Este, Albrook, Vía Centenario. Los conductores ya pasan por ahí: te montas de camino, no al otro lado de la ciudad.",
-    href: "/viajes",
+    href: "/ya",
     photo: "panamaCity",
     tone: "photo",
   },

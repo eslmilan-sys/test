@@ -12,6 +12,7 @@ import { PlacePicker } from "@/components/ui/PlacePicker";
 import { AuthDialog } from "@/components/site/AuthDialog";
 import { carsOf, useSession } from "@/lib/session";
 import { ALL_CITIES, buildRoute, getCorridor } from "@/lib/corridors";
+import { saveLastSearch, useLastSearch } from "@/lib/lastsearch";
 import {
   computePriceCap,
   formatUsd,
@@ -85,8 +86,18 @@ export function PublishFlow() {
   /* Route déjà choisie ? On ne la redemande pas : l'étape Ruta est
      sautée, « Atrás » y ramène si besoin. */
   const [step, setStep] = useState(preset ? 1 : 0);
-  const [from, setFrom] = useState(preset?.origin.slug ?? "panama-city");
-  const [to, setTo] = useState(preset?.destination.slug ?? "chitre");
+  /* Sans preset d'URL, le formulaire s'ouvre sur la DERNIÈRE recherche
+     faite ailleurs (accueil, /ya) : on ne redemande jamais ce que le
+     site sait déjà. Valeurs dérivées, jamais copiées. */
+  const last = useLastSearch();
+  const [fromChoice, setFromChoice] = useState<string | null>(
+    preset ? preset.origin.slug : null,
+  );
+  const [toChoice, setToChoice] = useState<string | null>(
+    preset ? preset.destination.slug : null,
+  );
+  const from = fromChoice ?? last?.from ?? "panama-city";
+  const to = toChoice ?? last?.to ?? "chitre";
   const [picking, setPicking] = useState<"origin" | "destination">("origin");
   const [stops, setStops] = useState<string[]>([]);
   const [exactFrom, setExactFrom] = useState("");
@@ -295,8 +306,8 @@ export function PublishFlow() {
                   type="button"
                   onClick={() => {
                     const last = session.lastPublish!;
-                    setFrom(last.from);
-                    setTo(last.to);
+                    setFromChoice(last.from);
+                    setToChoice(last.to);
                     setCityStops(last.cityStops);
                     setStops(last.pickups);
                     setHour(last.hour);
@@ -344,8 +355,8 @@ export function PublishFlow() {
                   exclude={to}
                   tone="origin"
                   onChange={(slug) => {
-                    setFrom(slug);
-                    if (slug === to) setTo("");
+                    setFromChoice(slug);
+                    if (slug === to) setToChoice("");
                     setStops([]);
                     setCityStops([]);
                   }}
@@ -354,8 +365,8 @@ export function PublishFlow() {
                   type="button"
                   aria-label="Invertir salida y destino"
                   onClick={() => {
-                    setFrom(to);
-                    setTo(from);
+                    setFromChoice(to);
+                    setToChoice(from);
                     setStops([]);
                     setCityStops([]);
                   }}
@@ -371,7 +382,7 @@ export function PublishFlow() {
                     exclude={from}
                     tone="destination"
                     onChange={(slug) => {
-                      setTo(slug);
+                      setToChoice(slug);
                       setStops([]);
                       setCityStops([]);
                     }}
@@ -387,11 +398,11 @@ export function PublishFlow() {
                   picking={picking}
                   onPick={(slug) => {
                     if (picking === "origin") {
-                      setFrom(slug);
-                      if (slug === to) setTo("");
+                      setFromChoice(slug);
+                      if (slug === to) setToChoice("");
                       setPicking("destination");
                     } else {
-                      setTo(slug);
+                      setToChoice(slug);
                       setPicking("origin");
                     }
                     setStops([]);
@@ -436,12 +447,24 @@ export function PublishFlow() {
                   ou pas. Catalogue local + géocodeur Mapbox, saisie libre
                   toujours valable. */}
               <section className="mb-6 grid gap-3 sm:grid-cols-2">
+                {/* Le point exact PILOTE la ruta : écrire un lieu d'une
+                    autre ville desservie déplace l'origine ou la
+                    destination — et les paradas, la carte et le tope
+                    suivent à la seconde. C'était LE bug ressenti trois
+                    fois : « je change ma destination et rien ne bouge ». */}
                 <PlacePicker
                   id="pub-salida-exacta"
                   label={`Sales exactamente de… (${corridor.origin.shortName})`}
                   citySlug={corridor.origin.slug}
                   value={exactFrom}
                   onChange={setExactFrom}
+                  onCityResolved={(slug) => {
+                    if (slug !== to) {
+                      setFromChoice(slug);
+                      setStops([]);
+                      setCityStops([]);
+                    }
+                  }}
                   placeholder="Ej. Multiplaza, Parque Omar…"
                 />
                 <PlacePicker
@@ -450,6 +473,13 @@ export function PublishFlow() {
                   citySlug={corridor.destination.slug}
                   value={exactTo}
                   onChange={setExactTo}
+                  onCityResolved={(slug) => {
+                    if (slug !== from) {
+                      setToChoice(slug);
+                      setStops([]);
+                      setCityStops([]);
+                    }
+                  }}
                   placeholder="Ej. el parque central, tu barriada…"
                 />
               </section>
@@ -1066,7 +1096,11 @@ export function PublishFlow() {
               <Button
                 className="ml-auto"
                 disabled={!canGoNext}
-                onClick={() => setStep((s) => s + 1)}
+                onClick={() => {
+                  if (step === 0 && corridor)
+                    saveLastSearch({ from, to });
+                  setStep((s) => s + 1);
+                }}
               >
                 Continuar
               </Button>

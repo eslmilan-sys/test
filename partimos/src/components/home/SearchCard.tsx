@@ -3,14 +3,14 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ALL_CITIES, buildRoute, CORRIDORS } from "@/lib/corridors";
+import { ALL_CITIES, buildRoute } from "@/lib/corridors";
 import { useSession } from "@/lib/session";
 import { Button } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
 import { CityCombobox } from "@/components/ui/CityCombobox";
 import { RouteMap } from "@/components/map/RouteMap";
-import { AvisameForm } from "@/components/AvisameForm";
 import { SEARCH_HORIZON_DAYS } from "@/lib/trips";
+import { saveLastSearch, useLastSearch } from "@/lib/lastsearch";
 
 /** L'horizon de recherche, libellé en espagnol du Panama. */
 function nextDays(count = SEARCH_HORIZON_DAYS) {
@@ -46,11 +46,18 @@ export function SearchCard() {
   const days = useMemo(() => nextDays(), []);
 
   const [mode, setMode] = useState<"buscar" | "ofrecer">("buscar");
-  const [from, setFrom] = useState("panama-city");
-  const [to, setTo] = useState("chitre");
+  /* La mémoire courte du site : tant que l'utilisateur n'a pas touché un
+     champ, il montre sa DERNIÈRE recherche — l'accueil, /ya et la
+     publication racontent la même histoire. Valeur dérivée, jamais
+     copiée : pas d'état rance possible. */
+  const last = useLastSearch();
+  const [fromChoice, setFromChoice] = useState<string | null>(null);
+  const [toChoice, setToChoice] = useState<string | null>(null);
+  const [seatsChoice, setSeatsChoice] = useState<number | null>(null);
+  const from = fromChoice ?? last?.from ?? "panama-city";
+  const to = toChoice ?? last?.to ?? "chitre";
+  const seats = seatsChoice ?? last?.seats ?? 1;
   const [date, setDate] = useState(days[0].value);
-  const [seats, setSeats] = useState(1);
-  const [noRoute, setNoRoute] = useState(false);
   const [showMap, setShowMap] = useState(false);
   // Sur la carte, le premier clic renseigne l'origine, le suivant la
   // destination. Alterner évite un sélecteur « je choisis quoi » de plus.
@@ -59,13 +66,12 @@ export function SearchCard() {
   const sameCity = from === to;
 
   function pickOnMap(slug: string) {
-    setNoRoute(false);
     if (picking === "origin") {
-      setFrom(slug);
-      if (slug === to) setTo("");
+      setFromChoice(slug);
+      if (slug === to) setToChoice("");
       setPicking("destination");
     } else {
-      setTo(slug);
+      setToChoice(slug);
       setPicking("origin");
     }
   }
@@ -73,30 +79,22 @@ export function SearchCard() {
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
     if (sameCity || !from || !to) return;
+    saveLastSearch({ from, to, seats, date });
 
     if (mode === "ofrecer") {
       router.push(`/publicar/nuevo?desde=${from}&hacia=${to}`);
       return;
     }
 
-    const corridor = CORRIDORS.find(
-      (c) => c.origin.slug === from && c.destination.slug === to,
+    /* TOUTE paire de villes se cherche : la ruta s'arme sur le réseau
+       routier (buildRoute), et la page de résultats sait dire « rien
+       pour cette date » avec l'alerte. L'ancien barrage « esa ruta no
+       está abierta » datait des corridors fermés — supprimé. */
+    router.push(
+      `/buscar?desde=${from}&hacia=${to}&fecha=${date}&puestos=${seats}`,
     );
-
-    if (corridor) {
-      router.push(
-        `/buscar?desde=${from}&hacia=${to}&fecha=${date}&puestos=${seats}`,
-      );
-      return;
-    }
-
-    // Aucun corridor ouvert : la recherche infructueuse est le signal le plus
-    // utile du produit. On ne renvoie pas une page vide, on collecte.
-    setNoRoute(true);
   }
 
-  const fromCity = ALL_CITIES.find((c) => c.slug === from);
-  const toCity = ALL_CITIES.find((c) => c.slug === to);
   const routine = session?.routine ?? null;
 
   return (
@@ -187,10 +185,7 @@ export function SearchCard() {
           value={from}
           exclude={to}
           tone="origin"
-          onChange={(slug) => {
-            setFrom(slug);
-            setNoRoute(false);
-          }}
+          onChange={(slug) => setFromChoice(slug)}
         />
 
         <div className="border-t border-ink-200">
@@ -200,10 +195,7 @@ export function SearchCard() {
             value={to}
             exclude={from}
             tone="destination"
-            onChange={(slug) => {
-              setTo(slug);
-              setNoRoute(false);
-            }}
+            onChange={(slug) => setToChoice(slug)}
           />
         </div>
 
@@ -240,7 +232,7 @@ export function SearchCard() {
               <select
                 id="puestos"
                 value={seats}
-                onChange={(e) => setSeats(Number(e.target.value))}
+                onChange={(e) => setSeatsChoice(Number(e.target.value))}
                 className={FIELD_INPUT}
               >
                 {[1, 2, 3, 4].map((n) => (
@@ -294,23 +286,6 @@ export function SearchCard() {
         </p>
       </form>
 
-      {noRoute && fromCity && toCity && (
-        <div className="border-t border-ink-200 px-3.5 pt-4 pb-2">
-          <p className="mb-3 text-[14.5px] leading-relaxed text-ink-500">
-            Todavía no tenemos viajes publicados entre{" "}
-            <b className="text-ink-900">{fromCity.shortName}</b> y{" "}
-            <b className="text-ink-900">{toCity.shortName}</b>. Déjanos tu
-            número y te escribimos apenas alguien salga para allá.
-          </p>
-          <AvisameForm
-            originSlug={from}
-            destinationSlug={to}
-            requestedDate={date}
-            seats={seats}
-            source="home-search"
-          />
-        </div>
-      )}
     </div>
   );
 }

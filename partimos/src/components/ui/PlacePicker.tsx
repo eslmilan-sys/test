@@ -3,9 +3,11 @@
 import { useEffect, useRef, useState } from "react";
 import { Command } from "cmdk";
 import { Icon } from "@/components/ui/Icon";
-import { placesForCity, KIND_LABELS } from "@/lib/places";
+import { placesForCity, searchPlaces, KIND_LABELS } from "@/lib/places";
 import { searchEverywhere, GEOSEARCH_ENABLED, type FoundPlace } from "@/lib/geosearch";
 import { ALL_CITIES } from "@/lib/corridors";
+import { nearestCity } from "@/lib/places";
+import { retrievePlace } from "@/lib/mapbox";
 
 /**
  * SÉLECTEUR DE LIEU EXACT — « ¿dónde exactamente? »
@@ -29,6 +31,7 @@ export function PlacePicker({
   citySlug,
   value,
   onChange,
+  onCityResolved,
   placeholder = "Escribe el lugar…",
 }: {
   id: string;
@@ -36,6 +39,11 @@ export function PlacePicker({
   citySlug: string;
   value: string;
   onChange: (place: string) => void;
+  /** Le lieu choisi appartient à une AUTRE ville desservie : l'appelant
+   *  peut déplacer la ruta. C'est ce qui fait qu'écrire « Coronado
+   *  Escapes » dans le point exact CHANGE la destination — et donc les
+   *  paradas, la carte, le tope. */
+  onCityResolved?: (citySlug: string) => void;
   placeholder?: string;
 }) {
   const [open, setOpen] = useState(false);
@@ -83,9 +91,36 @@ export function PlacePicker({
 
   const remoteShown = query.trim().length >= 3 ? remote : [];
 
+  /* Les lieux connus des AUTRES villes desservies : « El Rey de
+     Coronado » tapé depuis un trajet vers Chitré doit sortir, avec sa
+     ville — le choisir déplace la ruta (onCityResolved), catalogue
+     local, zéro réseau. */
+  const elsewhere =
+    onCityResolved && query.trim().length >= 3
+      ? searchPlaces(query)
+          .filter((p) => p.citySlug !== citySlug)
+          .slice(0, 3)
+      : [];
+
   const pick = (place: string) => {
     onChange(place);
     setOpen(false);
+  };
+
+  /* Un lieu du géocodeur : ses coordonnées disent SA ville. Si elle n'est
+     pas celle du champ, on prévient l'appelant — la ruta suit le lieu. */
+  const pickRemote = async (r: FoundPlace) => {
+    const coords =
+      r.lat !== 0 || r.lng !== 0
+        ? { lat: r.lat, lng: r.lng }
+        : r.mapboxId
+          ? await retrievePlace(r.mapboxId)
+          : null;
+    if (coords && onCityResolved) {
+      const cityOfPlace = nearestCity(coords.lat, coords.lng, ALL_CITIES);
+      if (cityOfPlace.slug !== citySlug) onCityResolved(cityOfPlace.slug);
+    }
+    pick(r.name);
   };
 
   return (
@@ -121,6 +156,17 @@ export function PlacePicker({
           onBlur={() => window.setTimeout(() => setOpen(false), 120)}
           onKeyDown={(e) => {
             if (e.key === "Escape") setOpen(false);
+            /* La touche « intro » du clavier du téléphone valide le
+               premier résultat — même remède que le sélecteur de villes. */
+            if (e.key === "Enter" && open) {
+              e.preventDefault();
+              if (local[0]) pick(local[0].name);
+              else if (elsewhere[0]) {
+                onCityResolved?.(elsewhere[0].citySlug);
+                pick(elsewhere[0].name);
+              } else if (remoteShown[0]) void pickRemote(remoteShown[0]);
+              else if (query.trim()) pick(query.trim());
+            }
           }}
           className="w-full border-none bg-transparent text-[14.5px] font-semibold placeholder:font-normal placeholder:text-ink-400 focus:outline-none"
         />
@@ -147,6 +193,26 @@ export function PlacePicker({
                 </span>
               </Command.Item>
             ))}
+            {elsewhere.map((p) => {
+              const placeCity = ALL_CITIES.find((c) => c.slug === p.citySlug);
+              return (
+                <Command.Item
+                  key={`otra-${p.citySlug}-${p.name}`}
+                  value={`otra-${p.citySlug}-${p.name}`}
+                  onMouseDown={(e) => e.preventDefault()}
+                  onSelect={() => {
+                    onCityResolved?.(p.citySlug);
+                    pick(p.name);
+                  }}
+                  className="flex cursor-pointer items-baseline justify-between gap-3 rounded-[10px] px-3 py-2.5 text-[14.5px] data-[selected=true]:bg-ink-50"
+                >
+                  <span className="font-semibold">{p.name}</span>
+                  <span className="shrink-0 text-[12.5px] font-semibold text-accent-ink">
+                    → {placeCity?.shortName ?? p.citySlug}
+                  </span>
+                </Command.Item>
+              );
+            })}
             {remoteShown
               .filter((r) => !local.some((l) => l.name === r.name))
               .map((r) => (
@@ -154,7 +220,7 @@ export function PlacePicker({
                   key={`geo-${r.name}-${r.context}`}
                   value={`geo-${r.name}-${r.context}`}
                   onMouseDown={(e) => e.preventDefault()}
-                  onSelect={() => pick(r.name)}
+                  onSelect={() => void pickRemote(r)}
                   className="flex cursor-pointer items-baseline justify-between gap-3 rounded-[10px] px-3 py-2.5 text-[14.5px] data-[selected=true]:bg-ink-50"
                 >
                   <span className="font-semibold">{r.name}</span>

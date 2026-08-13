@@ -28,7 +28,6 @@ const DEST = new URL(
 const PAGES = [
   "/",
   "/buscar/",
-  "/viajes/",
   "/viajes/panama-chitre/",
   "/viajes/panama-las-tablas/",
   "/viajes/panama-coronado/",

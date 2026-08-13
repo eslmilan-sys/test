@@ -61,10 +61,10 @@ export function Rutas() {
       </div>
 
       <Link
-        href="/viajes"
+        href="/ya"
         className="mt-6 inline-flex items-center gap-2 font-semibold text-accent-ink hover:underline"
       >
-        Ver todas las rutas
+        Buscar mi viaje
         <Icon name="arrowRight" className="size-4.5" />
       </Link>
     </Section>

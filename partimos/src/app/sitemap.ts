@@ -17,7 +17,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   const pages: MetadataRoute.Sitemap = [
     { url: canonical("/"), changeFrequency: "daily", priority: 1 },
-    { url: canonical("/viajes"), changeFrequency: "daily", priority: 0.9 },
     {
       url: canonical("/como-funciona"),
       changeFrequency: "monthly",

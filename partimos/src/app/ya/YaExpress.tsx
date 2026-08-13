@@ -16,6 +16,7 @@ import {
   type TripMatch,
 } from "@/lib/trips";
 import { agedConsumption, findCar, rateFromConsumption } from "@/lib/cars";
+import { saveLastSearch, useLastSearch } from "@/lib/lastsearch";
 
 /**
  * /ya — LA RECHERCHE EXPRESS, pour tout le monde.
@@ -105,10 +106,16 @@ export function YaExpress() {
 
 function ExpressSearch() {
   const { session, updateSession } = useSession();
-  const [from, setFrom] = useState("panama-city");
-  const [to, setTo] = useState("chitre");
+  /* La mémoire courte : la page s'ouvre sur la DERNIÈRE recherche faite
+     n'importe où sur le site — dérivée, jamais copiée. */
+  const last = useLastSearch();
+  const [fromChoice, setFromChoice] = useState<string | null>(null);
+  const [toChoice, setToChoice] = useState<string | null>(null);
+  const [seatsChoice, setSeatsChoice] = useState<number | null>(null);
+  const from = fromChoice ?? last?.from ?? "panama-city";
+  const to = toChoice ?? last?.to ?? "chitre";
+  const seats = seatsChoice ?? last?.seats ?? 1;
   const [when, setWhen] = useState<0 | 1>(0);
-  const [seats, setSeats] = useState(1);
   const [savingRoutine, setSavingRoutine] = useState(false);
 
   const valid = from !== to;
@@ -123,8 +130,8 @@ function ExpressSearch() {
         <div className="grid grid-cols-2 gap-2">
           {(
             [
-              ["Desde", from, setFrom, to],
-              ["Hacia", to, setTo, from],
+              ["Desde", from, setFromChoice, to],
+              ["Hacia", to, setToChoice, from],
             ] as const
           ).map(([label, value, set, other]) => (
             <label key={label} className="block">
@@ -133,7 +140,14 @@ function ExpressSearch() {
               </span>
               <select
                 value={value}
-                onChange={(e) => set(e.target.value)}
+                onChange={(e) => {
+                  set(e.target.value);
+                  saveLastSearch({
+                    from: label === "Desde" ? e.target.value : from,
+                    to: label === "Hacia" ? e.target.value : to,
+                    seats,
+                  });
+                }}
                 className="w-full appearance-none rounded-[12px] border-[1.5px] border-ink-200 bg-white px-3 py-2.5 text-[15px] font-semibold focus:border-accent focus:outline-none"
               >
                 {ALL_CITIES.map((c) => (
@@ -163,13 +177,17 @@ function ExpressSearch() {
             </button>
           ))}
           <span aria-hidden className="mx-1 h-5 w-px bg-ink-200" />
+          <Icon name="users" aria-hidden className="size-4 text-ink-400" />
           {[1, 2, 3, 4].map((n) => (
             <button
               key={n}
               type="button"
               aria-pressed={seats === n}
               aria-label={`${n} ${n === 1 ? "persona" : "personas"}`}
-              onClick={() => setSeats(n)}
+              onClick={() => {
+                setSeatsChoice(n);
+                saveLastSearch({ from, to, seats: n });
+              }}
               className={`flex size-9 items-center justify-center rounded-full border-[1.5px] text-[13.5px] font-bold transition-colors ${
                 seats === n
                   ? "border-ink-900 bg-ink-900 text-white"
@@ -179,9 +197,6 @@ function ExpressSearch() {
               {n}
             </button>
           ))}
-          <span className="text-[12px] text-ink-500">
-            {seats === 1 ? "persona" : "personas"}
-          </span>
         </div>
       </div>
 

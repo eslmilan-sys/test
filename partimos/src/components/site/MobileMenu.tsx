@@ -50,13 +50,21 @@ export function MobileMenu() {
             </Dialog.Close>
           </div>
 
+          {/* Une ligne = un lien, rien d'autre. Les sous-titres
+              expliquaient chaque page ET noyaient toutes les pages :
+              un menu se scanne, il ne se lit pas. La hiérarchie tient
+              en deux niveaux typographiques — l'étiquette de groupe en
+              petites capitales grises, le lien en un seul corps. */}
           <nav
             aria-label="Todas las páginas"
-            className="flex-1 overflow-y-auto px-5 py-5"
+            className="flex-1 overflow-y-auto px-4 py-4"
           >
             {NAV_SECTIONS.map((section) => (
-              <div key={section.title} className="mb-6 last:mb-0">
-                <h3 className="mb-2 text-[11.5px] font-bold tracking-[0.14em] text-ink-500 uppercase">
+              <div
+                key={section.title}
+                className="mb-2 border-b border-ink-200/60 pb-2 last:mb-0 last:border-0 last:pb-0"
+              >
+                <h3 className="px-3 pt-2 pb-1.5 text-[11px] font-bold tracking-[0.16em] text-ink-400 uppercase">
                   {section.title}
                 </h3>
                 <ul>
@@ -65,20 +73,13 @@ export function MobileMenu() {
                       <Dialog.Close asChild>
                         <Link
                           href={link.href}
-                          className="flex items-start gap-3 rounded-[12px] px-2.5 py-2.5 transition-colors hover:bg-ink-50"
+                          className="flex items-center gap-3.5 rounded-[12px] px-3 py-3 text-[16px] font-semibold tracking-[-0.01em] transition-colors hover:bg-ink-50"
                         >
                           <Icon
                             name={link.icon}
-                            className="mt-0.5 size-5 shrink-0 text-ink-500"
+                            className="size-[19px] shrink-0 text-ink-400"
                           />
-                          <span>
-                            <span className="block font-display text-[15.5px] font-bold">
-                              {link.label}
-                            </span>
-                            <span className="block text-[13px] leading-snug text-ink-500">
-                              {link.hint}
-                            </span>
-                          </span>
+                          {link.label}
                         </Link>
                       </Dialog.Close>
                     </li>
@@ -89,7 +90,7 @@ export function MobileMenu() {
           </nav>
 
           <div className="flex flex-col gap-2.5 border-t border-ink-200 px-5 py-4">
-            <ButtonLink href="/#buscar" full>
+            <ButtonLink href="/ya" full>
               Buscar viaje
             </ButtonLink>
             <AuthDialog

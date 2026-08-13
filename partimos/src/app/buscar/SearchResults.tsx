@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { saveLastSearch } from "@/lib/lastsearch";
 import Link from "next/link";
 import { Container } from "@/components/site/Section";
 import { SearchSummary } from "@/components/search/SearchSummary";
@@ -45,6 +46,19 @@ export function SearchResults() {
     date: params.get("fecha") ?? today,
     seats: Number(params.get("puestos")) || 1,
   };
+
+  /* L'URL est la vérité de cette page : on la recopie dans la mémoire
+     courte pour que l'accueil, /ya et la publication s'ouvrent sur la
+     même ruta ensuite. */
+  useEffect(() => {
+    if (criteria.from !== criteria.to)
+      saveLastSearch({
+        from: criteria.from,
+        to: criteria.to,
+        seats: criteria.seats,
+        date: criteria.date,
+      });
+  }, [criteria.from, criteria.to, criteria.seats, criteria.date]);
 
   const [sort, setSort] = useState<SortKey>("hora");
   const [onlyWomen, setOnlyWomen] = useState(false);

@@ -115,7 +115,7 @@ export function Hero() {
             </div>
 
             <div className="para-cerca">
-              <p className="enter enter-2 max-w-[44ch] text-[17px] leading-[1.5] font-light text-ink-600 md:text-[19px]">
+              <p className="enter enter-2 max-w-[44ch] text-[16.5px] leading-[1.38] font-light text-ink-600 md:text-[18px]">
                 Partimos junta a quien maneja con quien va para el mismo lado —
                 de bajada al interior o de vuelta a la ciudad. Reservas sin
                 pagar nada y haces el camino sentado, con una sola parada: la

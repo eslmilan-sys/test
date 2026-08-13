@@ -25,23 +25,16 @@ export const NAV_SECTIONS: NavSection[] = [
   {
     title: "Viajar",
     links: [
+      /* UNE seule entrée de recherche (décision du propriétaire) : trois
+         portes pour le même geste, c'est deux de trop. /ya cherche, et
+         renvoie vers /buscar pour les autres dates. La page « Todas las
+         rutas » a été supprimée — les pages corridor restent pour le
+         SEO, liées depuis l'accueil et le pied de page. */
       {
         href: "/ya",
-        label: "Tu próximo viaje",
-        hint: "Tu rutina, ya buscada — dos taps y listo",
-        icon: "route",
-      },
-      {
-        href: "/buscar",
         label: "Buscar un viaje",
-        hint: "Quién sale hoy, a qué hora y por cuánto",
+        hint: "Quién ya va para allá — hoy o mañana",
         icon: "search",
-      },
-      {
-        href: "/viajes",
-        label: "Todas las rutas",
-        hint: "Ida y vuelta por todo el país, con aportes",
-        icon: "route",
       },
       {
         href: "/como-funciona",
@@ -111,10 +104,9 @@ export const NAV_SECTIONS: NavSection[] = [
   },
 ];
 
-/** Les quatre entrées visibles en permanence sur grand écran. */
+/** Les entrées visibles en permanence sur grand écran. */
 export const PRIMARY_LINKS = [
-  { href: "/buscar", label: "Buscar" },
-  { href: "/viajes", label: "Rutas" },
+  { href: "/ya", label: "Buscar" },
   { href: "/como-funciona", label: "Cómo se paga" },
   { href: "/seguridad", label: "Seguridad" },
 ];
