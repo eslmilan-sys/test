@@ -173,5 +173,6 @@ BEGIN
 EXCEPTION
   WHEN duplicate_object THEN NULL;   -- politiques déjà posées
   WHEN undefined_table THEN NULL;    -- environnement sans Storage (tests locaux)
+  WHEN insufficient_privilege THEN NULL; -- Storage géré depuis le panneau
 END
 $storage$;

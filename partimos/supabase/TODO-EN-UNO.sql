@@ -1,15 +1,16 @@
 -- PARTIMOS — TODA LA BASE, DE UNA VEZ
 --
 -- Pégalo entero en: panel de Supabase → SQL Editor → New query → Run.
--- Son las 15 migraciones en orden. Tarda unos segundos.
+-- Son las 15 migraciones en orden.
 --
--- Probado en las DOS situaciones antes de publicarlo:
---   · Postgres 16 + PostGIS limpio;
---   · una copia de las condiciones de Supabase — esquema auth ajeno y
---     bloqueado, extensiones en el esquema `extensions`, rol sin
---     privilegios de superusuario.
+-- SE PUEDE RELANZAR. Si se corta a la mitad, si ya se aplicó, si se
+-- pega dos veces: no pasa nada. Cada objeto se crea solo si falta.
 --
--- Generado el 2026-08-14 desde supabase/migrations/.
+-- Probado en las dos situaciones y DOS VECES seguidas: Postgres 16 +
+-- PostGIS limpio, y una copia de las condiciones de Supabase (esquema
+-- auth ajeno y bloqueado, extensiones en `extensions`).
+--
+-- Generado desde supabase/migrations/ por scripts/build-sql-unico.mjs.
 
 -- ═══════════════════════════════════════════════════════════
 -- 0001_schema.sql
@@ -55,7 +56,7 @@ BEGIN
     -- Les colonnes reprises de Supabase, y compris celles que les vues
     -- de métriques lisent (dernière connexion, méthode d'inscription) :
     -- une doublure qui ment sur sa forme ne sert à rien pour tester.
-    CREATE TABLE auth.users (
+    CREATE TABLE IF NOT EXISTS auth.users (
       id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
       email text,
       phone text,
@@ -79,7 +80,7 @@ BEGIN
     WHERE n.nspname = 'auth' AND p.proname = 'uid'
   ) THEN
     EXECUTE $f$
-      CREATE FUNCTION auth.uid() RETURNS uuid LANGUAGE sql STABLE AS
+      CREATE OR REPLACE FUNCTION auth.uid() RETURNS uuid LANGUAGE sql STABLE AS
       'SELECT NULLIF(current_setting(''request.jwt.claim.sub'', true), '''')::uuid'
     $f$;
   END IF;
@@ -90,29 +91,45 @@ $bootstrap$;
 --  1. ÉNUMÉRATIONS
 -- =====================================================================
 
-CREATE TYPE verification_status AS ENUM ('pending', 'verified', 'rejected', 'expired');
-CREATE TYPE trip_status        AS ENUM ('draft', 'published', 'in_progress', 'completed', 'cancelled');
-CREATE TYPE booking_status     AS ENUM ('pending', 'confirmed', 'completed', 'cancelled_passenger', 'cancelled_driver', 'no_show_passenger', 'no_show_driver');
-CREATE TYPE payment_status     AS ENUM ('initiated', 'authorized', 'captured', 'failed', 'refunded');
-CREATE TYPE payout_status      AS ENUM ('pending', 'sent', 'confirmed', 'failed');
-CREATE TYPE stop_kind          AS ENUM ('origin', 'waypoint', 'destination');
-CREATE TYPE gender_pref        AS ENUM ('any', 'women_only');
-CREATE TYPE ledger_account     AS ENUM (
-  'passenger_escrow',   -- argent du passager détenu, non encore acquis
-  'driver_payable',     -- dû au conducteur
-  'platform_revenue',   -- frais de service acquis à la plateforme
-  'platform_tax',       -- ITBMS collecté
-  'psp_fees',           -- commission Yappy
-  'refunds',
-  'promotions'          -- subventions, bons carburant, parrainage
-);
-
+DO $idem$ BEGIN
+  CREATE TYPE verification_status AS ENUM ('pending', 'verified', 'rejected', 'expired');
+EXCEPTION WHEN duplicate_object THEN NULL; END $idem$;
+DO $idem$ BEGIN
+  CREATE TYPE trip_status        AS ENUM ('draft', 'published', 'in_progress', 'completed', 'cancelled');
+EXCEPTION WHEN duplicate_object THEN NULL; END $idem$;
+DO $idem$ BEGIN
+  CREATE TYPE booking_status     AS ENUM ('pending', 'confirmed', 'completed', 'cancelled_passenger', 'cancelled_driver', 'no_show_passenger', 'no_show_driver');
+EXCEPTION WHEN duplicate_object THEN NULL; END $idem$;
+DO $idem$ BEGIN
+  CREATE TYPE payment_status     AS ENUM ('initiated', 'authorized', 'captured', 'failed', 'refunded');
+EXCEPTION WHEN duplicate_object THEN NULL; END $idem$;
+DO $idem$ BEGIN
+  CREATE TYPE payout_status      AS ENUM ('pending', 'sent', 'confirmed', 'failed');
+EXCEPTION WHEN duplicate_object THEN NULL; END $idem$;
+DO $idem$ BEGIN
+  CREATE TYPE stop_kind          AS ENUM ('origin', 'waypoint', 'destination');
+EXCEPTION WHEN duplicate_object THEN NULL; END $idem$;
+DO $idem$ BEGIN
+  CREATE TYPE gender_pref        AS ENUM ('any', 'women_only');
+EXCEPTION WHEN duplicate_object THEN NULL; END $idem$;
+DO $idem$ BEGIN
+  CREATE TYPE ledger_account     AS ENUM (
+    'passenger_escrow',   -- argent du passager détenu, non encore acquis
+    'driver_payable',     -- dû au conducteur
+    'platform_revenue',   -- frais de service acquis à la plateforme
+    'platform_tax',       -- ITBMS collecté
+    'psp_fees',           -- commission Yappy
+    'refunds',
+    'promotions'          -- subventions, bons carburant, parrainage
+  );
+  
+EXCEPTION WHEN duplicate_object THEN NULL; END $idem$;
 -- =====================================================================
 --  2. RÉFÉRENTIEL GÉOGRAPHIQUE ET TARIFAIRE
 --     Ces tables pilotent à la fois le calcul du plafond ET les pages SEO.
 -- =====================================================================
 
-CREATE TABLE cities (
+CREATE TABLE IF NOT EXISTS cities (
   id           uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   country_code char(2) NOT NULL,                 -- 'PA', 'CR', 'GT'
   name         text NOT NULL,
@@ -127,7 +144,7 @@ CREATE TABLE cities (
 
 -- Un corridor = une paire de villes = une page SEO = un jeu de paramètres
 -- de prix. C'est l'unité de pilotage du business.
-CREATE TABLE corridors (
+CREATE TABLE IF NOT EXISTS corridors (
   id                    uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   origin_city_id        uuid NOT NULL REFERENCES cities(id),
   destination_city_id   uuid NOT NULL REFERENCES cities(id),
@@ -145,7 +162,7 @@ CREATE TABLE corridors (
 
 -- Points de prise en charge canoniques. Amorcés à la main, puis enrichis
 -- par les points que les passagers proposent (voir booking_stops).
-CREATE TABLE pickup_points (
+CREATE TABLE IF NOT EXISTS pickup_points (
   id            uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   city_id       uuid NOT NULL REFERENCES cities(id),
   name          text NOT NULL,                    -- 'Costa del Este — Town Center'
@@ -159,7 +176,7 @@ CREATE TABLE pickup_points (
 );
 
 -- Catégories de véhicule : le taux au km dépend du véhicule.
-CREATE TABLE vehicle_categories (
+CREATE TABLE IF NOT EXISTS vehicle_categories (
   code              text PRIMARY KEY,             -- 'economy', 'standard', 'suv'
   label_es          text NOT NULL,
   rate_per_km_cents int NOT NULL CHECK (rate_per_km_cents > 0)
@@ -171,7 +188,7 @@ CREATE TABLE vehicle_categories (
 --  version et on en ouvre une nouvelle. Chaque trajet référence la
 --  version en vigueur au moment de sa publication.
 -- ---------------------------------------------------------------------
-CREATE TABLE price_rules (
+CREATE TABLE IF NOT EXISTS price_rules (
   id                    uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   country_code          char(2) NOT NULL,
   version_label         text NOT NULL,             -- 'PA-2027-01'
@@ -187,7 +204,7 @@ CREATE TABLE price_rules (
   created_at            timestamptz NOT NULL DEFAULT now(),
   CHECK (effective_to IS NULL OR effective_to > effective_from)
 );
-CREATE UNIQUE INDEX one_active_rule_per_country
+CREATE UNIQUE INDEX IF NOT EXISTS one_active_rule_per_country
   ON price_rules (country_code) WHERE effective_to IS NULL;
 
 -- =====================================================================
@@ -196,7 +213,7 @@ CREATE UNIQUE INDEX one_active_rule_per_country
 --     des rôles contextuels, pas des types d'utilisateur.
 -- =====================================================================
 
-CREATE TABLE profiles (
+CREATE TABLE IF NOT EXISTS profiles (
   id                 uuid PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   first_name         text NOT NULL,
   last_initial       text,                        -- affiché : « Ana M. »
@@ -215,7 +232,7 @@ CREATE TABLE profiles (
 );
 
 -- KYC : on stocke le RÉSULTAT, jamais l'image de la cédula.
-CREATE TABLE identity_verifications (
+CREATE TABLE IF NOT EXISTS identity_verifications (
   id                uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   profile_id        uuid NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   provider          text NOT NULL,                -- 'truora', 'metamap'
@@ -230,7 +247,7 @@ CREATE TABLE identity_verifications (
   -- Volontairement absents : numéro de document, image, selfie.
 );
 
-CREATE TABLE vehicles (
+CREATE TABLE IF NOT EXISTS vehicles (
   id             uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   owner_id       uuid NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   category_code  text NOT NULL REFERENCES vehicle_categories(code),
@@ -248,7 +265,7 @@ CREATE TABLE vehicles (
 --  4. TRAJETS ET ARRÊTS
 -- =====================================================================
 
-CREATE TABLE trips (
+CREATE TABLE IF NOT EXISTS trips (
   id                  uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   driver_id           uuid NOT NULL REFERENCES profiles(id),
   vehicle_id          uuid NOT NULL REFERENCES vehicles(id),
@@ -283,7 +300,7 @@ CREATE TABLE trips (
   CONSTRAINT price_within_cap CHECK (price_cents <= snap_max_price_cents)
 );
 
-CREATE TABLE trip_stops (
+CREATE TABLE IF NOT EXISTS trip_stops (
   id              uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   trip_id         uuid NOT NULL REFERENCES trips(id) ON DELETE CASCADE,
   pickup_point_id uuid REFERENCES pickup_points(id),
@@ -300,7 +317,7 @@ CREATE TABLE trip_stops (
 --  5. RÉSERVATIONS
 -- =====================================================================
 
-CREATE TABLE bookings (
+CREATE TABLE IF NOT EXISTS bookings (
   id                 uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   trip_id            uuid NOT NULL REFERENCES trips(id),
   passenger_id       uuid NOT NULL REFERENCES profiles(id),
@@ -363,6 +380,8 @@ BEGIN
 END;
 $$;
 
+DROP TRIGGER IF EXISTS trg_seat_availability ON bookings;
+
 CREATE TRIGGER trg_seat_availability
   BEFORE INSERT OR UPDATE OF seats, status ON bookings
   FOR EACH ROW
@@ -375,7 +394,7 @@ CREATE TRIGGER trg_seat_availability
 --     On n'UPDATE jamais. Les soldes sont des SELECT.
 -- =====================================================================
 
-CREATE TABLE payments (
+CREATE TABLE IF NOT EXISTS payments (
   id               uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   booking_id       uuid NOT NULL REFERENCES bookings(id),
   provider         text NOT NULL DEFAULT 'yappy',
@@ -392,7 +411,7 @@ CREATE TABLE payments (
 
 -- Versements aux conducteurs. Au pilote : lots hebdomadaires manuels.
 -- La table est identique quand on automatisera : seul le remplissage change.
-CREATE TABLE payout_batches (
+CREATE TABLE IF NOT EXISTS payout_batches (
   id            uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   period_start  date NOT NULL,
   period_end    date NOT NULL,
@@ -403,7 +422,7 @@ CREATE TABLE payout_batches (
   created_at    timestamptz NOT NULL DEFAULT now()
 );
 
-CREATE TABLE payouts (
+CREATE TABLE IF NOT EXISTS payouts (
   id            uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   batch_id      uuid REFERENCES payout_batches(id),
   driver_id     uuid NOT NULL REFERENCES profiles(id),
@@ -416,7 +435,7 @@ CREATE TABLE payouts (
 );
 
 -- LE JOURNAL. Immuable par politique et par trigger.
-CREATE TABLE ledger_entries (
+CREATE TABLE IF NOT EXISTS ledger_entries (
   id            bigserial PRIMARY KEY,
   entry_group   uuid NOT NULL,                     -- lie les lignes d'une même écriture
   account       ledger_account NOT NULL,
@@ -437,6 +456,8 @@ BEGIN
   RAISE EXCEPTION 'Le journal comptable est immuable. Écrivez une écriture de contrepassation.';
 END;
 $$;
+
+DROP TRIGGER IF EXISTS trg_ledger_immutable ON ledger_entries;
 
 CREATE TRIGGER trg_ledger_immutable
   BEFORE UPDATE OR DELETE ON ledger_entries
@@ -467,7 +488,7 @@ $$;
 --  7. CONFIANCE, MESSAGERIE, SIGNAUX DE CROISSANCE
 -- =====================================================================
 
-CREATE TABLE reviews (
+CREATE TABLE IF NOT EXISTS reviews (
   id           uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   booking_id   uuid NOT NULL REFERENCES bookings(id),
   author_id    uuid NOT NULL REFERENCES profiles(id),
@@ -481,7 +502,7 @@ CREATE TABLE reviews (
 
 -- Messagerie interne : le numéro reste masqué, donc la conversation
 -- doit vivre ici. C'est une brique anti-désintermédiation, pas un confort.
-CREATE TABLE messages (
+CREATE TABLE IF NOT EXISTS messages (
   id           bigserial PRIMARY KEY,
   booking_id   uuid NOT NULL REFERENCES bookings(id) ON DELETE CASCADE,
   sender_id    uuid NOT NULL REFERENCES profiles(id),
@@ -490,7 +511,7 @@ CREATE TABLE messages (
   created_at   timestamptz NOT NULL DEFAULT now()
 );
 
-CREATE TABLE incidents (
+CREATE TABLE IF NOT EXISTS incidents (
   id            uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   booking_id    uuid REFERENCES bookings(id),
   reporter_id   uuid REFERENCES profiles(id),
@@ -510,7 +531,7 @@ CREATE TABLE incidents (
 --  corridor ouvrir ensuite. La plupart des équipes ne journalisent pas
 --  les recherches infructueuses et se privent de leur meilleur signal.
 -- ---------------------------------------------------------------------
-CREATE TABLE demand_signals (
+CREATE TABLE IF NOT EXISTS demand_signals (
   id                uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   corridor_id       uuid REFERENCES corridors(id),
   origin_city_id    uuid REFERENCES cities(id),
@@ -526,7 +547,7 @@ CREATE TABLE demand_signals (
 );
 
 -- Suivi de l'activation conducteur : le KPI de la Porte 2.
-CREATE TABLE driver_activation (
+CREATE TABLE IF NOT EXISTS driver_activation (
   profile_id            uuid PRIMARY KEY REFERENCES profiles(id) ON DELETE CASCADE,
   signed_up_at          timestamptz NOT NULL,
   acquisition_source    text,                       -- 'meta', 'google', 'seo', 'referral'
@@ -598,6 +619,7 @@ $$;
 -- Trajets réservables. Le prix suggéré (fourchette Formule C) est calculé
 -- ici et non stocké : il est commercial, donc révisable sans toucher
 -- à l'historique juridique.
+DROP VIEW IF EXISTS available_trips CASCADE;
 CREATE VIEW available_trips AS
 SELECT
   t.id, t.driver_id, t.corridor_id, t.departure_at, t.arrival_estimate_at,
@@ -619,6 +641,8 @@ WHERE t.status = 'published'
 -- acceptable jusqu'à quelques milliers de trajets actifs. Au-delà,
 -- remplacer par une vue matérialisée rafraîchie sur écriture de booking.
 
+DROP VIEW IF EXISTS driver_ratings CASCADE;
+
 CREATE VIEW driver_ratings AS
 SELECT subject_id AS profile_id,
        ROUND(AVG(rating)::numeric, 2) AS avg_rating,
@@ -627,6 +651,7 @@ FROM reviews GROUP BY subject_id;
 
 -- Tableau de bord par corridor — les indicateurs se lisent corridor par
 -- corridor, jamais en moyenne nationale.
+DROP VIEW IF EXISTS corridor_health CASCADE;
 CREATE VIEW corridor_health AS
 SELECT
   c.slug,
@@ -649,15 +674,15 @@ GROUP BY c.slug, c.is_priority;
 --  10. INDEX
 -- =====================================================================
 
-CREATE INDEX idx_trips_search      ON trips (corridor_id, departure_at) WHERE status = 'published';
-CREATE INDEX idx_trips_driver      ON trips (driver_id, departure_at DESC);
-CREATE INDEX idx_bookings_trip     ON bookings (trip_id) WHERE status IN ('pending','confirmed','completed');
-CREATE INDEX idx_bookings_passenger ON bookings (passenger_id, created_at DESC);
-CREATE INDEX idx_ledger_account    ON ledger_entries (account, profile_id, occurred_at);
-CREATE INDEX idx_ledger_group      ON ledger_entries (entry_group);
-CREATE INDEX idx_demand_corridor   ON demand_signals (corridor_id, requested_date) WHERE results_count = 0;
-CREATE INDEX idx_messages_booking  ON messages (booking_id, created_at);
-CREATE INDEX idx_stops_trip        ON trip_stops (trip_id, sequence);
+CREATE INDEX IF NOT EXISTS idx_trips_search      ON trips (corridor_id, departure_at) WHERE status = 'published';
+CREATE INDEX IF NOT EXISTS idx_trips_driver      ON trips (driver_id, departure_at DESC);
+CREATE INDEX IF NOT EXISTS idx_bookings_trip     ON bookings (trip_id) WHERE status IN ('pending','confirmed','completed');
+CREATE INDEX IF NOT EXISTS idx_bookings_passenger ON bookings (passenger_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_ledger_account    ON ledger_entries (account, profile_id, occurred_at);
+CREATE INDEX IF NOT EXISTS idx_ledger_group      ON ledger_entries (entry_group);
+CREATE INDEX IF NOT EXISTS idx_demand_corridor   ON demand_signals (corridor_id, requested_date) WHERE results_count = 0;
+CREATE INDEX IF NOT EXISTS idx_messages_booking  ON messages (booking_id, created_at);
+CREATE INDEX IF NOT EXISTS idx_stops_trip        ON trip_stops (trip_id, sequence);
 
 -- =====================================================================
 --  11. SÉCURITÉ AU NIVEAU LIGNE (RLS)
@@ -673,18 +698,22 @@ ALTER TABLE ledger_entries ENABLE ROW LEVEL SECURITY;
 ALTER TABLE identity_verifications ENABLE ROW LEVEL SECURITY;
 
 -- Profil : lecture publique du strict nécessaire via la vue publique.
+DROP VIEW IF EXISTS public_profiles CASCADE;
 CREATE VIEW public_profiles AS
 SELECT id, first_name, last_initial, photo_url, is_id_verified, home_city_id, bio, created_at
 FROM profiles WHERE is_suspended = false;
 
 -- Chacun lit et modifie son propre profil complet (téléphone compris).
+DROP POLICY IF EXISTS own_profile_select ON profiles;
 CREATE POLICY own_profile_select ON profiles
   FOR SELECT USING (id = auth.uid());
+DROP POLICY IF EXISTS own_profile_update ON profiles;
 CREATE POLICY own_profile_update ON profiles
   FOR UPDATE USING (id = auth.uid());
 
 -- Le numéro du conducteur n'est lisible qu'après une réservation confirmée.
 -- C'est LE mécanisme anti-désintermédiation.
+DROP POLICY IF EXISTS phone_visible_after_booking ON profiles;
 CREATE POLICY phone_visible_after_booking ON profiles
   FOR SELECT USING (
     EXISTS (
@@ -698,16 +727,23 @@ CREATE POLICY phone_visible_after_booking ON profiles
     )
   );
 
+DROP POLICY IF EXISTS trips_public_read ON trips;
+
 CREATE POLICY trips_public_read ON trips
   FOR SELECT USING (status = 'published' OR driver_id = auth.uid());
+DROP POLICY IF EXISTS trips_owner_write ON trips;
 CREATE POLICY trips_owner_write ON trips
   FOR ALL USING (driver_id = auth.uid()) WITH CHECK (driver_id = auth.uid());
+
+DROP POLICY IF EXISTS bookings_parties_only ON bookings;
 
 CREATE POLICY bookings_parties_only ON bookings
   FOR SELECT USING (
     passenger_id = auth.uid()
     OR EXISTS (SELECT 1 FROM trips t WHERE t.id = bookings.trip_id AND t.driver_id = auth.uid())
   );
+
+DROP POLICY IF EXISTS messages_parties_only ON messages;
 
 CREATE POLICY messages_parties_only ON messages
   FOR SELECT USING (
@@ -719,7 +755,9 @@ CREATE POLICY messages_parties_only ON messages
   );
 
 -- Le journal n'est jamais lisible par les utilisateurs finaux.
+DROP POLICY IF EXISTS ledger_no_client_access ON ledger_entries;
 CREATE POLICY ledger_no_client_access ON ledger_entries FOR SELECT USING (false);
+DROP POLICY IF EXISTS kyc_own_only ON identity_verifications;
 CREATE POLICY kyc_own_only ON identity_verifications
   FOR SELECT USING (profile_id = auth.uid());
 
@@ -730,11 +768,13 @@ CREATE POLICY kyc_own_only ON identity_verifications
 INSERT INTO vehicle_categories (code, label_es, rate_per_km_cents) VALUES
   ('economy',  'Económico (sedán pequeño)', 22),
   ('standard', 'Estándar (sedán / crossover)', 25),
-  ('suv',      'SUV o pick-up', 32);
+  ('suv',      'SUV o pick-up', 32)
+ON CONFLICT (code) DO NOTHING;
 
 INSERT INTO price_rules (country_code, version_label, effective_from, source_reference)
 VALUES ('PA', 'PA-2026-01', now(),
-        'À compléter : barème public de coût kilométrique validé par conseil juridique');
+        'À compléter : barème public de coût kilométrique validé par conseil juridique')
+ON CONFLICT DO NOTHING;
 
 INSERT INTO cities (country_code, name, slug, province, lat, lng) VALUES
   ('PA','Ciudad de Panamá','panama-city','Panamá',8.9824,-79.5199),
@@ -743,7 +783,8 @@ INSERT INTO cities (country_code, name, slug, province, lat, lng) VALUES
   ('PA','David','david','Chiriquí',8.4333,-82.4333),
   ('PA','Santiago','santiago','Veraguas',8.1000,-80.9833),
   ('PA','Penonomé','penonome','Coclé',8.5194,-80.3572),
-  ('PA','Coronado','coronado','Panamá Oeste',8.5333,-79.9500);
+  ('PA','Coronado','coronado','Panamá Oeste',8.5333,-79.9500)
+ON CONFLICT (country_code, slug) DO NOTHING;
 
 INSERT INTO corridors (origin_city_id, destination_city_id, slug, distance_km, toll_cents, typical_duration_min, bus_price_cents, is_priority)
 SELECT o.id, d.id, v.slug, v.km, v.toll, v.dur, v.bus, v.prio
@@ -756,7 +797,8 @@ FROM (VALUES
   ('panama-city','penonome',   'panama-penonome',   145.0, 300,         120,  600,         false)
 ) AS v(o_slug, d_slug, slug, km, toll, dur, bus, prio)
 JOIN cities o ON o.slug = v.o_slug
-JOIN cities d ON d.slug = v.d_slug;
+JOIN cities d ON d.slug = v.d_slug
+ON CONFLICT (slug) DO NOTHING;
 -- =====================================================================
 --  EXTENSION — ANNULATIONS, REMBOURSEMENTS, ABSENCES
 --  À appliquer après schema.sql
@@ -775,11 +817,15 @@ JOIN cities d ON d.slug = v.d_slug;
 --  réputationnelle, jamais monétaire.
 -- =====================================================================
 
-CREATE TYPE cancel_party AS ENUM ('passenger', 'driver', 'platform', 'system');
-CREATE TYPE refund_status AS ENUM ('pending', 'issued', 'failed');
-
+DO $idem$ BEGIN
+  CREATE TYPE cancel_party AS ENUM ('passenger', 'driver', 'platform', 'system');
+EXCEPTION WHEN duplicate_object THEN NULL; END $idem$;
+DO $idem$ BEGIN
+  CREATE TYPE refund_status AS ENUM ('pending', 'issued', 'failed');
+  
+EXCEPTION WHEN duplicate_object THEN NULL; END $idem$;
 -- Politique versionnée, sur le même principe que price_rules.
-CREATE TABLE cancellation_policies (
+CREATE TABLE IF NOT EXISTS cancellation_policies (
   id                      uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   country_code            char(2) NOT NULL,
   version_label           text NOT NULL,
@@ -802,11 +848,11 @@ CREATE TABLE cancellation_policies (
   CHECK (partial_refund_hours < full_refund_hours),
   CHECK (late_retain_pct BETWEEN 0 AND 100)
 );
-CREATE UNIQUE INDEX one_active_cancel_policy
+CREATE UNIQUE INDEX IF NOT EXISTS one_active_cancel_policy
   ON cancellation_policies (country_code) WHERE effective_to IS NULL;
 
 -- Journal des annulations. Une ligne par annulation, immuable de fait.
-CREATE TABLE cancellations (
+CREATE TABLE IF NOT EXISTS cancellations (
   id                 uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   booking_id         uuid REFERENCES bookings(id),
   trip_id            uuid REFERENCES trips(id),
@@ -829,7 +875,7 @@ CREATE TABLE cancellations (
   CHECK (booking_id IS NOT NULL OR trip_id IS NOT NULL)
 );
 
-CREATE TABLE refunds (
+CREATE TABLE IF NOT EXISTS refunds (
   id            uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   cancellation_id uuid NOT NULL REFERENCES cancellations(id),
   payment_id    uuid REFERENCES payments(id),
@@ -841,7 +887,7 @@ CREATE TABLE refunds (
 );
 
 -- Crédits (gestes commerciaux, parrainage). Jamais convertibles en argent.
-CREATE TABLE credits (
+CREATE TABLE IF NOT EXISTS credits (
   id            uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   profile_id    uuid NOT NULL REFERENCES profiles(id),
   amount_cents  bigint NOT NULL CHECK (amount_cents > 0),
@@ -852,7 +898,7 @@ CREATE TABLE credits (
   created_at    timestamptz NOT NULL DEFAULT now()
 );
 
-CREATE TABLE no_show_reports (
+CREATE TABLE IF NOT EXISTS no_show_reports (
   id            uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   booking_id    uuid NOT NULL REFERENCES bookings(id),
   reported_by   cancel_party NOT NULL,
@@ -945,7 +991,8 @@ END;
 $fn$;
 
 -- Fiabilité du conducteur : réputationnelle, jamais monétaire.
-CREATE OR REPLACE VIEW driver_reliability AS
+DROP VIEW IF EXISTS driver_reliability CASCADE;
+CREATE VIEW driver_reliability AS
 SELECT
   t.driver_id,
   count(*) FILTER (WHERE t.status = 'completed')                          AS trips_completed,
@@ -969,6 +1016,7 @@ GROUP BY t.driver_id;
 -- 1. available_trips appelait seats_taken() ligne par ligne (N+1).
 --    Remplacé par une agrégation unique en jointure latérale.
 DROP VIEW IF EXISTS available_trips;
+DROP VIEW IF EXISTS available_trips CASCADE;
 CREATE VIEW available_trips AS
 SELECT
   t.id, t.driver_id, t.corridor_id, t.departure_at, t.arrival_estimate_at,
@@ -1006,22 +1054,25 @@ BEGIN
   RETURN NULL;
 END;
 $$;
+DROP TRIGGER IF EXISTS trg_ledger_balanced ON ledger_entries;
 CREATE CONSTRAINT TRIGGER trg_ledger_balanced
   AFTER INSERT ON ledger_entries
   DEFERRABLE INITIALLY DEFERRED
   FOR EACH ROW EXECUTE FUNCTION check_ledger_balance();
 
 -- 3. Index manquants relevés à la relecture
-CREATE INDEX idx_cancel_booking   ON cancellations (booking_id);
-CREATE INDEX idx_cancel_driver    ON cancellations (trip_id, cancelled_by, created_at);
-CREATE INDEX idx_credits_active   ON credits (profile_id) WHERE consumed_booking_id IS NULL;
-CREATE INDEX idx_payments_booking ON payments (booking_id);
-CREATE INDEX idx_reviews_subject  ON reviews (subject_id);
-CREATE INDEX idx_trips_corridor_status ON trips (corridor_id, status, departure_at);
+CREATE INDEX IF NOT EXISTS idx_cancel_booking   ON cancellations (booking_id);
+CREATE INDEX IF NOT EXISTS idx_cancel_driver    ON cancellations (trip_id, cancelled_by, created_at);
+CREATE INDEX IF NOT EXISTS idx_credits_active   ON credits (profile_id) WHERE consumed_booking_id IS NULL;
+CREATE INDEX IF NOT EXISTS idx_payments_booking ON payments (booking_id);
+CREATE INDEX IF NOT EXISTS idx_reviews_subject  ON reviews (subject_id);
+CREATE INDEX IF NOT EXISTS idx_trips_corridor_status ON trips (corridor_id, status, departure_at);
 
 -- 4. Amorçage de la politique
 INSERT INTO cancellation_policies (country_code, version_label, effective_from)
-VALUES ('PA', 'PA-CANCEL-2026-01', now());
+VALUES ('PA', 'PA-CANCEL-2026-01', now())
+ON CONFLICT DO NOTHING;
+
 
 -- ═══════════════════════════════════════════════════════════
 -- 0002_waitlist.sql
@@ -1074,6 +1125,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS uniq_waitlist_signal_phone
 ALTER TABLE waitlist_signals ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS waitlist_no_client_access ON waitlist_signals;
+DROP POLICY IF EXISTS waitlist_no_client_access ON waitlist_signals;
 CREATE POLICY waitlist_no_client_access ON waitlist_signals
   FOR SELECT USING (false);
 
@@ -1082,7 +1134,8 @@ CREATE POLICY waitlist_no_client_access ON waitlist_signals
 --  C'est la requête qui déclenche l'alerte aux conducteurs :
 --  « 3 personas buscan Panamá → Chitré el viernes ».
 -- ---------------------------------------------------------------------
-CREATE OR REPLACE VIEW pending_demand AS
+DROP VIEW IF EXISTS pending_demand CASCADE;
+CREATE VIEW pending_demand AS
 SELECT
   ds.corridor_id,
   c.slug            AS corridor_slug,
@@ -1097,6 +1150,7 @@ LEFT JOIN waitlist_signals w ON w.demand_signal_id = ds.id
 WHERE ds.results_count = 0
   AND ds.requested_date >= current_date
 GROUP BY ds.corridor_id, c.slug, ds.requested_date;
+
 
 -- ═══════════════════════════════════════════════════════════
 -- 0003_didit.sql
@@ -1153,10 +1207,12 @@ END;
 $$;
 
 DROP TRIGGER IF EXISTS trg_sync_id_verified ON identity_verifications;
+DROP TRIGGER IF EXISTS trg_sync_id_verified ON identity_verifications;
 CREATE TRIGGER trg_sync_id_verified
   AFTER INSERT OR UPDATE OF status, expires_at OR DELETE
   ON identity_verifications
   FOR EACH ROW EXECUTE FUNCTION sync_profile_id_verified();
+
 
 -- ═══════════════════════════════════════════════════════════
 -- 0004_car_rate_linkedin.sql
@@ -1263,11 +1319,13 @@ COMMENT ON COLUMN profiles.linkedin_connected_at IS
 
 -- L'insigne est publique, comme l'affiliation : recrée la vue avec le
 -- booléen en fin de liste (ajouter en fin = pas de rupture de lecteurs).
-CREATE OR REPLACE VIEW public_profiles AS
+DROP VIEW IF EXISTS public_profiles CASCADE;
+CREATE VIEW public_profiles AS
 SELECT id, first_name, last_initial, photo_url, is_id_verified,
        home_city_id, bio, created_at,
        (linkedin_connected_at IS NOT NULL) AS has_linkedin
 FROM profiles WHERE is_suspended = false;
+
 
 -- ═══════════════════════════════════════════════════════════
 -- 0005_segment_inventory.sql
@@ -1291,13 +1349,15 @@ FROM profiles WHERE is_suspended = false;
 --     NULL = tout le trajet (les réservations existantes restent justes).
 --     Les bornes se réfèrent à trip_stops.sequence du trajet.
 -- ---------------------------------------------------------------------
-ALTER TABLE bookings
-  ADD COLUMN IF NOT EXISTS board_sequence  int,
-  ADD COLUMN IF NOT EXISTS alight_sequence int,
-  ADD CONSTRAINT booking_segment_forward
-    CHECK (board_sequence IS NULL OR alight_sequence IS NULL
-           OR board_sequence < alight_sequence);
-
+DO $idem$ BEGIN
+  ALTER TABLE bookings
+    ADD COLUMN IF NOT EXISTS board_sequence  int,
+    ADD COLUMN IF NOT EXISTS alight_sequence int,
+    ADD CONSTRAINT booking_segment_forward
+      CHECK (board_sequence IS NULL OR alight_sequence IS NULL
+             OR board_sequence < alight_sequence);
+  
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $idem$;
 COMMENT ON COLUMN bookings.board_sequence IS
   'Séquence (trip_stops.sequence) de la montée. NULL = origine du trajet.';
 COMMENT ON COLUMN bookings.alight_sequence IS
@@ -1408,7 +1468,8 @@ COMMENT ON COLUMN vehicles.photo_path IS
 -- La recherche montre le carro : modèle, année, taux et photo entrent
 -- dans la vue (colonnes ajoutées EN FIN — les lecteurs existants ne
 -- bougent pas).
-CREATE OR REPLACE VIEW available_trips AS
+DROP VIEW IF EXISTS available_trips CASCADE;
+CREATE VIEW available_trips AS
 SELECT
   t.id, t.driver_id, t.corridor_id, t.departure_at, t.arrival_estimate_at,
   t.price_cents, t.gender_preference, t.seats_offered,
@@ -1434,11 +1495,14 @@ BEGIN
   VALUES ('carros', 'carros', true)
   ON CONFLICT (id) DO NOTHING;
 
+  DROP POLICY IF EXISTS carros_owner_write ON storage.objects;
+
   CREATE POLICY carros_owner_write ON storage.objects
     FOR INSERT WITH CHECK (
       bucket_id = 'carros'
       AND (storage.foldername(name))[1] = auth.uid()::text
     );
+  DROP POLICY IF EXISTS carros_owner_update ON storage.objects;
   CREATE POLICY carros_owner_update ON storage.objects
     FOR UPDATE USING (
       bucket_id = 'carros'
@@ -1447,8 +1511,10 @@ BEGIN
 EXCEPTION
   WHEN duplicate_object THEN NULL;   -- politiques déjà posées
   WHEN undefined_table THEN NULL;    -- environnement sans Storage (tests locaux)
+  WHEN insufficient_privilege THEN NULL; -- Storage géré depuis le panneau
 END
 $storage$;
+
 
 -- ═══════════════════════════════════════════════════════════
 -- 0006_ofertas_puntos.sql
@@ -1480,15 +1546,18 @@ ALTER TABLE bookings
 
 -- La borne R3 : jamais au-dessus du prix figé à la réservation.
 -- (unit_price_cents est lui-même ≤ au plafond par price_within_cap.)
-ALTER TABLE bookings
-  ADD CONSTRAINT offer_never_above_price
-    CHECK (offer_price_cents IS NULL
-           OR offer_price_cents <= unit_price_cents);
-
+DO $idem$ BEGIN
+  ALTER TABLE bookings
+    ADD CONSTRAINT offer_never_above_price
+      CHECK (offer_price_cents IS NULL
+             OR offer_price_cents <= unit_price_cents);
+  
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $idem$;
 COMMENT ON COLUMN bookings.offer_price_cents IS
   'Offre du passager, en centimes. NULL = paie l''aporte publié. Toujours ≤ unit_price_cents : enchérir n''existe pas (R3).';
 COMMENT ON COLUMN bookings.offer_accepted IS
   'Réponse du conducteur à l''offre. NULL = en attente. Refus = la réservation reste possible à l''aporte publié.';
+
 
 -- ═══════════════════════════════════════════════════════════
 -- 0007_calificacion_criterios.sql
@@ -1527,7 +1596,8 @@ COMMENT ON COLUMN reviews.carro IS '¿El carro estaba limpio y era el registrado
 COMMENT ON COLUMN reviews.encuentro IS '¿Llegó al punto acordado?';
 
 -- Les moyennes par critère, à côté de la moyenne globale existante.
-CREATE OR REPLACE VIEW driver_ratings AS
+DROP VIEW IF EXISTS driver_ratings CASCADE;
+CREATE VIEW driver_ratings AS
 SELECT subject_id AS profile_id,
        ROUND(AVG(rating)::numeric, 2) AS avg_rating,
        COUNT(*) AS reviews_count,
@@ -1537,6 +1607,7 @@ SELECT subject_id AS profile_id,
        ROUND(AVG(carro)::numeric, 2) AS avg_carro,
        ROUND(AVG(encuentro)::numeric, 2) AS avg_encuentro
 FROM reviews GROUP BY subject_id;
+
 
 -- ═══════════════════════════════════════════════════════════
 -- 0008_recurrencia.sql
@@ -1553,8 +1624,10 @@ FROM reviews GROUP BY subject_id;
 --  mercredi.
 -- =====================================================================
 
-CREATE TYPE trip_recurrence AS ENUM ('none', 'daily', 'weekly', 'monthly');
-
+DO $idem$ BEGIN
+  CREATE TYPE trip_recurrence AS ENUM ('none', 'daily', 'weekly', 'monthly');
+  
+EXCEPTION WHEN duplicate_object THEN NULL; END $idem$;
 ALTER TABLE trips
   ADD COLUMN IF NOT EXISTS recurrence trip_recurrence NOT NULL DEFAULT 'none',
   -- L'occurrence pointe vers le viaje « modèle » qui l'a engendrée.
@@ -1567,6 +1640,7 @@ COMMENT ON COLUMN trips.recurrence_parent_id IS
 
 CREATE INDEX IF NOT EXISTS idx_trips_recurrence_parent
   ON trips (recurrence_parent_id) WHERE recurrence_parent_id IS NOT NULL;
+
 
 -- ═══════════════════════════════════════════════════════════
 -- 0009_pago_en_linea.sql
@@ -1592,26 +1666,31 @@ CREATE INDEX IF NOT EXISTS idx_trips_recurrence_parent
 --  attendaient ce jour : rien à créer, tout à brancher.
 -- =====================================================================
 
-CREATE TYPE payment_channel AS ENUM ('external', 'card', 'yappy_app');
-
+DO $idem$ BEGIN
+  CREATE TYPE payment_channel AS ENUM ('external', 'card', 'yappy_app');
+  
+EXCEPTION WHEN duplicate_object THEN NULL; END $idem$;
 ALTER TABLE bookings
   ADD COLUMN IF NOT EXISTS payment_channel payment_channel
     NOT NULL DEFAULT 'external';
 
 -- La tarifa n'existe QUE pour le paiement dans l'app, et elle est de
 -- 3,5 % du montant — jamais plus, jamais variable.
-ALTER TABLE bookings
-  ADD CONSTRAINT fee_only_in_app CHECK (
-    (payment_channel = 'external' AND service_fee_cents = 0)
-    OR payment_channel <> 'external'
-  ),
-  ADD CONSTRAINT fee_is_fixed_pct CHECK (
-    payment_channel = 'external'
-    OR service_fee_cents = ROUND(total_cents * 0.035)
-  );
-
+DO $idem$ BEGIN
+  ALTER TABLE bookings
+    ADD CONSTRAINT fee_only_in_app CHECK (
+      (payment_channel = 'external' AND service_fee_cents = 0)
+      OR payment_channel <> 'external'
+    ),
+    ADD CONSTRAINT fee_is_fixed_pct CHECK (
+      payment_channel = 'external'
+      OR service_fee_cents = ROUND(total_cents * 0.035)
+    );
+  
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $idem$;
 COMMENT ON COLUMN bookings.payment_channel IS
   'external = efectivo/Yappy directo au conducteur (gratuit). card / yappy_app = cobro dans l''app, tarifa de servicio 3,5 % au passager. Le conducteur reçoit son aporte complet dans tous les cas.';
+
 
 -- ═══════════════════════════════════════════════════════════
 -- 0010_metodo_pago.sql
@@ -1640,15 +1719,17 @@ COMMENT ON COLUMN bookings.payment_channel IS
 ALTER TABLE bookings
   DROP CONSTRAINT IF EXISTS fee_is_fixed_pct;
 
-ALTER TABLE bookings
-  ADD CONSTRAINT fee_is_fixed_pct CHECK (
-    CASE payment_channel
-      WHEN 'external'  THEN service_fee_cents = 0
-      WHEN 'yappy_app' THEN service_fee_cents = ROUND(total_cents * 0.025)
-      WHEN 'card'      THEN service_fee_cents = ROUND(total_cents * 0.05)
-    END
-  );
-
+DO $idem$ BEGIN
+  ALTER TABLE bookings
+    ADD CONSTRAINT fee_is_fixed_pct CHECK (
+      CASE payment_channel
+        WHEN 'external'  THEN service_fee_cents = 0
+        WHEN 'yappy_app' THEN service_fee_cents = ROUND(total_cents * 0.025)
+        WHEN 'card'      THEN service_fee_cents = ROUND(total_cents * 0.05)
+      END
+    );
+  
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $idem$;
 COMMENT ON COLUMN bookings.payment_channel IS
   'external = efectivo/Yappy directo au conducteur (gratuit). yappy_app = Botón de Pago Yappy, tarifa 2,5 %. card = pasarela certifiée, tarifa 5 %. La tarifa est cobrée au passager ; le conducteur reçoit son aporte complet dans tous les cas.';
 
@@ -1661,6 +1742,7 @@ ALTER TABLE profiles
 
 COMMENT ON COLUMN profiles.preferred_pay_channel IS
   'Moyen de paiement favori du passager — présélectionne le canal à la réservation. Les trois canaux restent proposés à chaque reserva.';
+
 
 -- ═══════════════════════════════════════════════════════════
 -- 0011_cobro_conductor.sql
@@ -1692,6 +1774,7 @@ COMMENT ON COLUMN profiles.accepts_cash IS
 ALTER TABLE trips
   ADD COLUMN IF NOT EXISTS accepts_yappy_direct boolean NOT NULL DEFAULT true,
   ADD COLUMN IF NOT EXISTS accepts_cash boolean NOT NULL DEFAULT true;
+
 
 -- ═══════════════════════════════════════════════════════════
 -- 0012_rutinas.sql
@@ -1726,9 +1809,12 @@ CREATE TABLE IF NOT EXISTS routines (
 
 ALTER TABLE routines ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS routines_own ON routines;
+
 CREATE POLICY routines_own ON routines
   FOR ALL USING (profile_id = auth.uid())
   WITH CHECK (profile_id = auth.uid());
+
 
 -- ═══════════════════════════════════════════════════════════
 -- 0013_lugares.sql
@@ -1828,12 +1914,14 @@ alter table places enable row level security;
 
 -- Leer es público: buscar una dirección no necesita cuenta.
 drop policy if exists places_read on places;
-create policy places_read on places for select using (is_public);
+DROP POLICY IF EXISTS places_read ON places;
+CREATE POLICY places_read ON places for select using (is_public);
 
 -- Escribir: solo usuarios conectados, y solo puntos suyos («usuario»).
 -- Nadie inyecta lugares 'osm' desde el navegador.
 drop policy if exists places_insert_own on places;
-create policy places_insert_own on places for insert to authenticated
+DROP POLICY IF EXISTS places_insert_own ON places;
+CREATE POLICY places_insert_own ON places for insert to authenticated
   with check (source = 'usuario');
 
 /**
@@ -1900,6 +1988,7 @@ $$;
 comment on table places is
   'Lugares buscables. Origen OSM (ODbL, atribución obligatoria en la app), Overture (CDLA-Permissive) y puntos escritos por los usuarios. Ver scripts/import-places.mjs.';
 
+
 -- ═══════════════════════════════════════════════════════════
 -- 0014_ciudades.sql
 -- ═══════════════════════════════════════════════════════════
@@ -1948,6 +2037,7 @@ insert into cities (country_code, name, slug, province, lat, lng) values
   ('PA','Almirante','almirante','Bocas del Toro',9.3,-82.4028),
   ('PA','Changuinola','changuinola','Bocas del Toro',9.4319,-82.5182)
 on conflict (country_code, slug) do nothing;
+
 
 -- ═══════════════════════════════════════════════════════════
 -- 0015_metricas.sql
@@ -2010,7 +2100,8 @@ alter table events enable row level security;
 -- Escribir: cualquiera, con o sin cuenta — el visitante anónimo es
 -- justamente el que hay que entender. La tabla solo acepta INSERT.
 drop policy if exists events_insert on events;
-create policy events_insert on events for insert to anon, authenticated
+DROP POLICY IF EXISTS events_insert ON events;
+CREATE POLICY events_insert ON events for insert to anon, authenticated
   with check (true);
 
 -- Leer: nadie desde la app. Los números se miran desde el panel (rol de
@@ -2022,7 +2113,8 @@ create policy events_insert on events for insert to anon, authenticated
 
 /** Quién se registró y cuándo, con su procedencia y su actividad.
  *  Una línea por persona: la respuesta a «¿quién es esta gente?». */
-create or replace view metricas_usuarios as
+DROP VIEW IF EXISTS metricas_usuarios CASCADE;
+CREATE VIEW metricas_usuarios as
 select
   u.id,
   p.first_name,
@@ -2046,7 +2138,8 @@ left join profiles p on p.id = u.id;
 /** El embudo, día a día. La pregunta es siempre la misma: ¿dónde se
  *  cae la gente? Sesiones que buscan, búsquedas que abren un viaje,
  *  viajes que terminan en reserva. */
-create or replace view metricas_embudo_diario as
+DROP VIEW IF EXISTS metricas_embudo_diario CASCADE;
+CREATE VIEW metricas_embudo_diario as
 select
   date_trunc('day', occurred_at)::date as dia,
   count(distinct session_id) filter (where name = 'pagina_vista') as sesiones,
@@ -2063,7 +2156,8 @@ order by 1 desc;
 /** De dónde viene la gente, y cuál de esas fuentes trae gente que
  *  RESERVA — no solo que mira. Es la única forma honesta de decidir
  *  dónde poner el esfuerzo. */
-create or replace view metricas_fuentes as
+DROP VIEW IF EXISTS metricas_fuentes CASCADE;
+CREATE VIEW metricas_fuentes as
 select
   coalesce(utm_source, referrer_host, 'directo') as fuente,
   utm_campaign as campana,
@@ -2081,7 +2175,8 @@ order by sesiones desc;
 /** Las rutas que la gente busca, y las que se quedan sin respuesta.
  *  Una ruta muy buscada y siempre vacía es un conductor que falta —
  *  el dato más accionable de todos. */
-create or replace view metricas_rutas_buscadas as
+DROP VIEW IF EXISTS metricas_rutas_buscadas CASCADE;
+CREATE VIEW metricas_rutas_buscadas as
 select
   origin_slug,
   destination_slug,
@@ -2100,7 +2195,8 @@ order by busquedas desc;
 
 /** Qué se toca en cada pantalla, por día. Responde a «¿hizo clic en
  *  qué?» sin tener que abrir la tabla cruda. */
-create or replace view metricas_eventos_diarios as
+DROP VIEW IF EXISTS metricas_eventos_diarios CASCADE;
+CREATE VIEW metricas_eventos_diarios as
 select
   date_trunc('day', occurred_at)::date as dia,
   name as evento,
