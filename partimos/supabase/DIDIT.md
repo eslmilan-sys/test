@@ -72,7 +72,39 @@ supabase db push          # applique 0001 → 0003
 `0003_didit.sql` ajoute l'index unique `(provider, provider_ref)`,
 `updated_at`, et le trigger qui synchronise `profiles.is_id_verified`.
 
-## 3. Côté Supabase — secrets et fonctions ⛔
+## 3. Côté Supabase — fonctions DÉPLOYÉES ✅, secrets ⛔
+
+Les deux fonctions Edge sont **en ligne** sur le projet
+`zcwueglgirqxwazhfidi`, déployées depuis cette session via le serveur MCP
+de Supabase :
+
+| Fonction | JWT | État |
+| --- | --- | --- |
+| `didit-start` | vérifié | ACTIVE |
+| `didit-webhook` | **désactivé** (c'est Didit qui appelle) | ACTIVE |
+
+⚠️ Une troisième fonction traîne, nommée `didit-start` mais avec le slug
+**`Diey`** — une tentative manuelle antérieure. Son adresse est
+`/functions/v1/Diey`, donc personne ne l'appellera jamais. À supprimer
+depuis le panneau, Edge Functions → Diey → Delete.
+
+**Ce qui reste ⛔ — les secrets.** Le serveur MCP de Supabase n'expose
+aucun outil pour eux (c'est volontaire de leur part). Panneau →
+Edge Functions → Secrets, cinq lignes :
+
+```
+DIDIT_API_KEY=…              (console Didit → API Keys)
+DIDIT_WEBHOOK_SECRET=…       (console Didit → Webhooks → signing secret)
+DIDIT_WORKFLOW_ID=d27705d1-9975-4ea2-8df2-3f8be47ff34f
+SITE_URL=https://eslmilan-sys.github.io/test/partimos
+SITE_ORIGIN=https://eslmilan-sys.github.io
+```
+
+Tant qu'ils manquent, `didit-start` répond `503 didit_not_configured` et
+`didit-webhook` répond `503 not configured` — proprement, sans rien
+casser.
+
+## 3 bis. L'ancienne procédure en ligne de commande ⛔
 
 ```sh
 supabase secrets set \
