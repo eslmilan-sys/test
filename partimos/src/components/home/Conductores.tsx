@@ -16,7 +16,7 @@ const DRIVER_POINTS = [
   {
     icon: "cash" as const,
     title: "Recibes el aporte completo",
-    body: "En efectivo o por Yappy, directo a ti. Partimos no descuenta comisión porque no participa en el pago.",
+    body: "En efectivo o por Yappy. Tu aporte te llega completo — lo que acordaste es lo que recibes.",
   },
   {
     icon: "users" as const,

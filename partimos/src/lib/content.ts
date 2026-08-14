@@ -70,8 +70,8 @@ export const HELP_FAQ: Faq[] = [
     a: "Cuatro como máximo, y ninguna en una terminal de buses. La idea es que el conductor recoja por donde ya iba a pasar, no que dé vueltas por la ciudad.",
   },
   {
-    q: "¿Partimos cobra comisión?",
-    a: "Al conductor, nunca: su aporte le llega completo. Al pasajero, solo si elige pagar en la app: una tarifa de servicio fija por canal — 5% con Yappy, 8% con tarjeta — por la reserva protegida. Es fija porque sigue el costo del canal, nunca la demanda. Pagar en efectivo, directo al conductor, no cuesta nada y siempre está disponible.",
+    q: "¿Cuánto cuesta usar Partimos?",
+    a: "El conductor recibe su aporte completo, siempre. Si el pasajero elige pagar dentro de la app, se le suma una tarifa de servicio fija por canal — la ves en pantalla antes de confirmar, sumada al total. Es fija porque sigue el costo del canal, nunca la demanda. Pagar en efectivo, directo al conductor, no cuesta nada y siempre está disponible.",
   },
   {
     q: "¿Guardan mi cédula?",

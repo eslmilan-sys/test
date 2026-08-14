@@ -10,7 +10,7 @@ import { canonical } from "@/lib/site";
 export const metadata: Metadata = {
   title: "Publica tu viaje y comparte los gastos",
   description:
-    "¿Vas al interior este fin de semana? Publica los puestos vacíos de tu carro y recupera parte de la gasolina y los peajes. Sin comisión: el aporte te llega completo.",
+    "¿Vas al interior este fin de semana? Publica los puestos vacíos de tu carro y recupera parte de la gasolina y los peajes. El aporte te llega completo.",
   alternates: { canonical: canonical("/publicar") },
 };
 

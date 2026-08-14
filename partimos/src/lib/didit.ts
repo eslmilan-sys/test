@@ -31,12 +31,15 @@ export type VerificationState = {
  * numéro de licence panaméen EST le numéro de cédula : le stocker
  * violerait la règle R6, donc il ne nous parvient jamais.
  */
-export type DocKind = "cedula" | "licencia";
+export type DocKind = "cedula" | "licencia" | "vehiculo";
 
 /** Le type stocké dans `identity_verifications.document_type`. */
 export const DOC_TYPE: Record<DocKind, string> = {
   cedula: "ID",
   licencia: "DL",
+  /* Le document du véhicule (registro vehicular). Chez Didit comme chez
+     nous, seul le VERDICT revient — jamais l'image, jamais la plaque. */
+  vehiculo: "VEHICLE",
 };
 
 /**

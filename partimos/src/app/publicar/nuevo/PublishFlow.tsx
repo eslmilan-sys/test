@@ -234,10 +234,12 @@ export function PublishFlow() {
   /** Combien de recherches distinctes les arrêts cochés rendent possibles. */
   const pairCount = servedPairCount(2 + cityStops.length);
 
-  /* Le carro doit être complet : sans photo ni placa, personne ne peut
-     reconnaître qui vient le chercher. */
+  /* Le carro doit être identifiable — en TEXTE. On ne demande plus de
+     photo : garder les images des carros de nos utilisateurs, c'est se
+     constituer une base à protéger pour un bénéfice que marca + modelo +
+     color + placa rendent déjà au point de rencontre. */
   const carroCompleto = registeredCars.some(
-    (c) => c.photoDataUrl && (c.plate ?? "").trim().length >= 4,
+    (c) => c.make && c.model && (c.plate ?? "").trim().length >= 4,
   );
   const faltantes: Requisito[] = !isSupabaseConfigured
     ? []
@@ -253,9 +255,9 @@ export function PublishFlow() {
           doc: "licencia" as const,
         },
         !carroCompleto && {
-          que: "Tu carro: marca, modelo, foto y placa",
+          que: "Tu carro: marca, modelo y placa",
           porQue:
-            "Es lo que permite reconocerte en el punto. La placa no se muestra en público.",
+            "Con eso te reconocen en el punto. No pedimos fotos, y la placa no se muestra en público.",
           donde: "/cuenta?panel=carro",
         },
       ].filter(Boolean) as Requisito[]);
@@ -935,17 +937,7 @@ export function PublishFlow() {
                       </div>
                     )}
                   <div className="flex flex-wrap items-center gap-3 rounded-[14px] border border-ink-200 px-4 py-3">
-                    {savedCar.photoDataUrl ? (
-                      /* eslint-disable-next-line @next/next/no-img-element -- data URL locale */
-                      <img
-                        src={savedCar.photoDataUrl}
-                        alt=""
-                        aria-hidden
-                        className="h-12 w-16 rounded-[10px] border border-ink-200 object-cover"
-                      />
-                    ) : (
-                      <Icon name="car" className="size-6 text-ink-500" />
-                    )}
+                    <Icon name="car" className="size-6 text-ink-500" />
                     <span className="min-w-0 flex-1">
                       <span className="block text-[15px] font-semibold">
                         {savedCar.make} {savedCar.model} {savedCar.year}

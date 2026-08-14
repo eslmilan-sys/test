@@ -288,8 +288,6 @@ function CarPanel() {
   const [year, setYear] = useState(2020);
   const [color, setColor] = useState("");
   const [plate, setPlate] = useState("");
-  const [photo, setPhoto] = useState<string | null>(null);
-  const [photoBusy, setPhotoBusy] = useState(false);
 
   const ref = findCar(make, model);
   const l100 = ref ? agedConsumption(ref.l100, year) : null;
@@ -310,25 +308,20 @@ function CarPanel() {
         year,
         color: color.trim(),
         plate: plate.trim().toUpperCase(),
-        photoDataUrl: photo,
+        /* PLUS DE PHOTO CHEZ NOUS. Décision du propriétaire : garder les
+           photos des carros de nos utilisateurs, c'est se constituer une
+           base d'images qu'il faut protéger, expliquer et supprimer sur
+           demande — pour un bénéfice qu'un vérificateur certifié rend
+           mieux. Ce qui reste est du TEXTE : marca, modelo, año, color y
+           placa, assez pour reconnaître le carro au point de rencontre. */
+        photoDataUrl: null,
       },
     ]);
     setMake("");
     setModel("");
     setColor("");
     setPlate("");
-    setPhoto(null);
     setEditing(false);
-  };
-
-  const onPhoto = async (file: File | undefined) => {
-    if (!file) return;
-    setPhotoBusy(true);
-    try {
-      setPhoto(await shrinkPhoto(file));
-    } finally {
-      setPhotoBusy(false);
-    }
   };
 
   return (
@@ -354,18 +347,6 @@ function CarPanel() {
                 key={`${c.make}-${c.model}-${c.year}-${i}`}
                 className="flex flex-wrap items-center gap-4 rounded-[14px] border border-ink-200 px-4 py-3.5"
               >
-                {c.photoDataUrl ? (
-                  /* eslint-disable-next-line @next/next/no-img-element -- data URL locale */
-                  <img
-                    src={c.photoDataUrl}
-                    alt={`${c.make} ${c.model} ${c.color}`}
-                    className="h-16 w-24 rounded-[10px] border border-ink-200 object-cover"
-                  />
-                ) : (
-                  <span className="flex h-16 w-24 items-center justify-center rounded-[10px] bg-ink-50 text-ink-500">
-                    <Icon name="car" className="size-6" />
-                  </span>
-                )}
                 <div className="min-w-0 flex-1">
                   <p className="text-[15px] font-semibold">
                     {c.make} {c.model} {c.year}
@@ -481,47 +462,16 @@ function CarPanel() {
             </p>
           )}
 
-          <div className="mt-4">
-            <p className="mb-2 text-[13.5px] font-semibold text-ink-900">
-              Foto del carro
-            </p>
-            <div className="flex flex-wrap items-center gap-3">
-              {photo ? (
-                /* eslint-disable-next-line @next/next/no-img-element -- data URL locale */
-                <img
-                  src={photo}
-                  alt="Foto elegida de tu carro"
-                  className="h-24 w-36 rounded-[14px] border border-ink-200 object-cover"
-                />
-              ) : (
-                <span className="flex h-24 w-36 items-center justify-center rounded-[14px] border-2 border-dashed border-ink-200 text-ink-400">
-                  <Icon name="car" className="size-7" />
-                </span>
-              )}
-              <label className="cursor-pointer rounded-[14px] border-[1.5px] border-ink-200 px-4 py-2.5 text-[13.5px] font-semibold transition-colors hover:border-accent hover:text-accent-ink">
-                {photoBusy
-                  ? "Procesando…"
-                  : photo
-                    ? "Cambiar foto"
-                    : "Subir foto"}
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="sr-only"
-                  onChange={(e) => onPhoto(e.target.files?.[0])}
-                />
-              </label>
-            </div>
-            <p className="mt-2 text-[12.5px] leading-snug text-ink-500">
-              Una sola foto, del exterior. Hace falta para publicar viajes: es
-              lo que permite reconocer el carro. En tu perfil público solo
-              aparecen el modelo, el color y esta foto.
-            </p>
-          </div>
+          <p className="mt-4 rounded-[14px] bg-ink-50 px-4 py-3 text-[12.5px] leading-relaxed text-ink-500">
+            No te pedimos fotos de tu carro. Con la marca, el modelo, el color
+            y la placa alcanza para reconocerte en el punto — y así no
+            guardamos ninguna imagen tuya. La placa no aparece en público:
+            solo la ve quien ya tiene la reserva confirmada contigo.
+          </p>
 
           <div className="mt-5 flex gap-3">
             <button
-              disabled={!ref || !photo || plate.trim().length < 4}
+              disabled={!ref || plate.trim().length < 4}
               onClick={addCar}
               className="rounded-[14px] bg-ink-900 px-6 py-3 font-display text-[15px] font-bold text-white transition-colors hover:bg-ink-800 disabled:opacity-50"
             >
@@ -551,30 +501,6 @@ function accountSelect() {
   ].join(" ");
 }
 
-/** Compresse la photo côté client : 800 px max, JPEG qualité 0,72. Une photo
- *  de téléphone fait 3–8 Mo ; en session `localStorage` (~5 Mo au total),
- *  seule une version réduite tient — et c'est aussi tout ce que l'affichage
- *  demande. */
-async function shrinkPhoto(file: File): Promise<string> {
-  const dataUrl = await new Promise<string>((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = () => reject(reader.error);
-    reader.readAsDataURL(file);
-  });
-  const img = await new Promise<HTMLImageElement>((resolve, reject) => {
-    const el = new Image();
-    el.onload = () => resolve(el);
-    el.onerror = reject;
-    el.src = dataUrl;
-  });
-  const scale = Math.min(1, 800 / Math.max(img.width, img.height));
-  const canvas = document.createElement("canvas");
-  canvas.width = Math.round(img.width * scale);
-  canvas.height = Math.round(img.height * scale);
-  canvas.getContext("2d")!.drawImage(img, 0, 0, canvas.width, canvas.height);
-  return canvas.toDataURL("image/jpeg", 0.72);
-}
 
 /**
  * LES PUESTOS RÉSERVÉS — la moitié passager de « Mis viajes ».

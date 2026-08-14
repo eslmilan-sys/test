@@ -33,7 +33,12 @@ export default function Home() {
         <Confianza />
         <RutasFrecuentes />
         <DriverCta />
-        <Faq items={GENERAL_FAQ} />
+        {/* QUATRE QUESTIONS, PAS ONZE. L'accueil doit convaincre, pas tout
+            expliquer : onze réponses ouvertes, c'est un mur de texte au
+            moment où la personne veut chercher un viaje. Les autres vivent
+            dans /ayuda, où on va quand on a vraiment une question — et le
+            balisage FAQ pour Google garde la liste complète. */}
+        <Faq items={GENERAL_FAQ.slice(0, 4)} />
       </main>
       <StickyCta />
       <FaqJsonLd items={GENERAL_FAQ} />

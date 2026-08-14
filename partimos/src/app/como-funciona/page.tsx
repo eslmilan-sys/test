@@ -184,7 +184,7 @@ export default function ComoFuncionaPage() {
                   {[
                     "Tu tarjeta por WhatsApp, correo o llamada",
                     "Un pago fuera de la app o de la mano al conductor",
-                    "Una comisión al conductor",
+                    "Un descuento sobre el aporte del conductor",
                     "Tu cédula — la ve solo el verificador certificado",
                   ].map((item) => (
                     <li

@@ -99,22 +99,6 @@ export function Pago() {
           </div>
         </div>
 
-        <div className="flex items-start gap-3.5 rounded-[20px] border border-danger/30 bg-danger-soft px-5.5 py-5">
-          <span className="flex size-8 shrink-0 items-center justify-center rounded-[10px] bg-danger/15 text-danger">
-            <Icon name="cross" className="size-4" />
-          </span>
-          <div>
-            <h3 className="mb-1.5 font-display text-[17px] font-bold">
-              Solo pagamos por canales oficiales
-            </h3>
-            <p className="text-[14.5px] leading-relaxed text-ink-500">
-              El único lugar donde Partimos cobra es dentro de la app, al
-              reservar, con su tarifa a la vista. Si alguien te pide tarjeta o
-              un pago por WhatsApp, correo o cualquier otra página a nombre de
-              Partimos, no somos nosotros — repórtalo.
-            </p>
-          </div>
-        </div>
       </div>
     </Section>
   );

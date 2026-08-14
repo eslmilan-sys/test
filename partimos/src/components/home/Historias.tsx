@@ -134,13 +134,14 @@ export function Historias() {
            première carte à sa place au repos, puis la deuxième venait se
            coller au bord de l'écran dès le premier glissement. Il faut dire
            séparément au défilement où commence la marge. */
-        /* 24 px et non 20 : la première carte doit respirer par rapport au
-           bord de l'écran, pas s'aligner pile sur la gouttière du texte —
-           un objet à fond plein paraît plus près du bord qu'un paragraphe
-           à la même distance, parce que son bord à lui est visible. */
+        /* 20 px, LA MÊME GOUTTIÈRE QUE LE TEXTE. On avait mis 24 pour
+           compenser optiquement le bord visible d'une carte pleine — le
+           propriétaire voit le décalage à l'œil nu, et il a raison : sur un
+           téléphone, quatre pixels d'écart entre le titre et la carte
+           en dessous se lisent comme un défaut, pas comme une intention. */
         style={{
-          paddingInline: "max(24px, calc((100vw - 1120px) / 2))",
-          scrollPaddingInline: "max(24px, calc((100vw - 1120px) / 2))",
+          paddingInline: "max(20px, calc((100vw - 1120px) / 2))",
+          scrollPaddingInline: "max(20px, calc((100vw - 1120px) / 2))",
         }}
       >
         {STORIES.map((story, index) => (

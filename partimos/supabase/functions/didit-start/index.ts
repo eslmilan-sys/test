@@ -43,10 +43,31 @@ Deno.serve(async (req) => {
   if (req.method !== "POST") return json(405, { error: "method_not_allowed" });
 
   const apiKey = Deno.env.get("DIDIT_API_KEY");
-  const workflowId = Deno.env.get("DIDIT_WORKFLOW_ID");
-  if (!apiKey || !workflowId) {
-    return json(503, { error: "didit_not_configured" });
+
+  /* QUEL DOCUMENT. Chaque type a son parcours chez Didit : la cédula ne
+     se vérifie pas comme un permis, et le document du véhicule encore
+     moins. Sans `kind`, on garde la cédula — c'est le cas d'avant. */
+  let kind = "cedula";
+  try {
+    const body = await req.json();
+    if (body && typeof body.kind === "string") kind = body.kind;
+  } catch {
+    /* Corps vide : la cédula. */
   }
+  const WORKFLOWS: Record<string, string | undefined> = {
+    cedula: Deno.env.get("DIDIT_WORKFLOW_ID"),
+    licencia: Deno.env.get("DIDIT_WORKFLOW_LICENCIA"),
+    vehiculo: Deno.env.get("DIDIT_WORKFLOW_VEHICULO"),
+  };
+  const DOC_TYPE: Record<string, string> = {
+    cedula: "ID",
+    licencia: "DL",
+    vehiculo: "VEHICLE",
+  };
+  const docType = DOC_TYPE[kind];
+  const workflowId = WORKFLOWS[kind];
+  if (!apiKey || !docType) return json(503, { error: "didit_not_configured" });
+  if (!workflowId) return json(503, { error: `sin_flujo_${kind}` });
 
   /* Qui demande ? Le JWT du porteur, vérifié par Supabase avant d'arriver
      ici, redevient un utilisateur via le client anon + en-tête. */
@@ -67,11 +88,15 @@ Deno.serve(async (req) => {
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
   );
 
-  /* Un dossier déjà vérifié et valide ? Rien à rouvrir. */
+  /* Un dossier déjà vérifié et valide ? Rien à rouvrir — MAIS pour CE
+     document-là. Sans le filtre sur `document_type`, une cédula vérifiée
+     bloquait la vérification du permis et du véhicule : le bouton
+     répondait « already_verified » pour un document jamais présenté. */
   const { data: existing } = await supabase
     .from("identity_verifications")
     .select("status, expires_at")
     .eq("profile_id", userId)
+    .eq("document_type", docType)
     .eq("status", "verified")
     .or("expires_at.is.null,expires_at.gt.now()")
     .limit(1);

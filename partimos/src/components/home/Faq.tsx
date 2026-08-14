@@ -9,10 +9,9 @@ import type { Faq as FaqItem } from "@/lib/content";
 export function FaqList({ items }: { items: FaqItem[] }) {
   return (
     <div className="mt-8 max-w-[800px]">
-      {items.map((item, index) => (
+      {items.map((item) => (
         <details
           key={item.q}
-          open={index === 0}
           className="group border-b border-ink-200"
         >
           <summary className="relative cursor-pointer list-none py-5 pr-10 font-display text-[17px] font-bold tracking-[-0.015em] [&::-webkit-details-marker]:hidden">
@@ -27,6 +26,14 @@ export function FaqList({ items }: { items: FaqItem[] }) {
           </p>
         </details>
       ))}
+      {/* Le reste des réponses n'a pas disparu : elle est là où on la
+          cherche vraiment. */}
+      <a
+        href="/ayuda"
+        className="mt-5 inline-flex items-center gap-2 text-[14.5px] font-semibold text-accent-ink hover:underline"
+      >
+        Ver todas las preguntas
+      </a>
     </div>
   );
 }
