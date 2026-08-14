@@ -23,10 +23,12 @@ die() { printf "\n\033[31m%s\033[0m\n" "$1" >&2; exit 1; }
 
 : "${SUPABASE_PROJECT_REF:?Falta SUPABASE_PROJECT_REF (está en la URL del panel: https://supabase.com/dashboard/project/AQUI)}"
 : "${SUPABASE_DB_PASSWORD:?Falta SUPABASE_DB_PASSWORD (la que pusiste al crear el proyecto)}"
-: "${SUPABASE_SERVICE_ROLE_KEY:?Falta SUPABASE_SERVICE_ROLE_KEY (panel → Project Settings → API → service_role)}"
-: "${NEXT_PUBLIC_SUPABASE_URL:?Falta NEXT_PUBLIC_SUPABASE_URL (panel → Project Settings → API → Project URL)}"
-
-export SUPABASE_URL="$NEXT_PUBLIC_SUPABASE_URL"
+: "${SUPABASE_SECRET_KEY:=${SUPABASE_SERVICE_ROLE_KEY:-}}"
+[ -n "$SUPABASE_SECRET_KEY" ] || die "Falta SUPABASE_SECRET_KEY (panel → Project Settings → API Keys → secret). En proyectos viejos se llama SUPABASE_SERVICE_ROLE_KEY."
+export SUPABASE_SECRET_KEY
+: "${SUPABASE_URL:=${NEXT_PUBLIC_SUPABASE_URL:-}}"
+[ -n "$SUPABASE_URL" ] || die "Falta SUPABASE_URL (panel → Project Settings → API → Project URL)."
+export SUPABASE_URL
 
 # ── 2. Herramientas ──────────────────────────────────────────────────
 command -v osmium >/dev/null || die \

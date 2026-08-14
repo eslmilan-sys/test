@@ -230,9 +230,13 @@ function centroid(geometry) {
 
 async function upload(rows) {
   const url = process.env.SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  /* Supabase renombró las claves: `sb_secret_…` sustituye al viejo JWT
+     `service_role`. Se aceptan las dos — un proyecto nuevo trae la
+     primera, uno viejo la segunda. */
+  const key =
+    process.env.SUPABASE_SECRET_KEY ?? process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!url || !key)
-    exitWith("Faltan SUPABASE_URL y SUPABASE_SERVICE_ROLE_KEY.");
+    exitWith("Faltan SUPABASE_URL y SUPABASE_SECRET_KEY (o SUPABASE_SERVICE_ROLE_KEY).");
 
   const CHUNK = 500;
   for (let i = 0; i < rows.length; i += CHUNK) {
