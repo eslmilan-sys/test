@@ -41,28 +41,72 @@ export default function PublicarPage() {
   return (
     <>
       <main id="contenido">
-        <div className="noche pt-10 pb-11 text-white">
-          <Container>
-            <h1 className="mb-4 max-w-[16ch] text-[clamp(32px,6.4vw,52px)] leading-[1.02] font-extrabold tracking-[-0.04em]">
-              El viaje ya lo ibas a hacer
-            </h1>
-            <p className="max-w-[54ch] text-[16.5px] leading-relaxed text-night-200">
-              No ganas dinero manejando: recuperas parte de lo que ibas a gastar
-              igual. La gasolina cuesta lo mismo vayas solo o acompañado.
-            </p>
-            <div className="mt-7 flex flex-wrap gap-3">
-              <ButtonLink href="/publicar/nuevo" variant="onDark" size="lg">
-                Publicar mi viaje
-              </ButtonLink>
-              <ButtonLink href="#calculadora" variant="onDark" size="lg">
-                Calcular mi aporte
-              </ButtonLink>
+        {/* LA PAGE COMMENCE PAR LE CHIFFRE.
+            On y arrive avec UNE question — « combien je récupère ? » — et
+            on tombait sur quatre écrans d'explications avant la calculette.
+            Elle passe donc en haut, à côté du titre, avec les mêmes couleurs
+            que l'accueil : le même ambre sur le même titre en trois temps,
+            pour que la page ne ressemble pas à un autre site. */}
+        <div className="relative overflow-hidden pt-9 pb-12">
+          {/* La lueur ambre de la maison, la même que sous la carte de
+              recherche de l'accueil. */}
+          <span
+            aria-hidden
+            className="pointer-events-none absolute -top-16 -left-10 size-56 rotate-[10deg] rounded-[40px] bg-[linear-gradient(135deg,#fde68a,#f59e0b_58%,#d97706)] opacity-25 blur-2xl"
+          />
+          <Container className="relative">
+            <div className="grid items-start gap-8 min-[960px]:grid-cols-[1.05fr_1fr] min-[960px]:gap-12">
+              <div>
+                <p className="glass mb-5 inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-[12.5px] font-semibold text-ink-600">
+                  <span className="font-display font-bold tracking-wide text-action-deep uppercase">
+                    Conductores
+                  </span>
+                  El viaje ya lo ibas a hacer
+                </p>
+                <h1 className="mb-5 overflow-hidden text-[clamp(32px,6.4vw,52px)] leading-[1.02] font-extrabold tracking-[-0.04em]">
+                  <span className="linea">
+                    <em className="text-action-deep not-italic">Maneja</em>{" "}
+                    igual.
+                  </span>
+                  <span className="linea linea-2">Gasta la mitad.</span>
+                  <span className="linea linea-3">
+                    <em className="text-action-deep not-italic">Comparte</em> el
+                    camino.
+                  </span>
+                </h1>
+                <p className="max-w-[48ch] text-[16.5px] leading-[1.38] font-light text-ink-600 md:text-[18px]">
+                  No ganas dinero manejando: recuperas parte de lo que ibas a
+                  gastar igual. La gasolina cuesta lo mismo vayas solo o
+                  acompañado — la diferencia es con quién.
+                </p>
+                <div className="mt-7 flex flex-wrap gap-3">
+                  <ButtonLink href="/publicar/nuevo" size="lg">
+                    Quiero proponer un viaje
+                  </ButtonLink>
+                  <ButtonLink href="#como" variant="secondary" size="lg">
+                    Cómo funciona
+                  </ButtonLink>
+                </div>
+              </div>
+
+              {/* LA CALCULETTE, en haut et avec le choix des villes :
+                  personne ne sait de tête que Panamá → Chitré fait 250 km. */}
+              <div id="calculadora" className="scroll-mt-24">
+                <Calculadora conRuta />
+                <ButtonLink
+                  href="/publicar/nuevo"
+                  size="lg"
+                  className="mt-3 w-full"
+                >
+                  Proponer este viaje
+                </ButtonLink>
+              </div>
             </div>
           </Container>
         </div>
 
         <div>
-          <section className="py-12 md:py-16">
+          <section id="como" className="scroll-mt-24 py-12 md:py-16">
             <Container>
               <h2 className="mb-8 max-w-[20ch] text-[clamp(24px,4vw,34px)] font-extrabold">
                 Publicar toma menos de un minuto
@@ -170,12 +214,12 @@ export default function PublicarPage() {
           </section>
 
           <section
-            id="calculadora"
+            id="tope"
             className="scroll-mt-24 bg-ink-50 py-12 md:py-16"
           >
             <Container>
               <div className="grid gap-9 min-[900px]:grid-cols-[1.04fr_0.96fr] min-[900px]:items-start min-[900px]:gap-12">
-                <Calculadora />
+                <Calculadora conRuta />
                 <div>
                   <h2 className="mb-4 max-w-[20ch] text-[clamp(24px,4vw,34px)] font-extrabold">
                     Por qué hay un tope

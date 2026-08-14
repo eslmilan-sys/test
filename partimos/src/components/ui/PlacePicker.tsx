@@ -53,6 +53,14 @@ export function PlacePicker({
   placeholder?: string;
 }) {
   const [open, setOpen] = useState(false);
+  /* LE MINUTEUR DE FERMETURE, retenu pour pouvoir l'ANNULER.
+     `onBlur` programme la fermeture 120 ms plus tard — le temps qu'un tap
+     sur une suggestion aboutisse. Sans référence, ce minuteur survivait au
+     retour du doigt : on retouchait le champ, la liste s'ouvrait, et 120 ms
+     après le minuteur d'AVANT la refermait. Le champ gardant le focus,
+     aucun nouvel événement ne venait jamais la rouvrir : la recherche
+     paraissait morte dès le deuxième essai. */
+  const cierre = useRef<number>(0);
   const [query, setQuery] = useState("");
   const [remote, setRemote] = useState<FoundPlace[]>([]);
   const debounce = useRef<number>(0);
@@ -159,7 +167,16 @@ export function PlacePicker({
           autoComplete="off"
           value={open ? query : value}
           placeholder={placeholder}
+          /* ROUVRIR AU CLIC, pas seulement au focus. Après avoir choisi une
+             ville, le champ GARDE le focus : le retoucher n'émettait donc
+             aucun `focus`, la liste restait fermée pour toujours et la
+             recherche paraissait morte dès le deuxième essai. */
+          onClick={() => {
+            window.clearTimeout(cierre.current);
+            setOpen(true);
+          }}
           onFocus={() => {
+            window.clearTimeout(cierre.current);
             setQuery(value);
             setOpen(true);
           }}
@@ -172,7 +189,10 @@ export function PlacePicker({
                correspond plus aux coordonnées d'avant. */
             onCoords?.(null);
           }}
-          onBlur={() => window.setTimeout(() => setOpen(false), 120)}
+          onBlur={() => {
+            window.clearTimeout(cierre.current);
+            cierre.current = window.setTimeout(() => setOpen(false), 120);
+          }}
           onKeyDown={(e) => {
             if (e.key === "Escape") setOpen(false);
             /* La touche « intro » du clavier du téléphone valide le

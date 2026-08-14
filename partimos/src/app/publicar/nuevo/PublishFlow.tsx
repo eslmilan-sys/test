@@ -6,6 +6,10 @@ import Link from "next/link";
 import { Container } from "@/components/site/Section";
 import { Button } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
+import {
+  RequisitosConductor,
+  type Requisito,
+} from "@/components/publicar/RequisitosConductor";
 import { RouteMap } from "@/components/map/RouteMap";
 import { CityCombobox } from "@/components/ui/CityCombobox";
 import { PlacePicker } from "@/components/ui/PlacePicker";
@@ -235,18 +239,18 @@ export function PublishFlow() {
   const carroCompleto = registeredCars.some(
     (c) => c.photoDataUrl && (c.plate ?? "").trim().length >= 4,
   );
-  const faltantes = !isSupabaseConfigured
+  const faltantes: Requisito[] = !isSupabaseConfigured
     ? []
-    : [
+    : ([
         !docs?.cedula && {
           que: "Verificar tu cédula",
           porQue: "Dice quién eres. Dos minutos, con Didit.",
-          donde: "/cuenta?panel=verificacion",
+          doc: "cedula" as const,
         },
         !docs?.licencia && {
           que: "Verificar tu licencia de conducir",
           porQue: "Dice que puedes conducir. El mismo recorrido.",
-          donde: "/cuenta?panel=verificacion",
+          doc: "licencia" as const,
         },
         !carroCompleto && {
           que: "Foto y placa de tu carro",
@@ -254,11 +258,7 @@ export function PublishFlow() {
             "Es lo que permite reconocerte en el punto. La placa no se muestra en público.",
           donde: "/cuenta?panel=carro",
         },
-      ].filter(Boolean as unknown as (v: unknown) => v is {
-        que: string;
-        porQue: string;
-        donde: string;
-      });
+      ].filter(Boolean) as Requisito[]);
   const puedePublicar = faltantes.length === 0;
 
   const canGoNext = [
@@ -499,6 +499,15 @@ export function PublishFlow() {
                 </p>
               )}
             </>
+          )}
+
+          {/* L'AVIS, dès le premier écran. Le savoir avant de remplir vingt
+              champs, c'est la différence entre « je m'y mets » et « j'ai
+              tout rempli pour rien ». */}
+          {step === 0 && session && !puedePublicar && (
+            <div className="mb-6">
+              <RequisitosConductor faltantes={faltantes} tono="aviso" />
+            </div>
           )}
 
           {step === 1 && corridor && (
@@ -1213,51 +1222,10 @@ export function PublishFlow() {
             </>
           )}
 
-          {/* LE VERROU. Il n'apparaît qu'à la dernière étape, et il dit
-              exactement ce qui manque et pourquoi — un blocage sans
-              raison se vit comme une porte fermée ; avec la raison,
-              c'est une règle du jeu. */}
+          {/* LE VERROU, à la dernière étape : là c'est la règle. */}
           {step === 3 && session && !puedePublicar && (
-            <div className="mt-6 rounded-[20px] border-[1.5px] border-action bg-action-soft px-4 py-4 sm:px-5">
-              <h2 className="mb-1 font-display text-[16.5px] font-bold text-action-ink">
-                Antes de publicar, falta poco
-              </h2>
-              <p className="mb-3 text-[13.5px] leading-relaxed text-action-ink/85">
-                Alguien va a subirse a tu carro. Estas tres cosas son las que
-                lo hacen posible — se piden una sola vez.
-              </p>
-              <ul className="grid gap-2">
-                {faltantes.map((f) => (
-                  <li key={f.que}>
-                    <Link
-                      href={f.donde}
-                      className="flex items-start gap-3 rounded-[14px] bg-white px-4 py-3 transition-colors hover:bg-white/70"
-                    >
-                      <span
-                        aria-hidden
-                        className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full border-2 border-ink-200"
-                      />
-                      <span className="min-w-0 flex-1">
-                        <span className="block text-[14.5px] font-semibold">
-                          {f.que}
-                        </span>
-                        <span className="block text-[12.5px] leading-snug text-ink-500">
-                          {f.porQue}
-                        </span>
-                      </span>
-                      <Icon
-                        name="arrowRight"
-                        className="mt-1 size-4 shrink-0 text-ink-400"
-                      />
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-              <p className="mt-3 text-[12.5px] leading-snug text-action-ink/85">
-                Los documentos los revisa Didit y nunca los guardamos: solo nos
-                llega «verificado». Buscar y reservar como pasajero no necesita
-                nada de esto.
-              </p>
+            <div className="mt-6">
+              <RequisitosConductor faltantes={faltantes} tono="bloqueo" />
             </div>
           )}
 

@@ -714,6 +714,56 @@
     }
   }
 
+  /* LE TITRE ARRIVE EN TROIS TEMPS, DE DEUX CÔTÉS.
+     Une ligne vient de la droite, la suivante de la gauche, la dernière
+     de la droite à nouveau : le regard fait des allers-retours et se cale
+     naturellement sur la lecture. Le déplacement est court (28 px) et la
+     courbe s'arrête net — c'est ce qui sépare l'élégance du carrousel de
+     foire. Chaque ligne masque son débordement, pour qu'aucune ne semble
+     glisser par-dessus la page.
+     Sans mouvement demandé (prefers-reduced-motion), tout est déjà en
+     place : le titre ne dépend pas de l'animation pour être lisible. */
+  .linea {
+    opacity: 1;
+    display: block;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .linea {
+      opacity: 0;
+      animation: entra-derecha 0.78s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    .linea-2 {
+      animation-name: entra-izquierda;
+      animation-delay: 0.13s;
+    }
+    .linea-3 {
+      animation-delay: 0.26s;
+    }
+  }
+
+  @keyframes entra-derecha {
+    from {
+      opacity: 0;
+      transform: translate3d(28px, 0, 0);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes entra-izquierda {
+    from {
+      opacity: 0;
+      transform: translate3d(-28px, 0, 0);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
   @keyframes enter-up {
     from {
       opacity: 0;

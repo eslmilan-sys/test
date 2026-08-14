@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { ALL_CITIES, buildRoute } from "@/lib/corridors";
 import {
   AVERAGE_TOLL_CENTS,
   computePriceCap,
@@ -77,18 +78,32 @@ export function Calculadora({
   initialKm = 250,
   tollCents = AVERAGE_TOLL_CENTS,
   compact = false,
+  conRuta = false,
 }: {
   initialKm?: number;
   tollCents?: number;
   compact?: boolean;
+  /** Choisir DEUX VILLES au lieu de deviner des kilomètres. Personne ne
+   *  sait que Panamá → Chitré fait 250 km : on demandait donc au
+   *  conducteur d'inventer le chiffre qui décide de son aporte. */
+  conRuta?: boolean;
 }) {
-  const [km, setKm] = useState(initialKm);
+  const [desde, setDesde] = useState(conRuta ? "panama-city" : "");
+  const [hacia, setHacia] = useState(conRuta ? "chitre" : "");
+  const [kmChoice, setKmChoice] = useState<number | null>(null);
   const [seats, setSeats] = useState(3);
   const [category, setCategory] = useState<VehicleCategory>("standard");
 
+  /* La ruta commande : elle donne les kilomètres ET les péages réels.
+     Le curseur reste en dessous pour affiner — dérivé, jamais recopié
+     dans un état par un effet. */
+  const ruta = conRuta ? buildRoute(desde, hacia) : null;
+  const km = kmChoice ?? ruta?.distanceKm ?? initialKm;
+  const peaje = ruta?.tollCents ?? tollCents;
+
   const result = useMemo(
-    () => computePriceCap(km, tollCents, category, seats),
-    [km, tollCents, category, seats],
+    () => computePriceCap(km, peaje, category, seats),
+    [km, peaje, category, seats],
   );
 
   const tope = useMontoRodante(result.maxPriceCents);
@@ -107,6 +122,55 @@ export function Calculadora({
         El tope se calcula solo. No se puede pasar de ahí.
       </p>
 
+      {conRuta && (
+        <div className="mb-5 grid gap-2.5 min-[420px]:grid-cols-2">
+          <label className="block">
+            <span className="mb-1.5 block text-[12.5px] font-bold tracking-[0.09em] text-ink-500 uppercase">
+              Desde
+            </span>
+            <select
+              value={desde}
+              onChange={(e) => {
+                setDesde(e.target.value);
+                setKmChoice(null);
+              }}
+              className="w-full cursor-pointer rounded-[14px] border border-ink-200 px-3.5 py-2.5 text-[15px] font-semibold focus:border-accent focus:outline-none"
+            >
+              {ALL_CITIES.map((c) => (
+                <option key={c.slug} value={c.slug}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="block">
+            <span className="mb-1.5 block text-[12.5px] font-bold tracking-[0.09em] text-ink-500 uppercase">
+              Hacia
+            </span>
+            <select
+              value={hacia}
+              onChange={(e) => {
+                setHacia(e.target.value);
+                setKmChoice(null);
+              }}
+              className="w-full cursor-pointer rounded-[14px] border border-ink-200 px-3.5 py-2.5 text-[15px] font-semibold focus:border-accent focus:outline-none"
+            >
+              {ALL_CITIES.map((c) => (
+                <option key={c.slug} value={c.slug}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
+          </label>
+          {!ruta && desde !== hacia && (
+            <p className="text-[12.5px] text-ink-500 min-[420px]:col-span-2">
+              Esa ruta todavía no la tenemos medida. Ajusta los kilómetros
+              abajo y el cálculo sigue funcionando igual.
+            </p>
+          )}
+        </div>
+      )}
+
       <div className="mb-5">
         <div className="mb-2.5 flex items-baseline justify-between">
           <label
@@ -124,7 +188,7 @@ export function Calculadora({
           max={450}
           step={5}
           value={km}
-          onChange={(e) => setKm(Number(e.target.value))}
+          onChange={(e) => setKmChoice(Number(e.target.value))}
           className="h-1.5 w-full cursor-pointer appearance-none rounded-full bg-ink-200 [&::-moz-range-thumb]:size-6 [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-4 [&::-moz-range-thumb]:border-accent [&::-moz-range-thumb]:bg-white [&::-webkit-slider-thumb]:size-6 [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-4 [&::-webkit-slider-thumb]:border-accent [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:shadow-[0_2px_8px_rgb(14_42_53/0.22)]"
         />
       </div>

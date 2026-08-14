@@ -107,19 +107,26 @@ export function Hero() {
             </div>
 
             <div className="para-medio">
-              <h1 className="enter enter-2 mb-5 text-[clamp(36px,7.4vw,62px)] leading-[0.98] font-extrabold tracking-[-0.045em]">
-                Viaja con{" "}
-                <em className="text-action-deep not-italic">quien ya va</em>{" "}
-                para allá.
+              {/* TROIS LIGNES, DEUX COULEURS, TROIS ENTRÉES.
+                  Le mot d'action est en ambre, le reste en encre : la
+                  couleur ne décore pas, elle marque le verbe. Chaque ligne
+                  entre d'un côté différent — droite, gauche, droite. */}
+              <h1 className="mb-5 overflow-hidden text-[clamp(36px,7.4vw,62px)] leading-[0.98] font-extrabold tracking-[-0.045em]">
+                <span className="linea">
+                  <em className="text-action-deep not-italic">Viaja</em> mejor.
+                </span>
+                <span className="linea linea-2">Gasta menos.</span>
+                <span className="linea linea-3">
+                  <em className="text-action-deep not-italic">Conecta</em> más.
+                </span>
               </h1>
             </div>
 
             <div className="para-cerca">
               <p className="enter enter-2 max-w-[44ch] text-[16.5px] leading-[1.38] font-light text-ink-600 md:text-[19px]">
-                Partimos junta a quien maneja con quien va para el mismo lado —
-                de bajada al interior o de vuelta a la ciudad. Reservas sin
-                pagar nada y haces el camino sentado, con una sola parada: la
-                tuya.
+                Partimos te conecta con personas que van a tu mismo destino.
+                Viajes cómodos, directos y sin dar vueltas — reservas sin pagar
+                nada y haces el camino sentado, con una sola parada: la tuya.
               </p>
             </div>
           </div>
