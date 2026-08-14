@@ -3,9 +3,11 @@
 -- Pégalo entero en: panel de Supabase → SQL Editor → New query → Run.
 -- Son las 14 migraciones en orden. Tarda unos segundos.
 --
--- Probado de verdad: se aplicó completo sobre Postgres 16 + PostGIS
--- limpio antes de publicarlo. Los roles 'authenticated' y 'anon' que
--- usan las políticas ya existen en cualquier proyecto Supabase.
+-- Probado en las DOS situaciones antes de publicarlo:
+--   · Postgres 16 + PostGIS limpio (crea el auth.users de respaldo);
+--   · una copia de las condiciones de Supabase — esquema auth ajeno y
+--     bloqueado, extensiones en el esquema `extensions` — donde el
+--     bloque de auth se salta solo y nada pide permisos que no tiene.
 --
 -- Generado el 2026-08-14 desde supabase/migrations/.
 
@@ -37,15 +39,28 @@
 --     vérification et la référence du prestataire.
 -- =====================================================================
 
--- Sur Supabase, le schéma auth existe déjà. Ce bloc permet d'exécuter
--- et de tester le schéma sur un Postgres nu.
-CREATE SCHEMA IF NOT EXISTS auth;
-CREATE TABLE IF NOT EXISTS auth.users (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  email text,
-  phone text,
-  created_at timestamptz NOT NULL DEFAULT now()
-);
+-- Sur Supabase, `auth.users` existe déjà et appartient au service
+-- d'authentification : personne d'autre n'a le droit d'y écrire. Même
+-- `CREATE TABLE IF NOT EXISTS` échoue là-bas (« permission denied for
+-- schema auth »), parce que le test de présence demande lui-même le
+-- droit de créer. On regarde donc AVANT, et on ne crée que sur un
+-- Postgres nu — le cas des tests hors ligne.
+DO $auth_bootstrap$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
+    WHERE n.nspname = 'auth' AND c.relname = 'users'
+  ) THEN
+    CREATE SCHEMA IF NOT EXISTS auth;
+    CREATE TABLE auth.users (
+      id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+      email text,
+      phone text,
+      created_at timestamptz NOT NULL DEFAULT now()
+    );
+  END IF;
+END
+$auth_bootstrap$;
 
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
@@ -1737,6 +1752,13 @@ CREATE POLICY routines_own ON routines
 -- El geocodificador externo queda de RESPALDO para lo que no tengamos,
 -- no de motor principal.
 
+-- Supabase instala las extensiones en el esquema `extensions`; un
+-- Postgres nuevo las pone en `public`. Nombrar `public.unaccent(...)` a
+-- mano rompía en el primer caso. Se resuelve por search_path — un
+-- esquema que no existe se ignora sin error, así que la misma línea vale
+-- para los dos mundos.
+set search_path = public, extensions;
+
 create extension if not exists postgis;
 create extension if not exists pg_trgm;
 create extension if not exists unaccent;
@@ -1785,7 +1807,8 @@ language sql
 immutable
 parallel safe
 strict
-as $$ select public.unaccent('public.unaccent', $1) $$;
+set search_path = public, extensions
+as $$ select unaccent('unaccent', $1) $$;
 
 -- Búsqueda por texto: trigramas sobre el nombre sin acentos. Es lo que
 -- hace que «torre mistral», «Torre Mistral» y «PH torre mistral» caigan
@@ -1830,6 +1853,7 @@ returns table (
 )
 language sql
 stable
+set search_path = public, extensions
 as $$
   select
     p.id,
@@ -1862,6 +1886,7 @@ create or replace function bump_place(place_id bigint)
 returns void
 language sql
 volatile
+set search_path = public, extensions
 as $$
   update places set used_count = used_count + 1 where id = place_id;
 $$;

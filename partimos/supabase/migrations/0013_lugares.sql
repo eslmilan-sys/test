@@ -23,6 +23,13 @@
 -- El geocodificador externo queda de RESPALDO para lo que no tengamos,
 -- no de motor principal.
 
+-- Supabase instala las extensiones en el esquema `extensions`; un
+-- Postgres nuevo las pone en `public`. Nombrar `public.unaccent(...)` a
+-- mano rompía en el primer caso. Se resuelve por search_path — un
+-- esquema que no existe se ignora sin error, así que la misma línea vale
+-- para los dos mundos.
+set search_path = public, extensions;
+
 create extension if not exists postgis;
 create extension if not exists pg_trgm;
 create extension if not exists unaccent;
@@ -71,7 +78,8 @@ language sql
 immutable
 parallel safe
 strict
-as $$ select public.unaccent('public.unaccent', $1) $$;
+set search_path = public, extensions
+as $$ select unaccent('unaccent', $1) $$;
 
 -- Búsqueda por texto: trigramas sobre el nombre sin acentos. Es lo que
 -- hace que «torre mistral», «Torre Mistral» y «PH torre mistral» caigan
@@ -116,6 +124,7 @@ returns table (
 )
 language sql
 stable
+set search_path = public, extensions
 as $$
   select
     p.id,
@@ -148,6 +157,7 @@ create or replace function bump_place(place_id bigint)
 returns void
 language sql
 volatile
+set search_path = public, extensions
 as $$
   update places set used_count = used_count + 1 where id = place_id;
 $$;

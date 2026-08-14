@@ -23,15 +23,28 @@
 --     vérification et la référence du prestataire.
 -- =====================================================================
 
--- Sur Supabase, le schéma auth existe déjà. Ce bloc permet d'exécuter
--- et de tester le schéma sur un Postgres nu.
-CREATE SCHEMA IF NOT EXISTS auth;
-CREATE TABLE IF NOT EXISTS auth.users (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  email text,
-  phone text,
-  created_at timestamptz NOT NULL DEFAULT now()
-);
+-- Sur Supabase, `auth.users` existe déjà et appartient au service
+-- d'authentification : personne d'autre n'a le droit d'y écrire. Même
+-- `CREATE TABLE IF NOT EXISTS` échoue là-bas (« permission denied for
+-- schema auth »), parce que le test de présence demande lui-même le
+-- droit de créer. On regarde donc AVANT, et on ne crée que sur un
+-- Postgres nu — le cas des tests hors ligne.
+DO $auth_bootstrap$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
+    WHERE n.nspname = 'auth' AND c.relname = 'users'
+  ) THEN
+    CREATE SCHEMA IF NOT EXISTS auth;
+    CREATE TABLE auth.users (
+      id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+      email text,
+      phone text,
+      created_at timestamptz NOT NULL DEFAULT now()
+    );
+  END IF;
+END
+$auth_bootstrap$;
 
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
