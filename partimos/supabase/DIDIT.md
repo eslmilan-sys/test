@@ -138,7 +138,28 @@ La connexion de démonstration en `localStorage` ne suffit pas — le
 branchement complet suppose donc d'activer aussi Supabase Auth (OTP par
 SMS, prévu au brief).
 
-## 5. Vérifier le branchement ⛔
+## 5. Vérifié ✅ — le 14 août 2026
+
+Le webhook a été testé de bout en bout depuis l'intérieur de la base
+(extension `pg_net` installée le temps du test, puis retirée), en
+fabriquant des requêtes signées avec le vrai secret :
+
+| Cas | Réponse attendue | Obtenu |
+| --- | --- | --- |
+| Signature correcte | 200 `ok` | ✅ 200 `ok` |
+| Signature falsifiée | 401 | ✅ 401 `invalid signature` |
+| Signature correcte, événement vieux d'une heure | 401 | ✅ 401 `stale event` |
+| Statut inconnu de Didit | 200 sans écriture | ✅ 200 `ignored` |
+
+Autrement dit : le secret est bien chargé, la signature HMAC est
+vérifiée, le rejeu est borné et un statut inattendu ne casse rien.
+
+Ce qui n'a PAS pu être testé sans un vrai utilisateur : l'écriture du
+verdict dans `identity_verifications`. Le chemin existe et répond 200
+quand la ligne n'existe pas encore ; il sera exercé à la première
+vérification réelle.
+
+### L'ancienne procédure de vérification manuelle ⛔
 
 1. `supabase functions logs didit-start` pendant qu'on clique le bouton :
    on doit voir la création de session, et une ligne `pending` dans
