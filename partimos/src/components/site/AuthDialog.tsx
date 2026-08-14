@@ -6,6 +6,7 @@ import { Icon } from "@/components/ui/Icon";
 import { getSupabase, isSupabaseConfigured } from "@/lib/supabase";
 import { useSession } from "@/lib/session";
 import { track } from "@/lib/analytics";
+import { readPastedAuth } from "@/lib/otp-link";
 
 /**
  * INSCRIPTION ET CONNEXION — l'écran NUIT.
@@ -88,6 +89,12 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
+  /* Ce que la personne colle quand son courriel contient un LIEN et pas
+     un code. Tant que le gabarit du courriel n'a pas été corrigé dans le
+     tableau de bord, c'est la seule façon d'entrer — et même après, un
+     client courriel qui masque le code laissera toujours le lien. */
+  const [pasted, setPasted] = useState("");
+  const [showPaste, setShowPaste] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [busy, setBusy] = useState(false);
@@ -96,6 +103,8 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
   function reset() {
     setStep("identity");
     setCode("");
+    setPasted("");
+    setShowPaste(false);
     setError("");
     setNotice("");
   }
@@ -152,27 +161,49 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
       last_name: lastName.trim(),
       locale: "es",
     };
+    /* « Entrar » n'invente pas de compte. Sans ça, se tromper d'adresse en
+       se connectant créait silencieusement un deuxième compte vide — et la
+       personne jurait avoir perdu ses viajes. Créer, c'est le rôle de
+       « crear cuenta », et de lui seul. */
+    const shouldCreateUser = mode === "register";
     const { error: authError } =
       channel === "phone"
         ? await supabase.auth.signInWithOtp({
             phone: e164,
             /* WhatsApp o SMS — el mismo código, el canal elegido.
                WhatsApp requiere el sender de Twilio en Supabase. */
-            options: { channel: codeVia, data },
+            options: { channel: codeVia, data, shouldCreateUser },
           })
         : await supabase.auth.signInWithOtp({
             email: email.trim(),
-            options: { data },
+            options: {
+              data,
+              shouldCreateUser,
+              /* Où le lien du courriel doit RETOMBER. Sans ça, Supabase
+                 renvoie sur son « Site URL » — et si celui-ci est resté
+                 sur localhost, le lien meurt dans le téléphone de la
+                 personne. On donne donc l'adresse d'ici, celle du site
+                 réellement ouvert : elle sera juste en production comme
+                 en développement. (Elle doit figurer dans la liste des
+                 « Redirect URLs » du tableau de bord, sinon Supabase
+                 retombe sur le Site URL.) */
+              emailRedirectTo: window.location.href,
+            },
           });
     if (authError) {
-      /* Le SMS demande un fournisseur (Twilio) branché sur Supabase.
-         Tant qu'il ne l'est pas, le dire franchement vaut mieux qu'un
-         « réessaie » qui ne marchera jamais. */
+      /* Trois pannes différentes, trois phrases différentes — « inténtalo
+         otra vez » sur une adresse sans compte fait tourner en rond. */
+      const noExiste =
+        !shouldCreateUser &&
+        /signup|not found|user.*exist/i.test(authError.message);
       setError(
-        channel === "phone"
-          ? "Todavía no podemos mandar códigos por celular. Entra con tu correo mientras tanto."
-          : "No pudimos mandar el código. Inténtalo otra vez.",
+        noExiste
+          ? "No hay cuenta con esos datos. Crea tu cuenta aquí abajo, toma diez segundos."
+          : channel === "phone"
+            ? "Todavía no podemos mandar códigos por celular. Entra con tu correo mientras tanto."
+            : "No pudimos mandar el código. Inténtalo otra vez.",
       );
+      if (noExiste) setMode("register");
       return false;
     }
     return true;
@@ -212,23 +243,63 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
       );
   }
 
+  /**
+   * Entrer, avec ce que la personne a REÇU — pas avec ce qu'on espérait
+   * qu'elle reçoive. Six chiffres si le courriel en contient ; le lien
+   * lui-même s'il n'y a qu'un lien. Les deux ouvrent la même porte.
+   */
   async function verify(event: React.FormEvent) {
     event.preventDefault();
-    if (code.length !== CODE_LENGTH) {
+    const supabase = getSupabase()!;
+
+    /* Le lien collé passe devant : s'il est là, c'est qu'il n'y avait pas
+       de code à recopier. */
+    const glued = readPastedAuth(pasted);
+    if (pasted.trim() && glued.kind === "nada") {
+      setError(
+        "Eso no parece el enlace del correo. Copia el enlace completo, empezando por https://",
+      );
+      return;
+    }
+
+    if (glued.kind === "nada" && code.length !== CODE_LENGTH) {
       setError("El código tiene seis dígitos.");
       return;
     }
+
     setError("");
     setBusy(true);
-    const supabase = getSupabase()!;
-    const { error: authError } = await supabase.auth.verifyOtp(
-      channel === "phone"
-        ? { phone: e164, token: code, type: "sms" }
-        : { email: email.trim(), token: code, type: "email" },
-    );
+
+    let authError = null;
+    if (glued.kind === "hash") {
+      ({ error: authError } = await supabase.auth.verifyOtp({
+        token_hash: glued.tokenHash,
+        type: glued.type as "email",
+      }));
+    } else if (glued.kind === "session") {
+      ({ error: authError } = await supabase.auth.setSession({
+        access_token: glued.accessToken,
+        refresh_token: glued.refreshToken,
+      }));
+    } else if (glued.kind === "pkce") {
+      ({ error: authError } = await supabase.auth.exchangeCodeForSession(
+        glued.code,
+      ));
+    } else {
+      ({ error: authError } = await supabase.auth.verifyOtp(
+        channel === "phone"
+          ? { phone: e164, token: code, type: "sms" }
+          : { email: email.trim(), token: code, type: "email" },
+      ));
+    }
+
     setBusy(false);
     if (authError) {
-      setError("Ese código no es correcto o ya venció.");
+      setError(
+        glued.kind === "nada"
+          ? "Ese código no es correcto o ya venció."
+          : "Ese enlace ya se usó o venció. Pide otro y pega el nuevo.",
+      );
       return;
     }
     window.location.reload();
@@ -295,7 +366,9 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
             </Dialog.Title>
             <Dialog.Description className="mx-auto mt-2 mb-6 max-w-[34ch] text-center text-[13.5px] leading-snug text-night-200">
               {step === "code"
-                ? `Te mandamos seis dígitos a ${codeDestination}.`
+                ? channel === "email"
+                  ? `Te lo mandamos a ${codeDestination}. Si el correo trae un enlace en vez de seis dígitos, pégalo aquí abajo: sirve igual.`
+                  : `Te mandamos seis dígitos a ${codeDestination}.`
                 : step === "done"
                   ? "Un paso más y entras."
                   : mode === "login"
@@ -588,6 +661,32 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
                   />
                 </div>
 
+                {/* LE COURRIEL N'A QU'UN LIEN ? On l'accepte tel quel.
+                    Demander six chiffres quand le courriel n'en contient
+                    pas, c'est fermer la porte et laisser la clé dedans. */}
+                {showPaste ? (
+                  <div className="rounded-[16px] border border-white/12 bg-white/6 p-3.5">
+                    <label
+                      htmlFor={`${id}-enlace`}
+                      className="mb-1.5 block text-[12.5px] leading-snug text-night-200"
+                    >
+                      Pega aquí el enlace del correo, completo:
+                    </label>
+                    <input
+                      id={`${id}-enlace`}
+                      type="url"
+                      inputMode="url"
+                      autoComplete="off"
+                      autoCapitalize="off"
+                      spellCheck={false}
+                      value={pasted}
+                      onChange={(e) => setPasted(e.target.value)}
+                      placeholder="https://…"
+                      className={`${pill} w-full px-4 py-3 text-[14.5px] placeholder:text-night-300 focus:border-action focus:outline-none`}
+                    />
+                  </div>
+                ) : null}
+
                 <button
                   type="submit"
                   disabled={busy}
@@ -595,6 +694,16 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
                 >
                   {busy ? "Verificando…" : "Confirmar"}
                 </button>
+
+                {!showPaste && (
+                  <button
+                    type="button"
+                    onClick={() => setShowPaste(true)}
+                    className="text-center text-[13.5px] text-night-200 underline-offset-2 hover:underline"
+                  >
+                    ¿El correo trae un enlace y no un código?
+                  </button>
+                )}
 
                 <p className="text-center text-[13.5px] text-night-200">
                   ¿No te llegó?{" "}
