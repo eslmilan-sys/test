@@ -13,6 +13,7 @@ import { AuthDialog } from "@/components/site/AuthDialog";
 import { carsOf, useSession } from "@/lib/session";
 import { ALL_CITIES, buildRoute, getCorridor } from "@/lib/corridors";
 import { saveLastSearch, useLastSearch } from "@/lib/lastsearch";
+import { track } from "@/lib/analytics";
 import {
   computePriceCap,
   formatUsd,
@@ -1181,6 +1182,17 @@ export function PublishFlow() {
                     priceCents: price,
                     dropAnywhere,
                   };
+                  track("publicacion_hecha", {
+                    origin_slug: from,
+                    destination_slug: to,
+                    props: {
+                      puestos: seats,
+                      paradas: cityStops.length,
+                      recurrencia: recurrence,
+                      abre_todo_el_camino: dropAnywhere,
+                      precio_centavos: price,
+                    },
+                  });
                   updateSession({
                     acceptsOutside,
                     lastPublish: snapshot,

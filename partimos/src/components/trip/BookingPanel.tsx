@@ -18,6 +18,7 @@ import {
 import { CashMark, TarjetaMark, YappyBubbles } from "@/components/ui/PayMark";
 import { quoteDetour } from "@/lib/detour";
 import { bookingDisclaimer } from "@/lib/content";
+import { track } from "@/lib/analytics";
 
 /**
  * Panneau de réservation.
@@ -143,6 +144,17 @@ export function BookingPanel({
         | "confirmado",
     };
     updateSession({ bookings: [...(session?.bookings ?? []), booking] });
+    track("reserva_pedida", {
+      origin_slug: fromSlug,
+      destination_slug: toSlug,
+      props: {
+        puestos: seats,
+        canal: payChannel,
+        total_centavos: totalCents,
+        punto_propio: isCustom,
+        estado: booking.status,
+      },
+    });
     setBooked(true);
   }
 

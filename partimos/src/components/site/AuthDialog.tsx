@@ -5,6 +5,7 @@ import * as Dialog from "@radix-ui/react-dialog";
 import { Icon } from "@/components/ui/Icon";
 import { getSupabase, isSupabaseConfigured } from "@/lib/supabase";
 import { useSession } from "@/lib/session";
+import { track } from "@/lib/analytics";
 
 /**
  * INSCRIPTION ET CONNEXION — l'écran NUIT.
@@ -294,13 +295,19 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
                 </div>
                 <Dialog.Close asChild>
                   <button
-                    onClick={() =>
+                    onClick={() => {
                       signIn(
                         channel === "phone" ? e164 : email.trim(),
                         firstName.trim(),
                         lastName.trim(),
-                      )
-                    }
+                      );
+                      /* Une cuenta_creada la première fois, une
+                         sesion_iniciada à chaque fois : la vue
+                         metricas_usuarios compte les secondes pour
+                         savoir qui revient. */
+                      track("cuenta_creada", { props: { canal: channel } });
+                      track("sesion_iniciada", { props: { canal: channel } });
+                    }}
                     className="mt-4 w-full rounded-full bg-white px-5 py-3.5 font-display text-[16.5px] font-bold text-ink-900 transition-colors hover:bg-ink-50"
                   >
                     Continuar como {firstName.trim() || "invitado"}

@@ -1,7 +1,9 @@
 "use client";
 
+import { useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { BookingPanel } from "@/components/trip/BookingPanel";
+import { track } from "@/lib/analytics";
 import type { Corridor } from "@/lib/corridors";
 import { formatDuration, formatUsd } from "@/lib/pricing";
 import { findSegment, segmentCap } from "@/lib/segments";
@@ -49,6 +51,20 @@ export function TripDetail({
 
   const match: TripMatch | null =
     (requested && matchFor(trip, requested)) ?? fullMatch(trip);
+
+  /* La mesure, AVANT le retour anticipé : un hook qui ne s'exécute pas
+     toujours est un hook cassé. */
+  const seenFrom = match?.segment.from.citySlug;
+  const seenTo = match?.segment.to.citySlug;
+  useEffect(() => {
+    if (!seenFrom || !seenTo) return;
+    track("viaje_visto", {
+      origin_slug: seenFrom,
+      destination_slug: seenTo,
+      props: { viaje: trip.id },
+    });
+  }, [trip.id, seenFrom, seenTo]);
+
   if (!match) return null;
 
   const { segment } = match;

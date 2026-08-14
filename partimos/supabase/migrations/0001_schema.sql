@@ -36,11 +36,17 @@ BEGIN
     WHERE n.nspname = 'auth' AND c.relname = 'users'
   ) THEN
     CREATE SCHEMA IF NOT EXISTS auth;
+    -- Les colonnes reprises de Supabase, y compris celles que les vues
+    -- de métriques lisent (dernière connexion, méthode d'inscription) :
+    -- une doublure qui ment sur sa forme ne sert à rien pour tester.
     CREATE TABLE auth.users (
       id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
       email text,
       phone text,
-      created_at timestamptz NOT NULL DEFAULT now()
+      created_at timestamptz NOT NULL DEFAULT now(),
+      last_sign_in_at timestamptz,
+      raw_app_meta_data jsonb NOT NULL DEFAULT '{}'::jsonb,
+      raw_user_meta_data jsonb NOT NULL DEFAULT '{}'::jsonb
     );
   END IF;
 END

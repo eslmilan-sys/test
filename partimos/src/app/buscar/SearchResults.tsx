@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { saveLastSearch } from "@/lib/lastsearch";
+import { track } from "@/lib/analytics";
 import Link from "next/link";
 import { Container } from "@/components/site/Section";
 import { SearchSummary } from "@/components/search/SearchSummary";
@@ -93,6 +94,26 @@ export function SearchResults() {
    *  chose après. Le proposer quand tous les trajets sont de passage donnerait
    *  un bouton qui vide la page — un filtre qui ne filtre rien d'utile. */
   const canFilterDirect = hasPartial && matches.some((m) => !m.isPartial);
+
+  /* La mesure : une recherche faite, et si elle est revenue vide. Une
+     ruta très cherchée et toujours vide, c'est un conducteur qui manque
+     — c'est le chiffre le plus actionnable du tableau de bord. */
+  useEffect(() => {
+    if (criteria.from === criteria.to) return;
+    const context = {
+      origin_slug: criteria.from,
+      destination_slug: criteria.to,
+      props: { puestos: criteria.seats, fecha: criteria.date },
+    };
+    track("busqueda_hecha", context);
+    if (matches.length === 0) track("busqueda_vacia", context);
+  }, [
+    criteria.from,
+    criteria.to,
+    criteria.date,
+    criteria.seats,
+    matches.length,
+  ]);
 
   const visible = useMemo(() => {
     const filtered = matches.filter(

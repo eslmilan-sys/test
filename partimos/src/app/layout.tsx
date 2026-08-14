@@ -1,6 +1,8 @@
+import { Suspense } from "react";
 import type { Metadata, Viewport } from "next";
 import { Gabarito, Nunito_Sans } from "next/font/google";
 import { Nav } from "@/components/site/Nav";
+import { PageView } from "@/components/site/PageView";
 import { Footer } from "@/components/site/Footer";
 import { SessionProvider } from "@/lib/session";
 import { SITE, canonical } from "@/lib/site";
@@ -113,6 +115,10 @@ export default function RootLayout({
           <Nav />
           {children}
           <Footer />
+          {/* La mesure : muette sans Supabase, jamais bloquante. */}
+          <Suspense fallback={null}>
+            <PageView />
+          </Suspense>
         </SessionProvider>
         <script
           type="application/ld+json"

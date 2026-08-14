@@ -87,7 +87,7 @@ export function PlacePicker({
       controller.abort();
       window.clearTimeout(debounce.current);
     };
-  }, [query, open, city]);
+  }, [query, open, city, citySlug]);
 
   const remoteShown = query.trim().length >= 3 ? remote : [];
 
