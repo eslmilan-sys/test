@@ -172,13 +172,21 @@ export function CityCombobox({
 
   return (
     <div className="relative">
-      <div className="flex items-center gap-3 rounded-[14px] px-3.5 py-3 transition-colors hover:bg-ink-50">
+      {/* UNE SEULE COLONNE DE TEXTE, comme sur les bons formulaires de
+          voyage. La pastille ronde/carrée poussait le libellé 35 px vers
+          la droite : dans la même carte, « DESDE » commençait à 55 px
+          quand les onglets étaient à 24 et le bouton à 10. Quatre bords
+          gauches pour un seul objet — c'est ça qui fait « tas ».
+          La pastille passe donc en position ABSOLUE dans la gouttière :
+          elle marque toujours l'origine et la destination, mais elle ne
+          décale plus rien. */}
+      <div className="relative flex items-center rounded-[14px] px-5 py-3 transition-colors hover:bg-ink-50">
         <span
           aria-hidden
-          className={`size-[19px] shrink-0 border-[3px] ${
+          className={`absolute top-1/2 left-1.5 size-2.5 -translate-y-1/2 border-[3px] ${
             tone === "origin"
               ? "rounded-full border-accent"
-              : "rounded-[6px] border-brand-green-deep"
+              : "rounded-[4px] border-brand-green-deep"
           }`}
         />
         <div className="min-w-0 flex-1">

@@ -128,7 +128,7 @@ export function SearchCard() {
           <Icon name="arrowRight" className="size-4 shrink-0" />
         </Link>
       )}
-      <div className="px-3 pt-2.5 pb-2">
+      <div className="px-5 pt-2.5 pb-2">
         <div
           role="group"
           aria-label="¿Qué quieres hacer?"
@@ -157,7 +157,7 @@ export function SearchCard() {
         </div>
       </div>
 
-      <div className="flex items-center justify-between gap-3 px-3 pb-2">
+      <div className="flex items-center justify-between gap-3 px-5 pb-2">
         <div
           role="group"
           aria-label="Cómo escoger las ciudades"
@@ -213,11 +213,7 @@ export function SearchCard() {
             pas — le flux de publication pose ses propres questions (audit C3). */}
         {mode === "buscar" && (
         <div className="flex border-t border-ink-200">
-          <div className="flex flex-1 items-center gap-3 rounded-[14px] px-3.5 py-3 transition-colors hover:bg-ink-50">
-            <Icon
-              name="calendar"
-              className="size-[19px] shrink-0 text-ink-500"
-            />
+          <div className="flex flex-1 items-center rounded-[14px] px-5 py-3 transition-colors hover:bg-ink-50">
             <div className="min-w-0 flex-1">
               <label htmlFor="fecha" className={FIELD_LABEL}>
                 Fecha
@@ -237,7 +233,7 @@ export function SearchCard() {
             </div>
           </div>
 
-          <div className="flex max-w-[176px] items-center gap-3 rounded-[14px] border-l border-ink-200 py-3 pl-3.5 transition-colors hover:bg-ink-50">
+          <div className="flex max-w-[176px] items-center rounded-[14px] border-l border-ink-200 py-3 pr-5 pl-5 transition-colors hover:bg-ink-50">
             <div className="min-w-0 flex-1">
               <label htmlFor="puestos" className={FIELD_LABEL}>
                 Puestos
