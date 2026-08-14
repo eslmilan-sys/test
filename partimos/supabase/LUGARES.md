@@ -29,6 +29,19 @@ todavía no tengamos.
 
 ## Cómo se corre (una vez)
 
+**Atajo — un solo comando.** Con las cuatro claves en `.env.local`
+(`SUPABASE_PROJECT_REF`, `SUPABASE_DB_PASSWORD`, `SUPABASE_SERVICE_ROLE_KEY`,
+`NEXT_PUBLIC_SUPABASE_URL`):
+
+```bash
+bash scripts/setup-lugares.sh
+```
+
+Hace lo mismo que los pasos de abajo, en orden, y se puede correr dos
+veces sin romper nada.
+
+### Paso a paso, si prefieres verlo
+
 ```bash
 # 1. herramienta de extracción
 brew install osmium-tool          # o: apt install osmium-tool
