@@ -27,6 +27,7 @@ import {
   MAPBOX_TOKEN,
   type GeocodedPlace,
 } from "./mapbox";
+import { getSupabase, isSupabaseConfigured } from "./supabase";
 
 const TOMTOM_KEY = process.env.NEXT_PUBLIC_TOMTOM_KEY ?? "";
 const LOCATIONIQ_KEY = process.env.NEXT_PUBLIC_LOCATIONIQ_KEY ?? "";
@@ -133,6 +134,53 @@ async function locationiqSearch(
 }
 
 /**
+ * NOTRE BASE À NOUS — interrogée EN PREMIER.
+ *
+ * La table `places` (migration 0013) contient l'extrait OpenStreetMap
+ * du Panama plus tous les points que les utilisateurs ont écrits et
+ * confirmés. C'est le seul fournisseur qui connaît « PH Torre Mistral »
+ * parce que quelqu'un l'a tapé chez nous. Elle répond en un aller-retour
+ * et ne coûte rien par requête ; les trois fournisseurs externes ne
+ * servent plus qu'à combler ce qu'elle ignore encore.
+ *
+ * Tant que Supabase n'est pas branché, elle rend une liste vide et la
+ * recherche se comporte exactement comme avant.
+ */
+async function ownPlaces(
+  query: string,
+  citySlug?: string,
+  signal?: AbortSignal,
+): Promise<FoundPlace[]> {
+  const client = isSupabaseConfigured ? getSupabase() : null;
+  if (!client) return [];
+  try {
+    const query$ = client.rpc("search_places", {
+      q: query,
+      near_city: citySlug ?? null,
+      max_results: 6,
+    });
+    const { data, error } = await (signal
+      ? query$.abortSignal(signal)
+      : query$);
+    if (error || !data) return [];
+    return (data as {
+      name: string;
+      address: string | null;
+      city_slug: string;
+      lat: number;
+      lng: number;
+    }[]).map((row) => ({
+      name: row.name,
+      context: row.address ?? "",
+      lat: row.lat,
+      lng: row.lng,
+    }));
+  } catch {
+    return [];
+  }
+}
+
+/**
  * La recherche combinée. L'ordre de fusion privilégie les fournisseurs
  * à coordonnées directes (TomTom, LocationIQ) puis Mapbox ; les
  * doublons se reconnaissent au nom normalisé. Six résultats maximum —
@@ -142,9 +190,12 @@ export async function searchEverywhere(
   query: string,
   near?: { lat: number; lng: number },
   signal?: AbortSignal,
+  /** Ville de la recherche : elle départage deux « Super 99 ». */
+  citySlug?: string,
 ): Promise<FoundPlace[]> {
   if (query.trim().length < 3) return [];
   const settled = await Promise.allSettled([
+    ownPlaces(query, citySlug, signal),
     tomtomSearch(query, near, signal),
     locationiqSearch(query, signal),
     MAPBOX_TOKEN

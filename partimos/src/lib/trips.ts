@@ -81,6 +81,11 @@ export type Trip = {
   stops: string[];
   womenOnly: boolean;
   instantBooking: boolean;
+  /** Le conducteur a déclaré qu'il dépose PARTOUT sur son chemin — pas
+   *  seulement aux points listés. Le passager peut donc proposer son
+   *  point sans que ça devienne une négociation, tant que ça reste sur
+   *  la route (un vrai détour, lui, se paie et s'accepte : R4). */
+  flexibleStops: boolean;
 };
 
 const DRIVERS = [
@@ -300,6 +305,7 @@ function buildTrip(corridor: Corridor, date: string, index: number): Trip {
     stops: corridor.pickupPoints.slice(0, 2 + ((seed >> 19) % 3)),
     womenOnly: (seed >> 23) % 7 === 0,
     instantBooking: (seed >> 25) % 3 !== 0,
+    flexibleStops: (seed >> 9) % 3 !== 0,
   };
 }
 

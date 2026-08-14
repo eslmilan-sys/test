@@ -190,6 +190,7 @@ export function TripDetail({
         category={trip.vehicle.ratePerKmCents}
         seatsOffered={trip.seatsOffered}
         instantBooking={trip.instantBooking}
+        flexibleStops={trip.flexibleStops}
       />
     </div>
   );

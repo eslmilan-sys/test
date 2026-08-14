@@ -45,6 +45,9 @@ type Props = {
   citySlug: string;
   seatsOffered: number;
   instantBooking: boolean;
+  /** Le conducteur dépose PARTOUT sur son chemin : proposer son point
+   *  n'est plus une négociation tant qu'on reste sur la route. */
+  flexibleStops?: boolean;
   /** Adresse exacte venue de /ya (?punto=) : présélectionne « Propongo
    *  mi punto » avec le texte déjà écrit. */
   initialPoint?: string;
@@ -67,6 +70,7 @@ export function BookingPanel({
   category,
   seatsOffered,
   instantBooking,
+  flexibleStops = false,
   initialPoint = "",
   fromSlug,
   toSlug,
@@ -111,9 +115,13 @@ export function BookingPanel({
   const feeCents = serviceFeeCents(totalCents, payChannel);
   const chargedCents = totalCents + feeCents;
   const blocked = isCustom && !quote.accepted;
-  /* Une offre ou un point proposé retirent la réservation instantanée :
-     il y a une décision humaine à prendre de l'autre côté. */
-  const needsDriverOk = !instantBooking || isCustom || activeOffer;
+  /* Une offre retire toujours la réservation instantanée : il y a une
+     décision humaine de l'autre côté. Un point proposé aussi — SAUF si
+     le conducteur a déclaré qu'il dépose partout sur son chemin et que
+     le point ne le fait pas dévier (quote.accepted, desvío compris dans
+     ce qu'il a ouvert). C'est sa déclaration qui décide, pas nous. */
+  const pointNeedsOk = isCustom && !flexibleStops;
+  const needsDriverOk = !instantBooking || pointNeedsOk || activeOffer;
 
   /* Réserver ÉCRIT : la reserva entre en session et « Mis viajes » la
      liste avec son état. Avant ça, « Pedir mi puesto » était un geste
@@ -151,7 +159,7 @@ export function BookingPanel({
           {needsDriverOk
             ? `${driverName} tiene 24 horas para responder${
                 activeOffer ? ` a tu oferta de ${formatUsd(unitCents)}` : ""
-              }${isCustom ? " y a tu punto propuesto" : ""}. Te avisamos por WhatsApp apenas decida.`
+              }${pointNeedsOk ? " y a tu punto propuesto" : ""}. Te avisamos por WhatsApp apenas decida.`
             : `Ya tienes tu puesto. Te compartimos el número de ${driverName} para que coordinen la hora y el punto exacto.`}
         </p>
         {!needsDriverOk && (
@@ -235,6 +243,17 @@ export function BookingPanel({
         <legend className="mb-1.5 text-[11.5px] font-bold tracking-[0.11em] text-ink-500 uppercase">
           Dónde te recoge
         </legend>
+        {flexibleStops && (
+          <p className="mb-2 flex items-start gap-2 rounded-[10px] bg-ink-50 px-3 py-2 text-[12.5px] leading-snug text-ink-600">
+            <Icon name="pin" className="mt-0.5 size-3.5 shrink-0 text-ink-500" />
+            <span>
+              <b className="font-semibold text-ink-900">
+                {driverName} para en cualquier punto de su camino.
+              </b>{" "}
+              Escoge uno de los suyos o propón el tuyo.
+            </span>
+          </p>
+        )}
         <div className="grid gap-1.5">
           {[...stops, "Propongo mi punto"].map((stop, index) => (
             <label
@@ -278,7 +297,9 @@ export function BookingPanel({
               placeholder="Ej. Multiplaza, Vía Israel, frente al parque…"
             />
             <p className="mt-1.5 text-[12.5px] leading-snug text-ink-500">
-              {`${driverName} decide si le queda de paso — el recorrido es suyo.`}
+              {flexibleStops
+                ? `${driverName} deja en cualquier punto de su camino: si te queda de paso, no hay nada que negociar. Un desvío de verdad sí lo decide ${driverName}.`
+                : `${driverName} decide si le queda de paso — el recorrido es suyo.`}
             </p>
           </div>
           <div className="mb-1 flex items-baseline justify-between">

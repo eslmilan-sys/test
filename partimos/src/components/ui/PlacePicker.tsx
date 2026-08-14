@@ -81,7 +81,7 @@ export function PlacePicker({
       const near = city ? { lat: city.lat, lng: city.lng } : undefined;
       /* TomTom + LocationIQ + Mapbox en parallèle : le lieu n'a besoin
          d'exister que dans UNE des trois bases pour sortir. */
-      searchEverywhere(query, near, controller.signal).then(setRemote);
+      searchEverywhere(query, near, controller.signal, citySlug).then(setRemote);
     }, 300);
     return () => {
       controller.abort();

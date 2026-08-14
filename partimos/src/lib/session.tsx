@@ -113,6 +113,9 @@ export type PublishedTrip = {
   seats: number;
   recurrence: "una-vez" | "diario" | "semanal" | "mensual";
   priceCents: number;
+  /** Le conducteur a ouvert TOUT son chemin : il dépose où ça lui reste
+   *  de paso, sans négocier point par point. */
+  dropAnywhere?: boolean;
 };
 
 /** La liste des carros, quel que soit l'âge de la session. */

@@ -103,6 +103,12 @@ export function PublishFlow() {
   const [exactFrom, setExactFrom] = useState("");
   const [exactTo, setExactTo] = useState("");
   const [cityStops, setCityStops] = useState<string[]>([]);
+  /* « Dejo en cualquier punto del camino » — un seul geste au lieu de
+     cocher dix villes. Il coche TOUT le trajet d'un coup et le déclare
+     au passager : celui-ci peut proposer son point sans que ça devienne
+     une négociation, tant que ça reste sur la route. Le recorrido reste
+     celui du conducteur (R4) : un vrai détour se paie et s'accepte. */
+  const [dropAnywhere, setDropAnywhere] = useState(false);
   const [date, setDate] = useState(days[1].value);
   const [hour, setHour] = useState("06:00");
   const [seats, setSeats] = useState(3);
@@ -309,6 +315,7 @@ export function PublishFlow() {
                     setFromChoice(last.from);
                     setToChoice(last.to);
                     setCityStops(last.cityStops);
+                    setDropAnywhere(Boolean(last.dropAnywhere));
                     setStops(last.pickups);
                     setHour(last.hour);
                     setSeats(last.seats);
@@ -514,8 +521,55 @@ export function PublishFlow() {
                   l'argument à lui montrer, chiffré et en direct. */}
               {innerStops.length > 0 && (
                 <section className="mb-6">
+                  {/* LE GESTE UNIQUE : « paro donde sea, en mi camino ».
+                      Dix cases à cocher pour dire une seule chose, c'est
+                      neuf de trop. Le bouton coche tout, et le passager
+                      le voit écrit sur la carte du viaje. */}
+                  <button
+                    type="button"
+                    aria-pressed={dropAnywhere}
+                    onClick={() => {
+                      const next = !dropAnywhere;
+                      setDropAnywhere(next);
+                      if (next)
+                        setCityStops(innerStops.map((s) => s.citySlug));
+                    }}
+                    className={`mb-4 flex w-full items-start gap-3 rounded-[20px] border-[1.5px] px-4 py-3.5 text-left transition-colors ${
+                      dropAnywhere
+                        ? "border-ink-900 bg-ink-900 text-white"
+                        : "border-ink-200 hover:border-accent"
+                    }`}
+                  >
+                    <span
+                      aria-hidden
+                      className={`mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-[6px] border-2 ${
+                        dropAnywhere
+                          ? "border-white bg-white text-ink-900"
+                          : "border-ink-200"
+                      }`}
+                    >
+                      {dropAnywhere && <Icon name="check" className="size-3" />}
+                    </span>
+                    <span className="min-w-0">
+                      <span className="block text-[15px] font-semibold">
+                        Puedo dejar en cualquier punto del camino
+                      </span>
+                      <span
+                        className={`block text-[13px] leading-snug ${
+                          dropAnywhere ? "text-white/75" : "text-ink-500"
+                        }`}
+                      >
+                        Marca de una vez todas las ciudades de tu ruta. Si
+                        alguien te pide un punto que te queda de paso, no
+                        tienes que negociar nada — un desvío de verdad sí lo
+                        decides tú.
+                      </span>
+                    </span>
+                  </button>
                   <h2 className="mb-1 text-[11.5px] font-bold tracking-[0.11em] text-ink-500 uppercase">
-                    Ciudades donde puedes dejar a alguien
+                    {dropAnywhere
+                      ? "Toda tu ruta queda abierta"
+                      : "Ciudades donde puedes dejar a alguien"}
                   </h2>
                   <p className="mb-3 text-[13.5px] leading-relaxed text-ink-500">
                     Pasas por estas ciudades de todas formas. Si aceptas parar,
@@ -529,13 +583,17 @@ export function PublishFlow() {
                           key={stop.citySlug}
                           type="button"
                           aria-pressed={active}
-                          onClick={() =>
+                          onClick={() => {
+                            /* Décocher une ville, c'est dire « pas
+                               partout » : le grand bouton doit suivre,
+                               sinon il mentirait au passager. */
+                            if (active) setDropAnywhere(false);
                             setCityStops((s) =>
                               active
                                 ? s.filter((c) => c !== stop.citySlug)
                                 : [...s, stop.citySlug],
-                            )
-                          }
+                            );
+                          }}
                           className={`flex items-center gap-3 rounded-[14px] border px-4 py-3 text-left transition-colors ${
                             active
                               ? "border-ink-900 bg-ink-50"
@@ -1121,6 +1179,7 @@ export function PublishFlow() {
                     seats,
                     recurrence,
                     priceCents: price,
+                    dropAnywhere,
                   };
                   updateSession({
                     acceptsOutside,

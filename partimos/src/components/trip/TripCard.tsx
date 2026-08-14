@@ -128,6 +128,7 @@ export function TripCard({ match }: { match: TripMatch }) {
               {trip.driver.isSuperDriver && (
                 <Chip tone="brand">Super conductor</Chip>
               )}
+              {trip.flexibleStops && <Chip>Deja en el camino</Chip>}
               {trip.womenOnly && <Chip>Solo mujeres</Chip>}
               {trip.instantBooking && <Chip>Reserva al instante</Chip>}
               <Chip tone={match.seatsFree === 1 ? "urgent" : "plain"}>
