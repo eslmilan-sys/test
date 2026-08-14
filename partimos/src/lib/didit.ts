@@ -55,6 +55,25 @@ export async function startIdVerification(
     { body: { kind } },
   );
   if (error || !data?.url) {
+    /* LIRE LA VRAIE RAISON. `invoke` ne rend qu'un « Edge Function
+       returned a non-2xx status code » : la cause exacte est dans le
+       CORPS de la réponse, et sans elle l'écran ne peut afficher qu'un
+       « intenta de nuevo » qui n'aide personne — ni la personne, ni
+       nous. On va donc la chercher. */
+    const contexto = (error as { context?: Response } | null)?.context;
+    if (contexto && typeof contexto.json === "function") {
+      try {
+        const cuerpo = (await contexto.clone().json()) as {
+          error?: string;
+          message?: string;
+        };
+        const detalle = cuerpo.error ?? cuerpo.message;
+        if (detalle) return { error: detalle };
+      } catch {
+        /* Corps illisible : on retombe sur le message générique. */
+      }
+      return { error: `http_${contexto.status}` };
+    }
     return { error: error?.message ?? "no_url" };
   }
   return { url: data.url };

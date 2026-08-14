@@ -5,6 +5,7 @@ import * as Dialog from "@radix-ui/react-dialog";
 import { Icon } from "@/components/ui/Icon";
 import { AuthDialog } from "./AuthDialog";
 import { NAV_SECTIONS } from "./navigation";
+import { useSession } from "@/lib/session";
 
 /**
  * Menu mobile — un panneau, pas un accordéon caché derrière trois traits.
@@ -15,6 +16,11 @@ import { NAV_SECTIONS } from "./navigation";
  * derrière une icône ne répond pas à cette question.
  */
 export function MobileMenu() {
+  /* Le menu doit savoir QUI le lit. Il proposait « Conectarme » à
+     quelqu'un déjà connecté — la première chose qu'on voit en ouvrant le
+     menu, et elle dit le contraire de la vérité. */
+  const { session, signOut } = useSession();
+
   return (
     <Dialog.Root>
       <Dialog.Trigger
@@ -88,17 +94,52 @@ export function MobileMenu() {
             ))}
           </nav>
 
-          {/* Un seul geste au pied du menu : se connecter. « Buscar viaje »
-              doublait la première entrée de la liste (audit B5) — un menu
-              qui répète sa propre première ligne se lit comme un bug. */}
+          {/* UN SEUL GESTE AU PIED DU MENU, et il dépend de qui lit.
+              Déconnecté : entrer. Connecté : son nom et la sortie —
+              proposer « Conectarme » à quelqu'un qui est déjà dedans, c'est
+              la première ligne du menu qui ment. */}
           <div className="flex flex-col gap-2.5 border-t border-ink-200 px-5 py-4">
-            <AuthDialog
-              trigger={
-                <button className="w-full rounded-[14px] border-[1.5px] border-ink-200 px-5 py-3 font-display text-[15px] font-bold transition-colors hover:border-accent hover:text-accent-ink">
-                  Conectarme
-                </button>
-              }
-            />
+            {session ? (
+              <>
+                <Dialog.Close asChild>
+                  <Link
+                    href="/cuenta"
+                    className="flex items-center gap-3 rounded-[14px] border-[1.5px] border-ink-200 px-4 py-3 transition-colors hover:border-accent"
+                  >
+                    <span
+                      aria-hidden
+                      className="flex size-9 shrink-0 items-center justify-center rounded-full bg-ink-900 font-display text-[14.5px] font-bold text-ink-50"
+                    >
+                      {session.firstName.charAt(0).toUpperCase()}
+                    </span>
+                    <span className="min-w-0">
+                      <span className="block truncate font-display text-[15px] font-bold">
+                        {session.firstName}
+                      </span>
+                      <span className="block text-[12.5px] text-ink-500">
+                        Mi cuenta y mis viajes
+                      </span>
+                    </span>
+                  </Link>
+                </Dialog.Close>
+                <Dialog.Close asChild>
+                  <button
+                    onClick={signOut}
+                    className="w-full rounded-[14px] px-5 py-2.5 text-[14.5px] font-semibold text-ink-500 transition-colors hover:text-ink-900"
+                  >
+                    Salir de mi cuenta
+                  </button>
+                </Dialog.Close>
+              </>
+            ) : (
+              <AuthDialog
+                trigger={
+                  <button className="w-full rounded-[14px] border-[1.5px] border-ink-200 px-5 py-3 font-display text-[15px] font-bold transition-colors hover:border-accent hover:text-accent-ink">
+                    Conectarme
+                  </button>
+                }
+              />
+            )}
           </div>
         </Dialog.Content>
       </Dialog.Portal>

@@ -92,6 +92,16 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
   const [lastName, setLastName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
+  /* LE MOT DE PASSE. Le site était « sin contraseña », et sur le papier
+     c'est plus simple — sauf que le seul chemin passait alors par le
+     courriel, et le courriel est le maillon qui casse : quota de deux
+     envois par heure, gabarit qu'on ne peut pas changer, liens qui
+     expirent. Un mot de passe, lui, marche hors ligne, tout de suite, et
+     sur n'importe quel appareil. Le lien par courriel reste, en secours. */
+  const [password, setPassword] = useState("");
+  const [verPassword, setVerPassword] = useState(false);
+  /* Le chemin par courriel devient l'exception qu'on demande. */
+  const [porEnlace, setPorEnlace] = useState(false);
   const [code, setCode] = useState("");
   /* Ce que la personne colle quand son courriel contient un LIEN et pas
      un code. Tant que le gabarit du courriel n'a pas été corrigé dans le
@@ -138,6 +148,10 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
     setNotice("");
   }
 
+  /* Le mot de passe ne vaut que pour le courriel : par téléphone, le code
+     reste le seul moyen. Et « por enlace » le désactive volontairement. */
+  const usaPassword = channel === "email" && !porEnlace;
+
   const digits = phone.replace(/\D/g, "");
   const e164 = digits.length <= 8 ? `+507${digits}` : `+${digits}`;
 
@@ -153,6 +167,8 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
       !/^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(email.trim())
     )
       return "Escribe un correo válido.";
+    if (usaPassword && password.length < 8)
+      return "La contraseña necesita al menos ocho caracteres.";
     return "";
   }
 
@@ -258,6 +274,14 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
     return true;
   }
 
+  /**
+   * ENTRER, PAR LE CHEMIN LE PLUS COURT QUI MARCHE.
+   *
+   * Avec un mot de passe, personne n'attend un courriel : on entre. Sans
+   * mot de passe (celular, ou « por enlace »), on retombe sur le code.
+   * À l'inscription, si Supabase rend une session tout de suite, on est
+   * dedans ; s'il exige une confirmation, on passe à l'écran du courriel.
+   */
   async function submitIdentity(event: React.FormEvent) {
     event.preventDefault();
     const problem = validate();
@@ -271,10 +295,88 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
       setStep("done");
       return;
     }
+
+    if (usaPassword) {
+      setBusy(true);
+      const ok = await conPassword();
+      setBusy(false);
+      return void ok;
+    }
+
     setBusy(true);
     const ok = await sendCode();
     setBusy(false);
     if (ok) setStep("code");
+  }
+
+  /** Entrer ou créer le compte avec un mot de passe. */
+  async function conPassword(): Promise<boolean> {
+    const supabase = getSupabase()!;
+
+    if (mode === "login") {
+      const { error: authError } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password,
+      });
+      if (!authError) {
+        window.location.reload();
+        return true;
+      }
+      const codigo = (authError as { code?: string }).code ?? "";
+      if (codigo === "email_not_confirmed") {
+        setError(
+          "Tu correo todavía no está confirmado. Te mandamos el enlace de confirmación: ábrelo y vuelve.",
+        );
+        setPorEnlace(true);
+        return false;
+      }
+      /* Le cas le plus fréquent, et de loin : le compte existe (créé par
+         un lien magique) mais n'a jamais eu de mot de passe. On ne dit
+         donc pas « mot de passe incorrect » tout sec — on montre la
+         sortie de secours. */
+      setError(
+        "Correo o contraseña incorrectos. Si nunca pusiste una contraseña, entra con el enlace por correo y luego créala en tu cuenta.",
+      );
+      return false;
+    }
+
+    const { data, error: authError } = await supabase.auth.signUp({
+      email: email.trim(),
+      password,
+      options: {
+        data: {
+          first_name: firstName.trim(),
+          last_name: lastName.trim(),
+          locale: "es",
+        },
+        emailRedirectTo: window.location.href,
+      },
+    });
+    if (authError) {
+      const codigo = (authError as { code?: string }).code ?? "";
+      const status = (authError as { status?: number }).status ?? 0;
+      if (codigo === "over_email_send_rate_limit" || status === 429) {
+        setError(
+          "El servidor de correo llegó a su tope de envíos por hora. Tu cuenta no se creó — vuelve en un rato.",
+        );
+        return false;
+      }
+      if (codigo === "user_already_exists" || /already registered/i.test(authError.message)) {
+        setError("Ya hay una cuenta con ese correo. Entra en vez de crearla.");
+        setMode("login");
+        return false;
+      }
+      setError("No pudimos crear la cuenta. Inténtalo otra vez.");
+      return false;
+    }
+    /* Session immédiate = la confirmation par courriel est désactivée :
+       on est dedans, rien à attendre. */
+    if (data.session) {
+      window.location.reload();
+      return true;
+    }
+    setStep("code");
+    return true;
   }
 
   async function resend() {
@@ -427,8 +529,8 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
                 : step === "done"
                   ? "Un paso más y entras."
                   : mode === "login"
-                    ? "Sin contraseña: un toque, o un código y listo."
-                    : "Toma diez segundos. Sin contraseña, sin tarjeta."}
+                    ? "Con tu correo y tu contraseña. Sin tarjeta."
+                    : "Toma diez segundos. Sin tarjeta, sin cédula todavía."}
             </Dialog.Description>
 
             {step === "done" ? (
@@ -586,13 +688,76 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
                     </div>
                   )}
 
+                  {/* LE MOT DE PASSE, quand on entre par courriel. C'est
+                      lui le chemin normal : il n'attend rien, ne dépend
+                      d'aucun serveur de courriel, et marche sur n'importe
+                      quel téléphone. */}
+                  {usaPassword && (
+                    <div>
+                      <span className="mb-1.5 flex items-center justify-between text-[12.5px] font-semibold text-night-200">
+                        Contraseña
+                        <button
+                          type="button"
+                          onClick={() => setVerPassword((v) => !v)}
+                          className="font-semibold text-action/90 hover:underline"
+                        >
+                          {verPassword ? "ocultar" : "ver"}
+                        </button>
+                      </span>
+                      <NightField
+                        id={`${id}-pass`}
+                        label="Contraseña"
+                        icon="shield"
+                        value={password}
+                        onChange={setPassword}
+                        type={verPassword ? "text" : "password"}
+                        autoComplete={
+                          mode === "register"
+                            ? "new-password"
+                            : "current-password"
+                        }
+                        placeholder={
+                          mode === "register" ? "Mínimo 8 caracteres" : "••••••••"
+                        }
+                        hideLabel
+                      />
+                    </div>
+                  )}
+
                   <button
                     type="submit"
                     disabled={busy}
                     className="mt-1 w-full rounded-full bg-white px-5 py-3.5 font-display text-[16.5px] font-bold text-ink-900 transition-colors hover:bg-ink-50 disabled:opacity-50"
                   >
-                    {busy ? "Mandando…" : "Mandarme el código"}
+                    {busy
+                      ? usaPassword
+                        ? "Entrando…"
+                        : "Mandando…"
+                      : usaPassword
+                        ? mode === "register"
+                          ? "Crear mi cuenta"
+                          : "Entrar"
+                        : "Mandarme el código"}
                   </button>
+
+                  {/* LA SORTIE DE SECOURS, jamais cachée. Quelqu'un qui a
+                      créé son compte par lien magique n'a pas de mot de
+                      passe : sans cette ligne, il est enfermé dehors. */}
+                  {channel === "email" && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setPorEnlace((v) => !v);
+                        setError("");
+                        setNotice("");
+                      }}
+                      className="text-center text-[13px] text-night-200 underline-offset-2 hover:underline"
+                    >
+                      {porEnlace
+                        ? "Mejor con mi contraseña"
+                        : "No tengo contraseña — mándame un enlace por correo"}
+                    </button>
+                  )}
                 </form>
 
                 {/* On n'affiche QUE les fournisseurs réellement activés.
@@ -841,7 +1006,7 @@ function NightField({
 }: {
   id: string;
   label: string;
-  icon: "users" | "chat" | "phone";
+  icon: "users" | "chat" | "phone" | "shield";
   value: string;
   onChange: (v: string) => void;
   type?: string;

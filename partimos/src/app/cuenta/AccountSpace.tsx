@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Container } from "@/components/site/Section";
 import { Icon, type IconName } from "@/components/ui/Icon";
-import { ButtonLink } from "@/components/ui/Button";
+import { Button, ButtonLink } from "@/components/ui/Button";
 import { AuthDialog } from "@/components/site/AuthDialog";
 import {
   carsOf,
@@ -21,6 +21,8 @@ import {
   type VerificationState,
 } from "@/lib/didit";
 import { connectLinkedIn, hasLinkedIn } from "@/lib/linkedin";
+import { getSupabase } from "@/lib/supabase";
+import { useHydrated } from "@/lib/lastsearch";
 import { PayChannelPicker } from "@/components/ui/PayChannelPicker";
 import { ALL_CITIES, buildRoute } from "@/lib/corridors";
 import { computePriceCap, formatUsd } from "@/lib/pricing";
@@ -49,6 +51,22 @@ import {
 
 type Tab = "viajes" | "perfil" | "carro" | "verificacion";
 
+const TABS_VALIDOS: Tab[] = ["viajes", "perfil", "carro", "verificacion"];
+
+/**
+ * L'onglet demandé par l'adresse — `?panel=verificacion`.
+ *
+ * Le formulaire de publication envoie ici quand il manque la cédula, le
+ * permis ou le carro… et on atterrissait sur « Mis viajes ». Le bouton
+ * disait « Verificar » et menait ailleurs : la personne devait deviner
+ * qu'il fallait encore chercher un onglet.
+ */
+function panelDeLaUrl(): Tab | null {
+  if (typeof window === "undefined") return null;
+  const p = new URLSearchParams(window.location.search).get("panel");
+  return TABS_VALIDOS.includes(p as Tab) ? (p as Tab) : null;
+}
+
 const TABS: { id: Tab; label: string; icon: IconName }[] = [
   { id: "viajes", label: "Mis viajes", icon: "route" },
   { id: "perfil", label: "Mi perfil", icon: "users" },
@@ -58,7 +76,13 @@ const TABS: { id: Tab; label: string; icon: IconName }[] = [
 
 export function AccountSpace() {
   const { session, isDemo, signOut } = useSession();
-  const [tab, setTab] = useState<Tab>("viajes");
+  /* DÉRIVÉ : ce que la personne a choisi, sinon ce que l'adresse demande,
+     sinon « Mis viajes ». L'adresse ne s'applique qu'après hydratation —
+     le HTML pré-rendu montre toujours le premier onglet. */
+  const [tabChoice, setTab] = useState<Tab | null>(null);
+  const [panelPedido] = useState<Tab | null>(panelDeLaUrl);
+  const hydrated = useHydrated();
+  const tab: Tab = tabChoice ?? (hydrated ? (panelPedido ?? "viajes") : "viajes");
 
   if (!session) {
     return (
@@ -221,7 +245,10 @@ export function AccountSpace() {
         {tab === "carro" && <CarPanel />}
 
         {tab === "verificacion" && (
-          <VerificacionPanel sessionVerified={session.isVerified} />
+          <>
+            <ContrasenaPanel />
+            <VerificacionPanel sessionVerified={session.isVerified} />
+          </>
         )}
       </div>
 
@@ -1026,6 +1053,90 @@ function LinkedInRow() {
  * el veredicto vuelve por webhook y aquí solo se lee un estado. En modo
  * demostración no hay backend : el panel lo dice tal cual, sin fingir.
  */
+/**
+ * PONERLE UNA CONTRASEÑA A LA CUENTA.
+ *
+ * Quien entró por un enlace del correo no tiene contraseña: la próxima
+ * vez vuelve a depender del correo, que es justo el eslabón que falla
+ * (dos envíos por hora, enlaces que vencen). Una contraseña rompe esa
+ * dependencia para siempre, y ponerla toma diez segundos — pero solo se
+ * puede desde adentro, que es exactamente donde estamos aquí.
+ */
+function ContrasenaPanel() {
+  const [valor, setValor] = useState("");
+  const [ver, setVer] = useState(false);
+  const [estado, setEstado] = useState<"idle" | "guardando" | "listo">("idle");
+  const [error, setError] = useState("");
+
+  if (!isSupabaseConfigured) return null;
+
+  const guardar = async () => {
+    if (valor.length < 8) {
+      setError("Necesita al menos ocho caracteres.");
+      return;
+    }
+    setError("");
+    setEstado("guardando");
+    const supabase = getSupabase()!;
+    const { error: authError } = await supabase.auth.updateUser({
+      password: valor,
+    });
+    if (authError) {
+      setEstado("idle");
+      setError("No se pudo guardar. Vuelve a entrar y prueba otra vez.");
+      return;
+    }
+    setEstado("listo");
+    setValor("");
+  };
+
+  return (
+    <section className="mb-4 rounded-[18px] border border-ink-200 p-4">
+      <h3 className="font-display text-[16.5px] font-bold">
+        Tu contraseña
+      </h3>
+      <p className="mt-1 mb-3 text-[13.5px] leading-relaxed text-ink-500">
+        {estado === "listo"
+          ? "Lista. La próxima vez entras con tu correo y tu contraseña, sin esperar ningún correo."
+          : "Ponle una contraseña y no vuelves a depender del correo para entrar."}
+      </p>
+      {estado !== "listo" && (
+        <>
+          <div className="flex gap-2">
+            <input
+              type={ver ? "text" : "password"}
+              value={valor}
+              onChange={(e) => setValor(e.target.value)}
+              autoComplete="new-password"
+              placeholder="Mínimo 8 caracteres"
+              className="min-w-0 flex-1 rounded-[14px] border border-ink-200 px-3.5 py-2.5 text-[15px] focus:border-accent focus:outline-none"
+            />
+            <button
+              type="button"
+              onClick={() => setVer((v) => !v)}
+              className="shrink-0 px-2 text-[13.5px] font-semibold text-accent-ink hover:underline"
+            >
+              {ver ? "ocultar" : "ver"}
+            </button>
+          </div>
+          <Button
+            className="mt-3"
+            onClick={guardar}
+            disabled={estado === "guardando" || valor.length < 8}
+          >
+            {estado === "guardando" ? "Guardando…" : "Guardar mi contraseña"}
+          </Button>
+        </>
+      )}
+      {error && (
+        <p role="alert" className="mt-2 text-[13px] text-danger">
+          {error}
+        </p>
+      )}
+    </section>
+  );
+}
+
 function VerificacionPanel({ sessionVerified }: { sessionVerified: boolean }) {
   return (
     <>
@@ -1113,10 +1224,18 @@ function DocumentoRow({
       return;
     }
     setLaunching(false);
+    /* On DIT ce qui a échoué. « Intenta de nuevo en un momento » sur une
+       panne de configuration fait réessayer mille fois pour rien — et
+       nous prive de la seule information utile pour la réparer. */
+    const causa = result.error;
     setError(
-      result.error === "already_verified"
+      causa === "already_verified"
         ? "Ese documento ya está verificado."
-        : "No se pudo abrir la verificación. Intenta de nuevo en un momento.",
+        : causa === "not_configured"
+          ? "La verificación todavía no está conectada."
+          : causa === "http_401" || causa === "http_403"
+            ? "Tu sesión venció. Vuelve a entrar y prueba otra vez."
+            : `No se pudo abrir la verificación (${causa}). Escríbenos con ese detalle si sigue igual.`,
     );
   };
 

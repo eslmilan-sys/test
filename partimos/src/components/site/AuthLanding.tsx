@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useHydrated } from "@/lib/lastsearch";
+import { useSession } from "@/lib/session";
 
 /**
  * LE RETOUR DU LIEN DU COURRIEL — dire ce qui vient de se passer.
@@ -69,6 +70,10 @@ export function AuthLanding() {
      contient pas cette bande, et rendre autre chose que lui au premier
      tour, c'est l'erreur React #418. */
   const hydrated = useHydrated();
+  /* « Entrando… » est une ATTENTE, pas un état. Il disparaît dès que la
+     session existe — sinon il restait affiché sous le nom de la personne
+     déjà connectée, ce qui donne l'impression que le site est coincé. */
+  const { session } = useSession();
 
   /* Nettoyer l'adresse est un effet de bord, donc il vit dans un effet —
      et il ne touche à aucun état. Recharger ne doit pas rejouer un
@@ -80,6 +85,7 @@ export function AuthLanding() {
 
   if (!hydrated) return null;
   if (estado.kind === "nada") return null;
+  if (estado.kind === "entrando" && session) return null;
 
   const esError = estado.kind === "error";
 
