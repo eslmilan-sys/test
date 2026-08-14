@@ -1,9 +1,13 @@
 "use client";
 
-import { useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { Icon } from "@/components/ui/Icon";
-import { getSupabase, isSupabaseConfigured } from "@/lib/supabase";
+import {
+  fetchProveedores,
+  getSupabase,
+  isSupabaseConfigured,
+} from "@/lib/supabase";
 import { useSession } from "@/lib/session";
 import { track } from "@/lib/analytics";
 import { readPastedAuth } from "@/lib/otp-link";
@@ -99,10 +103,31 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
      vides devant un courriel qui n'en contient pas, c'est une porte
      peinte sur un mur. Par téléphone, le code est bien un code. */
   const [verCodigo, setVerCodigo] = useState(false);
+  /* Le quota d'envois de Supabase est minuscule et partagé par tout le
+     site : on empêche de le brûler à coups de « reenviar ». */
+  const [puedeReenviar, setPuedeReenviar] = useState(true);
+  /* `null` = on ne sait pas encore ; on montre tout, comme avant. */
+  const [proveedores, setProveedores] = useState<{
+    google: boolean;
+    apple: boolean;
+  } | null>(null);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [busy, setBusy] = useState(false);
   const codeInput = useRef<HTMLInputElement>(null);
+
+  /* La configuration publique de Supabase dit quels boutons sociaux
+     existent vraiment. Requête unique, asynchrone : elle ne bloque rien
+     et, si elle échoue, l'écran reste tel qu'il était. */
+  useEffect(() => {
+    let vivo = true;
+    void fetchProveedores().then((p) => {
+      if (vivo && p) setProveedores(p);
+    });
+    return () => {
+      vivo = false;
+    };
+  }, []);
 
   function reset() {
     setStep("identity");
@@ -195,21 +220,41 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
             },
           });
     if (authError) {
-      /* Trois pannes différentes, trois phrases différentes — « inténtalo
-         otra vez » sur une adresse sans compte fait tourner en rond. */
+      /* CHAQUE PANNE A SON NOM. « Inténtalo otra vez » était le pire des
+         messages : il invite à refaire exactement ce qui vient d'échouer.
+         Sur la limite d'envoi, il fait même du mal — chaque nouvel essai
+         repousse le déblocage. */
+      const codigo = (authError as { code?: string }).code ?? "";
+      const status = (authError as { status?: number }).status ?? 0;
+
+      if (codigo === "over_email_send_rate_limit" || status === 429) {
+        setError(
+          "El servidor de correo llegó a su tope de envíos por hora y está esperando. No sirve de nada volver a intentar ahora: espera un rato, o revisa si ya te llegó un correo de antes — todavía sirve.",
+        );
+        return false;
+      }
       const noExiste =
         !shouldCreateUser &&
         /signup|not found|user.*exist/i.test(authError.message);
+      if (noExiste) {
+        setError(
+          "No hay cuenta con esos datos. Crea tu cuenta aquí abajo, toma diez segundos.",
+        );
+        setMode("register");
+        return false;
+      }
       setError(
-        noExiste
-          ? "No hay cuenta con esos datos. Crea tu cuenta aquí abajo, toma diez segundos."
-          : channel === "phone"
-            ? "Todavía no podemos mandar códigos por celular. Entra con tu correo mientras tanto."
-            : "No pudimos mandar el código. Inténtalo otra vez.",
+        channel === "phone"
+          ? "Todavía no podemos mandar códigos por celular. Entra con tu correo mientras tanto."
+          : "No pudimos mandar el correo. Espera un momento y vuelve a intentar.",
       );
-      if (noExiste) setMode("register");
       return false;
     }
+    /* Un envoi réussi ferme la porte une minute. Le quota d'envois est
+       petit et partagé par TOUT le site : chaque « reenviar » impatient le
+       brûlait pour la personne suivante. */
+    setPuedeReenviar(false);
+    window.setTimeout(() => setPuedeReenviar(true), 60_000);
     return true;
   }
 
@@ -308,6 +353,10 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
     }
     window.location.reload();
   }
+
+  /* Tant qu'on ne sait pas, on montre — c'est l'état d'avant. */
+  const hayGoogle = proveedores === null || proveedores.google;
+  const hayApple = proveedores === null || proveedores.apple;
 
   const codeDestination =
     channel === "email"
@@ -546,35 +595,49 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
                   </button>
                 </form>
 
-                <div
-                  aria-hidden
-                  className="my-4 flex items-center gap-3 text-[11.5px] font-semibold tracking-[0.1em] text-night-300 uppercase"
-                >
-                  <span className="h-px flex-1 bg-white/12" />
-                  o continúa con
-                  <span className="h-px flex-1 bg-white/12" />
-                </div>
+                {/* On n'affiche QUE les fournisseurs réellement activés.
+                    Un bouton Google qui mène à une page d'erreur de
+                    Supabase au milieu de l'écran de connexion, c'est pire
+                    que pas de bouton du tout. */}
+                {hayGoogle || hayApple ? (
+                  <>
+                    <div
+                      aria-hidden
+                      className="my-4 flex items-center gap-3 text-[11.5px] font-semibold tracking-[0.1em] text-night-300 uppercase"
+                    >
+                      <span className="h-px flex-1 bg-white/12" />
+                      o continúa con
+                      <span className="h-px flex-1 bg-white/12" />
+                    </div>
 
-                <div className="grid grid-cols-2 gap-2.5">
-                  <button
-                    type="button"
-                    onClick={() => social("google")}
-                    disabled={busy}
-                    className={`flex items-center justify-center gap-2.5 px-3 py-3 text-[14.5px] font-semibold hover:bg-white/20 disabled:opacity-60 ${pill}`}
-                  >
-                    <GoogleMark />
-                    Google
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => social("apple")}
-                    disabled={busy}
-                    className={`flex items-center justify-center gap-2.5 px-3 py-3 text-[14.5px] font-semibold hover:bg-white/20 disabled:opacity-60 ${pill}`}
-                  >
-                    <AppleMark />
-                    Apple
-                  </button>
-                </div>
+                    <div
+                      className={`grid gap-2.5 ${hayGoogle && hayApple ? "grid-cols-2" : "grid-cols-1"}`}
+                    >
+                      {hayGoogle && (
+                        <button
+                          type="button"
+                          onClick={() => social("google")}
+                          disabled={busy}
+                          className={`flex items-center justify-center gap-2.5 px-3 py-3 text-[14.5px] font-semibold hover:bg-white/20 disabled:opacity-60 ${pill}`}
+                        >
+                          <GoogleMark />
+                          Google
+                        </button>
+                      )}
+                      {hayApple && (
+                        <button
+                          type="button"
+                          onClick={() => social("apple")}
+                          disabled={busy}
+                          className={`flex items-center justify-center gap-2.5 px-3 py-3 text-[14.5px] font-semibold hover:bg-white/20 disabled:opacity-60 ${pill}`}
+                        >
+                          <AppleMark />
+                          Apple
+                        </button>
+                      )}
+                    </div>
+                  </>
+                ) : null}
 
                 {/* La bascule, EN BAS et en une phrase : l'écran ne
                     montre qu'un chemin à la fois. */}
@@ -727,11 +790,11 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
                 )}
 
                 <p className="text-center text-[13.5px] text-night-200">
-                  ¿No te llegó?{" "}
+                  {puedeReenviar ? "¿No te llegó? " : "Puedes pedir otro en un minuto. "}
                   <button
                     type="button"
                     onClick={resend}
-                    disabled={busy}
+                    disabled={busy || !puedeReenviar}
                     className="font-bold text-white hover:underline disabled:opacity-60"
                   >
                     {channel === "email" ? "Reenviar el correo" : "Reenviar el código"}

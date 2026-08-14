@@ -52,6 +52,40 @@ export function getSupabase(): SupabaseClient | null {
 }
 
 /**
+ * QUELS BOUTONS SOCIAUX EXISTENT VRAIMENT.
+ *
+ * Google et Apple s'affichaient toujours. Or ils ne sont pas activés dans
+ * le projet : les toucher envoyait sur une page d'erreur de Supabase
+ * (« provider is not enabled »), c'est-à-dire une impasse au milieu de
+ * l'écran de connexion. Supabase expose sa configuration publique sur
+ * /auth/v1/settings — on la lit et on n'affiche que ce qui marche.
+ *
+ * En cas de doute (réseau coupé, réponse illisible) on laisse tout
+ * affiché : mieux vaut un bouton de trop qu'un écran amputé par une
+ * requête ratée.
+ */
+export async function fetchProveedores(): Promise<{
+  google: boolean;
+  apple: boolean;
+} | null> {
+  if (!url || !anonKey) return null;
+  try {
+    const r = await fetch(`${url}/auth/v1/settings`, {
+      headers: { apikey: anonKey },
+    });
+    if (!r.ok) return null;
+    const j = (await r.json()) as { external?: Record<string, boolean> };
+    if (!j.external) return null;
+    return {
+      google: Boolean(j.external.google),
+      apple: Boolean(j.external.apple),
+    };
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Client serveur avec la clé de service. Réservé aux écritures que le
  * visiteur anonyme ne peut pas faire lui-même (journalisation des recherches
  * infructueuses, préinscription). Jamais importé dans un composant client :
