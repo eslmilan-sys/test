@@ -30,17 +30,38 @@ Le site étant un export statique, le secret Didit ne peut vivre **que**
 dans les secrets Supabase. Aucun fichier du dépôt ne doit jamais le
 contenir.
 
-## 1. Côté Didit ⛔
+## 1. Côté Didit — FAIT ✅
 
-1. Crée un compte sur <https://business.didit.me> (l'offre de base de la
-   vérification d'identité est gratuite).
-2. Crée une application, puis un **workflow** de vérification : « ID
-   Verification » + « Face Match » suffisent pour la cédula panaméenne.
-   Note le `workflow_id`.
-3. Dans les réglages de l'application, récupère la **clé API**
-   (`x-api-key`) et le **secret webhook**.
-4. Configure l'URL du webhook (après l'étape 3 ci-dessous) :
-   `https://<ref-projet>.supabase.co/functions/v1/didit-webhook`
+Configuré directement depuis cette session, via le serveur MCP de Didit
+(organisation « Partimos », `1d2fa472-294f-420b-af1e-dde593e66e7c`) :
+
+| Élément | Valeur |
+| --- | --- |
+| Application production | « My Application » — `c89b0424-6623-47ab-9dd0-13eaf288c0dd` |
+| Application bac à sable | « Partimos (Sandbox) » — `88e1638d-888f-474d-8242-b80418143651` |
+| **Workflow production** (publié) | **`d27705d1-9975-4ea2-8df2-3f8be47ff34f`** — « Free KYC » |
+| Workflow bac à sable (publié) | `772c58c7-2212-49bb-9b68-8cd4dafcd2d9` |
+| Webhook production | `612fe824-1bf4-4d60-9e39-46f619508e34` → `…/functions/v1/didit-webhook` (v2) |
+| Webhook bac à sable | `8bb18a34-d238-42bb-9d39-72290f9f86c2` → même URL (v2) |
+
+Le workflow retenu est **Free KYC** : OCR du document + preuve de vie +
+comparaison faciale, sans AML. C'est ce qu'il faut pour une cédula
+panaméenne, et son prix plancher est de 0 $. Les documents du Panama
+acceptés couvrent la cédula (ID), le passeport et le permis.
+
+Version de webhook **v2** délibérément : c'est le format que
+`didit-webhook/index.ts` sait lire (`session_id`, `status`,
+`vendor_data` à la racine, signature HMAC dans `x-signature`).
+
+### Ce qui reste côté Didit ⛔
+
+**La clé API.** Aucune n'existe encore, et elle ne se crée pas par
+l'API — c'est un secret, il n'apparaît qu'une fois, à sa création :
+
+1. <https://business.didit.me> → l'application **My Application**
+2. *Settings → API Keys → Create* → copier la clé (`x-api-key`)
+3. *Settings → Webhooks* → ouvrir « Partimos — Supabase didit-webhook »
+   → copier le **signing secret**
 
 ## 2. Côté Supabase — migrations
 
@@ -56,7 +77,7 @@ supabase db push          # applique 0001 → 0003
 ```sh
 supabase secrets set \
   DIDIT_API_KEY="..." \
-  DIDIT_WORKFLOW_ID="..." \
+  DIDIT_WORKFLOW_ID="d27705d1-9975-4ea2-8df2-3f8be47ff34f" \
   DIDIT_WEBHOOK_SECRET="..." \
   SITE_URL="https://eslmilan-sys.github.io/test/partimos" \
   SITE_ORIGIN="https://eslmilan-sys.github.io"
