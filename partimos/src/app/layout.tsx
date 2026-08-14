@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from "next";
 import { Gabarito, Nunito_Sans } from "next/font/google";
 import { Nav } from "@/components/site/Nav";
 import { PageView } from "@/components/site/PageView";
+import { AuthLanding } from "@/components/site/AuthLanding";
 import { Footer } from "@/components/site/Footer";
 import { SessionProvider } from "@/lib/session";
 import { SITE, canonical } from "@/lib/site";
@@ -113,6 +114,8 @@ export default function RootLayout({
 
         <SessionProvider>
           <Nav />
+          {/* Le retour du lien du courriel : muet sur une visite normale. */}
+          <AuthLanding />
           {children}
           <Footer />
           {/* La mesure : muette sans Supabase, jamais bloquante. */}

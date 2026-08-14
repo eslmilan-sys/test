@@ -35,7 +35,17 @@ export function getSupabase(): SupabaseClient | null {
       persistSession: true,
       autoRefreshToken: true,
       detectSessionInUrl: true,
-      flowType: "pkce",
+      /* IMPLICITE, ET C'EST UN CHOIX RÉFLÉCHI.
+         PKCE garde un « code_verifier » dans le stockage du navigateur qui
+         a DEMANDÉ le lien : le lien ne vaut alors que là. Or le chemin
+         réel de nos gens est un iPhone — on demande le lien dans Safari,
+         Mail l'ouvre dans son propre navigateur, et le vérificateur n'y
+         est pas. La connexion échouait sans rien dire.
+         En implicite, le lien porte lui-même les jetons : il marche dans
+         n'importe quel navigateur, sur n'importe quel appareil. Les jetons
+         passent par le dièse de l'URL — ils ne partent donc jamais vers un
+         serveur — et supabase-js nettoie l'adresse aussitôt lue. */
+      flowType: "implicit",
     },
   });
   return browserClient;

@@ -94,7 +94,11 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
      tableau de bord, c'est la seule façon d'entrer — et même après, un
      client courriel qui masque le code laissera toujours le lien. */
   const [pasted, setPasted] = useState("");
-  const [showPaste, setShowPaste] = useState(false);
+  /* Par courriel, les six cases ne s'affichent QUE si on les demande : le
+     gabarit d'origine de Supabase n'envoie pas de chiffres, et six cases
+     vides devant un courriel qui n'en contient pas, c'est une porte
+     peinte sur un mur. Par téléphone, le code est bien un code. */
+  const [verCodigo, setVerCodigo] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [busy, setBusy] = useState(false);
@@ -104,7 +108,7 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
     setStep("identity");
     setCode("");
     setPasted("");
-    setShowPaste(false);
+    setVerCodigo(false);
     setError("");
     setNotice("");
   }
@@ -236,7 +240,7 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
     if (ok)
       setNotice(
         channel === "email"
-          ? "Código reenviado a tu correo."
+          ? "Correo reenviado. Revisa también la carpeta de no deseados."
           : codeVia === "whatsapp"
             ? "Código reenviado por WhatsApp."
             : "Código reenviado por SMS.",
@@ -357,7 +361,9 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
 
             <Dialog.Title className="mx-auto mt-3 max-w-[16ch] text-center font-display text-[26px] leading-[1.12] font-extrabold tracking-[-0.03em]">
               {step === "code"
-                ? "Escribe tu código"
+                ? channel === "email"
+                  ? "Revisa tu correo"
+                  : "Escribe tu código"
                 : step === "done"
                   ? "Casi listo"
                   : mode === "login"
@@ -367,7 +373,7 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
             <Dialog.Description className="mx-auto mt-2 mb-6 max-w-[34ch] text-center text-[13.5px] leading-snug text-night-200">
               {step === "code"
                 ? channel === "email"
-                  ? `Te lo mandamos a ${codeDestination}. Si el correo trae un enlace en vez de seis dígitos, pégalo aquí abajo: sirve igual.`
+                  ? `Te escribimos a ${email.trim()}. Abre el correo y toca el enlace: con eso entras, no tienes que volver aquí.`
                   : `Te mandamos seis dígitos a ${codeDestination}.`
                 : step === "done"
                   ? "Un paso más y entras."
@@ -625,8 +631,46 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
                 noValidate
                 className="flex flex-col gap-4"
               >
+                {/* PAR COURRIEL, LE CHEMIN EST LE LIEN. Le gabarit d'origine
+                    de Supabase n'envoie pas de chiffres : afficher six cases
+                    en premier, c'était demander à quelqu'un de recopier une
+                    chose qui n'existe pas dans son courriel. */}
+                {channel === "email" && (
+                  <div className="rounded-[16px] border border-white/12 bg-white/6 p-4">
+                    <p className="flex items-start gap-2.5 text-[13.5px] leading-snug text-white">
+                      <Icon
+                        name="check"
+                        className="mt-0.5 size-4 shrink-0 text-action"
+                      />
+                      <span>
+                        <b className="font-semibold">Toca el enlace del correo</b>{" "}
+                        y quedas dentro. Puedes cerrar esta ventana.
+                      </span>
+                    </p>
+                    <label
+                      htmlFor={`${id}-enlace`}
+                      className="mt-3 mb-1.5 block text-[12.5px] leading-snug text-night-200"
+                    >
+                      ¿Tocarlo no te trajo de vuelta? Copia el enlace completo
+                      y pégalo aquí:
+                    </label>
+                    <input
+                      id={`${id}-enlace`}
+                      type="url"
+                      inputMode="url"
+                      autoComplete="off"
+                      autoCapitalize="off"
+                      spellCheck={false}
+                      value={pasted}
+                      onChange={(e) => setPasted(e.target.value)}
+                      placeholder="https://…"
+                      className={`${pill} w-full px-4 py-3 text-[14.5px] placeholder:text-night-300 focus:border-action focus:outline-none`}
+                    />
+                  </div>
+                )}
+
                 <div
-                  className="relative"
+                  className={`relative ${channel === "email" && !verCodigo ? "hidden" : ""}`}
                   onClick={() => codeInput.current?.focus()}
                 >
                   <div aria-hidden className="grid grid-cols-6 gap-2">
@@ -650,7 +694,7 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
                     aria-label="Código de seis dígitos"
                     inputMode="numeric"
                     autoComplete="one-time-code"
-                    autoFocus
+                    autoFocus={channel === "phone"}
                     value={code}
                     onChange={(e) =>
                       setCode(
@@ -661,32 +705,6 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
                   />
                 </div>
 
-                {/* LE COURRIEL N'A QU'UN LIEN ? On l'accepte tel quel.
-                    Demander six chiffres quand le courriel n'en contient
-                    pas, c'est fermer la porte et laisser la clé dedans. */}
-                {showPaste ? (
-                  <div className="rounded-[16px] border border-white/12 bg-white/6 p-3.5">
-                    <label
-                      htmlFor={`${id}-enlace`}
-                      className="mb-1.5 block text-[12.5px] leading-snug text-night-200"
-                    >
-                      Pega aquí el enlace del correo, completo:
-                    </label>
-                    <input
-                      id={`${id}-enlace`}
-                      type="url"
-                      inputMode="url"
-                      autoComplete="off"
-                      autoCapitalize="off"
-                      spellCheck={false}
-                      value={pasted}
-                      onChange={(e) => setPasted(e.target.value)}
-                      placeholder="https://…"
-                      className={`${pill} w-full px-4 py-3 text-[14.5px] placeholder:text-night-300 focus:border-action focus:outline-none`}
-                    />
-                  </div>
-                ) : null}
-
                 <button
                   type="submit"
                   disabled={busy}
@@ -695,13 +713,16 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
                   {busy ? "Verificando…" : "Confirmar"}
                 </button>
 
-                {!showPaste && (
+                {channel === "email" && !verCodigo && (
                   <button
                     type="button"
-                    onClick={() => setShowPaste(true)}
+                    onClick={() => {
+                      setVerCodigo(true);
+                      window.setTimeout(() => codeInput.current?.focus(), 50);
+                    }}
                     className="text-center text-[13.5px] text-night-200 underline-offset-2 hover:underline"
                   >
-                    ¿El correo trae un enlace y no un código?
+                    Mi correo trae seis dígitos
                   </button>
                 )}
 
@@ -713,7 +734,7 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
                     disabled={busy}
                     className="font-bold text-white hover:underline disabled:opacity-60"
                   >
-                    Reenviar el código
+                    {channel === "email" ? "Reenviar el correo" : "Reenviar el código"}
                   </button>
                 </p>
               </form>
