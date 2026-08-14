@@ -78,7 +78,10 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
 
   const [step, setStep] = useState<Step>("identity");
   const [mode, setMode] = useState<Mode>("login");
-  const [channel, setChannel] = useState<Channel>("phone");
+  /* Le courriel par défaut : c'est le seul canal qui marche sans
+     fournisseur SMS branché. Le celular reste choisissable — et le dit
+     clairement s'il échoue. */
+  const [channel, setChannel] = useState<Channel>("email");
   const [codeVia, setCodeVia] = useState<CodeVia>("whatsapp");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -140,17 +143,36 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
   async function sendCode(): Promise<boolean> {
     if (!isSupabaseConfigured) return true;
     const supabase = getSupabase()!;
+    /* Le prénom voyage AVEC la demande de code : c'est le déclencheur
+       `handle_new_user` (migration 0017) qui le lit pour créer le
+       profil. Sans ça, la personne s'appellerait « Viajero » sur son
+       propre compte. */
+    const data = {
+      first_name: firstName.trim(),
+      last_name: lastName.trim(),
+      locale: "es",
+    };
     const { error: authError } =
       channel === "phone"
         ? await supabase.auth.signInWithOtp({
             phone: e164,
             /* WhatsApp o SMS — el mismo código, el canal elegido.
                WhatsApp requiere el sender de Twilio en Supabase. */
-            options: { channel: codeVia },
+            options: { channel: codeVia, data },
           })
-        : await supabase.auth.signInWithOtp({ email: email.trim() });
+        : await supabase.auth.signInWithOtp({
+            email: email.trim(),
+            options: { data },
+          });
     if (authError) {
-      setError("No pudimos mandar el código. Inténtalo otra vez.");
+      /* Le SMS demande un fournisseur (Twilio) branché sur Supabase.
+         Tant qu'il ne l'est pas, le dire franchement vaut mieux qu'un
+         « réessaie » qui ne marchera jamais. */
+      setError(
+        channel === "phone"
+          ? "Todavía no podemos mandar códigos por celular. Entra con tu correo mientras tanto."
+          : "No pudimos mandar el código. Inténtalo otra vez.",
+      );
       return false;
     }
     return true;

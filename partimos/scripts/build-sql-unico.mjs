@@ -121,10 +121,6 @@ function idempotent(sql) {
 }
 
 const files = (await readdir(DIR)).filter((f) => f.endsWith(".sql")).sort();
-const today = new Date(Number(process.env.SOURCE_DATE_EPOCH ?? Date.now()) * 1)
-  .toISOString()
-  .slice(0, 10);
-
 const parts = [
   `-- PARTIMOS — TODA LA BASE, DE UNA VEZ`,
   `--`,

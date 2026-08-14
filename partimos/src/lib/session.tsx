@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useMemo, useSyncExternalStore } from "react";
-import { isSupabaseConfigured } from "./supabase";
+import { getSupabase, isSupabaseConfigured } from "./supabase";
 import type { PayChannel } from "./pricing";
 
 /**
@@ -130,31 +130,169 @@ const EVENT = "partimos:session";
 
 const listeners = new Set<() => void>();
 
+/**
+ * L'IDENTITÉ VIENT DE SUPABASE, LES PRÉFÉRENCES DU NAVIGATEUR.
+ *
+ * Depuis que la base existe, « être connecté » ne se décide plus dans le
+ * navigateur : c'est la session Supabase qui fait foi, et le profil
+ * (`profiles`, créé par le déclencheur de la migration 0017) qui donne
+ * le nom. Personne ne peut plus se déclarer connecté en écrivant dans
+ * son propre stockage.
+ *
+ * Le reste — moyen de paiement favori, rutina, carros, viajes publiés,
+ * reservas — vit encore dans le navigateur, sous une clé PAR compte :
+ * ces tables existent en base mais le site ne les écrit pas encore.
+ * C'est la prochaine étape, et elle est annoncée telle quelle dans
+ * l'interface plutôt que maquillée.
+ */
+type RemoteIdentity = {
+  userId: string;
+  contact: string;
+  firstName: string;
+  lastInitial: string;
+  isVerified: boolean;
+  since: string;
+};
+
+let remote: RemoteIdentity | null = null;
+let authStarted = false;
+/** Le cache du snapshot : `useSyncExternalStore` exige que deux lectures
+ *  sans changement rendent la MÊME chaîne, sinon React reboucle. */
+let merged: string | null = null;
+let dirty = true;
+
 function emit() {
+  dirty = true;
   listeners.forEach((listener) => listener());
 }
 
-function subscribe(listener: () => void) {
-  listeners.add(listener);
-  // `storage` couvre les autres onglets ; l'événement maison couvre celui-ci.
-  window.addEventListener("storage", listener);
-  window.addEventListener(EVENT, listener);
-  return () => {
-    listeners.delete(listener);
-    window.removeEventListener("storage", listener);
-    window.removeEventListener(EVENT, listener);
-  };
+/** La clé des préférences : une par compte, pour que deux personnes sur
+ *  le même téléphone ne héritent pas des réglages de l'autre. */
+function prefsKey(): string {
+  return remote ? `partimos.prefs.${remote.userId}` : STORAGE_KEY;
 }
 
-/** Le snapshot est la chaîne brute : deux lectures identiques doivent rendre
- *  la MÊME référence, sinon React reboucle indéfiniment. */
-function getSnapshot(): string | null {
+function readLocal(): string | null {
   try {
-    return window.localStorage.getItem(STORAGE_KEY);
+    return window.localStorage.getItem(prefsKey());
   } catch {
     // Stockage refusé (navigation privée stricte) : on reste déconnecté.
     return null;
   }
+}
+
+/** Branche la session Supabase une seule fois, au premier abonnement. */
+function startAuth(): void {
+  if (authStarted || !isSupabaseConfigured) return;
+  authStarted = true;
+  const client = getSupabase();
+  if (!client) return;
+
+  const apply = async (user: { id: string; email?: string | null; phone?: string | null; created_at?: string } | null) => {
+    if (!user) {
+      remote = null;
+      emit();
+      return;
+    }
+    /* Le profil porte le nom affiché. S'il n'est pas encore là (la
+       toute première milliseconde après l'inscription), on n'invente
+       rien : le prénom arrivera au prochain événement.
+       Réseau coupé ? On garde la session — être connecté ne dépend pas
+       d'avoir pu lire son prénom. */
+    let profile: {
+      first_name?: string | null;
+      last_initial?: string | null;
+      is_id_verified?: boolean | null;
+    } | null = null;
+    try {
+      const { data } = await client
+        .from("profiles")
+        .select("first_name, last_initial, is_id_verified")
+        .eq("id", user.id)
+        .maybeSingle();
+      profile = data;
+    } catch {
+      profile = null;
+    }
+    /* Le profil n'a pas répondu (réseau) ? On ne montre pas « Hola, »
+       tout seul : on retombe sur la même règle que le déclencheur en
+       base — la première partie de l'adresse — pour que le prénom
+       affiché soit celui qui existe côté serveur. */
+    const contact = user.phone || user.email || "";
+    const local = (user.email ?? "").split("@")[0].split(".")[0];
+    const deLAdresse = local
+      ? local.charAt(0).toUpperCase() + local.slice(1)
+      : "Viajero";
+    remote = {
+      userId: user.id,
+      contact,
+      firstName: profile?.first_name || deLAdresse,
+      lastInitial: profile?.last_initial ?? "",
+      isVerified: Boolean(profile?.is_id_verified),
+      since: user.created_at ?? new Date().toISOString(),
+    };
+    emit();
+  };
+
+  /* Supabase injoignable (3G qui tombe, coupure) : on reste
+     déconnecté sans lever d'exception — le site continue de marcher. */
+  client.auth
+    .getSession()
+    .then(({ data }) => apply(data.session?.user ?? null))
+    .catch(() => apply(null));
+  client.auth.onAuthStateChange((_event, session) =>
+    apply(session?.user ?? null),
+  );
+}
+
+function subscribe(listener: () => void) {
+  listeners.add(listener);
+  startAuth();
+  // `storage` couvre les autres onglets ; l'événement maison couvre celui-ci.
+  window.addEventListener("storage", emit);
+  window.addEventListener(EVENT, listener);
+  return () => {
+    listeners.delete(listener);
+    window.removeEventListener("storage", emit);
+    window.removeEventListener(EVENT, listener);
+  };
+}
+
+function getSnapshot(): string | null {
+  if (!dirty) return merged;
+  dirty = false;
+
+  if (!isSupabaseConfigured) {
+    merged = readLocal();
+    return merged;
+  }
+
+  /* Base branchée : sans session Supabase, personne n'est connecté —
+     quoi que dise le stockage local. */
+  if (!remote) {
+    merged = null;
+    return merged;
+  }
+  let prefs: Partial<Session> = {};
+  const raw = readLocal();
+  if (raw) {
+    try {
+      prefs = JSON.parse(raw) as Partial<Session>;
+    } catch {
+      prefs = {};
+    }
+  }
+  merged = JSON.stringify({
+    ...prefs,
+    contact: remote.contact,
+    firstName: remote.firstName,
+    lastName: prefs.lastName ?? "",
+    lastInitial: remote.lastInitial,
+    isVerified: remote.isVerified,
+    affiliation: prefs.affiliation ?? null,
+    since: remote.since,
+  } satisfies Session);
+  return merged;
 }
 
 /** Sur le serveur, personne n'est connecté — et le rendu doit correspondre
@@ -182,6 +320,10 @@ export function useSession() {
       lastName = "",
       payPref: PayChannel | null = null,
     ) => {
+      /* Avec la base branchée, on n'ouvre PAS de session soi-même : c'est
+         le code reçu par courriel qui la crée. Écrire ici ferait croire à
+         une connexion qui n'existe pas côté serveur. */
+      if (isSupabaseConfigured) return;
       const next: Session = {
         contact,
         firstName,
@@ -211,7 +353,7 @@ export function useSession() {
       try {
         const current = JSON.parse(raw) as Session;
         window.localStorage.setItem(
-          STORAGE_KEY,
+          prefsKey(),
           JSON.stringify({ ...current, ...patch }),
         );
       } catch {
@@ -223,6 +365,17 @@ export function useSession() {
   );
 
   const signOut = useCallback(() => {
+    /* Les préférences du compte restent : se déconnecter n'est pas
+       oublier son moyen de paiement favori. C'est la SESSION qu'on
+       ferme, et côté serveur quand il y en a un. */
+    const client = isSupabaseConfigured ? getSupabase() : null;
+    if (client) {
+      void client.auth.signOut().then(() => {
+        remote = null;
+        emit();
+      });
+      return;
+    }
     try {
       window.localStorage.removeItem(STORAGE_KEY);
     } catch {

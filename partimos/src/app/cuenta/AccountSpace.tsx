@@ -25,6 +25,7 @@ import { ALL_CITIES, buildRoute } from "@/lib/corridors";
 import { computePriceCap, formatUsd } from "@/lib/pricing";
 import { formatDayLabel, formatTime, localIso } from "@/lib/trips";
 import { RutinaDaysPicker, DAY_CHIPS } from "@/components/ui/RutinaDays";
+import { TRIPS_ARE_DEMO } from "@/lib/config";
 import {
   CAR_MAKES,
   CAR_YEARS,
@@ -223,10 +224,11 @@ export function AccountSpace() {
         )}
       </div>
 
-      {isDemo && (
-        <p className="mt-5 text-center text-[12.5px] text-ink-500">
-          Modo demostración: esta sesión vive solo en tu navegador y no crea
-          ninguna cuenta.{" "}
+      {(isDemo || TRIPS_ARE_DEMO) && (
+        <p className="mt-5 text-center text-[12.5px] leading-snug text-ink-500">
+          {isDemo
+            ? "Modo demostración: esta sesión vive solo en tu navegador y no crea ninguna cuenta. "
+            : "Tu cuenta es real. Tus viajes y reservas todavía se guardan en este dispositivo, no en la base — por eso no los verás desde otro teléfono. "}
           <Link
             href="/ayuda"
             className="font-semibold text-accent-ink hover:underline"

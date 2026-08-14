@@ -18,6 +18,7 @@ import {
 import { CashMark, TarjetaMark, YappyBubbles } from "@/components/ui/PayMark";
 import { quoteDetour } from "@/lib/detour";
 import { bookingDisclaimer } from "@/lib/content";
+import { TRIPS_ARE_DEMO } from "@/lib/config";
 import { track } from "@/lib/analytics";
 
 /**
@@ -559,9 +560,11 @@ export function BookingPanel({
         {bookingDisclaimer(driverName)}
       </p>
 
-      {isDemo && (
-        <p className="mt-3 text-center text-[12.5px] text-ink-500">
-          Modo demostración: no se crea ninguna cuenta ni reserva real.
+      {TRIPS_ARE_DEMO && (
+        <p className="mt-3 text-center text-[12.5px] leading-snug text-ink-500">
+          {isDemo
+            ? "Modo demostración: no se crea ninguna cuenta ni reserva real."
+            : "Este conductor es de demostración: tu reserva queda guardada en tu cuenta, pero nadie va a pasar a recogerte todavía."}
         </p>
       )}
     </aside>

@@ -18,11 +18,25 @@ export const isSupabaseConfigured = Boolean(url && anonKey);
 
 let browserClient: SupabaseClient | null = null;
 
-/** Client lecture publique (RLS active). */
+/**
+ * Client du NAVIGATEUR — lecture publique (RLS active) ET session.
+ *
+ * `persistSession: false` était juste tant que ce client ne servait qu'à
+ * lire des données publiques. Depuis que les comptes sont réels, c'est
+ * un piège : la session ne survivait pas au rechargement qui suit la
+ * saisie du code, et la personne se retrouvait déconnectée une seconde
+ * après s'être connectée. Elle se garde donc, se rafraîchit toute seule,
+ * et le retour d'un OAuth (Google) est reconnu dans l'URL.
+ */
 export function getSupabase(): SupabaseClient | null {
   if (!url || !anonKey) return null;
   browserClient ??= createClient(url, anonKey, {
-    auth: { persistSession: false },
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true,
+      flowType: "pkce",
+    },
   });
   return browserClient;
 }

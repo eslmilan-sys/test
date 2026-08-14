@@ -13,7 +13,7 @@ import { Icon } from "@/components/ui/Icon";
 import { ButtonLink } from "@/components/ui/Button";
 import { CORRIDORS, ALL_CITIES, corridorsServing } from "@/lib/corridors";
 import { searchTrips, formatDayLabel, localIso } from "@/lib/trips";
-import { isSupabaseConfigured } from "@/lib/supabase";
+import { TRIPS_ARE_DEMO } from "@/lib/config";
 
 /**
  * PAGE DE RÉSULTATS — la boucle principale du produit.
@@ -183,14 +183,15 @@ export function SearchResults() {
       </div>
 
       <Container className="pt-6">
-        {!isSupabaseConfigured && (
+        {TRIPS_ARE_DEMO && (
           <p className="mb-4 flex items-start gap-2.5 rounded-[14px] border border-ink-200 bg-white px-4 py-3 text-[13.5px] leading-relaxed text-ink-500">
             <Icon name="bell" className="mt-0.5 size-4 shrink-0" />
             <span>
               <b className="font-semibold text-ink-900">Viajes de ejemplo.</b>{" "}
-              La base de datos todavía no está conectada, así que estos
-              conductores son de muestra. Todo lo demás —el cálculo del aporte,
-              las reglas, los desvíos— funciona de verdad.
+              Todavía no hay conductores publicando, así que estos los
+              generamos nosotros para que puedas recorrer la app. Tu cuenta,
+              en cambio, es de verdad — y el cálculo del aporte, las reglas y
+              los desvíos funcionan igual que el primer día real.
             </span>
           </p>
         )}

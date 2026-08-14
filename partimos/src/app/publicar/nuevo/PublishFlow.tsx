@@ -14,6 +14,7 @@ import { carsOf, useSession } from "@/lib/session";
 import { ALL_CITIES, buildRoute, getCorridor } from "@/lib/corridors";
 import { saveLastSearch, useLastSearch } from "@/lib/lastsearch";
 import { track } from "@/lib/analytics";
+import { TRIPS_ARE_DEMO } from "@/lib/config";
 import {
   computePriceCap,
   formatUsd,
@@ -269,9 +270,11 @@ export function PublishFlow() {
               </Link>
             )}
           </div>
-          {isDemo && (
-            <p className="mt-5 text-[12.5px] text-ink-500">
-              Modo demostración: nada se guardó en una base de datos.
+          {TRIPS_ARE_DEMO && (
+            <p className="mt-5 text-[12.5px] leading-snug text-ink-500">
+              {isDemo
+                ? "Modo demostración: nada se guardó en una base de datos."
+                : "Tu viaje quedó guardado en tu cuenta, en este dispositivo. Todavía no aparece en las búsquedas de los demás — eso llega cuando abramos la publicación de verdad."}
             </p>
           )}
         </div>

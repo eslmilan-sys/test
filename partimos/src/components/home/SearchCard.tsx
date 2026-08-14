@@ -10,7 +10,7 @@ import { Icon } from "@/components/ui/Icon";
 import { CityCombobox } from "@/components/ui/CityCombobox";
 import { RouteMap } from "@/components/map/RouteMap";
 import { localIso, SEARCH_HORIZON_DAYS } from "@/lib/trips";
-import { saveLastSearch, useLastSearch } from "@/lib/lastsearch";
+import { saveLastSearch, useHydrated, useLastSearch } from "@/lib/lastsearch";
 
 /** L'horizon de recherche, libellé en espagnol du Panama. */
 function nextDays(count = SEARCH_HORIZON_DAYS) {
@@ -57,7 +57,16 @@ export function SearchCard() {
   const from = fromChoice ?? last?.from ?? "panama-city";
   const to = toChoice ?? last?.to ?? "chitre";
   const seats = seatsChoice ?? last?.seats ?? 1;
-  const [date, setDate] = useState(days[0].value);
+  /* LA DATE NE PEUT PAS S'INITIALISER AVEC L'HEURE.
+     Le HTML est fabriqué au build : « Hoy » y vaut la date du build,
+     et dans le navigateur la date d'aujourd'hui. Deux textes
+     différents au même endroit — c'est l'erreur d'hydratation React
+     #418, et elle traînait sur l'accueil depuis un moment. La liste
+     complète n'apparaît donc qu'APRÈS l'hydratation ; avant, une seule
+     entrée, identique des deux côtés. */
+  const hydrated = useHydrated();
+  const [dateChoice, setDateChoice] = useState<string | null>(null);
+  const date = dateChoice ?? days[0].value;
   const [showMap, setShowMap] = useState(false);
   // Sur la carte, le premier clic renseigne l'origine, le suivant la
   // destination. Alterner évite un sélecteur « je choisis quoi » de plus.
@@ -216,10 +225,10 @@ export function SearchCard() {
               <select
                 id="fecha"
                 value={date}
-                onChange={(e) => setDate(e.target.value)}
+                onChange={(e) => setDateChoice(e.target.value)}
                 className={FIELD_INPUT}
               >
-                {days.map((day) => (
+                {(hydrated ? days : days.slice(0, 1)).map((day) => (
                   <option key={day.value} value={day.value}>
                     {day.label}
                   </option>
