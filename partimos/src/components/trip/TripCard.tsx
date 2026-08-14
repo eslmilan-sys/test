@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Icon } from "@/components/ui/Icon";
+import { Rating } from "@/components/ui/Rating";
 import { formatUsd, formatDuration } from "@/lib/pricing";
 import { getCorridor } from "@/lib/corridors";
 import { formatTime, type TripMatch } from "@/lib/trips";
@@ -112,11 +113,11 @@ export function TripCard({ match }: { match: TripMatch }) {
               <span className="block truncate text-[14.5px] font-semibold">
                 {trip.driver.firstName} {trip.driver.lastInitial}.
               </span>
-              <span className="tnum flex items-center gap-1 text-[12.5px] text-ink-500">
-                <Icon name="star" className="size-3.5" />
-                {trip.driver.rating.toFixed(1)} · {trip.driver.ridesCount}{" "}
-                viajes
-              </span>
+              <Rating
+                value={trip.driver.rating}
+                count={trip.driver.ridesCount}
+                className="text-[12.5px]"
+              />
               <span className="flex items-center gap-1 text-[12.5px] text-ink-500">
                 <Icon name="car" className="size-3.5 shrink-0" />
                 {trip.vehicle.make} {trip.vehicle.model} {trip.vehicle.year} ·{" "}

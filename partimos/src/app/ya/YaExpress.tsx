@@ -19,6 +19,7 @@ import {
 import { agedConsumption, findCar, rateFromConsumption } from "@/lib/cars";
 import { saveLastSearch, useHydrated, useLastSearch } from "@/lib/lastsearch";
 import { CityCombobox } from "@/components/ui/CityCombobox";
+import { Rating } from "@/components/ui/Rating";
 import { DAY_CHIPS, RutinaDaysPicker } from "@/components/ui/RutinaDays";
 
 /**
@@ -587,12 +588,7 @@ function ExpressCard({
           {trip.driver.initial}
         </span>
         {trip.driver.firstName} {trip.driver.lastInitial}.
-        {trip.driver.rating > 0 && (
-          <span className="flex items-center gap-1 text-ink-500">
-            <Icon name="star" className="size-3.5" />
-            {trip.driver.rating.toFixed(1)}
-          </span>
-        )}
+        <Rating value={trip.driver.rating} className="text-[13.5px]" />
         <span className="text-ink-500">
           · {trip.vehicle.make} {trip.vehicle.model} · {seatsFree}{" "}
           {seatsFree === 1 ? "puesto libre" : "puestos libres"}

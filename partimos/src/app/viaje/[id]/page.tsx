@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Container } from "@/components/site/Section";
 import { Icon } from "@/components/ui/Icon";
+import { Rating } from "@/components/ui/Rating";
 import { TripDetail } from "@/components/trip/TripDetail";
 import { getCorridor } from "@/lib/corridors";
 import { demoTripIds, getTrip } from "@/lib/trips";
@@ -73,11 +74,11 @@ export default async function TripPage({ params }: Params) {
                     {trip.driver.firstName} {trip.driver.lastInitial}.
                   </p>
                   <p className="tnum flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[13.5px] text-ink-500">
-                    <span className="flex items-center gap-1">
-                      <Icon name="star" className="size-3.5" />
-                      {trip.driver.rating.toFixed(1)}
-                    </span>
-                    · {trip.driver.ridesCount} viajes
+                    <Rating
+                      value={trip.driver.rating}
+                      count={trip.driver.ridesCount}
+                      size="md"
+                    />
                   </p>
                 </div>
               </div>

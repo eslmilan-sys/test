@@ -31,6 +31,11 @@ export type SavedCar = {
   model: string;
   year: number;
   color: string;
+  /** La placa. Elle ne s'affiche JAMAIS en public — seulement au
+   *  passager dont la reserva est confirmée, comme le numéro de
+   *  téléphone. C'est ce qui lui permet de reconnaître le carro au point
+   *  de rencontre sans exposer le conducteur à toute la plateforme. */
+  plate?: string;
   /** Photo compressée (JPEG ~800 px) en data URL — mode démonstration.
    *  Avec Supabase, elle partira dans le bucket Storage `carros`. */
   photoDataUrl: string | null;

@@ -98,17 +98,17 @@ test("Plus de sièges offerts ne fait jamais monter le plafond", () => {
 });
 
 /* ── La tarifa de servicio — fixe PAR CANAL, jamais par la demande ────────
-   R2 amendée : Yappy 2,5 % (recommandé), tarjeta 5 %, efectivo 0. Les
+   R2 amendée : Yappy 5 % (recommandé), tarjeta 8 %, efectivo 0. Les
    pourcentages suivent le coût du canal ; s'ils changent ici sans changer
    la contrainte `fee_is_fixed_pct` (migration 0010), c'est un bug. */
 
-test("La tarifa par canal : 2,5 % Yappy, 5 % tarjeta, 0 efectivo", () => {
-  assert.equal(serviceFeeCents(1000, "yappy"), 25);
-  assert.equal(serviceFeeCents(1000, "tarjeta"), 50);
+test("La tarifa par canal : 5 % Yappy, 8 % tarjeta, 0 efectivo", () => {
+  assert.equal(serviceFeeCents(1000, "yappy"), 50);
+  assert.equal(serviceFeeCents(1000, "tarjeta"), 80);
   assert.equal(serviceFeeCents(1000, "efectivo"), 0);
   // Le montant réel d'un Panamá → David à 18 $ : arrondi au centime.
-  assert.equal(serviceFeeCents(1800, "yappy"), 45);
-  assert.equal(serviceFeeCents(1800, "tarjeta"), 90);
+  assert.equal(serviceFeeCents(1800, "yappy"), 90);
+  assert.equal(serviceFeeCents(1800, "tarjeta"), 144);
 });
 
 test("L'ordre des canaux : le recommandé d'abord, l'efectivo en dernier", () => {

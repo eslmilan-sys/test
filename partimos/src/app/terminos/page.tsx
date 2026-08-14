@@ -44,12 +44,12 @@ export default function TerminosPage() {
 
       <h2>2 bis. El pago — tres vías, a elección del pasajero</h2>
       <p>
-        <b>Yappy en la app (tarifa de servicio del 2.5%).</b> El pasajero
+        <b>Yappy en la app (tarifa de servicio del 5%).</b> El pasajero
         paga por la plataforma mediante el Botón de Pago Yappy. Es la vía
         recomendada y la de tarifa más baja.
       </p>
       <p>
-        <b>Tarjeta en la app (tarifa de servicio del 5%).</b> El pasajero
+        <b>Tarjeta en la app (tarifa de servicio del 8%).</b> El pasajero
         paga por la plataforma con tarjeta, a través de una pasarela
         certificada; los datos de la tarjeta nunca pasan por los servidores
         de Partimos.

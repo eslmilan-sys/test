@@ -28,7 +28,7 @@ applicatif.
 (Amendée le 2026-08-12 par décision du propriétaire, deux fois.) Le paiement
 EN LIGNE existe comme OPTION du passager, avec trois canaux présentés dans
 CET ORDRE : Yappy dans l'app (recommandé), tarjeta dans l'app, efectivo en
-dernier. La tarifa de servicio est FIXE PAR CANAL — 2,5 % Yappy, 5 %
+dernier. La tarifa de servicio est FIXE PAR CANAL — 5 % Yappy, 8 %
 tarjeta, 0 efectivo — parce qu'elle suit le coût du canal (Yappy commerçant
 ~1 %, processeur carte ~3,5–4 %), jamais la demande. Elle rémunère le
 service digital de réservation (cobro protégé, comprobante, remboursements),

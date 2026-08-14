@@ -7,6 +7,7 @@ import { track } from "@/lib/analytics";
 import type { Corridor } from "@/lib/corridors";
 import { formatDuration, formatUsd } from "@/lib/pricing";
 import { findSegment, segmentCap } from "@/lib/segments";
+import { routePoints } from "@/lib/desvio";
 import {
   formatDayLabel,
   formatTime,
@@ -207,6 +208,9 @@ export function TripDetail({
         seatsOffered={trip.seatsOffered}
         instantBooking={trip.instantBooking}
         flexibleStops={trip.flexibleStops}
+        /* Le tracé complet du conducteur : le détour se mesure par rapport
+           au CHEMIN, pas par rapport à la ville où l'on monte. */
+        route={routePoints(trip.servedStops.map((s) => s.citySlug))}
       />
     </div>
   );

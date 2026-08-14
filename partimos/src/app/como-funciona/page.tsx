@@ -82,7 +82,7 @@ const STEPS: Step[] = [
 const FAQ: Faq[] = [
   {
     q: "¿Puedo pagar con tarjeta en la app?",
-    a: "Sí, si quieres. Al reservar eliges entre tres: Yappy en la app (recomendado, tarifa de servicio del 2.5%), tarjeta en la app (tarifa del 5%) o efectivo en la mano, sin tarifa. La tarifa paga la reserva protegida — comprobante, soporte y reembolso según las reglas de cancelación. El conductor recibe su aporte completo en los tres casos.",
+    a: "Sí, si quieres. Al reservar eliges entre tres: Yappy en la app (recomendado, tarifa de servicio del 5%), tarjeta en la app (tarifa del 8%) o efectivo en la mano, sin tarifa. La tarifa paga la reserva protegida — comprobante, soporte y reembolso según las reglas de cancelación. El conductor recibe su aporte completo en los tres casos.",
   },
   {
     q: "¿Y si el conductor me quiere cobrar más el día del viaje?",

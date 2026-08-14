@@ -17,6 +17,7 @@ import {
   getVerificationState,
   isSupabaseConfigured,
   startIdVerification,
+  type DocKind,
   type VerificationState,
 } from "@/lib/didit";
 import { connectLinkedIn, hasLinkedIn } from "@/lib/linkedin";
@@ -259,6 +260,7 @@ function CarPanel() {
   const [model, setModel] = useState("");
   const [year, setYear] = useState(2020);
   const [color, setColor] = useState("");
+  const [plate, setPlate] = useState("");
   const [photo, setPhoto] = useState<string | null>(null);
   const [photoBusy, setPhotoBusy] = useState(false);
 
@@ -275,11 +277,19 @@ function CarPanel() {
   const addCar = () => {
     saveCars([
       ...cars,
-      { make, model, year, color: color.trim(), photoDataUrl: photo },
+      {
+        make,
+        model,
+        year,
+        color: color.trim(),
+        plate: plate.trim().toUpperCase(),
+        photoDataUrl: photo,
+      },
     ]);
     setMake("");
     setModel("");
     setColor("");
+    setPlate("");
     setPhoto(null);
     setEditing(false);
   };
@@ -335,6 +345,7 @@ function CarPanel() {
                   </p>
                   <p className="tnum text-[13.5px] text-ink-500 capitalize">
                     {c.color}
+                    {c.plate ? ` · ${c.plate}` : ""}
                     {cRate !== null &&
                       ` · $${(cRate / 100).toFixed(2)} por km`}
                   </p>
@@ -406,13 +417,28 @@ function CarPanel() {
             </select>
           </div>
 
-          <input
-            value={color}
-            onChange={(e) => setColor(e.target.value)}
-            placeholder="Color (gris, blanco…)"
-            aria-label="Color del carro"
-            className="mt-2 w-full rounded-[14px] border-[1.5px] border-ink-200 px-3.5 py-2.5 text-[14.5px] font-semibold placeholder:font-normal placeholder:text-ink-400 focus:border-accent focus:outline-none sm:max-w-[calc((100%-1rem)/3)]"
-          />
+          <div className="mt-2 grid gap-2 sm:grid-cols-3">
+            <input
+              value={color}
+              onChange={(e) => setColor(e.target.value)}
+              placeholder="Color (gris, blanco…)"
+              aria-label="Color del carro"
+              className="w-full rounded-[14px] border-[1.5px] border-ink-200 px-3.5 py-2.5 text-[14.5px] font-semibold placeholder:font-normal placeholder:text-ink-400 focus:border-accent focus:outline-none"
+            />
+            <input
+              value={plate}
+              onChange={(e) => setPlate(e.target.value.toUpperCase())}
+              placeholder="Placa (AB1234)"
+              aria-label="Placa del carro"
+              maxLength={10}
+              className="tnum w-full rounded-[14px] border-[1.5px] border-ink-200 px-3.5 py-2.5 text-[14.5px] font-semibold uppercase placeholder:font-normal placeholder:normal-case placeholder:text-ink-400 focus:border-accent focus:outline-none"
+            />
+          </div>
+          <p className="mt-1.5 text-[12.5px] leading-snug text-ink-500">
+            La placa NO se muestra en público. Solo la ve el pasajero cuando
+            su reserva queda confirmada, para reconocer el carro en el punto
+            de encuentro.
+          </p>
 
           {ref && l100 !== null && rate !== null && (
             <p className="tnum mt-2.5 rounded-[14px] bg-ink-50 px-3.5 py-2.5 text-[13.5px] leading-relaxed text-ink-500">
@@ -460,14 +486,15 @@ function CarPanel() {
               </label>
             </div>
             <p className="mt-2 text-[12.5px] leading-snug text-ink-500">
-              Una sola foto, del exterior. Nada de placa completa: en tu perfil
-              público solo aparecen el modelo, el color y la foto.
+              Una sola foto, del exterior. Hace falta para publicar viajes: es
+              lo que permite reconocer el carro. En tu perfil público solo
+              aparecen el modelo, el color y esta foto.
             </p>
           </div>
 
           <div className="mt-5 flex gap-3">
             <button
-              disabled={!ref}
+              disabled={!ref || !photo || plate.trim().length < 4}
               onClick={addCar}
               className="rounded-[14px] bg-ink-900 px-6 py-3 font-display text-[15px] font-bold text-white transition-colors hover:bg-ink-800 disabled:opacity-50"
             >
@@ -1000,6 +1027,64 @@ function LinkedInRow() {
  * demostración no hay backend : el panel lo dice tal cual, sin fingir.
  */
 function VerificacionPanel({ sessionVerified }: { sessionVerified: boolean }) {
+  return (
+    <>
+      <h2 className="mb-1.5 font-display text-[19px] font-bold">Verificación</h2>
+      <p className="mb-4 text-[14px] leading-relaxed text-ink-500">
+        Para viajar de pasajero no hace falta nada de esto. Para publicar
+        sí: quien maneja demuestra quién es y que puede conducir.
+      </p>
+      <ul className="mb-5 grid gap-2.5">
+        <Status
+          done
+          label="Celular o correo confirmado"
+          detail="Con el código que usaste para entrar"
+        />
+      </ul>
+      <div className="grid gap-3">
+        <DocumentoRow
+          kind="cedula"
+          titulo="Cédula"
+          porQue="Dice quién eres. La verifica Didit, un proveedor certificado."
+          yaVerificado={sessionVerified}
+        />
+        <DocumentoRow
+          kind="licencia"
+          titulo="Licencia de conducir"
+          porQue="Dice que puedes conducir. Solo hace falta si vas a publicar viajes."
+        />
+      </div>
+      <p className="mt-4 rounded-[14px] bg-ink-50 px-4 py-3 text-[13px] leading-relaxed text-ink-500">
+        <b className="font-semibold text-ink-900">
+          Nunca guardamos tus documentos.
+        </b>{" "}
+        Ni la foto, ni el número — y en Panamá el número de la licencia es el
+        de la cédula, así que tampoco ese. De Didit solo nos llega
+        «verificado» o «rechazado».
+      </p>
+    </>
+  );
+}
+
+/**
+ * UNE LIGNE PAR DOCUMENT.
+ *
+ * Le même composant sert à la cédula et à la licencia : même parcours
+ * Didit, même façon de n'en garder que le verdict. Ce qui change est le
+ * workflow appelé et la raison affichée — parce qu'un conducteur a le
+ * droit de savoir POURQUOI on lui demande un papier de plus.
+ */
+function DocumentoRow({
+  kind,
+  titulo,
+  porQue,
+  yaVerificado = false,
+}: {
+  kind: DocKind;
+  titulo: string;
+  porQue: string;
+  yaVerificado?: boolean;
+}) {
   const [remote, setRemote] = useState<VerificationState | null>(null);
   const [launching, setLaunching] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -1007,22 +1092,22 @@ function VerificacionPanel({ sessionVerified }: { sessionVerified: boolean }) {
   useEffect(() => {
     if (!isSupabaseConfigured) return;
     let cancelled = false;
-    getVerificationState().then((state) => {
+    getVerificationState(kind).then((state) => {
       if (!cancelled) setRemote(state);
     });
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [kind]);
 
   const status = remote?.status ?? "none";
-  const verified = sessionVerified || status === "verified";
+  const verified = yaVerificado || status === "verified";
   const pending = status === "pending";
 
   const launch = async () => {
     setLaunching(true);
     setError(null);
-    const result = await startIdVerification();
+    const result = await startIdVerification(kind);
     if ("url" in result) {
       window.location.assign(result.url);
       return;
@@ -1030,67 +1115,66 @@ function VerificacionPanel({ sessionVerified }: { sessionVerified: boolean }) {
     setLaunching(false);
     setError(
       result.error === "already_verified"
-        ? "Tu cédula ya está verificada."
+        ? "Ese documento ya está verificado."
         : "No se pudo abrir la verificación. Intenta de nuevo en un momento.",
     );
   };
 
   return (
-    <>
-      <h2 className="mb-4 font-display text-[19px] font-bold">Verificación</h2>
-      <ul className="grid gap-2.5">
-        <Status
-          done
-          label="Celular confirmado"
-          detail="Con el código que acabas de usar"
-        />
-        <Status
-          done={verified}
-          label={
-            pending ? "Cédula en revisión" : "Cédula verificada"
-          }
-          detail={
-            pending
-              ? "Didit está revisando tu documento. El resultado aparece aquí solo."
-              : "La hace Didit, un proveedor certificado. No guardamos la imagen ni el número — solo el resultado."
-          }
-        />
-      </ul>
-
-      {!verified && !pending && isSupabaseConfigured && (
-        <div className="mt-4">
+    <div className="rounded-[14px] border border-ink-200 px-4 py-3.5">
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+        <span
+          aria-hidden
+          className={`flex size-8 shrink-0 items-center justify-center rounded-full ${
+            verified
+              ? "bg-ink-900 text-white"
+              : pending
+                ? "bg-action-soft text-action-ink"
+                : "border-2 border-ink-200 text-ink-400"
+          }`}
+        >
+          <Icon name={verified ? "check" : "id"} className="size-4" />
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block text-[15px] font-semibold">
+            {titulo}
+            <span className="sr-only">
+              {verified ? " — verificado" : pending ? " — en revisión" : " — pendiente"}
+            </span>
+          </span>
+          <span className="block text-[12.5px] leading-snug text-ink-500">
+            {verified
+              ? "Verificado"
+              : pending
+                ? "En revisión — el resultado aparece aquí solo"
+                : porQue}
+          </span>
+        </span>
+        {!verified && !pending && isSupabaseConfigured && (
           <button
             onClick={launch}
             disabled={launching}
-            className="rounded-[14px] bg-ink-900 px-6 py-3.5 font-display text-[15px] font-bold text-white transition-colors hover:bg-ink-800 disabled:opacity-60"
+            className="rounded-[14px] bg-ink-900 px-4 py-2.5 text-[14px] font-bold text-white transition-colors hover:bg-ink-800 disabled:opacity-60"
           >
-            {launching ? "Abriendo…" : "Verificar mi cédula"}
+            {launching ? "Abriendo…" : "Verificar"}
           </button>
-          <p className="mt-3 text-[13.5px] leading-relaxed text-ink-500">
-            Te lleva al recorrido seguro de Didit: foto de la cédula y una
-            selfie, dos minutos. Al terminar vuelves aquí.
-            {status === "rejected" &&
-              " Tu intento anterior no pasó; puedes volver a intentarlo."}
-            {status === "expired" &&
-              " Tu intento anterior expiró; puedes volver a empezar."}
-          </p>
-          {error && (
-            <p role="alert" className="mt-2 text-[13.5px] font-semibold text-danger">
-              {error}
-            </p>
-          )}
-        </div>
-      )}
-
-      {!verified && !isSupabaseConfigured && (
-        <p className="mt-4 rounded-[14px] bg-ink-50 px-4 py-3 text-[13.5px] leading-relaxed text-ink-500">
-          La verificación la hará Didit, un proveedor certificado: nosotros
-          nunca vemos ni guardamos tu cédula, solo el resultado. En esta
-          demostración todavía no está conectada. Puedes buscar y reservar sin
-          ella; para publicar sí hace falta.
+        )}
+      </div>
+      {!verified && !pending && (
+        <p className="mt-2 text-[12.5px] leading-snug text-ink-500">
+          {isSupabaseConfigured
+            ? "Dos minutos: foto del documento y una selfie, en el recorrido seguro de Didit."
+            : "Disponible al conectar la base."}
+          {status === "rejected" && " Tu intento anterior no pasó; puedes volver a intentarlo."}
+          {status === "expired" && " Tu intento anterior expiró; puedes volver a empezar."}
         </p>
       )}
-    </>
+      {error && (
+        <p role="alert" className="mt-2 text-[12.5px] font-semibold text-danger">
+          {error}
+        </p>
+      )}
+    </div>
   );
 }
 

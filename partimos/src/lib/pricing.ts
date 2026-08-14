@@ -67,8 +67,8 @@ export type PayChannel = "yappy" | "tarjeta" | "efectivo";
 export const PAY_CHANNELS: PayChannel[] = ["yappy", "tarjeta", "efectivo"];
 
 export const SERVICE_FEE_PCT: Record<PayChannel, number> = {
-  yappy: 2.5,
-  tarjeta: 5,
+  yappy: 5,
+  tarjeta: 8,
   efectivo: 0,
 };
 

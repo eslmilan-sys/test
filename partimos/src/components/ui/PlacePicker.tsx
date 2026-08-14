@@ -32,6 +32,7 @@ export function PlacePicker({
   value,
   onChange,
   onCityResolved,
+  onCoords,
   placeholder = "Escribe el lugar…",
 }: {
   id: string;
@@ -39,6 +40,11 @@ export function PlacePicker({
   citySlug: string;
   value: string;
   onChange: (place: string) => void;
+  /** Les COORDONNÉES du lieu choisi, quand on les connaît — c'est ce qui
+   *  permet de mesurer le détour au lieu de le faire deviner au passager.
+   *  `null` veut dire « on ne sait pas » : l'appelant retombe alors sur
+   *  son estimation manuelle. Un lieu tapé à la main n'a pas de point. */
+  onCoords?: (coords: { lat: number; lng: number } | null) => void;
   /** Le lieu choisi appartient à une AUTRE ville desservie : l'appelant
    *  peut déplacer la ruta. C'est ce qui fait qu'écrire « Coronado
    *  Escapes » dans le point exact CHANGE la destination — et donc les
@@ -102,8 +108,18 @@ export function PlacePicker({
           .slice(0, 3)
       : [];
 
-  const pick = (place: string) => {
+  /* Un lieu du catalogue n'a pas de coordonnées propres, mais il est
+     NOTOIRE dans sa ville : le centre de la ville est la meilleure
+     approximation qu'on ait, et elle est bonne — ces repères sont sur le
+     chemin, pas au bout d'une route de terre. */
+  const cityCoords = (slug: string) => {
+    const c = ALL_CITIES.find((x) => x.slug === slug);
+    return c ? { lat: c.lat, lng: c.lng } : null;
+  };
+
+  const pick = (place: string, coords: { lat: number; lng: number } | null) => {
     onChange(place);
+    onCoords?.(coords);
     setOpen(false);
   };
 
@@ -120,7 +136,7 @@ export function PlacePicker({
       const cityOfPlace = nearestCity(coords.lat, coords.lng, ALL_CITIES);
       if (cityOfPlace.slug !== citySlug) onCityResolved(cityOfPlace.slug);
     }
-    pick(r.name);
+    pick(r.name, coords);
   };
 
   return (
@@ -152,6 +168,9 @@ export function PlacePicker({
             /* La frappe EST la valeur : pas besoin de choisir dans la
                liste pour que le texte compte. */
             onChange(e.target.value);
+            /* …mais retaper ANNULE le point mesuré : le texte ne
+               correspond plus aux coordonnées d'avant. */
+            onCoords?.(null);
           }}
           onBlur={() => window.setTimeout(() => setOpen(false), 120)}
           onKeyDown={(e) => {
@@ -160,12 +179,12 @@ export function PlacePicker({
                premier résultat — même remède que le sélecteur de villes. */
             if (e.key === "Enter" && open) {
               e.preventDefault();
-              if (local[0]) pick(local[0].name);
+              if (local[0]) pick(local[0].name, cityCoords(citySlug));
               else if (elsewhere[0]) {
                 onCityResolved?.(elsewhere[0].citySlug);
-                pick(elsewhere[0].name);
+                pick(elsewhere[0].name, cityCoords(elsewhere[0].citySlug));
               } else if (remoteShown[0]) void pickRemote(remoteShown[0]);
-              else if (query.trim()) pick(query.trim());
+              else if (query.trim()) pick(query.trim(), null);
             }
           }}
           className="w-full border-none bg-transparent text-[14.5px] font-semibold placeholder:font-normal placeholder:text-ink-400 focus:outline-none"
@@ -184,7 +203,7 @@ export function PlacePicker({
                 key={`local-${p.name}`}
                 value={`local-${p.name}`}
                 onMouseDown={(e) => e.preventDefault()}
-                onSelect={() => pick(p.name)}
+                onSelect={() => pick(p.name, cityCoords(citySlug))}
                 className="flex cursor-pointer items-baseline justify-between gap-3 rounded-[10px] px-3 py-2.5 text-[14.5px] data-[selected=true]:bg-ink-50"
               >
                 <span className="font-semibold">{p.name}</span>
@@ -202,7 +221,7 @@ export function PlacePicker({
                   onMouseDown={(e) => e.preventDefault()}
                   onSelect={() => {
                     onCityResolved?.(p.citySlug);
-                    pick(p.name);
+                    pick(p.name, cityCoords(p.citySlug));
                   }}
                   className="flex cursor-pointer items-baseline justify-between gap-3 rounded-[10px] px-3 py-2.5 text-[14.5px] data-[selected=true]:bg-ink-50"
                 >
@@ -235,7 +254,7 @@ export function PlacePicker({
               key="libre"
               value="libre"
               onMouseDown={(e) => e.preventDefault()}
-              onSelect={() => pick(query.trim())}
+              onSelect={() => pick(query.trim(), null)}
               className="flex cursor-pointer items-baseline justify-between gap-3 rounded-[10px] px-3 py-2.5 text-[14.5px] data-[selected=true]:bg-ink-50"
             >
               <span className="font-semibold">

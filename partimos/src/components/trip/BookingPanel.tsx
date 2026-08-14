@@ -17,6 +17,7 @@ import {
 } from "@/lib/pricing";
 import { CashMark, TarjetaMark, YappyBubbles } from "@/components/ui/PayMark";
 import { quoteDetour } from "@/lib/detour";
+import { detourKm, type Punto } from "@/lib/desvio";
 import { bookingDisclaimer } from "@/lib/content";
 import { TRIPS_ARE_DEMO } from "@/lib/config";
 import { track } from "@/lib/analytics";
@@ -58,6 +59,10 @@ type Props = {
   fromSlug: string;
   toSlug: string;
   boardingAt: string;
+  /** Le TRACÉ du conducteur, en coordonnées : c'est par rapport à lui
+   *  qu'on mesure le détour d'un point proposé — pas par rapport à la
+   *  ville. Vide, on retombe sur le curseur manuel. */
+  route?: Punto[];
 };
 
 export function BookingPanel({
@@ -77,6 +82,7 @@ export function BookingPanel({
   fromSlug,
   toSlug,
   boardingAt,
+  route = [],
 }: Props) {
   const { session, isDemo, updateSession } = useSession();
   const [seats, setSeats] = useState(1);
@@ -87,7 +93,11 @@ export function BookingPanel({
     initialPoint ? stops.length : 0,
   );
   const [customPoint, setCustomPoint] = useState(initialPoint);
-  const [extraKm, setExtraKm] = useState(5);
+  /* Le point exact, en coordonnées, dès que le sélecteur les connaît.
+     C'est LUI qui commande le prix : le détour n'est plus une supposition
+     du passager, c'est une mesure. */
+  const [pointCoords, setPointCoords] = useState<Punto | null>(null);
+  const [manualKm, setManualKm] = useState(5);
   const [booked, setBooked] = useState(false);
   /* L'offre du passager : MOINS que l'aporte publié, jamais plus. Offrir
      plus serait enchérir — le prix suivrait la demande, exactement ce que
@@ -105,6 +115,13 @@ export function BookingPanel({
   const [channelChoice, setChannelChoice] = useState<PayChannel | null>(null);
 
   const isCustom = stopIndex === stops.length;
+  /* MESURÉ quand on a le point, DEVINÉ sinon — dérivé, jamais recopié
+     dans un état par un effet. Zéro est une réponse valable et c'est même
+     la meilleure nouvelle du panneau : le point est SUR son chemin, il ne
+     coûte rien de plus. */
+  const measuredKm =
+    pointCoords && route.length > 0 ? detourKm(pointCoords, route) : null;
+  const extraKm = measuredKm ?? manualKm;
   const quote = quoteDetour(baseKm, tollCents, extraKm, category, seatsOffered);
   const activeOffer = offerOpen && offerCents !== null && offerCents < priceCents;
   const baseCents = activeOffer ? offerCents : priceCents;
@@ -307,6 +324,7 @@ export function BookingPanel({
               citySlug={citySlug}
               value={customPoint}
               onChange={setCustomPoint}
+              onCoords={setPointCoords}
               placeholder="Ej. Multiplaza, Vía Israel, frente al parque…"
             />
             <p className="mt-1.5 text-[12.5px] leading-snug text-ink-500">
@@ -315,37 +333,69 @@ export function BookingPanel({
                 : `${driverName} decide si le queda de paso — el recorrido es suyo.`}
             </p>
           </div>
-          <div className="mb-1 flex items-baseline justify-between">
-            <label
-              htmlFor="book-km"
-              className="text-[12.5px] font-semibold text-ink-500"
-            >
-              Cuánto se desvía
-            </label>
-            <b className="tnum text-[14.5px]">+{extraKm.toFixed(1)} km</b>
-          </div>
-          <input
-            id="book-km"
-            type="range"
-            min={1}
-            max={Math.round(baseKm * 0.22)}
-            step={0.5}
-            value={extraKm}
-            onChange={(e) => setExtraKm(Number(e.target.value))}
-            className="h-1.5 w-full cursor-pointer appearance-none rounded-full bg-ink-200 [&::-moz-range-thumb]:size-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-4 [&::-moz-range-thumb]:border-accent [&::-moz-range-thumb]:bg-white [&::-webkit-slider-thumb]:size-5 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-4 [&::-webkit-slider-thumb]:border-accent [&::-webkit-slider-thumb]:bg-white"
-          />
+          {/* Quand le point a des coordonnées, le détour se MESURE : plus
+              de curseur à régler soi-même. Personne ne sait de tête si son
+              PH fait dévier de deux ou de huit kilomètres — et ce chiffre
+              commande le prix. Le curseur reste, mais seulement pour un
+              lieu qu'aucune base ne connaît. */}
+          {measuredKm !== null ? (
+            <div className="flex items-baseline justify-between gap-3">
+              <span className="flex items-center gap-1.5 text-[12.5px] font-semibold text-ink-500">
+                <Icon name="pin" className="size-3.5 shrink-0" />
+                {extraKm === 0 ? "Te queda de paso" : "Se desvía de su camino"}
+              </span>
+              <b className="tnum text-[14.5px]">
+                {extraKm === 0 ? "Sin desvío" : `+${extraKm.toFixed(1)} km`}
+              </b>
+            </div>
+          ) : (
+            <>
+              <div className="mb-1 flex items-baseline justify-between">
+                <label
+                  htmlFor="book-km"
+                  className="text-[12.5px] font-semibold text-ink-500"
+                >
+                  Cuánto se desvía
+                </label>
+                <b className="tnum text-[14.5px]">+{extraKm.toFixed(1)} km</b>
+              </div>
+              <input
+                id="book-km"
+                type="range"
+                min={1}
+                max={Math.round(baseKm * 0.22)}
+                step={0.5}
+                value={manualKm}
+                onChange={(e) => setManualKm(Number(e.target.value))}
+                className="h-1.5 w-full cursor-pointer appearance-none rounded-full bg-ink-200 [&::-moz-range-thumb]:size-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-4 [&::-moz-range-thumb]:border-accent [&::-moz-range-thumb]:bg-white [&::-webkit-slider-thumb]:size-5 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-4 [&::-webkit-slider-thumb]:border-accent [&::-webkit-slider-thumb]:bg-white"
+              />
+            </>
+          )}
           <p
             className="mt-2 text-[12.5px] leading-relaxed text-ink-500"
             aria-live="polite"
           >
             {quote.accepted ? (
-              <>
-                Los kilómetros de más los pones tú, no el conductor:{" "}
-                <b className="font-semibold text-ink-900">
-                  +{formatUsd(quote.extraCents)}
-                </b>{" "}
-                sobre el aporte de la ruta. No es un cargo por recogerte.
-              </>
+              measuredKm === 0 ? (
+                <>
+                  Tu punto está sobre el camino de {driverName}: no le suma
+                  kilómetros, así que{" "}
+                  <b className="font-semibold text-ink-900">
+                    no cambia el aporte
+                  </b>
+                  .
+                </>
+              ) : (
+                <>
+                  {measuredKm !== null
+                    ? `Medido desde tu punto hasta el camino de ${driverName}, ida y vuelta: `
+                    : "Los kilómetros de más los pones tú, no el conductor: "}
+                  <b className="font-semibold text-ink-900">
+                    +{formatUsd(quote.extraCents)}
+                  </b>{" "}
+                  sobre el aporte de la ruta. No es un cargo por recogerte.
+                </>
+              )
             ) : (
               <span className="text-danger">{quote.reason}</span>
             )}

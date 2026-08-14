@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Container } from "@/components/site/Section";
@@ -15,6 +15,7 @@ import { ALL_CITIES, buildRoute, getCorridor } from "@/lib/corridors";
 import { saveLastSearch, useLastSearch } from "@/lib/lastsearch";
 import { track } from "@/lib/analytics";
 import { TRIPS_ARE_DEMO } from "@/lib/config";
+import { getVerificationState, isSupabaseConfigured } from "@/lib/didit";
 import {
   computePriceCap,
   formatUsd,
@@ -136,6 +137,34 @@ export function PublishFlow() {
   const [carYear, setCarYear] = useState(2020);
   const [priceCents, setPriceCents] = useState<number | null>(null);
   const [published, setPublished] = useState(false);
+  /* CE QU'IL FAUT POUR PUBLIER — décision du propriétaire.
+     Un passager monte dans le carro d'un inconnu : celui qui conduit
+     prouve qui il est (cédula), qu'il a le droit de conduire (licencia)
+     et quel carro il amène (photo + placa). Les deux documents passent
+     par Didit et n'y laissent qu'un verdict ; la photo et la placa
+     restent chez nous, et la placa ne se montre qu'au passager dont la
+     reserva est confirmée. */
+  const [docs, setDocs] = useState<{
+    cedula: boolean;
+    licencia: boolean;
+  } | null>(null);
+  useEffect(() => {
+    if (!isSupabaseConfigured || !session) return;
+    let cancelled = false;
+    void Promise.all([
+      getVerificationState("cedula"),
+      getVerificationState("licencia"),
+    ]).then(([cedula, licencia]) => {
+      if (cancelled) return;
+      setDocs({
+        cedula: cedula.status === "verified",
+        licencia: licencia.status === "verified",
+      });
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [session]);
 
   /* Le carro réel prime sur la catégorie : sa consommation de référence,
      corrigée de l'âge, donne le taux au km sur la MÊME droite que le
@@ -185,23 +214,52 @@ export function PublishFlow() {
   const innerStops = corridor ? corridor.waypoints.slice(1, -1) : [];
   /* Sur une longue ruta le réseau dense propose une douzaine de pueblos —
      tous valables, mais une grille de 14 cases écrase l'écran. Le tri
-     intelligent : les villes MAJEURES d'abord (celles que tout le monde
-     connaît), les pueblos repliés derrière un bouton — et un pueblo déjà
-     coché reste toujours visible. */
-  const isMajorCity = (slug: string) =>
-    ALL_CITIES.find((c) => c.slug === slug)?.isMajor ?? false;
+     intelligent — voir juste dessous. */
+  /* TROIS VILLES, PAS SEIZE.
+     La liste complète d'un trajet Colón → Las Tablas fait seize cases à
+     cocher : un mur. On montre le grand bouton « partout » d'abord —
+     c'est le geste que 80 % des conducteurs veulent — puis trois villes,
+     et le reste derrière « Ver más ». La liste s'ouvre d'office si le
+     conducteur a déjà coché à la main : on ne cache pas ses choix. */
   const [showPueblos, setShowPueblos] = useState(false);
-  const majorStops = innerStops.filter((s) => isMajorCity(s.citySlug));
-  const puebloStops = innerStops.filter((s) => !isMajorCity(s.citySlug));
-  const visibleStops =
-    showPueblos || majorStops.length === 0
-      ? innerStops
-      : innerStops.filter(
-          (s) => isMajorCity(s.citySlug) || cityStops.includes(s.citySlug),
-        );
+  const PREVIEW = 3;
+  const visibleStops = showPueblos
+    ? innerStops
+    : innerStops.slice(0, PREVIEW);
   const hiddenCount = innerStops.length - visibleStops.length;
   /** Combien de recherches distinctes les arrêts cochés rendent possibles. */
   const pairCount = servedPairCount(2 + cityStops.length);
+
+  /* Le carro doit être complet : sans photo ni placa, personne ne peut
+     reconnaître qui vient le chercher. */
+  const carroCompleto = registeredCars.some(
+    (c) => c.photoDataUrl && (c.plate ?? "").trim().length >= 4,
+  );
+  const faltantes = !isSupabaseConfigured
+    ? []
+    : [
+        !docs?.cedula && {
+          que: "Verificar tu cédula",
+          porQue: "Dice quién eres. Dos minutos, con Didit.",
+          donde: "/cuenta?panel=verificacion",
+        },
+        !docs?.licencia && {
+          que: "Verificar tu licencia de conducir",
+          porQue: "Dice que puedes conducir. El mismo recorrido.",
+          donde: "/cuenta?panel=verificacion",
+        },
+        !carroCompleto && {
+          que: "Foto y placa de tu carro",
+          porQue:
+            "Es lo que permite reconocerte en el punto. La placa no se muestra en público.",
+          donde: "/cuenta?panel=carro",
+        },
+      ].filter(Boolean as unknown as (v: unknown) => v is {
+        que: string;
+        porQue: string;
+        donde: string;
+      });
+  const puedePublicar = faltantes.length === 0;
 
   const canGoNext = [
     Boolean(corridor),
@@ -535,8 +593,13 @@ export function PublishFlow() {
                     onClick={() => {
                       const next = !dropAnywhere;
                       setDropAnywhere(next);
-                      if (next)
+                      /* Cocher les seize villes NE déplie pas la liste :
+                         le conducteur a dit « partout », il n'a pas
+                         demandé à les relire une par une. */
+                      if (next) {
                         setCityStops(innerStops.map((s) => s.citySlug));
+                        setShowPueblos(false);
+                      }
                     }}
                     className={`mb-4 flex w-full items-start gap-3 rounded-[20px] border-[1.5px] px-4 py-3.5 text-left transition-colors ${
                       dropAnywhere
@@ -628,16 +691,23 @@ export function PublishFlow() {
                       );
                     })}
                   </div>
-                  {puebloStops.length > 0 && majorStops.length > 0 && (
+                  {hiddenCount > 0 && (
                     <button
                       type="button"
                       aria-expanded={showPueblos}
-                      onClick={() => setShowPueblos((v) => !v)}
+                      onClick={() => setShowPueblos(true)}
+                      className="mt-2.5 w-full rounded-[14px] border-[1.5px] border-ink-200 px-4 py-3 text-[14.5px] font-bold transition-colors hover:border-accent hover:text-accent-ink"
+                    >
+                      Ver las {hiddenCount} ciudades que faltan
+                    </button>
+                  )}
+                  {showPueblos && innerStops.length > PREVIEW && (
+                    <button
+                      type="button"
+                      onClick={() => setShowPueblos(false)}
                       className="mt-2.5 text-[13.5px] font-semibold text-accent-ink hover:underline"
                     >
-                      {showPueblos
-                        ? "Ocultar los pueblos del camino"
-                        : `Mostrar los pueblos del camino (${hiddenCount} más)`}
+                      Ver menos
                     </button>
                   )}
                   <p
@@ -1143,6 +1213,54 @@ export function PublishFlow() {
             </>
           )}
 
+          {/* LE VERROU. Il n'apparaît qu'à la dernière étape, et il dit
+              exactement ce qui manque et pourquoi — un blocage sans
+              raison se vit comme une porte fermée ; avec la raison,
+              c'est une règle du jeu. */}
+          {step === 3 && session && !puedePublicar && (
+            <div className="mt-6 rounded-[20px] border-[1.5px] border-action bg-action-soft px-4 py-4 sm:px-5">
+              <h2 className="mb-1 font-display text-[16.5px] font-bold text-action-ink">
+                Antes de publicar, falta poco
+              </h2>
+              <p className="mb-3 text-[13.5px] leading-relaxed text-action-ink/85">
+                Alguien va a subirse a tu carro. Estas tres cosas son las que
+                lo hacen posible — se piden una sola vez.
+              </p>
+              <ul className="grid gap-2">
+                {faltantes.map((f) => (
+                  <li key={f.que}>
+                    <Link
+                      href={f.donde}
+                      className="flex items-start gap-3 rounded-[14px] bg-white px-4 py-3 transition-colors hover:bg-white/70"
+                    >
+                      <span
+                        aria-hidden
+                        className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full border-2 border-ink-200"
+                      />
+                      <span className="min-w-0 flex-1">
+                        <span className="block text-[14.5px] font-semibold">
+                          {f.que}
+                        </span>
+                        <span className="block text-[12.5px] leading-snug text-ink-500">
+                          {f.porQue}
+                        </span>
+                      </span>
+                      <Icon
+                        name="arrowRight"
+                        className="mt-1 size-4 shrink-0 text-ink-400"
+                      />
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-3 text-[12.5px] leading-snug text-action-ink/85">
+                Los documentos los revisa Didit y nunca los guardamos: solo nos
+                llega «verificado». Buscar y reservar como pasajero no necesita
+                nada de esto.
+              </p>
+            </div>
+          )}
+
           <div className="mt-6 flex items-center gap-3 border-t border-ink-200 pt-5">
             {step > 0 && (
               <button
@@ -1169,6 +1287,7 @@ export function PublishFlow() {
             ) : session ? (
               <Button
                 className="ml-auto"
+                disabled={!puedePublicar}
                 onClick={() => {
                   /* Le choix de cobro devient le réglage du compte, et le
                      viaje entier devient la matière du « repetir » : la

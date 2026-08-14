@@ -144,11 +144,34 @@ export function nearestCity(
   return { slug: best.slug, name: best.name, distanceKm: Math.round(bestD) };
 }
 
+/**
+ * CE QUI COMMENCE PAR CE QU'ON TAPE PASSE DEVANT.
+ *
+ * Chercher « Mu » et voir d'abord « Plaza Comercial de Multicentro »
+ * parce que le mot est au milieu, c'est ce qui fait dire « ça ne
+ * comprend rien ». L'ordre est donc, dans cet ordre :
+ *
+ *   1. le NOM commence par ce qu'on tape        → « Multiplaza »
+ *   2. un MOT du nom commence par ce qu'on tape → « Parque Omar » pour « Om »
+ *   3. le reste, quelque part dedans            → filet de sécurité
+ *
+ * Une lettre suffit : à la première frappe on montre déjà quelque chose,
+ * au lieu d'attendre deux caractères comme avant.
+ */
 export function searchPlaces(query: string, limit = 4): KnownPlace[] {
   const q = normalize(query.trim());
-  if (q.length < 2) return [];
-  return KNOWN_PLACES.filter((p) => normalize(p.name).includes(q)).slice(
-    0,
-    limit,
-  );
+  if (q.length < 1) return [];
+
+  const rank = (name: string): number => {
+    const n = normalize(name);
+    if (n.startsWith(q)) return 0;
+    if (n.split(/[\s(),.–—-]+/).some((word) => word.startsWith(q))) return 1;
+    return n.includes(q) ? 2 : 3;
+  };
+
+  return KNOWN_PLACES.map((p) => ({ p, r: rank(p.name) }))
+    .filter(({ r }) => r < 3)
+    .sort((a, b) => a.r - b.r || a.p.name.length - b.p.name.length)
+    .slice(0, limit)
+    .map(({ p }) => p);
 }
