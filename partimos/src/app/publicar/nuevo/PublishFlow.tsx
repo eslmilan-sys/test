@@ -253,7 +253,7 @@ export function PublishFlow() {
           doc: "licencia" as const,
         },
         !carroCompleto && {
-          que: "Foto y placa de tu carro",
+          que: "Tu carro: marca, modelo, foto y placa",
           porQue:
             "Es lo que permite reconocerte en el punto. La placa no se muestra en público.",
           donde: "/cuenta?panel=carro",
@@ -312,7 +312,7 @@ export function PublishFlow() {
           <div className="flex flex-wrap justify-center gap-3">
             <Link
               href="/cuenta"
-              className="rounded-[14px] bg-ink-900 px-5 py-3 font-display text-[15px] font-bold text-white"
+              className="rounded-[14px] bg-ink-900 px-5 py-3 font-display text-[15px] font-bold text-white shadow-[0_8px_20px_-8px_rgb(14_42_53/0.5)] transition-[transform,background-color] duration-150 hover:-translate-y-px hover:bg-ink-800 active:scale-[0.97]"
             >
               Ver mis viajes
             </Link>
@@ -335,6 +335,40 @@ export function PublishFlow() {
                 : "Tu viaje quedó guardado en tu cuenta, en este dispositivo. Todavía no aparece en las búsquedas de los demás — eso llega cuando abramos la publicación de verdad."}
             </p>
           )}
+        </div>
+      </Container>
+    );
+  }
+
+  /* LE CONTRÔLE DES PAPIERS PASSE DEVANT TOUT.
+     Décision du propriétaire : on ne remplit pas un viaje pour découvrir
+     à la fin qu'il manque la cédula. Tant que les trois choses ne sont pas
+     là, le formulaire n'existe pas — on ne voit QUE ce qu'il faut faire,
+     et chaque ligne porte son geste. C'est plus dur en apparence, et
+     beaucoup plus honnête : on sait tout de suite ce qu'on signe. */
+  if (session && !puedePublicar) {
+    return (
+      <Container className="pt-6">
+        <div className="mx-auto max-w-[620px]">
+          <h1 className="mb-2 font-display text-[clamp(24px,5vw,32px)] leading-[1.08] font-extrabold tracking-[-0.03em]">
+            Primero, confirmemos quién eres
+          </h1>
+          <p className="mb-6 text-[15px] leading-relaxed text-ink-500">
+            Alguien va a subirse a tu carro. Estas tres cosas se piden una
+            sola vez, y después publicar toma menos de un minuto.
+          </p>
+          <RequisitosConductor faltantes={faltantes} tono="bloqueo" />
+          <p className="mt-4 text-center text-[13.5px] text-ink-500">
+            ¿Ya lo hiciste y sigue apareciendo aquí?{" "}
+            <button
+              type="button"
+              onClick={() => window.location.reload()}
+              className="font-semibold text-accent-ink hover:underline"
+            >
+              Vuelve a revisar
+            </button>
+            . La verificación puede tardar un par de minutos.
+          </p>
         </div>
       </Container>
     );
@@ -499,15 +533,6 @@ export function PublishFlow() {
                 </p>
               )}
             </>
-          )}
-
-          {/* L'AVIS, dès le premier écran. Le savoir avant de remplir vingt
-              champs, c'est la différence entre « je m'y mets » et « j'ai
-              tout rempli pour rien ». */}
-          {step === 0 && session && !puedePublicar && (
-            <div className="mb-6">
-              <RequisitosConductor faltantes={faltantes} tono="aviso" />
-            </div>
           )}
 
           {step === 1 && corridor && (
@@ -1222,19 +1247,12 @@ export function PublishFlow() {
             </>
           )}
 
-          {/* LE VERROU, à la dernière étape : là c'est la règle. */}
-          {step === 3 && session && !puedePublicar && (
-            <div className="mt-6">
-              <RequisitosConductor faltantes={faltantes} tono="bloqueo" />
-            </div>
-          )}
-
           <div className="mt-6 flex items-center gap-3 border-t border-ink-200 pt-5">
             {step > 0 && (
               <button
                 type="button"
                 onClick={() => setStep((s) => s - 1)}
-                className="rounded-[14px] border-[1.5px] border-ink-200 px-5 py-3 font-display text-[15px] font-bold transition-colors hover:border-accent"
+                className="rounded-[14px] border-[1.5px] border-ink-200 px-5 py-3 font-display text-[15px] font-bold transition-[transform,border-color,color] duration-150 hover:border-accent hover:text-accent-ink active:scale-[0.97]"
               >
                 Atrás
               </button>
@@ -1296,7 +1314,7 @@ export function PublishFlow() {
             ) : (
               <AuthDialog
                 trigger={
-                  <button className="ml-auto inline-flex items-center justify-center rounded-[14px] bg-ink-900 px-5.5 py-3.5 font-display text-[16.5px] font-bold text-white transition-colors hover:bg-ink-800">
+                  <button className="ml-auto inline-flex items-center justify-center gap-2 rounded-[14px] bg-ink-900 px-5.5 py-3.5 font-display text-[16.5px] font-bold text-white shadow-[0_8px_20px_-8px_rgb(14_42_53/0.5)] transition-[transform,background-color] duration-150 hover:-translate-y-px hover:bg-ink-800 active:scale-[0.97]">
                     Conectarme y publicar
                   </button>
                 }

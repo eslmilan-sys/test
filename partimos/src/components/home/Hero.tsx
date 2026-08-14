@@ -111,7 +111,7 @@ export function Hero() {
                   Le mot d'action est en ambre, le reste en encre : la
                   couleur ne décore pas, elle marque le verbe. Chaque ligne
                   entre d'un côté différent — droite, gauche, droite. */}
-              <h1 className="mb-5 overflow-hidden text-[clamp(36px,7.4vw,62px)] leading-[0.98] font-extrabold tracking-[-0.045em]">
+              <h1 className="mb-5 overflow-hidden text-[clamp(42px,9.2vw,78px)] leading-[0.94] font-extrabold tracking-[-0.045em]">
                 <span className="linea">
                   <em className="text-action-deep not-italic">Viaja</em> mejor.
                 </span>
@@ -125,8 +125,8 @@ export function Hero() {
             <div className="para-cerca">
               <p className="enter enter-2 max-w-[44ch] text-[16.5px] leading-[1.38] font-light text-ink-600 md:text-[19px]">
                 Partimos te conecta con personas que van a tu mismo destino.
-                Viajes cómodos, directos y sin dar vueltas — reservas sin pagar
-                nada y haces el camino sentado, con una sola parada: la tuya.
+                Viajes cómodos, compartidos y directos: sin terminal, sin
+                trasbordos y con una sola parada — la tuya.
               </p>
             </div>
           </div>
