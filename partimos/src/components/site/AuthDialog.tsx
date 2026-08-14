@@ -160,7 +160,15 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
       return "Escribe tu nombre.";
     if (mode === "register" && lastName.trim().length < 2)
       return "Escribe tu apellido.";
-    if (channel === "phone" && (digits.length < 7 || digits.length > 13))
+    /* Le numéro est demandé À L'INSCRIPTION quel que soit le canal : c'est
+       par là que le conducteur et le passager se coordonnent le jour du
+       viaje. On ne le VÉRIFIE pas (ça demande un fournisseur SMS payant),
+       et on ne le montre à personne avant une reserva confirmada — mais
+       le demander après coup, personne ne revient le remplir. */
+    if (
+      (channel === "phone" || mode === "register") &&
+      (digits.length < 7 || digits.length > 13)
+    )
       return "Escribe tu celular, por ejemplo 6123-4567.";
     if (
       channel === "email" &&
@@ -347,6 +355,10 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
         data: {
           first_name: firstName.trim(),
           last_name: lastName.trim(),
+          /* Rangé dans les métadonnées, PAS comme identité téléphonique :
+             passer `phone` à signUp déclencherait un envoi de SMS, donc
+             une facture, pour un numéro qu'on ne vérifie pas. */
+          phone: e164,
           locale: "es",
         },
         emailRedirectTo: window.location.href,
@@ -685,6 +697,44 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
                           {label}
                         </button>
                       ))}
+                    </div>
+                  )}
+
+                  {/* LE NUMÉRO, à l'inscription seulement — et seulement
+                      si le canal ne le demande pas déjà juste au-dessus.
+                      C'est le moyen de se retrouver le jour du viaje ;
+                      demandé plus tard, il ne se remplit jamais. */}
+                  {mode === "register" && channel === "email" && (
+                    <div>
+                      <span className="mb-1.5 block text-[12.5px] font-semibold text-night-200">
+                        Celular
+                      </span>
+                      <label
+                        htmlFor={`${id}-cel`}
+                        className={`flex items-center gap-2.5 px-4 py-3 focus-within:border-action/70 ${pill}`}
+                      >
+                        <Icon
+                          name="phone"
+                          className="size-4.5 shrink-0 text-night-200"
+                        />
+                        <span className="tnum shrink-0 text-[15px] font-semibold text-night-200">
+                          +507
+                        </span>
+                        <input
+                          id={`${id}-cel`}
+                          type="tel"
+                          inputMode="tel"
+                          autoComplete="tel"
+                          placeholder="6123-4567"
+                          value={phone}
+                          onChange={(e) => setPhone(e.target.value)}
+                          className="tnum w-full border-none bg-transparent text-[15px] font-semibold text-white placeholder:text-white/35 focus:outline-none"
+                        />
+                      </label>
+                      <p className="mt-1.5 text-[12px] leading-snug text-night-300">
+                        Para coordinar el viaje. Nadie lo ve hasta que tengas
+                        una reserva confirmada.
+                      </p>
                     </div>
                   )}
 

@@ -193,7 +193,16 @@ function startAuth(): void {
   const client = getSupabase();
   if (!client) return;
 
-  const apply = async (user: { id: string; email?: string | null; phone?: string | null; created_at?: string } | null) => {
+  const apply = async (user: {
+    id: string;
+    email?: string | null;
+    phone?: string | null;
+    created_at?: string;
+    /* Le numéro donné à l'inscription vit ICI : on ne l'enregistre pas
+       comme identité téléphonique (ça coûterait un SMS de vérification
+       pour un numéro qu'on ne vérifie pas). */
+    user_metadata?: { phone?: string | null } | null;
+  } | null) => {
     if (!user) {
       remote = null;
       emit();
@@ -223,7 +232,8 @@ function startAuth(): void {
        tout seul : on retombe sur la même règle que le déclencheur en
        base — la première partie de l'adresse — pour que le prénom
        affiché soit celui qui existe côté serveur. */
-    const contact = user.phone || user.email || "";
+    const contact =
+      user.phone || user.email || user.user_metadata?.phone || "";
     const local = (user.email ?? "").split("@")[0].split(".")[0];
     const deLAdresse = local
       ? local.charAt(0).toUpperCase() + local.slice(1)
