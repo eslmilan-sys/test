@@ -99,8 +99,8 @@ export function Inicio() {
             <Icon name="bell" className="size-[21px]" />
           </Link>
           <Link
-            href="/cuenta"
-            aria-label="Mi cuenta"
+            href="/cuenta?panel=perfil"
+            aria-label="Mi perfil"
             className="flex size-10 items-center justify-center rounded-full bg-verde-perfil font-display text-[15px] font-bold text-white"
           >
             {(nombre?.[0] ?? "?").toUpperCase()}

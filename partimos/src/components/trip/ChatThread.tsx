@@ -192,6 +192,21 @@ export function ChatThread({
             </div>
           </header>
 
+          {/* LE BANDEAU DE SÉCURITÉ — ce qu'il dit et ce qu'il NE dit pas.
+              Il ne dit pas « ne payez jamais hors de l'application » :
+              chez nous payer le conducteur en main est un canal
+              légitime, et l'interdire serait mentir sur le produit. Il
+              dit ce qui est vrai et utile : la conversation reste écrite
+              et non modifiable, donc elle sert de preuve — à condition
+              de ne pas la déplacer ailleurs. */}
+          <p className="flex items-start gap-2 border-b border-ink-200 bg-verde-suave px-4 py-2.5 text-[12.5px] leading-snug text-ink-600">
+            <Icon name="shield" className="mt-0.5 size-4 shrink-0 text-verde-ok" />
+            <span>
+              Todo lo que acuerden aquí queda escrito y nadie puede cambiarlo
+              después. No hace falta dar tu número ni tu dirección exacta.
+            </span>
+          </p>
+
           {/* LE FIL */}
           <div className="flex-1 overflow-y-auto px-4 py-4">
             <div className="grid gap-2">
@@ -237,7 +252,11 @@ export function ChatThread({
               dessous. `safe-area-inset-bottom` tient compte de la barre
               d'accueil de l'iPhone : un champ posé dessus est inatteignable. */}
           <div className="glass border-t border-ink-200 px-4 pt-3 pb-[calc(12px+env(safe-area-inset-bottom))]">
-            {messages.length === 0 && !closed && (
+            {/* LES QUESTIONS TOUTES FAITES restent tant que je n'ai rien
+                écrit MOI. Les retirer au premier message reçu privait de
+                la béquille exactement au moment où l'on hésite à
+                répondre ; elles partent quand on n'en a plus besoin. */}
+            {!messages.some((m) => m.mine) && !closed && (
               <div className="mb-2.5 flex flex-wrap gap-1.5">
                 {QUICK_QUESTIONS.map((q) => (
                   <button

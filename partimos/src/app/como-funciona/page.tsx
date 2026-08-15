@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Container } from "@/components/site/Section";
+import { Descubre } from "@/components/app/Descubre";
 import { ButtonLink } from "@/components/ui/Button";
 import { Icon, type IconName } from "@/components/ui/Icon";
 import { FaqList, FaqJsonLd } from "@/components/home/Faq";
@@ -106,6 +107,14 @@ export default function ComoFuncionaPage() {
   return (
     <>
       <main id="contenido">
+        {/* L'APP a sa version de cette page : six choses qui marchent
+            déjà, chacune menant à l'écran où elles servent. Le site
+            garde son parcours en étapes, qui parle à un inconnu. */}
+        <div className="solo-app">
+          <Descubre />
+        </div>
+
+        <div className="solo-web">
         <div className="noche pt-10 pb-11 text-white">
           <Container>
             <h1 className="mb-4 max-w-[18ch] text-[clamp(32px,6.4vw,50px)] leading-[1.03] font-extrabold tracking-[-0.04em]">
@@ -256,6 +265,7 @@ export default function ComoFuncionaPage() {
             </div>
           </Container>
         </section>
+        </div>
       </main>
 
       <FaqJsonLd items={FAQ} />
