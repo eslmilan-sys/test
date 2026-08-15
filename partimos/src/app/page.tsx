@@ -1,5 +1,6 @@
 import { Hero } from "@/components/home/Hero";
 import { Hoy } from "@/components/app/Hoy";
+import { Saludo } from "@/components/app/Saludo";
 import { RutasFrecuentes } from "@/components/home/RutasFrecuentes";
 import { Pasos } from "@/components/home/Pasos";
 import { Pago } from "@/components/home/Pago";
@@ -20,12 +21,19 @@ export default function Home() {
   return (
     <>
       <main id="contenido">
-        {/* LE COCKPIT DE L'APP. Quelqu'un qui a une reserva ouvre l'app
-            pour vérifier qu'elle tient — pas pour qu'on lui redemande où
-            il va. La carte n'existe qu'en mode app : sur le site,
-            l'accueil parle à un inconnu. */}
+        {/* L'EN-TÊTE ET LE COCKPIT DE L'APP.
+            Quelqu'un qui a une reserva ouvre l'app pour vérifier qu'elle
+            tient — pas pour qu'on lui redemande où il va. Les deux
+            n'existent qu'en mode app : sur le site, l'accueil parle à un
+            inconnu, et un salut nommé n'y aurait aucun sens.
+            `--paso` donne à chaque bloc son rang dans l'ouverture. */}
         <div className="solo-app">
-          <Hoy />
+          <div style={{ ["--paso" as string]: 0 }}>
+            <Saludo />
+          </div>
+          <div style={{ ["--paso" as string]: 1 }}>
+            <Hoy />
+          </div>
         </div>
         <Hero />
 

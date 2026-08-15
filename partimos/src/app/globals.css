@@ -1081,6 +1081,93 @@ html.app-instalada .solo-app {
   display: revert;
 }
 
+/* ===========================================================================
+   L'OUVERTURE DE L'APP
+   ===========================================================================
+
+   Ce que ce mouvement APPREND — sinon il saute : l'app ouvre sur une
+   réponse, pas sur un formulaire. Les blocs arrivent donc dans l'ordre où
+   ils comptent (le salut, ton viaje, puis la recherche), et la barre
+   d'onglets monte DU BORD OÙ ELLE VIT. Deux informations en une demi-
+   seconde : ce qui est prioritaire, et d'où viendra la navigation.
+
+   Trois précautions, chacune payée par un travers classique :
+
+     · RIEN N'EST CACHÉ AU DÉPART. L'animation vit sous
+       `prefers-reduced-motion: no-preference` ; si elle ne tourne pas, le
+       contenu est déjà là, opaque et cliquable. Poser `opacity: 0` par
+       défaut, c'est offrir un écran blanc à qui a désactivé les
+       animations — ou à qui charge sur un vieux téléphone.
+     · SEULEMENT `opacity` ET `transform`. Ce sont les deux propriétés que
+       le compositeur anime sans repeindre. Sur un Android d'entrée de
+       gamme en 4G, animer autre chose se voit.
+     · ELLE NE RETARDE RIEN. Aucun écran de démarrage, aucun délai avant
+       interaction : on peut toucher la carte pendant qu'elle monte.
+
+   Sur le SITE, rien de tout ça : une page web qu'on visite n'a pas à
+   « s'ouvrir ». */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes entraApp {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 15px, 0);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes entraBarra {
+    from {
+      transform: translate3d(0, 100%, 0);
+    }
+    to {
+      transform: none;
+    }
+  }
+
+  /* `--paso` échelonne : chaque bloc part 80 ms après le précédent. Assez
+     pour lire une séquence, trop peu pour attendre. */
+  html.app-instalada .entra-app,
+  html.app-instalada .solo-app .entra-app {
+    animation: entraApp 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation-delay: calc(var(--paso, 0) * 80ms);
+  }
+  html.app-instalada nav[aria-label="Navegación principal"] {
+    animation: entraBarra 0.44s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation-delay: 200ms;
+  }
+}
+@media (prefers-reduced-motion: no-preference) and (display-mode: standalone) {
+  .entra-app {
+    animation: entraApp 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation-delay: calc(var(--paso, 0) * 80ms);
+  }
+  nav[aria-label="Navegación principal"] {
+    animation: entraBarra 0.44s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation-delay: 200ms;
+  }
+}
+
+/* LES ONGLETS RÉPONDENT AU DOIGT. Sur un téléphone il n'y a pas de survol :
+   le seul retour possible est celui de l'appui, et sans lui on doute
+   d'avoir touché. `:active` est instantané, `transition` ne sert qu'au
+   relâchement. */
+nav[aria-label="Navegación principal"] a {
+  transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  -webkit-tap-highlight-color: transparent;
+}
+nav[aria-label="Navegación principal"] a:active {
+  transform: scale(0.93);
+}
+@media (prefers-reduced-motion: reduce) {
+  nav[aria-label="Navegación principal"] a,
+  nav[aria-label="Navegación principal"] a:active {
+    transition: none;
+    transform: none;
+  }
+}
+
 /* LE PREMIER ÉCRAN NE REMONTE PLUS QUAND LA BARRE HAUTE N'EST PAS LÀ.
    `.sky` porte `margin-top: calc(-1 * var(--nav-space))` pour glisser SOUS
    la barre flottante — sans quoi la barre survolerait une bande blanche.

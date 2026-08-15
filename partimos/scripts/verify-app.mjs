@@ -80,6 +80,12 @@ async function abrir({ modo, conSesion }) {
 
 const ve = (p, sel) => p.locator(sel).first().isVisible().catch(() => false);
 
+/** Le titre marketing, repéré par son CONTENU et non par « le premier h1 » :
+ *  l'app pose ses propres titres avant lui dans le DOM, et un sélecteur de
+ *  position aurait mesuré le mauvais élément. */
+const tituloMarketing = (p) =>
+  p.locator("h1", { hasText: "Gasta menos" }).first().isVisible().catch(() => false);
+
 console.log(`\nMode app — ${BASE}\n`);
 
 /* 1. LE SITE reste le site, même avec une reserva en session. */
@@ -87,7 +93,7 @@ console.log(`\nMode app — ${BASE}\n`);
   const { ctx, p } = await abrir({ modo: "sitio", conSesion: true });
   ok("site — pas de cockpit « Hoy »", !(await ve(p, '[aria-label="Tu próximo viaje"]')));
   ok("site — pas de barre d'onglets", !(await ve(p, 'nav[aria-label="Navegación principal"]')));
-  ok("site — titre marketing présent", await ve(p, "h1"));
+  ok("site — titre marketing présent", await tituloMarketing(p));
   ok("site — barre haute présente", await ve(p, 'nav[aria-label="Principal"]'));
   await ctx.close();
 }
@@ -97,7 +103,7 @@ console.log(`\nMode app — ${BASE}\n`);
   const { ctx, p } = await abrir({ modo: "app", conSesion: true });
   const cockpit = p.locator('[aria-label="Tu próximo viaje"]');
   ok("app — le cockpit apparaît", await ve(p, '[aria-label="Tu próximo viaje"]'));
-  ok("app — marketing masqué", !(await ve(p, "h1")));
+  ok("app — marketing masqué", !(await tituloMarketing(p)));
   ok("app — buscador toujours là", await ve(p, "#desde"));
 
   const txt = (await cockpit.textContent().catch(() => "")) ?? "";
@@ -151,12 +157,47 @@ console.log(`\nMode app — ${BASE}\n`);
   await ctx.close();
 }
 
-/* 5. LE POINT SEO : le HTML servi ne dépend pas du mode. */
+/* 5. L'ANIMATION D'OUVERTURE NE DOIT JAMAIS CACHER LE CONTENU.
+      C'est le travers classique : poser `opacity: 0` en état de départ, et
+      livrer un écran blanc à qui a désactivé les animations. Ici elle vit
+      sous `prefers-reduced-motion: no-preference` — donc sans mouvement,
+      tout est déjà là, opaque et cliquable. */
+{
+  const ctx = await navegador.newContext({
+    ...devices["iPhone 13"],
+    reducedMotion: "reduce",
+  });
+  await ctx.addInitScript((s) => {
+    window.localStorage.setItem("partimos.demo-session", JSON.stringify(s));
+  }, SESSION);
+  const p = await ctx.newPage();
+  await p.goto(`${BASE}/`, { waitUntil: "networkidle" });
+  await p.evaluate(() => document.documentElement.classList.add("app-instalada"));
+  await p.waitForTimeout(300);
+
+  const cockpit = p.locator('[aria-label="Tu próximo viaje"]');
+  ok("mouvement réduit — le cockpit est là tout de suite", await ve(p, '[aria-label="Tu próximo viaje"]'));
+  const op = await cockpit.evaluate((e) => getComputedStyle(e).opacity).catch(() => "0");
+  ok("mouvement réduit — rien n'est transparent", op === "1", `opacity ${op}`);
+  const barra = await p
+    .locator('nav[aria-label="Navegación principal"]')
+    .evaluate((e) => getComputedStyle(e).transform)
+    .catch(() => null);
+  ok("mouvement réduit — la barre n'est pas décalée", barra === "none" || barra === "matrix(1, 0, 0, 1, 0, 0)", String(barra));
+  await ctx.close();
+}
+
+/* 6. LE POINT SEO : le HTML servi ne dépend pas du mode. */
 {
   const brut = await fetch(`${BASE}/`).then((r) => r.text());
   ok("SEO — l'argumentaire est dans le HTML servi", brut.includes("Gasta menos"));
   ok("SEO — le balisage FAQ est là", brut.includes("FAQPage"));
   ok("SEO — la barre d'onglets est servie à tous", brut.includes("Navegación principal"));
+  /* Un seul `h1` : l'app pose ses propres titres, et le HTML servi les
+     contient TOUS — le mode app ne masque qu'à l'affichage. Un titre d'app
+     promu en `h1` entrerait en concurrence avec celui que Google lit. */
+  const h1 = (brut.match(/<h1[\s>]/g) ?? []).length;
+  ok("SEO — un seul h1 dans le HTML servi", h1 === 1, `${h1} trouvé(s)`);
 }
 
 await navegador.close();

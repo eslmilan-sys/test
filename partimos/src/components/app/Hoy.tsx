@@ -1,11 +1,11 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
 import Link from "next/link";
 import { Icon } from "@/components/ui/Icon";
 import { useSession, type Booking } from "@/lib/session";
 import { ALL_CITIES } from "@/lib/corridors";
 import { formatDayLabel, formatTime, localIso } from "@/lib/trips";
+import { useAhora } from "@/lib/reloj";
 import { SeguridadSheet } from "./Seguridad";
 
 /**
@@ -33,35 +33,6 @@ import { SeguridadSheet } from "./Seguridad";
 
 const cityName = (slug: string) =>
   ALL_CITIES.find((c) => c.slug === slug)?.shortName ?? slug;
-
-/**
- * L'HEURE COURANTE, À LA MINUTE — via `useSyncExternalStore`.
- *
- * Le temps est un système EXTÉRIEUR à React, au même titre que la session
- * de ce projet : c'est l'outil prévu pour ça. Un `useState` posé depuis un
- * effet serait refusé par le compilateur (« cascading renders »), et un
- * `Date.now()` au rendu serait refusé par la règle de pureté.
- *
- * L'instantané est le NUMÉRO DE MINUTE, pas les millisecondes : React
- * exige que deux lectures sans changement rendent la même valeur, sinon il
- * reboucle à l'infini. La minute suffit — personne ne regarde les secondes
- * d'un compte à rebours de départ.
- *
- * Sur le serveur : `null`. Le HTML pré-rendu est le même pour tout le
- * monde, robots compris — il ne connaît ni l'heure du client ni ses
- * reservas.
- */
-function suscribirMinuto(alCambiar: () => void) {
-  const reloj = window.setInterval(alCambiar, 30_000);
-  return () => window.clearInterval(reloj);
-}
-const minutoActual = () => Math.floor(Date.now() / 60_000);
-const sinMinuto = () => null;
-
-function useAhora(): number | null {
-  const minuto = useSyncExternalStore(suscribirMinuto, minutoActual, sinMinuto);
-  return minuto === null ? null : minuto * 60_000;
-}
 
 /** « Sale en 40 min », « Sale en 3 h », sinon le jour et l'heure. */
 function cuandoSale(boardingAt: string, ahora: number): string {
@@ -96,7 +67,7 @@ export function Hoy() {
   return (
     <section
       aria-label="Tu próximo viaje"
-      className="mx-auto w-full max-w-[1120px] px-5 pt-5"
+      className="entra-app mx-auto w-full max-w-[1120px] px-5 pt-5"
     >
       <div className="rounded-[20px] border border-ink-200 bg-white p-5">
         <div className="mb-2.5 flex items-center justify-between gap-3">
