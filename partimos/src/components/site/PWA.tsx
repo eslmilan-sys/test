@@ -40,9 +40,36 @@ export function PWA() {
     const iosInstalada =
       "standalone" in navigator &&
       (navigator as Navigator & { standalone?: boolean }).standalone === true;
-    if (iosInstalada) {
-      document.documentElement.classList.add("app-instalada");
+
+    /* VOIR L'APP SANS L'INSTALLER — `?app=1`, et `?app=0` pour en sortir.
+       Sans ça, les deux versions ne sont pas comparables : le mode app ne
+       se déclenche qu'une fois l'icône posée sur l'écran d'accueil, donc
+       sur un ordinateur on ne le voit JAMAIS. C'est le seul moyen de
+       regarder le site d'un côté et l'app de l'autre, côte à côte.
+
+       Dans `sessionStorage`, pas dans l'adresse : la navigation interne de
+       Next ne recharge pas la page et perdrait le paramètre au premier
+       lien. Session et non `localStorage` — on ferme l'onglet, on retrouve
+       le site normal, sans réglage caché qui traîne.
+
+       Aucun effet sur ce qui est servi : le HTML est le même, seule une
+       classe change après hydratation. Le SEO ne bouge pas d'un pouce. */
+    const PREVIA = "partimos.previa-app";
+    let previa = false;
+    try {
+      const pedido = new URLSearchParams(window.location.search).get("app");
+      if (pedido === "1") window.sessionStorage.setItem(PREVIA, "1");
+      else if (pedido === "0") window.sessionStorage.removeItem(PREVIA);
+      previa = window.sessionStorage.getItem(PREVIA) === "1";
+    } catch {
+      /* stockage refusé : la prévisualisation ne survit pas au clic, le
+         site marche exactement pareil */
     }
+
+    document.documentElement.classList.toggle(
+      "app-instalada",
+      iosInstalada || previa,
+    );
   }, []);
 
   useEffect(() => {
