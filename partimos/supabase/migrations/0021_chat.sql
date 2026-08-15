@@ -64,6 +64,14 @@ create policy messages_parties_only on messages
 --
 -- La reserva cancelada cierra la conversación: dejar hablar después de
 -- una cancelación es la puerta a « me pagas por fuera y la cancelamos ».
+--
+-- OJO con el nombre del estado. El enum `booking_status` no tiene ningún
+-- valor que se llame 'cancelled' a secas: son 'cancelled_passenger' y
+-- 'cancelled_driver' (quién canceló importa para el reembolso). Comparar
+-- contra 'cancelled' no da error — simplemente nunca es cierto, y la
+-- puerta que creíamos cerrada queda abierta de par en par. Por eso el
+-- prefijo: cubre los dos valores reales, y de paso cualquier grafía
+-- ('canceled', 'cancelada') si algún entorno viejo los tuviera.
 drop policy if exists messages_write_parties on messages;
 create policy messages_write_parties on messages
   for insert with check (
@@ -72,7 +80,7 @@ create policy messages_write_parties on messages
       select 1 from bookings b join trips t on t.id = b.trip_id
       where b.id = messages.booking_id
         and (b.passenger_id = auth.uid() or t.driver_id = auth.uid())
-        and coalesce(b.status::text, '') not in ('cancelled', 'cancelada', 'canceled')
+        and coalesce(b.status::text, '') not like 'cancel%'
     )
   );
 
