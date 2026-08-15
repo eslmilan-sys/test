@@ -25,16 +25,33 @@ import { Icon, type IconName } from "@/components/ui/Icon";
  * et le coût d'un mot de sept lettres est nul.
  */
 
-type Tab = { href: string; label: string; icon: IconName };
+/**
+ * `rutas` dit quelles ADRESSES allument l'onglet — ce n'est pas toujours
+ * celle où il mène. « Buscar » mène aux salidas du jour, mais la page de
+ * résultats et les pages de ruta font partie du même geste : chercher.
+ * Un onglet éteint sur l'écran qu'il a ouvert, c'est une carte de métro
+ * sans « vous êtes ici ».
+ *
+ * `rutas: []` veut dire « n'allume jamais ». C'est le cas de Mensajes :
+ * il n'ouvre pas une page mais un panneau par-dessus /cuenta. Le juger
+ * sur le chemin l'allumerait en même temps que Viajes — deux onglets
+ * actifs disent moins que zéro.
+ */
+type Tab = { href: string; label: string; icon: IconName; rutas: string[] };
 
 /** Deux à gauche du bouton, deux à droite : le + tombe au centre exact. */
 const IZQUIERDA: Tab[] = [
-  { href: "/", label: "Inicio", icon: "home" },
-  { href: "/ya", label: "Buscar", icon: "search" },
+  { href: "/", label: "Inicio", icon: "home", rutas: ["/"] },
+  {
+    href: "/ya",
+    label: "Buscar",
+    icon: "search",
+    rutas: ["/ya", "/buscar", "/viajes", "/viaje"],
+  },
 ];
 const DERECHA: Tab[] = [
-  { href: "/cuenta?panel=mensajes", label: "Mensajes", icon: "chat" },
-  { href: "/cuenta", label: "Viajes", icon: "route" },
+  { href: "/cuenta?panel=mensajes", label: "Mensajes", icon: "chat", rutas: [] },
+  { href: "/cuenta", label: "Viajes", icon: "route", rutas: ["/cuenta"] },
 ];
 
 export function TabBar() {
@@ -42,13 +59,11 @@ export function TabBar() {
 
   /* L'onglet actif se juge sur le PRÉFIXE, sauf l'accueil : « / » est
      préfixe de tout, et l'allumer partout ne dirait plus rien. */
-  const activo = (href: string) => {
-    const base = href.split("?")[0];
-    return base === "/" ? pathname === "/" : pathname.startsWith(base);
-  };
+  const activo = (rutas: string[]) =>
+    rutas.some((r) => (r === "/" ? pathname === "/" : pathname.startsWith(r)));
 
   const item = (t: Tab) => {
-    const on = activo(t.href);
+    const on = activo(t.rutas);
     return (
       <li key={t.href} className="flex-1">
         <Link

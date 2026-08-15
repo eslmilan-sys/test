@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { SearchResults } from "./SearchResults";
+import { Buscar } from "@/components/app/Buscar";
 import { canonical } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -42,9 +43,23 @@ export default function BuscarPage() {
           recherche collante, en-tête, puis des cartes. Un gabarit vide de
           70 vh laissait le contenu « sauter » à l'arrivée — c'est exactement
           ce que mesure le CLS. */}
-      <Suspense fallback={<ResultsSkeleton />}>
-        <SearchResults />
-      </Suspense>
+      {/* Deux présentations, UNE source de données (`searchTrips`). Le
+          site garde sa page large ; l'app a la sienne, à la maquette du
+          propriétaire. Dupliquer la recherche aurait dupliqué
+          l'inventaire par tronçon, qui est la partie la plus délicate du
+          produit.
+          `useSearchParams` impose la frontière Suspense — c'est la seule
+          raison de ces enveloppes. */}
+      <div className="solo-web">
+        <Suspense fallback={<ResultsSkeleton />}>
+          <SearchResults />
+        </Suspense>
+      </div>
+      <div className="solo-app">
+        <Suspense fallback={<ResultsSkeleton />}>
+          <Buscar />
+        </Suspense>
+      </div>
     </main>
   );
 }
