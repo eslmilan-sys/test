@@ -1198,3 +1198,42 @@ html.app-instalada .sky {
 html.app-instalada body {
   padding-bottom: calc(64px + env(safe-area-inset-bottom));
 }
+
+/* ===========================================================================
+   LE PANNEAU DE DROITE
+   ===========================================================================
+
+   La direction du mouvement porte l'information : le fil ARRIVE de la
+   droite, donc il y RETOURNE quand on le ferme. C'est ce qui fait qu'on
+   sait où l'on est sans avoir à lire — et c'est la raison pour laquelle
+   ce panneau ne remonte pas du bas comme une feuille : le bas est déjà
+   pris par la barre d'onglets et par la feuille Seguridad, et deux gestes
+   identiques pour deux natures différentes brouillent les deux.
+
+   Sous 560 px il occupe tout l'écran : sur un téléphone, un panneau qui
+   laisse voir 40 px de la page derrière lui n'a pas l'air d'un écran, il a
+   l'air d'un accident. */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes panelEntra {
+    from {
+      transform: translate3d(100%, 0, 0);
+    }
+    to {
+      transform: none;
+    }
+  }
+  @keyframes fondoEntra {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  .panel-derecha {
+    animation: panelEntra 0.34s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .panel-fondo {
+    animation: fondoEntra 0.24s ease-out both;
+  }
+}

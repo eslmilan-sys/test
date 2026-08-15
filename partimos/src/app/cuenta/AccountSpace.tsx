@@ -565,6 +565,9 @@ function BookingsList({ bookings }: { bookings: Booking[] }) {
             <ChatThread
               bookingId={bookingKey(b)}
               otherName={b.driverName.split(" ")[0] ?? b.driverName}
+              ruta={`${cityName(b.from)} → ${cityName(b.to)} · ${formatDayLabel(
+                localIso(new Date(b.boardingAt)),
+              )} ${formatTime(b.boardingAt)}`}
             />
           </li>
         ))}
