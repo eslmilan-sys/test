@@ -7,12 +7,14 @@ import { Icon, type IconName } from "@/components/ui/Icon";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { AuthDialog } from "@/components/site/AuthDialog";
 import {
+  bookingKey,
   carsOf,
   useSession,
   type Booking,
   type PublishedTrip,
   type SavedCar,
 } from "@/lib/session";
+import { ChatThread } from "@/components/trip/ChatThread";
 import {
   getVerificationState,
   isSupabaseConfigured,
@@ -520,10 +522,17 @@ function BookingsList({ bookings }: { bookings: Booking[] }) {
       </h3>
       <ul className="grid gap-2.5">
         {bookings.map((b, i) => (
-          <li key={`${b.tripId}-${b.boardingAt}-${i}`}>
+          <li
+            key={`${b.tripId}-${b.boardingAt}-${i}`}
+            className="rounded-[14px] border border-ink-200 px-4 py-3"
+          >
+            {/* Le lien ne couvre PLUS toute la carte : le chat vit dedans,
+                et un bouton dans un lien n'est pas cliquable de façon
+                fiable — c'est du HTML invalide, et Safari en particulier
+                suit le lien au lieu d'ouvrir le fil. */}
             <Link
               href={`/viaje/${b.tripId}?desde=${b.from}&hacia=${b.to}`}
-              className="flex flex-wrap items-center gap-x-4 gap-y-1.5 rounded-[14px] border border-ink-200 px-4 py-3 transition-colors hover:border-accent"
+              className="flex flex-wrap items-center gap-x-4 gap-y-1.5 rounded-[10px] transition-colors hover:text-accent-ink"
             >
               <span className="min-w-0 flex-1">
                 <span className="block text-[15px] font-semibold">
@@ -553,6 +562,10 @@ function BookingsList({ bookings }: { bookings: Booking[] }) {
                 {formatUsd(b.totalCents + b.feeCents)}
               </span>
             </Link>
+            <ChatThread
+              bookingId={bookingKey(b)}
+              otherName={b.driverName.split(" ")[0] ?? b.driverName}
+            />
           </li>
         ))}
       </ul>

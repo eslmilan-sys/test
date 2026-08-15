@@ -93,6 +93,13 @@ export type Session = {
  *  le puesto est acquis. Avec Supabase, la table `bookings` prendra le
  *  relais avec les mêmes états. */
 export type Booking = {
+  /** L'identité de la reserva — c'est à ELLE que pend le fil de discussion,
+   *  jamais au viaje (deux personnes qui réservent le même viaje ont deux
+   *  conversations séparées avec le conducteur). En démonstration c'est un
+   *  id fabriqué ici ; avec Supabase ce sera l'UUID de `bookings`, et
+   *  `transportFor()` distingue les deux sur cette seule forme.
+   *  Optionnel : les reservas d'avant ce champ existent encore en session. */
+  id?: string;
   tripId: string;
   from: string;
   to: string;
@@ -107,6 +114,41 @@ export type Booking = {
   point: string;
   status: "pendiente" | "confirmado";
 };
+
+/**
+ * La clé du fil d'une reserva.
+ *
+ * Les reservas écrites avant l'arrivée du chat n'ont pas d'`id`. Les
+ * ignorer aurait été le choix facile — et leur propriétaire aurait vu ses
+ * viajes sans bulle, sans savoir pourquoi. On dérive donc une clé stable
+ * de ce qui les identifie déjà de façon unique : le viaje et l'heure de
+ * montée. Ce n'est pas un UUID, donc `transportFor()` la traite comme
+ * locale, ce qui est exactement juste.
+ */
+export function bookingKey(b: Booking): string {
+  return b.id ?? `demo-${b.tripId}-${b.boardingAt}`;
+}
+
+/**
+ * L'id d'une nouvelle reserva de démonstration.
+ *
+ * Vit ICI, hors de tout composant, et pas seulement par propreté : le
+ * compilateur React refuse `Date.now()` et `Math.random()` dans le corps
+ * d'un composant (règle `react-hooks/purity`), même appelés depuis un
+ * gestionnaire de clic — il ne peut pas prouver que ça n'arrive pas au
+ * rendu.
+ *
+ * Le préfixe `demo-` n'est pas décoratif : il garantit que cet id n'a
+ * jamais la forme d'un UUID, donc que `transportFor()` du chat le range
+ * en local et n'essaie pas d'écrire dans `bookings`, où il n'existe pas.
+ */
+export function newDemoBookingId(): string {
+  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
+    return `demo-${crypto.randomUUID()}`;
+  }
+  /* Safari < 15.4, ou contexte non sécurisé. */
+  return `demo-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+}
 
 export type PublishedTrip = {
   from: string;

@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/Button";
 import { PlacePicker } from "@/components/ui/PlacePicker";
 import { Icon } from "@/components/ui/Icon";
 import { AuthDialog } from "@/components/site/AuthDialog";
-import { useSession } from "@/lib/session";
+import { newDemoBookingId, useSession } from "@/lib/session";
 import {
   formatUsd,
   serviceFeeCents,
@@ -147,6 +147,8 @@ export function BookingPanel({
      sans lendemain — le trou de logique n° 1 de l'audit. */
   function confirmBooking() {
     const booking = {
+      /* L'identité de la reserva, et donc de son fil de discussion. */
+      id: newDemoBookingId(),
       tripId,
       from: fromSlug,
       to: toSlug,
@@ -189,13 +191,20 @@ export function BookingPanel({
           {needsDriverOk
             ? `${driverName} tiene 24 horas para responder${
                 activeOffer ? ` a tu oferta de ${formatUsd(unitCents)}` : ""
-              }${pointNeedsOk ? " y a tu punto propuesto" : ""}. Te avisamos por WhatsApp apenas decida.`
-            : `Ya tienes tu puesto. Te compartimos el número de ${driverName} para que coordinen la hora y el punto exacto.`}
+              }${pointNeedsOk ? " y a tu punto propuesto" : ""}. Te avisamos apenas decida.`
+            : `Ya tienes tu puesto. Coordina la hora y el punto exacto con ${driverName} por el chat de esta reserva.`}
         </p>
+        {/* PLUS DE NUMÉRO. On affichait le celular du conducteur dès la
+            confirmation — c'était sortir la coordination de la plateforme
+            à la première minute : plus aucune trace de ce qui a été
+            convenu le jour où quelqu'un réclame, et la porte ouverte à
+            « arreglemos por fuera ». Le fil de la reserva le remplace, et
+            il est écrit, daté, non modifiable des deux côtés. */}
         {!needsDriverOk && (
-          <p className="tnum mb-4 inline-flex items-center gap-2 rounded-[10px] bg-ink-50 px-3 py-2 text-[14.5px] font-semibold">
-            <Icon name="phone" className="size-4" />
-            {driverName} · +507 6XXX-4471
+          <p className="mb-4 inline-flex items-center gap-2 rounded-[10px] bg-ink-50 px-3 py-2 text-[13.5px] leading-snug text-ink-500">
+            <Icon name="chat" className="size-4 shrink-0" />
+            El chat con {driverName} está en Mis viajes. Nadie necesita dar su
+            número.
           </p>
         )}
         <p className="rounded-[14px] bg-ink-50 px-4 py-3 text-[13.5px] leading-relaxed text-ink-500">
