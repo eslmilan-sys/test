@@ -164,10 +164,20 @@ export default function RootLayout({
           {/* L'app installée : service worker, hors-ligne, mises à jour. */}
           <PWA />
           {/* Toujours dans le HTML, montrée par CSS seulement une fois
-              l'app installée — voir `.solo-app` dans globals.css. */}
-          <Suspense fallback={null}>
-            <TabBar />
-          </Suspense>
+              l'app installée — voir `.solo-app` dans globals.css.
+
+              PAS de <Suspense> autour. Il y en avait un, par prudence mal
+              placée : React rend alors la barre dans un <div hidden> que
+              seule l'hydratation vient déplacer. Conséquence, mesurée —
+              dans le fichier autonome (scripts sans React) la barre reste
+              masquée POUR TOUJOURS, et sur le vrai site elle n'apparaît
+              qu'après l'hydratation : la navigation principale de l'app
+              arrive en retard sur un téléphone lent, ce qui est le pire
+              endroit où la faire attendre.
+              Seul `useSearchParams` impose une frontière Suspense ;
+              `usePathname`, dont la barre se sert, n'en a jamais eu
+              besoin. */}
+          <TabBar />
         </SessionProvider>
         <script
           type="application/ld+json"

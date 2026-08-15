@@ -205,6 +205,70 @@ const router = `<script>
 })();
 </script>`;
 
+/**
+ * LE SÉLECTEUR SITE / APP — il n'existe QUE dans ce fichier.
+ *
+ * Sur le vrai site, le mode app s'allume tout seul quand Partimos est
+ * installé sur l'écran d'accueil (`@media (display-mode: standalone)`).
+ * Donc sur un ordinateur, ou dans un fichier qu'on ouvre à la main, on ne
+ * peut PAS le voir — c'est précisément ce qui empêchait de comparer les
+ * deux. La bascule pose la classe `.app-instalada`, la même que celle que
+ * l'app utilise sur les iPhone anciens : ce sont exactement les mêmes
+ * règles CSS qui s'appliquent, donc ce qu'on voit ici est ce qu'on aura.
+ *
+ * Il n'entre jamais dans le site publié : ce script est écrit ici, dans le
+ * générateur du fichier de démonstration, pas dans l'application.
+ */
+const selector = `<style>
+  #sa-modo {
+    position: fixed; z-index: 999;
+    left: 50%; transform: translateX(-50%);
+    bottom: calc(12px + env(safe-area-inset-bottom));
+    display: flex; gap: 2px; padding: 3px;
+    border-radius: 999px; border: 1px solid rgba(0,0,0,.10);
+    background: rgba(255,255,255,.86);
+    backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    box-shadow: 0 6px 22px rgba(0,0,0,.13);
+    font: 600 13px/1 system-ui, -apple-system, sans-serif;
+  }
+  #sa-modo button {
+    appearance: none; border: 0; cursor: pointer;
+    padding: 9px 16px; border-radius: 999px;
+    background: transparent; color: #57534e; font: inherit;
+    /* Sans ça les deux libellés se cassent en deux lignes sur 390 px et la
+       pastille devient un pavé. */
+    white-space: nowrap;
+  }
+  #sa-modo button[aria-pressed="true"] { background: #1c1917; color: #fff; }
+  /* La barre d'onglets de l'app occupe ce bord : on remonte pour ne pas
+     la couvrir, sinon on cacherait justement ce qu'on veut montrer. */
+  html.app-instalada #sa-modo { bottom: calc(78px + env(safe-area-inset-bottom)); }
+  @media print { #sa-modo { display: none; } }
+</style>
+<div id="sa-modo" role="group" aria-label="Ver como sitio o como app">
+  <button type="button" data-modo="sitio" aria-pressed="true">Sitio</button>
+  <button type="button" data-modo="app" aria-pressed="false">App</button>
+</div>
+<script>
+(function () {
+  var barra = document.getElementById("sa-modo");
+  var botones = barra.querySelectorAll("button");
+  function aplicar(modo) {
+    document.documentElement.classList.toggle("app-instalada", modo === "app");
+    botones.forEach(function (b) {
+      b.setAttribute("aria-pressed", String(b.dataset.modo === modo));
+    });
+    try { sessionStorage.setItem("sa-modo", modo); } catch (e) {}
+  }
+  botones.forEach(function (b) {
+    b.addEventListener("click", function () { aplicar(b.dataset.modo); });
+  });
+  var guardado = "sitio";
+  try { guardado = sessionStorage.getItem("sa-modo") || "sitio"; } catch (e) {}
+  aplicar(location.hash.indexOf("app") > -1 ? "app" : guardado);
+})();
+</script>`;
+
 const doc = `<!doctype html>
 <html lang="es-PA">
 <head>
@@ -215,6 +279,7 @@ ${styles}
 <div id="sa-root"></div>
 ${templates}
 ${router}
+${selector}
 </body>
 </html>`;
 
