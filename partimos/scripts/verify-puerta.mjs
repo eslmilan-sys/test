@@ -111,6 +111,97 @@ console.log(`\nPuerta, invitado y enlaces — ${BASE}\n`);
   await ctx.close();
 }
 
+/* ═══ 1 bis. L'INSCRIPTION — UNE QUESTION PAR ÉCRAN ═══ */
+console.log("\n  Registro :\n");
+{
+  const { ctx, p } = await abrir("/", "nadie");
+  const zona = () => p.locator(".solo-app").first();
+  const siguiente = () => zona().getByLabel("Siguiente").first();
+
+  await p.getByRole("button", { name: "Crear cuenta" }).click();
+  await p.waitForTimeout(600);
+  ok("registro — il s'ouvre", /Cómo te llamas/.test(await texto(p)));
+  ok("registro — la progression se compte", /Paso 1 de 5/.test(await texto(p)));
+
+  /* LE BOUTON NE MENT PAS : éteint tant que la réponse ne va pas. */
+  ok("registro — suivant est éteint à vide", await siguiente().isDisabled());
+
+  await p.locator("#reg-nombre").fill("Milan");
+  await p.locator("#reg-apellido").fill("Ruiz");
+  await p.waitForTimeout(300);
+  ok("registro — il montre le nom public", /Milan R\./.test(await texto(p)));
+  ok("registro — suivant s'allume", !(await siguiente().isDisabled()));
+
+  await siguiente().click();
+  await p.waitForTimeout(400);
+  ok("registro — 2. la naissance", /Cuándo naciste/.test(await texto(p)));
+
+  /* LA MAJORITÉ EST UNE CONDITION LÉGALE, pas une préférence : un mineur
+     doit être arrêté ICI, pas trois écrans plus loin. */
+  await p.locator("#reg-nacimiento").fill("2015-01-15");
+  await p.waitForTimeout(400);
+  ok("registro — un mineur est refusé", /18 años/.test(await texto(p)));
+  ok("registro — et il ne peut pas passer", await siguiente().isDisabled());
+
+  await p.locator("#reg-nacimiento").fill("1992-04-08");
+  await p.waitForTimeout(400);
+  await siguiente().click();
+  await p.waitForTimeout(400);
+  const t3 = await texto(p);
+  ok("registro — 3. le traitement", /Cómo prefieres que te llamemos/.test(t3));
+  /* TROIS PORTES : sans « ne pas le dire », on force à mentir. */
+  ok("registro — Señora, Señor et « prefiero no decirlo »",
+    /Señora/.test(t3) && /Señor/.test(t3) && /Prefiero no decirlo/.test(t3));
+
+  await zona().getByRole("button", { name: "Señor", exact: true }).click();
+  await p.waitForTimeout(300);
+  await siguiente().click();
+  await p.waitForTimeout(400);
+  ok("registro — 4. le correo", /Cuál es tu correo/.test(await texto(p)));
+
+  await p.locator("#reg-correo").fill("no-es-un-correo");
+  await p.waitForTimeout(300);
+  ok("registro — un correo faux est refusé", await siguiente().isDisabled());
+  await p.locator("#reg-correo").fill("milan@ejemplo.com");
+  await p.waitForTimeout(300);
+  await siguiente().click();
+  await p.waitForTimeout(400);
+  ok("registro — 5. le celular, facultatif", /Y tu celular/.test(await texto(p)));
+  ok("registro — on peut finir sans le donner",
+    !(await zona().getByLabel("Crear mi cuenta").first().isDisabled()));
+
+  /* ON PEUT REVENIR, et le champ garde ce qui était écrit. Un tunnel
+     sans marche arrière fait abandonner à la première faute de frappe. */
+  await zona().getByLabel("Atrás").first().click();
+  await p.waitForTimeout(400);
+  ok("registro — la marche arrière garde la réponse",
+    (await p.locator("#reg-correo").inputValue()) === "milan@ejemplo.com");
+  await siguiente().click();
+  await p.waitForTimeout(400);
+
+  await zona().getByLabel("Crear mi cuenta").first().click();
+  await p.waitForTimeout(1400);
+  const fin = await texto(p);
+  ok("registro — la session s'ouvre vraiment", /Hola, Milan/.test(fin), fin.slice(0, 40));
+  await ctx.close();
+}
+
+/* ═══ 1 ter. LA CONNEXION a la même forme ═══ */
+{
+  const { ctx, p } = await abrir("/", "nadie");
+  await p.getByRole("button", { name: "Iniciar sesión" }).click();
+  await p.waitForTimeout(600);
+  ok("acceder — il s'ouvre", /Cuál es tu correo/.test(await texto(p)));
+  ok("acceder — il renvoie vers l'inscription",
+    /Todavía no tengo cuenta/.test(await texto(p)));
+  await p.locator("#acc-correo").fill("ana@ejemplo.com");
+  await p.waitForTimeout(300);
+  await p.locator(".solo-app").first().getByLabel("Continuar").first().click();
+  await p.waitForTimeout(1400);
+  ok("acceder — la session s'ouvre", /Hola, Ana/.test(await texto(p)), (await texto(p)).slice(0, 40));
+  await ctx.close();
+}
+
 /* ═══ 2. CE QUE PEUT UN INVITÉ ═══ */
 console.log("\n  Invitado :\n");
 

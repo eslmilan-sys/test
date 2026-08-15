@@ -4,8 +4,9 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "@/lib/session";
 import { useHydrated } from "@/lib/lastsearch";
-import { AuthDialog } from "@/components/site/AuthDialog";
 import { Entrar } from "./Entrar";
+import { Registro } from "./Registro";
+import { Acceder } from "./Acceder";
 
 /**
  * LA PORTE, POSÉE DEVANT UN ÉCRAN QUI EXIGE UN COMPTE.
@@ -37,16 +38,29 @@ export function Puerta({
   const { session } = useSession();
   const hidratado = useHydrated();
   const router = useRouter();
-  const [abrirCorreo, setAbrirCorreo] = useState(false);
+  const [puerta, setPuerta] = useState<"entrar" | "registro" | "acceder">(
+    "entrar",
+  );
 
   if (!hidratado) return null;
   if (session) return <>{children}</>;
+
+  if (puerta === "registro")
+    return <Registro onCerrar={() => setPuerta("entrar")} />;
+  if (puerta === "acceder")
+    return (
+      <Acceder
+        onCerrar={() => setPuerta("entrar")}
+        onRegistro={() => setPuerta("registro")}
+      />
+    );
 
   return (
     <>
       <Entrar
         motivo={motivo}
-        onCorreo={() => setAbrirCorreo(true)}
+        onRegistro={() => setPuerta("registro")}
+        onAcceder={() => setPuerta("acceder")}
         /* Fermer ici, c'est revenir d'où l'on vient — pas « rester sur
            une page vide ». Sans historique (lien ouvert de l'extérieur),
            on retombe sur la recherche, la seule chose qui marche sans
@@ -56,13 +70,6 @@ export function Puerta({
           else router.push("/ya");
         }}
       />
-      {abrirCorreo && (
-        <AuthDialog
-          open={abrirCorreo}
-          onOpenChange={setAbrirCorreo}
-          trigger={null}
-        />
-      )}
     </>
   );
 }

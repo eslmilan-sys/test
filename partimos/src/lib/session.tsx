@@ -49,6 +49,18 @@ export type Session = {
   /** Initiale affichée en public — jamais le nom complet (« Ana M. »). */
   lastInitial: string;
   isVerified: boolean;
+  /** Date de naissance, ISO court. Sert à une seule chose : vérifier la
+   *  majorité. On ne l'affiche nulle part et on n'en tire pas d'âge
+   *  public — l'âge d'un passager ne regarde personne. */
+  birthDate?: string | null;
+  /** Comment la personne veut qu'on s'adresse à elle. Trois valeurs, dont
+   *  « ne pas le dire » : demander le genre sans laisser cette porte
+   *  force à mentir, et le mode « solo mujeres » a besoin d'un choix
+   *  déclaré, pas d'une déduction sur le prénom. */
+  trato?: "senora" | "senor" | "sin-decir" | null;
+  /** Celular, si la personne l'a donné. Jamais public — il sert aux
+   *  avis de reserva, pas à la mise en relation : le chat s'en charge. */
+  phone?: string | null;
   /** Insigne employeur ou université, si l'utilisateur l'a connecté. */
   affiliation: string | null;
   since: string;

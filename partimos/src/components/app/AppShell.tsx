@@ -4,8 +4,9 @@ import { useState } from "react";
 import { useSession } from "@/lib/session";
 import { useHydrated } from "@/lib/lastsearch";
 import { entrarComoInvitado, useInvitado } from "@/lib/invitado";
-import { AuthDialog } from "@/components/site/AuthDialog";
 import { Entrar } from "./Entrar";
+import { Registro } from "./Registro";
+import { Acceder } from "./Acceder";
 import { Bienvenida } from "./Bienvenida";
 
 /**
@@ -32,7 +33,12 @@ export function AppShell() {
   const { session } = useSession();
   const hydrated = useHydrated();
   const invitado = useInvitado();
-  const [abrirCorreo, setAbrirCorreo] = useState(false);
+  /* Trois écrans de porte, jamais deux à la fois. Un état plutôt que
+     deux booléens : deux booléens finissent toujours par être vrais
+     ensemble, et on se retrouve avec deux plein-écrans superposés. */
+  const [puerta, setPuerta] = useState<"entrar" | "registro" | "acceder">(
+    "entrar",
+  );
 
   /* Avant hydratation on ne sait pas s'il y a un compte : rendre l'écran
      d'entrée « au cas où » le ferait clignoter chez qui est connecté. */
@@ -41,18 +47,20 @@ export function AppShell() {
   if (!session && !invitado) {
     return (
       <div className="fixed inset-0 z-[150] overflow-y-auto bg-white">
-        <Entrar
-          onCorreo={() => setAbrirCorreo(true)}
-          onCerrar={entrarComoInvitado}
-        />
-        {/* Le formulaire courriel réutilise le dialogue existant : toute
-            la logique de code, de quota et d'erreurs y vit déjà, et la
-            dupliquer serait la façon la plus sûre de la faire diverger. */}
-        {abrirCorreo && (
-          <AuthDialog
-            open={abrirCorreo}
-            onOpenChange={setAbrirCorreo}
-            trigger={null}
+        {puerta === "entrar" && (
+          <Entrar
+            onRegistro={() => setPuerta("registro")}
+            onAcceder={() => setPuerta("acceder")}
+            onCerrar={entrarComoInvitado}
+          />
+        )}
+        {puerta === "registro" && (
+          <Registro onCerrar={() => setPuerta("entrar")} />
+        )}
+        {puerta === "acceder" && (
+          <Acceder
+            onCerrar={() => setPuerta("entrar")}
+            onRegistro={() => setPuerta("registro")}
           />
         )}
       </div>

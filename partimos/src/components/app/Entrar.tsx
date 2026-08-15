@@ -84,7 +84,8 @@ const CAPACIDADES = [
 ] as const;
 
 export function Entrar({
-  onCorreo,
+  onRegistro,
+  onAcceder,
   onCerrar,
   /** Le titre change selon la porte par laquelle on arrive : entrer dans
    *  l'app n'est pas la même demande que « je viens de toucher Perfil ».
@@ -92,7 +93,8 @@ export function Entrar({
    *  comme un mur. */
   motivo,
 }: {
-  onCorreo: () => void;
+  onRegistro: () => void;
+  onAcceder: () => void;
   /** Absent = pas de sortie (première ouverture d'une session). */
   onCerrar?: () => void;
   motivo?: string;
@@ -156,7 +158,10 @@ export function Entrar({
             type="button"
             onClick={onCerrar}
             aria-label="Seguir sin cuenta"
-            className="glass absolute top-[calc(14px+env(safe-area-inset-top))] left-4 z-10 flex size-11 items-center justify-center rounded-full"
+            /* 48 px et non 44 : le propriétaire l'a vue rater. Sur une
+               photo, sans bord net, on vise moins bien qu'on croit — et
+               une croix qu'on rate deux fois passe pour cassée. */
+            className="glass absolute top-[calc(14px+env(safe-area-inset-top))] left-4 z-20 flex size-12 items-center justify-center rounded-full"
           >
             <Icon name="cross" className="size-5" />
           </button>
@@ -192,7 +197,7 @@ export function Entrar({
         <div className="mt-5 grid gap-2.5">
           <button
             type="button"
-            onClick={onCorreo}
+            onClick={onRegistro}
             className="flex h-[54px] items-center justify-center rounded-full bg-naranja px-6 font-display text-[16.5px] font-bold text-white transition-colors hover:bg-naranja-hondo"
           >
             Crear cuenta
@@ -203,7 +208,7 @@ export function Entrar({
               porte qui le concerne. */}
           <button
             type="button"
-            onClick={onCorreo}
+            onClick={onAcceder}
             className="flex h-[46px] items-center justify-center rounded-full font-display text-[15.5px] font-bold text-naranja transition-colors hover:bg-naranja-suave"
           >
             Iniciar sesión
