@@ -78,7 +78,7 @@ export function SeguridadSheet({
         <Dialog.Overlay className="fixed inset-0 z-[90] bg-ink-900/40 backdrop-blur-[2px]" />
         <Dialog.Content
           aria-describedby={undefined}
-          className="fixed inset-x-0 bottom-0 z-[100] mx-auto max-w-[560px] rounded-t-[22px] border-t border-ink-200 bg-white p-5 pb-[calc(20px+env(safe-area-inset-bottom))] shadow-[0_-8px_40px_rgba(0,0,0,0.18)] focus:outline-none"
+          className="hoja-abajo glass fixed inset-x-0 bottom-0 z-[100] mx-auto max-w-[560px] rounded-t-[22px] p-5 pb-[calc(20px+env(safe-area-inset-bottom))] focus:outline-none"
         >
           <Dialog.Title className="mb-1 font-display text-[19px] font-bold">
             Seguridad

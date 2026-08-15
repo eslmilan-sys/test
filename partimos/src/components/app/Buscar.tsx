@@ -210,7 +210,11 @@ export function Buscar() {
   return (
     <div className="mx-auto w-full max-w-[520px]">
       {/* EN-TÊTE — d'où à où, quand, et de quoi corriger sans repartir. */}
-      <header className="sticky top-0 z-30 border-b border-ink-200 bg-ink-50/95 px-4 pt-[calc(10px+env(safe-area-inset-top))] pb-2.5 backdrop-blur-md">
+      <header /* EN VERRE, et pas seulement pour l'effet : les résultats
+              défilent DESSOUS, et les voir passer derrière la vitre est
+              ce qui dit que la liste continue. Un bandeau opaque, lui,
+              se lit comme le bord de l'écran. */
+            className="glass sticky top-0 z-30 rounded-b-[20px] px-4 pt-[calc(10px+env(safe-area-inset-top))] pb-2.5">
         <div className="flex items-start gap-2">
           <button
             type="button"

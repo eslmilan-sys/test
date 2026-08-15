@@ -410,7 +410,7 @@ export default async function CorridorPage({ params }: Params) {
               )}
 
               <div className="mt-9 flex flex-wrap gap-3">
-                <ButtonLink href="/#buscar" size="lg">
+                <ButtonLink href="/ya" size="lg">
                   Buscar puesto
                 </ButtonLink>
                 <ButtonLink

@@ -275,7 +275,7 @@ export default function PublicarPage() {
               </div>
 
               <div className="mt-9 flex flex-wrap gap-3">
-                <ButtonLink href="/#buscar" size="lg">
+                <ButtonLink href="/ya" size="lg">
                   Publicar mi viaje
                 </ButtonLink>
                 <ButtonLink href="/ayuda" variant="secondary" size="lg">

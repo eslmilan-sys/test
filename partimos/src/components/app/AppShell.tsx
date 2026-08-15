@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useSession } from "@/lib/session";
 import { useHydrated } from "@/lib/lastsearch";
+import { entrarComoInvitado, useInvitado } from "@/lib/invitado";
 import { AuthDialog } from "@/components/site/AuthDialog";
 import { Entrar } from "./Entrar";
 import { Bienvenida } from "./Bienvenida";
@@ -10,11 +11,13 @@ import { Bienvenida } from "./Bienvenida";
 /**
  * QUI DÉCIDE DE CE QU'ON VOIT EN OUVRANT L'APP.
  *
- * Trois états, dans l'ordre voulu par le propriétaire :
+ * Quatre états, dans l'ordre voulu par le propriétaire :
  *
  *   1. pas de compte  → l'écran d'entrée, plein écran ;
- *   2. compte, première ouverture de la session → l'écran de bienvenue ;
- *   3. ensuite        → l'app.
+ *   2. la croix a été touchée → mode invité : l'app s'ouvre, mais seule
+ *      la RECHERCHE marche. Tout le reste ramène à la porte (`Puerta`) ;
+ *   3. compte, première ouverture de la session → l'écran de bienvenue ;
+ *   4. ensuite        → l'app.
  *
  * IL NE S'APPLIQUE QU'À L'APP INSTALLÉE. Sur le site, exiger un compte
  * pour voir l'accueil serait une faute grave : le SEO est le canal
@@ -28,16 +31,20 @@ import { Bienvenida } from "./Bienvenida";
 export function AppShell() {
   const { session } = useSession();
   const hydrated = useHydrated();
+  const invitado = useInvitado();
   const [abrirCorreo, setAbrirCorreo] = useState(false);
 
   /* Avant hydratation on ne sait pas s'il y a un compte : rendre l'écran
      d'entrée « au cas où » le ferait clignoter chez qui est connecté. */
   if (!hydrated) return null;
 
-  if (!session) {
+  if (!session && !invitado) {
     return (
-      <div className="fixed inset-0 z-[150] overflow-y-auto bg-ink-50">
-        <Entrar onCorreo={() => setAbrirCorreo(true)} />
+      <div className="fixed inset-0 z-[150] overflow-y-auto bg-white">
+        <Entrar
+          onCorreo={() => setAbrirCorreo(true)}
+          onCerrar={entrarComoInvitado}
+        />
         {/* Le formulaire courriel réutilise le dialogue existant : toute
             la logique de code, de quota et d'erreurs y vit déjà, et la
             dupliquer serait la façon la plus sûre de la faire diverger. */}
@@ -51,6 +58,10 @@ export function AppShell() {
       </div>
     );
   }
+
+  /* En invité, pas de bienvenue : on n'accueille pas quelqu'un par son
+     prénom quand on ne le connaît pas. */
+  if (!session) return null;
 
   return <Bienvenida nombre={session.firstName?.trim() || null} />;
 }

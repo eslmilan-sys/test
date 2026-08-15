@@ -256,7 +256,7 @@ export default function ComoFuncionaPage() {
             <FaqList items={FAQ} />
 
             <div className="mt-10 flex flex-wrap gap-3">
-              <ButtonLink href="/#buscar" size="lg">
+              <ButtonLink href="/ya" size="lg">
                 Buscar mi viaje
               </ButtonLink>
               <ButtonLink href="/seguridad" variant="secondary" size="lg">

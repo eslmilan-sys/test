@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { AccountSpace } from "./AccountSpace";
 import { Cuenta } from "@/components/app/Cuenta";
+import { Puerta } from "@/components/app/Puerta";
 import { canonical } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -21,7 +22,13 @@ export default function CuentaPage() {
           l'enveloppe. */}
       <div className="solo-app">
         <Suspense fallback={null}>
-          <Cuenta />
+          {/* SANS COMPTE, CET ÉCRAN EST LA PORTE. Demande du
+              propriétaire : toucher Perfil, Mis viajes ou Mensajes sans
+              être connecté renvoie à la connexion — seule la recherche
+              marche en invité. */}
+          <Puerta motivo="Tus viajes viven en tu cuenta">
+            <Cuenta />
+          </Puerta>
         </Suspense>
       </div>
       <div className="solo-web">

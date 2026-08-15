@@ -133,8 +133,16 @@ export function Footer() {
           </ul>
         </div>
 
-        {/* Mention légale obligatoire sur toutes les pages (§8 du brief). */}
-        <div className="flex flex-wrap items-start justify-between gap-5 border-t border-white/12 pt-6">
+        {/* LE PAVÉ DE CONFORMITÉ EST `solo-web`, ET C'EST RÉFLÉCHI.
+            Le §8 l'impose sur toutes les pages du SITE, et il y reste
+            entier : une page web se lit une fois, son pied porte les
+            mentions. Dans l'app on revient sur les mêmes écrans vingt
+            fois par jour, et six lignes de conformité sous chaque liste
+            de viajes deviennent du bruit qu'on apprend à ne plus voir —
+            la pire chose qui puisse arriver à un texte légal. Il n'a pas
+            disparu de l'app : il a une page, « Legal », et le profil y
+            mène. */}
+        <div className="solo-web flex flex-wrap items-start justify-between gap-5 border-t border-white/12 pt-6">
           {/* Interligne resserré : un pavé légal en 12,5 px avec un
               interligne « relaxed » prenait plus de place que le contenu
               utile du footer. « snug » reste lisible à cette taille. */}

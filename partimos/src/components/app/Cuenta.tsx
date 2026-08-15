@@ -8,7 +8,8 @@ import { ChatThread } from "@/components/trip/ChatThread";
 import { ALL_CITIES } from "@/lib/corridors";
 import { formatUsd } from "@/lib/pricing";
 import { formatDayLabel, formatTime, localIso } from "@/lib/trips";
-import { bookingKey, useSession, type Booking } from "@/lib/session";
+import { bookingKey, carsOf, useSession, type Booking } from "@/lib/session";
+import { LEGAL_FOOTER } from "@/lib/content";
 import { useAhora } from "@/lib/reloj";
 
 /**
@@ -26,7 +27,7 @@ import { useAhora } from "@/lib/reloj";
  * reste de l'écran.
  */
 
-type Panel = "viajes" | "mensajes" | "perfil";
+type Panel = "viajes" | "mensajes" | "perfil" | "verificacion" | "legal";
 
 const nombre = (slug: string) =>
   ALL_CITIES.find((c) => c.slug === slug)?.shortName ?? slug;
@@ -52,8 +53,20 @@ export function Cuenta() {
   const ahora = useAhora();
 
   const pedido = params.get("panel");
-  const panel: Panel =
-    pedido === "mensajes" || pedido === "perfil" ? pedido : "viajes";
+  const PANELES: Panel[] = [
+    "viajes",
+    "mensajes",
+    "perfil",
+    "verificacion",
+    "legal",
+  ];
+  /* Un `?panel=` inconnu retombe sur Mis viajes plutôt que sur une page
+     vide. C'est ce qui a mordu : la carte « Verifica tu cédula » pointait
+     vers un panneau qui n'existait pas, et le bouton ne faisait
+     visiblement rien. */
+  const panel: Panel = PANELES.includes(pedido as Panel)
+    ? (pedido as Panel)
+    : "viajes";
 
   const reservas = useMemo(
     () =>
@@ -63,18 +76,15 @@ export function Cuenta() {
     [session?.bookings],
   );
 
-  if (!session) {
-    return (
-      <div className="mx-auto w-full max-w-[520px] px-4 pt-6">
-        <p className="rounded-[18px] border border-ink-200 bg-white px-5 py-8 text-center text-[14px] leading-relaxed text-ink-500">
-          Entra con tu correo para ver tus viajes, tus mensajes y tu perfil.
-        </p>
-      </div>
-    );
-  }
+  /* Pas de repli « conéctate » ici : la page pose `<Puerta>` autour de
+     cet écran, et c'est ELLE qui montre la connexion. Deux endroits qui
+     décident de la même chose finissent toujours par se contredire. */
+  if (!session) return null;
 
   if (panel === "perfil") return <Perfil reservas={reservas} ahora={ahora} />;
   if (panel === "mensajes") return <Mensajes reservas={reservas} />;
+  if (panel === "verificacion") return <Verificacion />;
+  if (panel === "legal") return <Legal />;
   return <MisViajes reservas={reservas} ahora={ahora} />;
 }
 
@@ -318,17 +328,262 @@ function Mensajes({ reservas }: { reservas: Booking[] }) {
   );
 }
 
+
+/* ------------------------------------------------------------------ */
+/* VERIFICACIÓN                                                        */
+/* ------------------------------------------------------------------ */
+
+/**
+ * QUATRE PIÈCES, PAS UNE — et elles ne se traitent pas pareil.
+ *
+ * Le propriétaire l'a dit en clair : il n'y a pas que la cédula. Pour
+ * conduire il faut aussi le permis, la photo du carro et la plaque.
+ *
+ * MAIS LA RÈGLE R6 TIENT : aucune image de cédula n'est stockée, et le
+ * permis est un document d'identité de la même famille. Ces deux-là
+ * passent donc par le prestataire externe, qui nous rend DEUX choses —
+ * passé ou non, et une référence de dossier. Ni l'image, ni le numéro.
+ *
+ * Le carro et la plaque, eux, ne sont pas des documents d'identité :
+ * ils décrivent un véhicule, ils sont visibles dans la rue, et le
+ * passager a besoin de les voir pour reconnaître la voiture qui
+ * s'arrête. Ceux-là, nous les gardons.
+ *
+ * Les deux premières valent pour tout le monde ; les deux dernières ne
+ * concernent que qui publie. Les demander à un passager serait
+ * réclamer des papiers pour monter dans une voiture.
+ */
+type Pieza = {
+  icon: IconName;
+  titulo: string;
+  texto: string;
+  /** Qui doit la fournir. */
+  para: "todos" | "conductor";
+  /** Ce que nous conservons — dit à chaque ligne, parce que c'est la
+   *  question que personne ne pose et que tout le monde se pose. */
+  guardamos: string;
+};
+
+const PIEZAS: Pieza[] = [
+  {
+    icon: "id",
+    titulo: "Cédula o pasaporte",
+    texto:
+      "Un proveedor certificado confirma que el documento es real y que corresponde a tu cara.",
+    para: "todos",
+    guardamos: "Solo si pasó, y una referencia del expediente.",
+  },
+  {
+    icon: "car",
+    titulo: "Licencia de conducir",
+    texto:
+      "Vigente y a tu nombre. La revisa el mismo proveedor, en el mismo paso.",
+    para: "conductor",
+    guardamos: "Solo si pasó, y una referencia del expediente.",
+  },
+  {
+    icon: "camera",
+    titulo: "Foto del carro",
+    texto:
+      "Como se ve por fuera. Es lo que mira el pasajero cuando un carro se detiene.",
+    para: "conductor",
+    guardamos: "La foto, visible en tu viaje.",
+  },
+  {
+    icon: "hash",
+    titulo: "Número de placa",
+    texto:
+      "Se le muestra al pasajero que ya reservó, nunca en la búsqueda abierta.",
+    para: "conductor",
+    guardamos: "La placa, visible tras reservar.",
+  },
+];
+
+function Verificacion() {
+  const { session } = useSession();
+  const carros = session ? carsOf(session) : [];
+  /* On n'invente aucun état : ce que la session sait, elle le dit ; ce
+     qu'elle ignore reste « pendiente ». Un badge « vérifié » posé par
+     défaut serait le pire mensonge possible sur cet écran. */
+  const hecho = (p: Pieza) =>
+    p.icon === "id"
+      ? Boolean(session?.isVerified)
+      : p.icon === "camera" || p.icon === "hash"
+        ? carros.length > 0
+        : false;
+
+  const listas = PIEZAS.filter(hecho).length;
+
+  return (
+    <div className="mx-auto w-full max-w-[520px] px-4 pt-[calc(14px+env(safe-area-inset-top))] pb-4">
+      <Volver />
+      <p className="mt-2 font-display text-[26px] leading-tight font-extrabold tracking-[-0.03em]">
+        Verificación
+      </p>
+      <p className="mt-1.5 text-[13.5px] leading-snug text-ink-500">
+        {listas} de {PIEZAS.length} listas. Las dos primeras valen para
+        cualquiera; las dos últimas solo si publicas viajes.
+      </p>
+
+      <ul className="mt-4 grid gap-2.5">
+        {PIEZAS.map((p) => {
+          const ok = hecho(p);
+          return (
+            <li
+              key={p.titulo}
+              className="rounded-[18px] border border-ink-200 bg-white p-4"
+            >
+              <div className="flex items-start gap-3">
+                <span
+                  className={`flex size-10 shrink-0 items-center justify-center rounded-[13px] ${
+                    ok ? "bg-verde-suave text-verde-ok" : "bg-ink-100 text-ink-400"
+                  }`}
+                >
+                  <Icon name={p.icon} className="size-[19px]" />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="flex flex-wrap items-center gap-x-2 gap-y-1 font-display text-[15.5px] font-bold">
+                    {p.titulo}
+                    {p.para === "conductor" && (
+                      <span className="rounded-full bg-ink-100 px-2 py-0.5 text-[11px] font-semibold text-ink-500">
+                        Si manejas
+                      </span>
+                    )}
+                  </p>
+                  <p className="mt-1 text-[13.5px] leading-relaxed text-ink-600">
+                    {p.texto}
+                  </p>
+                  <p className="mt-1.5 flex items-start gap-1.5 text-[12px] leading-snug text-ink-400">
+                    <Icon name="shield" className="mt-0.5 size-3.5 shrink-0" />
+                    Guardamos: {p.guardamos}
+                  </p>
+                </div>
+                <span
+                  className={`shrink-0 rounded-full px-2.5 py-1 text-[11.5px] font-bold ${
+                    ok
+                      ? "bg-verde-suave text-verde-ok"
+                      : "bg-naranja-suave text-naranja"
+                  }`}
+                >
+                  {ok ? "Lista" : "Pendiente"}
+                </span>
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+
+      {/* CE QUE CE BOUTON FAIT VRAIMENT, aujourd'hui. Le prestataire
+          n'est pas branché : le dire vaut mieux qu'un bouton qui tourne
+          dans le vide. */}
+      <p className="mt-3 rounded-[18px] bg-naranja-suave p-4 text-[13px] leading-relaxed text-ink-600">
+        <b className="font-semibold text-naranja-hondo">
+          La verificación se abre pronto.
+        </b>{" "}
+        El proveedor externo está en conexión. Mientras tanto puedes buscar,
+        reservar y publicar: la insignia solo cambia cuánto te aceptan.
+      </p>
+
+      <Link
+        href="/cuenta?panel=perfil"
+        className="mt-3 flex items-center justify-center gap-2 rounded-[16px] border border-ink-200 bg-white px-5 py-3.5 text-[14px] font-semibold text-ink-600 transition-colors hover:border-naranja"
+      >
+        Volver a mi perfil
+      </Link>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* LEGAL                                                               */
+/* ------------------------------------------------------------------ */
+
+/**
+ * LE TEXTE DE CONFORMITÉ, DANS SA PAGE.
+ *
+ * Il était en pied de CHAQUE écran de l'app : six lignes de mentions
+ * sous une liste de viajes, répétées vingt fois par jour. Sur un site
+ * c'est la norme — une page web se lit une fois, et le pied porte les
+ * mentions. Dans une app on revient sur les mêmes écrans sans arrêt, et
+ * ce pavé devient du bruit qu'on apprend à ne plus voir : la pire chose
+ * qui puisse arriver à un texte légal.
+ *
+ * Il n'a donc pas disparu — il a une adresse, et le profil y mène.
+ */
+function Legal() {
+  return (
+    <div className="mx-auto w-full max-w-[520px] px-4 pt-[calc(14px+env(safe-area-inset-top))] pb-4">
+      <Volver />
+      <p className="mt-2 font-display text-[26px] leading-tight font-extrabold tracking-[-0.03em]">
+        Legal
+      </p>
+
+      <div className="mt-4 rounded-[18px] border border-ink-200 bg-white p-4">
+        <p className="font-display text-[15.5px] font-bold">Qué es Partimos</p>
+        <p className="mt-1.5 text-[13.5px] leading-relaxed text-ink-600">
+          {LEGAL_FOOTER}
+        </p>
+      </div>
+
+      <ul className="mt-3 overflow-hidden rounded-[18px] border border-ink-200 bg-white">
+        {[
+          { href: "/terminos", label: "Términos de uso" },
+          { href: "/privacidad", label: "Privacidad" },
+          { href: "/seguridad", label: "Seguridad" },
+        ].map((l, i) => (
+          <li key={l.href}>
+            <Link
+              href={l.href}
+              className={`flex items-center gap-3 px-4 py-3.5 transition-colors hover:bg-ink-50 ${
+                i > 0 ? "border-t border-ink-100" : ""
+              }`}
+            >
+              <span className="min-w-0 flex-1 text-[14.5px] font-semibold">
+                {l.label}
+              </span>
+              <Icon name="arrowRight" className="size-4 shrink-0 text-ink-300" />
+            </Link>
+          </li>
+        ))}
+      </ul>
+
+      <p className="mt-3 px-1 text-[12px] leading-snug text-ink-400">
+        © {new Date().getFullYear()} Partimos — hecho para las carreteras de
+        Panamá
+      </p>
+    </div>
+  );
+}
+
+/** Le retour vers le profil, en haut à gauche : un écran de réglages
+ *  sans retour oblige à passer par la barre d'onglets, qui n'y mène pas. */
+function Volver() {
+  return (
+    <Link
+      href="/cuenta?panel=perfil"
+      aria-label="Volver a mi perfil"
+      className="-ml-1.5 flex size-10 items-center justify-center rounded-full text-ink-500 transition-colors hover:bg-ink-100"
+    >
+      <Icon name="arrowRight" className="size-5 rotate-180" />
+    </Link>
+  );
+}
+
 /* ------------------------------------------------------------------ */
 /* PERFIL                                                              */
 /* ------------------------------------------------------------------ */
 
 const MENU: { href: string; label: string; icon: IconName }[] = [
   { href: "/cuenta", label: "Mis viajes", icon: "route" },
+  { href: "/cuenta?panel=verificacion", label: "Verificación", icon: "id" },
   { href: "/publicar/nuevo", label: "Publicar un viaje", icon: "plus" },
   { href: "/como-funciona", label: "Cómo funciona", icon: "compass" },
   { href: "/seguridad", label: "Seguridad", icon: "shield" },
   { href: "/ayuda", label: "Ayuda", icon: "chat" },
-  { href: "/terminos", label: "Términos y privacidad", icon: "id" },
+  /* LE TEXTE LÉGAL A SA PAGE. Il traînait en bas de CHAQUE écran de
+     l'app — six lignes de conformité sous une liste de viajes, à
+     répétition. Il reste obligatoire, il reste lisible : il est ici. */
+  { href: "/cuenta?panel=legal", label: "Legal", icon: "briefcase" },
 ];
 
 function Perfil({

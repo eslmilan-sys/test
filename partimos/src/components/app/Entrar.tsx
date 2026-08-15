@@ -2,23 +2,32 @@
 
 import { useState } from "react";
 import { Icon } from "@/components/ui/Icon";
-import { Logo } from "@/components/site/Logo";
+import { Photo } from "@/components/ui/Photo";
+import { PHOTOS } from "@/lib/photos";
 import { getSupabase, isSupabaseConfigured } from "@/lib/supabase";
 
 /**
  * LA PORTE DE L'APP — le premier écran, avant tout le reste.
  *
- * Décision du propriétaire : installée, l'app s'ouvre sur « entrer ou
- * s'inscrire », pas sur la recherche. C'est cohérent avec ce que l'app
- * EST — un outil pour quelqu'un qui a un compte — alors que le site
- * reste ouvert à tous et n'exige jamais de se connecter pour chercher.
+ * SA FORME VIENT D'UNE DEMANDE PRÉCISE du propriétaire, exemple à
+ * l'appui : une photo qui occupe le haut de l'écran, une croix en haut à
+ * GAUCHE pour la quitter, et en bas une feuille blanche avec le titre,
+ * le bouton d'inscription puis le lien de connexion. C'est la grammaire
+ * de tous les onboardings de voyage, et elle marche pour une raison :
+ * l'image dit ce qu'on achète avant qu'un mot soit lu.
+ *
+ * LA CROIX N'EST PAS DÉCORATIVE. Elle mène au mode invité, où la
+ * RECHERCHE reste entière — chercher un viaje et voir l'aporte ne
+ * demandent pas de compte, et exiger l'inscription à l'entrée coûte plus
+ * de visiteurs qu'elle n'en qualifie. Tout ce qui engage quelqu'un
+ * (réserver, publier, écrire, son profil) ramène ici.
  *
  * TROIS PORTES, ET C'EST UNE LEÇON PAYÉE CHER. L'inscription est restée
  * cassée des heures pour trois raisons cumulées : un quota de deux
  * courriels par heure, un gabarit non modifiable, et un lien qui
  * renvoyait sur localhost. La règle qui en sort : ne jamais faire
- * dépendre l'entrée d'un seul canal. Google et LinkedIn ne sont donc pas
- * du confort, ce sont des chemins de secours quand le courriel tombe.
+ * dépendre l'entrée d'un seul canal. Google et LinkedIn ne sont pas du
+ * confort, ce sont des chemins de secours quand le courriel tombe.
  *
  * Et quand un fournisseur n'est pas activé, on le DIT — avec sa vraie
  * cause. « Réessaie » sur un provider désactivé fait réessayer à l'infini
@@ -63,7 +72,31 @@ function LinkedInGlyph() {
   );
 }
 
-export function Entrar({ onCorreo }: { onCorreo: () => void }) {
+/** Les quatre choses qu'on peut faire avec un compte, en pictogrammes
+ *  posés sur la photo. Elles ne remplacent pas le titre : elles disent en
+ *  un coup d'œil que l'app couvre le trajet entier, pas juste la
+ *  recherche. */
+const CAPACIDADES = [
+  { icon: "car", label: "Reservar un puesto" },
+  { icon: "plus", label: "Publicar tu viaje" },
+  { icon: "chat", label: "Hablar sin dar tu número" },
+  { icon: "shield", label: "Viajar con gente verificada" },
+] as const;
+
+export function Entrar({
+  onCorreo,
+  onCerrar,
+  /** Le titre change selon la porte par laquelle on arrive : entrer dans
+   *  l'app n'est pas la même demande que « je viens de toucher Perfil ».
+   *  Un écran de connexion qui ne dit pas POURQUOI il s'affiche se lit
+   *  comme un mur. */
+  motivo,
+}: {
+  onCorreo: () => void;
+  /** Absent = pas de sortie (première ouverture d'une session). */
+  onCerrar?: () => void;
+  motivo?: string;
+}) {
   const [estado, setEstado] = useState<Estado>(null);
   const [cargando, setCargando] = useState<string | null>(null);
 
@@ -97,70 +130,131 @@ export function Entrar({ onCorreo }: { onCorreo: () => void }) {
   }
 
   return (
-    <div className="flex min-h-[100dvh] flex-col bg-ink-50 px-6 pt-[calc(28px+env(safe-area-inset-top))] pb-[calc(24px+env(safe-area-inset-bottom))]">
-      <div className="entra-app flex flex-1 flex-col justify-center">
-        <Logo gradientId="brand-entrar" />
+    <div className="flex min-h-[100dvh] flex-col bg-white">
+      {/* LA PHOTO — elle occupe le haut, elle est coupée par la feuille. */}
+      <div className="relative min-h-0 flex-1">
+        <Photo
+          photo={PHOTOS.carroLleno}
+          sizes="100vw"
+          priority
+          fill
+          imgClassName="object-cover object-[50%_38%]"
+        />
+        {/* Un dégradé bas : sans lui, les pictogrammes blancs tombent
+            parfois sur une zone claire de la photo et disparaissent. */}
+        <span
+          aria-hidden
+          className="absolute inset-x-0 bottom-0 h-40 bg-[linear-gradient(to_top,rgba(20,16,12,0.55),transparent)]"
+        />
 
-        <h1 className="mt-8 font-display text-[34px] leading-[1.05] font-extrabold tracking-[-0.035em]">
-          Alguien ya va
-          <br />
-          <span className="text-naranja">para allá.</span>
-        </h1>
-        <p className="mt-3 max-w-[30ch] text-[15.5px] leading-relaxed text-ink-500">
-          Comparte el carro y los gastos entre Ciudad de Panamá y el interior.
-          Entra para reservar tu puesto o publicar tu viaje.
-        </p>
-      </div>
-
-      <div className="entra-app grid gap-2.5" style={{ ["--paso" as string]: 1 }}>
-        <button
-          type="button"
-          onClick={onCorreo}
-          className="flex h-[54px] items-center justify-center rounded-[16px] bg-naranja px-6 font-display text-[16.5px] font-bold text-white transition-colors hover:bg-naranja-hondo"
-        >
-          Continuar con correo
-        </button>
-
-        <div className="my-1 flex items-center gap-3 text-[12.5px] text-ink-400">
-          <span className="h-px flex-1 bg-ink-200" />o
-          <span className="h-px flex-1 bg-ink-200" />
-        </div>
-
-        <button
-          type="button"
-          onClick={() => void social("google")}
-          disabled={cargando !== null}
-          className="flex h-[54px] items-center justify-center gap-3 rounded-[16px] border-[1.5px] border-ink-200 bg-white px-6 text-[15.5px] font-semibold transition-colors hover:border-ink-300 disabled:opacity-60"
-        >
-          <GoogleGlyph />
-          {cargando === "google" ? "Abriendo Google…" : "Continuar con Google"}
-        </button>
-
-        <button
-          type="button"
-          onClick={() => void social("linkedin_oidc")}
-          disabled={cargando !== null}
-          className="flex h-[54px] items-center justify-center gap-3 rounded-[16px] border-[1.5px] border-ink-200 bg-white px-6 text-[15.5px] font-semibold transition-colors hover:border-ink-300 disabled:opacity-60"
-        >
-          <LinkedInGlyph />
-          {cargando === "linkedin_oidc"
-            ? "Abriendo LinkedIn…"
-            : "Continuar con LinkedIn"}
-        </button>
-
-        {estado && (
-          <p
-            role="alert"
-            className="mt-1 flex items-start gap-2 rounded-[12px] bg-danger-soft px-3.5 py-2.5 text-[13.5px] leading-snug text-danger"
+        {onCerrar && (
+          /* LA CROIX, EN HAUT À GAUCHE — demande explicite du
+             propriétaire, et c'est aussi la convention : à gauche on
+             quitte, à droite on agit. En verre, pour rester lisible quelle
+             que soit la photo derrière. */
+          <button
+            type="button"
+            onClick={onCerrar}
+            aria-label="Seguir sin cuenta"
+            className="glass absolute top-[calc(14px+env(safe-area-inset-top))] left-4 z-10 flex size-11 items-center justify-center rounded-full"
           >
-            <Icon name="shield" className="mt-0.5 size-4 shrink-0" />
-            {estado.texto}
-          </p>
+            <Icon name="cross" className="size-5" />
+          </button>
         )}
 
-        <p className="mt-2 text-center text-[12.5px] leading-snug text-ink-400">
-          Buscar viajes y calcular el aporte no necesita cuenta.
+        <ul className="absolute inset-x-0 bottom-5 z-10 flex items-center justify-center gap-2.5">
+          {CAPACIDADES.map((c) => (
+            <li key={c.label}>
+              <span
+                title={c.label}
+                className="glass flex size-11 items-center justify-center rounded-full text-ink-900"
+              >
+                <Icon name={c.icon} className="size-[19px]" title={c.label} />
+              </span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {/* LA FEUILLE — elle monte par-dessus la photo, coins arrondis. */}
+      <div className="relative z-20 -mt-6 rounded-t-[26px] bg-white px-6 pt-7 pb-[calc(22px+env(safe-area-inset-bottom))]">
+        <h1 className="font-display text-[27px] leading-[1.12] font-extrabold tracking-[-0.035em]">
+          {motivo ?? (
+            <>
+              Alguien ya va <span className="text-naranja">para allá</span>
+            </>
+          )}
+        </h1>
+        <p className="mt-2 text-[14.5px] leading-snug text-ink-500">
+          Comparte el carro y los gastos entre Ciudad de Panamá y el interior.
         </p>
+
+        <div className="mt-5 grid gap-2.5">
+          <button
+            type="button"
+            onClick={onCorreo}
+            className="flex h-[54px] items-center justify-center rounded-full bg-naranja px-6 font-display text-[16.5px] font-bold text-white transition-colors hover:bg-naranja-hondo"
+          >
+            Crear cuenta
+          </button>
+
+          {/* CONNEXION EN SECOND, et en lien : celui qui a déjà un compte
+              sait le trouver ; celui qui n'en a pas doit voir d'abord la
+              porte qui le concerne. */}
+          <button
+            type="button"
+            onClick={onCorreo}
+            className="flex h-[46px] items-center justify-center rounded-full font-display text-[15.5px] font-bold text-naranja transition-colors hover:bg-naranja-suave"
+          >
+            Iniciar sesión
+          </button>
+
+          <div className="my-0.5 flex items-center gap-3 text-[12.5px] text-ink-400">
+            <span className="h-px flex-1 bg-ink-200" />o
+            <span className="h-px flex-1 bg-ink-200" />
+          </div>
+
+          <div className="grid grid-cols-2 gap-2.5">
+            <button
+              type="button"
+              onClick={() => void social("google")}
+              disabled={cargando !== null}
+              className="flex h-[50px] items-center justify-center gap-2.5 rounded-full border-[1.5px] border-ink-200 bg-white text-[14.5px] font-semibold transition-colors hover:border-ink-300 disabled:opacity-60"
+            >
+              <GoogleGlyph />
+              {cargando === "google" ? "Abriendo…" : "Google"}
+            </button>
+            <button
+              type="button"
+              onClick={() => void social("linkedin_oidc")}
+              disabled={cargando !== null}
+              className="flex h-[50px] items-center justify-center gap-2.5 rounded-full border-[1.5px] border-ink-200 bg-white text-[14.5px] font-semibold transition-colors hover:border-ink-300 disabled:opacity-60"
+            >
+              <LinkedInGlyph />
+              {cargando === "linkedin_oidc" ? "Abriendo…" : "LinkedIn"}
+            </button>
+          </div>
+
+          {estado && (
+            <p
+              role="alert"
+              className="mt-1 flex items-start gap-2 rounded-[12px] bg-danger-soft px-3.5 py-2.5 text-[13.5px] leading-snug text-danger"
+            >
+              <Icon name="shield" className="mt-0.5 size-4 shrink-0" />
+              {estado.texto}
+            </p>
+          )}
+
+          {onCerrar && (
+            <button
+              type="button"
+              onClick={onCerrar}
+              className="mt-1 text-center text-[13.5px] font-semibold text-ink-500 underline-offset-2 hover:underline"
+            >
+              Solo quiero buscar viajes
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );

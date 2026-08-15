@@ -1202,17 +1202,19 @@ html.app-instalada .sky {
   padding-top: 0;
 }
 
-/* La barre d'onglets couvre le bas de l'écran : sans cette réserve, le
-   dernier élément de chaque page finit dessous. `safe-area-inset-bottom`
-   ajoute la barre d'accueil de l'iPhone, qui n'est pas une invention — un
-   bouton posé dessus est inatteignable. */
+/* La barre d'onglets FLOTTE au-dessus du bas de l'écran : sans cette
+   réserve, le dernier élément de chaque page finit dessous. Elle vaut la
+   hauteur de la pilule (64) + ce qui la décolle du bord (10) + une
+   respiration (10), plus `safe-area-inset-bottom` — la barre d'accueil
+   de l'iPhone n'est pas une invention, un bouton posé dessus est
+   inatteignable. */
 @media (display-mode: standalone) {
   body {
-    padding-bottom: calc(64px + env(safe-area-inset-bottom));
+    padding-bottom: calc(84px + env(safe-area-inset-bottom));
   }
 }
 html.app-instalada body {
-  padding-bottom: calc(64px + env(safe-area-inset-bottom));
+  padding-bottom: calc(84px + env(safe-area-inset-bottom));
 }
 
 /* ===========================================================================

@@ -253,7 +253,7 @@ export function Viaje({ trip, corridor }: { trip: Trip; corridor: Corridor }) {
 
       {/* LA BARRE DE RÉSERVATION. Elle est au-dessus de la barre
           d'onglets — sur cet écran, l'action est réserver, pas naviguer. */}
-      <div className="fixed inset-x-0 bottom-0 z-[60] border-t border-ink-200 bg-white/95 px-4 pt-3 backdrop-blur-md" style={{ paddingBottom: "calc(12px + env(safe-area-inset-bottom))" }}>
+      <div className="glass fixed inset-x-0 bottom-0 z-[60] rounded-t-[22px] px-4 pt-3" style={{ paddingBottom: "calc(12px + env(safe-area-inset-bottom))" }}>
         <div className="mx-auto flex w-full max-w-[520px] items-center gap-3">
           <span className="min-w-0">
             <span className="tnum block font-display text-[21px] leading-none font-extrabold">
@@ -279,7 +279,7 @@ export function Viaje({ trip, corridor }: { trip: Trip; corridor: Corridor }) {
             </Dialog.Trigger>
             <Dialog.Portal>
               <Dialog.Overlay className="fixed inset-0 z-[70] bg-ink-900/45" />
-              <Dialog.Content className="hoja-abajo fixed inset-x-0 bottom-0 z-[80] max-h-[92vh] overflow-y-auto rounded-t-[24px] bg-ink-50 p-4">
+              <Dialog.Content className="hoja-abajo glass fixed inset-x-0 bottom-0 z-[80] max-h-[92vh] overflow-y-auto rounded-t-[24px] p-4">
                 <div className="mx-auto w-full max-w-[520px]">
                   <div className="mb-3 flex items-center justify-between gap-3">
                     <Dialog.Title className="font-display text-[18px] font-bold">

@@ -91,19 +91,36 @@ export function Inicio() {
           </span>
         </span>
         <span className="flex items-center gap-1.5">
+          {/* LA CLOCHE MÈNE À MIS VIAJES — décision du propriétaire, et
+              elle est juste : nos seules notifications parlent d'une
+              reserva (le conducteur a accepté, un message est arrivé, le
+              départ approche). Un écran d'avis séparé qui ne ferait que
+              renvoyer vers le viaje serait un détour de plus. */}
           <Link
             href="/cuenta"
-            aria-label="Avisos"
+            aria-label="Mis viajes y avisos"
             className="flex size-10 items-center justify-center rounded-full text-ink-500 transition-colors hover:bg-ink-100"
           >
             <Icon name="bell" className="size-[21px]" />
           </Link>
+          {/* SANS COMPTE, PAS D'INITIALE INVENTÉE. Un rond vert avec un
+              « ? » se lit comme un compte cassé ; une silhouette se lit
+              comme « entre ». Le lien est le même — la porte s'occupe du
+              reste. */}
           <Link
             href="/cuenta?panel=perfil"
-            aria-label="Mi perfil"
-            className="flex size-10 items-center justify-center rounded-full bg-verde-perfil font-display text-[15px] font-bold text-white"
+            aria-label={nombre ? "Mi perfil" : "Entrar en mi cuenta"}
+            className={`flex size-10 items-center justify-center rounded-full font-display text-[15px] font-bold ${
+              nombre
+                ? "bg-verde-perfil text-white"
+                : "border-[1.5px] border-ink-200 bg-white text-ink-500"
+            }`}
           >
-            {(nombre?.[0] ?? "?").toUpperCase()}
+            {nombre ? (
+              nombre[0].toUpperCase()
+            ) : (
+              <Icon name="user" className="size-[19px]" />
+            )}
           </Link>
         </span>
       </header>

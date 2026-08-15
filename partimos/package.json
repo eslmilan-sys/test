@@ -16,6 +16,7 @@
     "verify:viaje": "node scripts/verify-viaje.mjs",
     "verify:cuenta": "node scripts/verify-cuenta.mjs",
     "verify:paginas": "node scripts/verify-paginas.mjs",
+    "verify:puerta": "node scripts/verify-puerta.mjs",
     "verify:geo": "node scripts/verify-geo.mjs"
   },
   "dependencies": {
