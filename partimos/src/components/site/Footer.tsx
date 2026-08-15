@@ -37,7 +37,13 @@ export function Footer() {
   return (
     <footer className="mt-5 bg-night-900 pt-13 pb-8 text-night-300">
       <div className="mx-auto w-full max-w-[1120px] px-5">
-        <div className="mb-9 grid gap-8 md:grid-cols-[1.6fr_1fr_1fr_1fr]">
+        {/* LE PLAN DU SITE EST `solo-web`. Quatre colonnes de liens et le
+            catalogue des rutas servent le référencement et le visiteur qui
+            explore ; dans l'app, la barre d'onglets mène déjà où il faut, et
+            ce pavé ne serait qu'un mur à faire défiler après chaque écran.
+            La mention légale, elle, reste partout — c'est le §8, pas une
+            préférence de mise en page. */}
+        <div className="solo-web mb-9 grid gap-8 md:grid-cols-[1.6fr_1fr_1fr_1fr]">
           <div>
             <Link
               href="/"
@@ -79,7 +85,10 @@ export function Footer() {
 
         {/* Maillage interne : chaque page pointe vers tous les corridors.
             C'est ce qui fait remonter les pages SEO les unes les autres. */}
-        <nav aria-label="Rutas" className="mb-8 border-t border-white/10 pt-7">
+        <nav
+          aria-label="Rutas"
+          className="solo-web mb-8 border-t border-white/10 pt-7"
+        >
           <h2 className="mb-3 font-display text-sm font-bold text-white">
             Rutas populares
           </h2>
@@ -96,6 +105,33 @@ export function Footer() {
             ))}
           </ul>
         </nav>
+
+        {/* Dans l'app, les deux pages légales ne sont plus atteignables par
+            le plan du site qu'on vient de masquer. Elles reviennent ici, en
+            une ligne : masquer un lien de navigation est une décision de
+            confort, rendre un texte légal introuvable n'en est pas une. */}
+        {/* `solo-app` sur un CONTENEUR, pas sur la liste elle-même : la règle
+            qui la révèle rend son `display` au navigateur, ce qui écraserait
+            le `flex` de la liste et empilerait les trois liens l'un sous
+            l'autre. Le conteneur est un bloc, la liste garde sa disposition. */}
+        <div className="solo-app">
+          <ul className="mb-5 flex flex-wrap gap-x-5 gap-y-1.5 text-[13px]">
+            {[
+              { href: "/terminos", label: "Términos" },
+              { href: "/privacidad", label: "Privacidad" },
+              { href: "/seguridad", label: "Seguridad" },
+            ].map((l) => (
+              <li key={l.href}>
+                <Link
+                  href={l.href}
+                  className="py-1 transition-colors hover:text-white"
+                >
+                  {l.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
 
         {/* Mention légale obligatoire sur toutes les pages (§8 du brief). */}
         <div className="flex flex-wrap items-start justify-between gap-5 border-t border-white/12 pt-6">

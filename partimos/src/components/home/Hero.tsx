@@ -80,12 +80,28 @@ export function Hero() {
           aplat, et un aplat flouté reste un aplat. */}
       <span aria-hidden className="halos" />
       {/* Les orbes WebGL par-dessus les halos : c'est ce que le verre floute.
-          Sous 768 px et sans WebGL, les halos seuls font le travail. */}
-      <HeroScene />
+          Sous 768 px et sans WebGL, les halos seuls font le travail.
+          Coupés dans l'app : une scène WebGL qui tourne pour décorer un
+          écran qu'on ouvre vingt fois par jour, c'est de la batterie
+          dépensée à ne rien dire. Les halos CSS restent. */}
+      <div className="solo-web">
+        <HeroScene />
+      </div>
 
       <div className="relative z-[2] mx-auto w-full max-w-[1120px] px-5 pt-6 md:pt-20">
+        {/* DANS L'APP, IL NE RESTE QUE LA CARTE DE RECHERCHE.
+            Le titre, l'accroche et les quatre preuves sont de la vente :
+            utiles à qui découvre, du remplissage à qui a installé. La
+            carte, elle, est l'outil — elle garde sa place, et une seule
+            question la précède. Un mot sur la carte de recherche ELLE-MÊME
+            plutôt qu'un second exemplaire : ses champs ont des `id` fixes
+            (`desde`, `hacia`, `fecha`), et deux exemplaires dans la même
+            page casseraient les `label` des deux. */}
+        <p className="solo-app mb-4 font-display text-[26px] leading-tight font-extrabold tracking-[-0.03em]">
+          ¿Para dónde vas?
+        </p>
         <div className="flex flex-col min-[960px]:grid min-[960px]:grid-cols-[1.08fr_0.92fr] min-[960px]:items-start min-[960px]:gap-x-16 min-[960px]:gap-y-8">
-          <div className="order-1 min-[960px]:col-start-1 min-[960px]:row-start-1">
+          <div className="solo-web order-1 min-[960px]:col-start-1 min-[960px]:row-start-1">
             {/* La pilule est revenue avec une RAISON d'exister : annoncer le
                 lancement. La version d'avant disait une évidence permanente
                 (« salidas todos los días ») — un badge sans nouvelle est du
@@ -150,7 +166,7 @@ export function Hero() {
             </div>
           </div>
 
-          <ul className="enter enter-4 order-3 mt-8 grid grid-cols-2 border-t border-ink-200 min-[960px]:col-start-1 min-[960px]:row-start-2 min-[960px]:mt-0">
+          <ul className="solo-web enter enter-4 order-3 mt-8 grid grid-cols-2 border-t border-ink-200 min-[960px]:col-start-1 min-[960px]:row-start-2 min-[960px]:mt-0">
             {PROOF.map((item, index) => (
               <li
                 key={item.title}
@@ -177,7 +193,9 @@ export function Hero() {
           </ul>
         </div>
 
-        <LiveStrip />
+        <div className="solo-web">
+          <LiveStrip />
+        </div>
       </div>
     </div>
   );

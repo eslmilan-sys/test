@@ -6,6 +6,7 @@ import { PageView } from "@/components/site/PageView";
 import { AuthLanding } from "@/components/site/AuthLanding";
 import { PWA } from "@/components/site/PWA";
 import { Footer } from "@/components/site/Footer";
+import { TabBar } from "@/components/site/TabBar";
 import { SessionProvider } from "@/lib/session";
 import { SITE, canonical } from "@/lib/site";
 import "./globals.css";
@@ -145,7 +146,13 @@ export default function RootLayout({
         </svg>
 
         <SessionProvider>
-          <Nav />
+          {/* La barre haute est celle du SITE. Dans l'app, la barre
+              d'onglets basse la remplace : deux navigations pour quatre
+              destinations, c'est une de trop, et celle du haut est la
+              moins atteignable au pouce. */}
+          <div className="solo-web">
+            <Nav />
+          </div>
           {/* Le retour du lien du courriel : muet sur une visite normale. */}
           <AuthLanding />
           {children}
@@ -156,6 +163,11 @@ export default function RootLayout({
           </Suspense>
           {/* L'app installée : service worker, hors-ligne, mises à jour. */}
           <PWA />
+          {/* Toujours dans le HTML, montrée par CSS seulement une fois
+              l'app installée — voir `.solo-app` dans globals.css. */}
+          <Suspense fallback={null}>
+            <TabBar />
+          </Suspense>
         </SessionProvider>
         <script
           type="application/ld+json"

@@ -22,6 +22,29 @@ import { useEffect } from "react";
  * du domaine, où il n'y a rien.
  */
 export function PWA() {
+  /**
+   * L'APP INSTALLÉE SE RECONNAÎT — pour les iPhone que la requête média
+   * ne couvre pas.
+   *
+   * `@media (display-mode: standalone)` fait tout le travail sur Android,
+   * sur Chrome de bureau et sur iOS ≥ 16.4. En dessous, Safari ne
+   * l'implémente pas et ne connaît que `navigator.standalone`, une
+   * propriété non standard qui n'existe que chez lui. Une classe sur
+   * <html> rejoint les deux chemins sur les mêmes règles CSS.
+   *
+   * Posé dans un effet, donc après l'hydratation : le HTML rendu par le
+   * serveur reste identique pour tout le monde — c'est ce qui garde le
+   * SEO intact, et l'app mode ne coûte rien à personne d'autre.
+   */
+  useEffect(() => {
+    const iosInstalada =
+      "standalone" in navigator &&
+      (navigator as Navigator & { standalone?: boolean }).standalone === true;
+    if (iosInstalada) {
+      document.documentElement.classList.add("app-instalada");
+    }
+  }, []);
+
   useEffect(() => {
     if (!("serviceWorker" in navigator)) return;
 

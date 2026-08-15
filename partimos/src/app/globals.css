@@ -1031,3 +1031,65 @@
     animation-name: none !important;
   }
 }
+
+/* ===========================================================================
+   MODE APP INSTALLÉE
+   ===========================================================================
+
+   Installée sur l'écran d'accueil, Partimos ne doit plus être une page qui
+   vend : la personne a déjà installé, l'argumentaire a fait son travail. Il
+   reste un outil — chercher, réserver, retrouver ses viajes.
+
+   TOUT SE JOUE EN CSS, ET C'EST LA DÉCISION IMPORTANTE. La tentation était
+   de détecter le mode en JavaScript et de rendre un autre arbre. Ça aurait
+   violé la règle de la maison — « ne jamais concevoir d'abord pour le mobile
+   natif : le SEO est le canal principal » : le HTML servi aurait dépendu du
+   client, et un robot d'indexation n'a pas de `display-mode`. Ici le HTML
+   est identique pour tout le monde, Google reçoit la page marketing entière,
+   et seul l'affichage change chez qui a installé. Aucun surcoût de rendu,
+   aucun clignotement d'hydratation.
+
+   `display-mode: standalone` couvre Android, Chrome de bureau et iOS ≥ 16.4.
+   Pour les iPhone plus anciens, `PWA.tsx` pose la classe `.app-instalada`
+   sur <html> à partir de `navigator.standalone` — même effet, une ligne. */
+
+/* ATTENTION EN POSANT `.solo-app` : la règle qui révèle l'élément REND son
+   `display` au navigateur (`revert`). Sur un élément qui compte sur une
+   classe utilitaire de disposition — `flex`, `grid` — cette classe est donc
+   écrasée, et la disposition retombe en `block`. Ça s'est vu une fois : les
+   trois liens légaux du pied de page se sont empilés au lieu de tenir sur
+   une ligne.
+   La parade est constante dans ce code : on pose `.solo-app` (et `.solo-web`)
+   sur un CONTENEUR neutre, et l'élément mis en forme vit dedans. */
+.solo-app {
+  display: none;
+}
+
+@media (display-mode: standalone) {
+  .solo-web {
+    display: none !important;
+  }
+  .solo-app {
+    display: revert;
+  }
+}
+
+html.app-instalada .solo-web {
+  display: none !important;
+}
+html.app-instalada .solo-app {
+  display: revert;
+}
+
+/* La barre d'onglets couvre le bas de l'écran : sans cette réserve, le
+   dernier élément de chaque page finit dessous. `safe-area-inset-bottom`
+   ajoute la barre d'accueil de l'iPhone, qui n'est pas une invention — un
+   bouton posé dessus est inatteignable. */
+@media (display-mode: standalone) {
+  body {
+    padding-bottom: calc(64px + env(safe-area-inset-bottom));
+  }
+}
+html.app-instalada body {
+  padding-bottom: calc(64px + env(safe-area-inset-bottom));
+}
