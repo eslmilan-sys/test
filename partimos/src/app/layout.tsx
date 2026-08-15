@@ -4,6 +4,7 @@ import { Gabarito, Nunito_Sans } from "next/font/google";
 import { Nav } from "@/components/site/Nav";
 import { PageView } from "@/components/site/PageView";
 import { AuthLanding } from "@/components/site/AuthLanding";
+import { PWA } from "@/components/site/PWA";
 import { Footer } from "@/components/site/Footer";
 import { SessionProvider } from "@/lib/session";
 import { SITE, canonical } from "@/lib/site";
@@ -30,6 +31,9 @@ const nunito = Nunito_Sans({
   display: "swap",
 });
 
+/* Le préfixe d'URL du dépôt, pour les ressources écrites en dur. */
+const ICONO = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
   title: {
@@ -54,6 +58,34 @@ export const metadata: Metadata = {
       "Te recogen cerca, vas sentado todo el camino y pagas como prefieras: Yappy, tarjeta o efectivo. El aporte le llega completo al conductor.",
   },
   robots: { index: true, follow: true },
+  /* iOS ne lit PAS le manifeste pour le mode plein écran ni pour l'icône :
+     il lui faut ses propres balises. Sans elles, « Ajouter à l'écran
+     d'accueil » produit un signet qui rouvre Safari, barre comprise —
+     c'est-à-dire tout sauf une app. */
+  appleWebApp: {
+    capable: true,
+    title: "Partimos",
+    statusBarStyle: "default",
+  },
+  icons: {
+    /* LE PRÉFIXE DU DÉPÔT, ÉCRIT À LA MAIN. Next n'applique pas le
+       `basePath` aux URLs d'icônes : « /icono-180.png » viserait la racine
+       du domaine, où il n'y a rien. Le test l'avait raté parce que le
+       serveur d'essai servait les deux chemins — corrigé aussi. */
+    icon: [
+      { url: `${ICONO}/icono-192.png`, sizes: "192x192", type: "image/png" },
+      { url: `${ICONO}/icono-512.png`, sizes: "512x512", type: "image/png" },
+    ],
+    apple: [
+      { url: `${ICONO}/icono-180.png`, sizes: "180x180", type: "image/png" },
+    ],
+  },
+  other: {
+    /* iOS < 16.4 ne connaît QUE la balise préfixée `apple-`. Next n'émet
+       plus que la version moderne ; sans celle-ci, un iPhone un peu ancien
+       installe un signet qui rouvre Safari au lieu d'une app. */
+    "apple-mobile-web-app-capable": "yes",
+  },
 };
 
 export const viewport: Viewport = {
@@ -122,6 +154,8 @@ export default function RootLayout({
           <Suspense fallback={null}>
             <PageView />
           </Suspense>
+          {/* L'app installée : service worker, hors-ligne, mises à jour. */}
+          <PWA />
         </SessionProvider>
         <script
           type="application/ld+json"
