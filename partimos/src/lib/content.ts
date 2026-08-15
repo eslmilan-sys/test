@@ -34,8 +34,8 @@ export const GENERAL_FAQ: Faq[] = [
     a: "Como prefieras, en este orden: Yappy en la app (recomendado, tarifa de servicio del 5%), tarjeta en la app (tarifa del 8%, por una pasarela certificada) o efectivo en la mano el día del viaje, sin tarifa. La tarifa paga la reserva protegida — comprobante, soporte y reembolso según las reglas de cancelación. En los tres casos el conductor recibe su aporte completo.",
   },
   {
-    q: "¿Cuándo veo el número del conductor?",
-    a: "Apenas confirmas tu reserva. Antes no aparece, para que los conductores no reciban llamadas de gente que al final no viaja. Con el número coordinas el punto exacto de recogida y cómo le vas a pagar.",
+    q: "¿Cómo hablo con el conductor?",
+    a: "Por el chat de tu reserva, que se abre apenas confirmas. Antes no existe, para que los conductores no reciban mensajes de gente que al final no viaja. Nadie da su celular: ahí coordinas el punto exacto de recogida y cómo le vas a pagar, y lo que acuerden queda escrito — un mensaje no se edita ni se borra, de los dos lados.",
   },
   {
     q: "¿El conductor gana dinero conmigo?",

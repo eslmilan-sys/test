@@ -37,7 +37,7 @@ const PASOS: { icon: IconName; title: string; body: string }[] = [
   {
     icon: "chat",
     title: "Reserva y coordinen",
-    body: "Reservar no cuesta nada. Al confirmar te aparece el número del conductor, y entre ustedes afinan la esquina exacta del encuentro.",
+    body: "Reservar no cuesta nada. Al confirmar se abre el chat con el conductor, y entre ustedes afinan la esquina exacta del encuentro.",
   },
   {
     icon: "car",

@@ -9,7 +9,7 @@ import type { Faq } from "@/lib/content";
 export const metadata: Metadata = {
   title: "Cómo se paga un viaje, paso a paso",
   description:
-    "Del primer clic al pago: buscas, reservas gratis, te aparece el número del conductor, coordinan el punto y le pagas a la persona el día del viaje, en efectivo o por Yappy.",
+    "Del primer clic al pago: buscas, reservas gratis, se abre el chat con el conductor, coordinan el punto y le pagas a la persona el día del viaje, en efectivo o por Yappy.",
   alternates: { canonical: canonical("/como-funciona") },
 };
 
@@ -53,7 +53,7 @@ const STEPS: Step[] = [
     icon: "chat",
     when: "Ahora",
     title: "Reservas tu puesto",
-    body: "Reservar es gratis. Pagas como prefieras: en la mano el día del viaje, o en la app con cobro protegido. Al confirmar, se te desbloquea el número del conductor.",
+    body: "Reservar es gratis. Pagas como prefieras: en la mano el día del viaje, o en la app con cobro protegido. Al confirmar, se abre el chat con el conductor.",
     money: "No pagas nada",
   },
   {

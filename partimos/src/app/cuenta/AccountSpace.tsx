@@ -193,7 +193,7 @@ export function AccountSpace() {
                 <Empty
                   icon="route"
                   title="Todavía no tienes viajes"
-                  body="Cuando reserves un puesto o publiques un viaje, aparecen aquí con la hora, el punto de recogida y el número de la otra persona."
+                  body="Cuando reserves un puesto o publiques un viaje, aparecen aquí con la hora, el punto de recogida y el chat para coordinar."
                   actions={
                     <>
                       <ButtonLink href="/ya">Buscar un viaje</ButtonLink>

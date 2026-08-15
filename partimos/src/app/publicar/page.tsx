@@ -199,8 +199,8 @@ export default function PublicarPage() {
                   </h3>
                   <p className="text-sm leading-relaxed text-ink-500">
                     Nadie reserva sin cédula verificada. Ves el perfil y las
-                    calificaciones antes de aceptar, y su número solo se
-                    comparte con reserva confirmada.
+                    calificaciones antes de aceptar, y hablan por el chat de la
+                    reserva — sin dar tu celular a nadie.
                   </p>
                 </div>
               </div>

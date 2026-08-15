@@ -7,7 +7,7 @@ import { canonical } from "@/lib/site";
 export const metadata: Metadata = {
   title: "Ayuda y preguntas frecuentes",
   description:
-    "Cómo se paga, cuándo aparece el número del conductor, dónde te recogen, qué pasa si alguien cancela. Todo lo que se pregunta antes del primer viaje.",
+    "Cómo se paga, cómo hablas con el conductor, dónde te recogen, qué pasa si alguien cancela. Todo lo que se pregunta antes del primer viaje.",
   alternates: { canonical: canonical("/ayuda") },
 };
 

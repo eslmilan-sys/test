@@ -80,21 +80,28 @@ export function Pago() {
           se faire avoir. Le corail reste réservé à l'avertissement. */}
       <div className="mt-6.5 grid gap-3.5 md:grid-cols-2">
         <div className="glass flex items-start gap-3.5 rounded-[20px] px-5.5 py-5 [--glass-alpha:0.82]">
+          {/* CETTE CARTE PROMETTAIT LE NUMÉRO DU CONDUCTEUR.
+              Elle est devenue fausse le jour où le chat l'a remplacé : on
+              ne débloque plus aucun numéro, ni au moment de réserver ni
+              après. La laisser telle quelle, c'était vendre sur la page
+              d'accueil quelque chose que le produit ne fait plus. */}
           <span className="flex size-8 shrink-0 items-center justify-center rounded-[10px] bg-ink-100">
-            <Icon name="phone" className="size-4.5" />
+            <Icon name="chat" className="size-4.5" />
           </span>
           <div>
             <h3 className="mb-1.5 font-display text-[17px] font-bold">
-              El número del conductor aparece al reservar
+              Se coordina por el chat de la reserva
             </h3>
             <p className="text-[14.5px] leading-relaxed text-ink-500">
-              Para coordinar el punto exacto y el pago, necesitas hablar con la
-              persona. Por eso su número se desbloquea apenas confirmas tu
-              puesto — antes no, para que nadie reciba llamadas de quien no va a
-              viajar con él.
+              Para acordar el punto exacto y la hora, hablas con la persona
+              desde el chat, que se abre apenas reservas — antes no, para que
+              nadie reciba mensajes de quien no va a viajar con él. Nadie da su
+              celular, y lo que acuerden queda escrito: un mensaje no se edita
+              ni se borra, de los dos lados.
             </p>
-            <span className="tnum mt-2.5 inline-flex items-center gap-2 rounded-[10px] bg-ink-100 px-3 py-1.5 text-[13.5px] font-semibold">
-              Ana M. · +507 6XXX-4471
+            <span className="mt-2.5 inline-flex items-center gap-2 rounded-[10px] bg-ink-100 px-3 py-1.5 text-[13.5px] font-semibold">
+              <Icon name="chat" className="size-4" />
+              Chat con Ana M.
             </span>
           </div>
         </div>
