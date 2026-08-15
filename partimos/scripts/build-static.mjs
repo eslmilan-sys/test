@@ -15,7 +15,14 @@
  */
 
 import { spawnSync } from "node:child_process";
-import { existsSync, renameSync, writeFileSync, rmSync } from "node:fs";
+import {
+  existsSync,
+  readFileSync,
+  readdirSync,
+  renameSync,
+  writeFileSync,
+  rmSync,
+} from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -28,6 +35,30 @@ function restore() {
     if (existsSync(apiDir)) rmSync(apiDir, { recursive: true, force: true });
     renameSync(parked, apiDir);
   }
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   LE PRÉFIXE DOIT ÊTRE UNE DÉCISION, PAS UN OUBLI.
+
+   Un export construit sans `BASE_PATH` demande `/_next/...`, c'est-à-dire
+   la racine du domaine. Servi depuis `/test/partimos/`, chaque CSS et
+   chaque JS renvoie 404 — et la page s'affiche en Times New Roman avec
+   des puces, sans une seule erreur au build. Ça s'est produit, deux
+   déploiements de suite, et la seule façon de s'en apercevoir a été
+   d'ouvrir le site sur un téléphone.
+
+   On distingue donc « BASE_PATH oublié » de « BASE_PATH vide, à
+   dessein » : `"BASE_PATH" in process.env` est vrai pour `BASE_PATH=`,
+   faux quand la variable n'existe pas. Publier à la racine reste
+   possible ; l'oublier ne l'est plus.
+   ════════════════════════════════════════════════════════════════════ */
+if (!("BASE_PATH" in process.env)) {
+  console.error(
+    "\nBASE_PATH n'est pas défini.\n\n" +
+      "  Pour GitHub Pages ici :   npm run build:pages\n" +
+      "  Pour un domaine racine :  BASE_PATH= npm run build:static\n",
+  );
+  process.exit(1);
 }
 
 process.on("exit", restore);
@@ -65,4 +96,59 @@ if (!existsSync(notFound)) {
   );
 }
 
-console.log("\nExport statique prêt dans out/");
+/* ════════════════════════════════════════════════════════════════════
+   LE CONTRÔLE DU PRÉFIXE — le seul qui ait déjà mis le site en ligne à
+   terre.
+
+   Ce qui s'est passé : un export construit SANS `BASE_PATH` demande
+   `/_next/...`, c'est-à-dire la racine du domaine. Servi depuis
+   `/test/partimos/`, chaque CSS et chaque JS renvoie 404 — et la page
+   s'affiche en Times New Roman avec des puces, sans une seule erreur
+   au build. Rien, dans les mille lignes de sortie de `next build`, ne
+   le signale.
+
+   Le contrôle est donc ici, sur le HTML PRODUIT, et il fait échouer le
+   build : un export au mauvais préfixe ne doit jamais atteindre le
+   dossier `out/`, parce que la seule façon de s'en apercevoir ensuite
+   est d'ouvrir le site sur son téléphone.
+   ════════════════════════════════════════════════════════════════════ */
+const prefijo = process.env.BASE_PATH ?? "";
+
+/** Toutes les pages exportées, en descendant `out/`. */
+function paginas(dir) {
+  const out = [];
+  for (const entrada of readdirSync(dir, { withFileTypes: true })) {
+    const camino = join(dir, entrada.name);
+    if (entrada.isDirectory()) {
+      if (entrada.name === "_next") continue;
+      out.push(...paginas(camino));
+    } else if (entrada.name.endsWith(".html")) {
+      out.push(camino);
+    }
+  }
+  return out;
+}
+
+const esperado = `"${prefijo}/_next/`;
+const fautives = paginas(join(root, "out")).filter((f) => {
+  const html = readFileSync(f, "utf8");
+  if (!html.includes("/_next/")) return false;
+  return !html.includes(esperado);
+});
+
+if (fautives.length > 0) {
+  console.error(
+    `\nBASE_PATH est « ${prefijo || "(vide)" } », mais ${fautives.length} page(s) ` +
+      `ne demandent pas leurs fichiers sous « ${prefijo}/_next/ ».`,
+  );
+  console.error(fautives.slice(0, 5).map((f) => `  · ${f}`).join("\n"));
+  console.error(
+    "\nServi depuis un sous-dossier, ce site s'affichera sans styles.\n" +
+      "Pour GitHub Pages ici :  BASE_PATH=/test/partimos npm run build:static\n",
+  );
+  process.exit(1);
+}
+
+console.log(
+  `\nExport statique prêt dans out/ — fichiers servis depuis « ${prefijo || "/"} ».`,
+);

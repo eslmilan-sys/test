@@ -9,6 +9,7 @@
     "lint": "eslint",
     "test": "node --test --experimental-strip-types 'src/**/*.test.ts'",
     "build:static": "node scripts/build-static.mjs",
+    "build:pages": "BASE_PATH=/test/partimos node scripts/build-static.mjs",
     "verify:sw": "node scripts/verify-sw.mjs",
     "verify:app": "node scripts/verify-app.mjs",
     "verify:buscar": "node scripts/verify-buscar.mjs",
