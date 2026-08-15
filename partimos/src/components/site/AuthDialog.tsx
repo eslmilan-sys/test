@@ -77,7 +77,23 @@ function AppleMark({ className = "size-4.5" }: { className?: string }) {
 const pill =
   "rounded-full border border-white/15 bg-white/10 text-white transition-colors";
 
-export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
+/**
+ * `open` / `onOpenChange` sont FACULTATIFS : sans eux le dialogue se
+ * pilote lui-même par son déclencheur, comme partout sur le site. L'app
+ * installée, elle, l'ouvre depuis son écran d'entrée — elle a besoin de
+ * le commander de l'extérieur. Rendre le composant contrôlable coûte
+ * trois lignes ; le dupliquer aurait fait diverger deux copies de toute
+ * la logique de quota, de canal et de messages d'erreur.
+ */
+export function AuthDialog({
+  trigger,
+  open,
+  onOpenChange,
+}: {
+  trigger: React.ReactNode;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}) {
   const id = useId();
   const { signIn } = useSession();
 
@@ -480,8 +496,14 @@ export function AuthDialog({ trigger }: { trigger: React.ReactNode }) {
         : `tu celular ${e164} por SMS`;
 
   return (
-    <Dialog.Root onOpenChange={(open) => !open && reset()}>
-      <Dialog.Trigger asChild>{trigger}</Dialog.Trigger>
+    <Dialog.Root
+      open={open}
+      onOpenChange={(abierto) => {
+        if (!abierto) reset();
+        onOpenChange?.(abierto);
+      }}
+    >
+      {trigger && <Dialog.Trigger asChild>{trigger}</Dialog.Trigger>}
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 z-[130] bg-night-950/70 backdrop-blur-[6px] motion-safe:animate-[fade-in_0.18s_ease-out]" />
         {/* Le fond de la carte est un DÉGRADÉ, pas un aplat : plus clair

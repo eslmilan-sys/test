@@ -1237,3 +1237,52 @@ html.app-instalada body {
     animation: fondoEntra 0.24s ease-out both;
   }
 }
+
+/* ===========================================================================
+   L'APP — la maquette du propriétaire
+   ===========================================================================
+
+   Le site garde sa palette. L'APP prend celle de la maquette : un orange
+   franc pour l'action, un vert profond pour le profil. Les deux vivent
+   côte à côte parce que les deux surfaces ont des métiers différents — le
+   site convainc un inconnu, l'app sert quelqu'un qui a déjà décidé.
+
+   L'orange n'est pas l'ambre du site (#f59e0b) : sur un écran de
+   téléphone tenu en plein soleil, l'ambre passe pour du jaune passé.
+   Celui-ci tient. Texte blanc dessus : 4,6:1 en 17 px gras — au-dessus du
+   seuil AA pour du texte large, qui est ce que porte un bouton d'action. */
+@theme {
+  --color-naranja: #e2540c;
+  --color-naranja-vivo: #f26419;
+  --color-naranja-hondo: #b8420a;
+  --color-naranja-suave: #fdeee5;
+  --color-verde-perfil: #1f4d2e;
+  --color-verde-ok: #1a7f45;
+  --color-verde-suave: #e6f4ea;
+}
+
+/* ---- L'écran de bienvenue ---- */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes bienvenidaFondo {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes bienvenidaSube {
+    from { opacity: 0; transform: translate3d(0, 18px, 0); }
+    to { opacity: 1; transform: none; }
+  }
+  @keyframes bienvenidaSale {
+    to { opacity: 0; transform: scale(1.04); }
+  }
+  /* Le fond entre, les trois lignes montent l'une après l'autre, puis
+     l'ensemble s'efface en s'écartant très légèrement — le geste dit
+     « je te laisse passer », pas « je disparais ». */
+  .bienvenida {
+    animation:
+      bienvenidaFondo 0.22s ease-out both,
+      bienvenidaSale 0.34s cubic-bezier(0.4, 0, 1, 1) 1.06s both;
+  }
+  .bienvenida-marca { animation: bienvenidaSube 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.06s both; }
+  .bienvenida-linea { animation: bienvenidaSube 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both; }
+  .bienvenida-nombre { animation: bienvenidaSube 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both; }
+}

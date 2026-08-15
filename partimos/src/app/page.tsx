@@ -1,6 +1,7 @@
 import { Hero } from "@/components/home/Hero";
 import { Hoy } from "@/components/app/Hoy";
 import { Saludo } from "@/components/app/Saludo";
+import { AppShell } from "@/components/app/AppShell";
 import { RutasFrecuentes } from "@/components/home/RutasFrecuentes";
 import { Pasos } from "@/components/home/Pasos";
 import { Pago } from "@/components/home/Pago";
@@ -27,6 +28,12 @@ export default function Home() {
             n'existent qu'en mode app : sur le site, l'accueil parle à un
             inconnu, et un salut nommé n'y aurait aucun sens.
             `--paso` donne à chaque bloc son rang dans l'ouverture. */}
+        {/* LA PORTE. Pas de compte → l'écran d'entrée par-dessus tout ;
+            compte + première ouverture → l'écran de bienvenue. Ne rend
+            rien sur le site, ni avant hydratation. */}
+        <div className="solo-app">
+          <AppShell />
+        </div>
         <div className="solo-app">
           <div style={{ ["--paso" as string]: 0 }}>
             <Saludo />
