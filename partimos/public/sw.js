@@ -38,7 +38,12 @@
 /* Changer ce numéro purge les anciens caches à l'activation. Il passe à v2
    parce que v1 contient des navigations mises en cache par la logique
    fautive — les garder, c'est garder le bug quelques jours de plus. */
-const CACHE = "partimos-v2";
+/* v3 : la version précédente a mis en cache un shell dont les CSS et les
+   JS pointaient vers la racine du domaine (build sans BASE_PATH). Changer
+   de nom purge ces entrées à l'activation — sans ça, quelqu'un qui a
+   ouvert le site pendant la panne garderait la page sans styles jusqu'à
+   ce qu'il désinstalle l'app. */
+const CACHE = "partimos-v3";
 
 /* 4 secondes. Au-delà, on considère que le réseau ment : sur un téléphone
    en bord de couverture, une requête peut « pendre » une minute sans jamais
