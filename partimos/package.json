@@ -12,6 +12,7 @@
     "verify:sw": "node scripts/verify-sw.mjs",
     "verify:app": "node scripts/verify-app.mjs",
     "verify:buscar": "node scripts/verify-buscar.mjs",
+    "verify:viaje": "node scripts/verify-viaje.mjs",
     "verify:geo": "node scripts/verify-geo.mjs"
   },
   "dependencies": {

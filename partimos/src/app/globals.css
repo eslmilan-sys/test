@@ -1236,6 +1236,21 @@ html.app-instalada body {
   .panel-fondo {
     animation: fondoEntra 0.24s ease-out both;
   }
+  /* LA FEUILLE DU BAS — celle de la réservation. Elle monte, alors que le
+     fil de discussion arrive de la droite : deux natures, deux gestes.
+     Une feuille se pose sur ce qu'on regarde sans le remplacer (on garde
+     la fiche viaje en tête), un panneau EST l'écran suivant. */
+  @keyframes hojaEntra {
+    from {
+      transform: translate3d(0, 100%, 0);
+    }
+    to {
+      transform: none;
+    }
+  }
+  .hoja-abajo {
+    animation: hojaEntra 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
 }
 
 /* ===========================================================================

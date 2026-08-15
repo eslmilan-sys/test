@@ -6,6 +6,7 @@ import { Container } from "@/components/site/Section";
 import { Icon } from "@/components/ui/Icon";
 import { Rating } from "@/components/ui/Rating";
 import { TripDetail } from "@/components/trip/TripDetail";
+import { Viaje } from "@/components/app/Viaje";
 import { getCorridor } from "@/lib/corridors";
 import { demoTripIds, getTrip } from "@/lib/trips";
 
@@ -39,7 +40,17 @@ export default async function TripPage({ params }: Params) {
 
   return (
     <main id="contenido" className="bg-ink-50 pb-16">
-      <Container className="pt-5">
+      {/* LA FICHE, VERSION APP. Même trajet, même moteur de prix, même
+          panneau de réservation — une autre mise en page, celle d'un
+          écran qu'on tient à la main. Le HTML servi contient les deux :
+          `.solo-app` / `.solo-web` ne choisissent qu'à l'affichage. */}
+      <div className="solo-app">
+        <Suspense fallback={<DetailSkeleton />}>
+          <Viaje trip={trip} corridor={corridor} />
+        </Suspense>
+      </div>
+
+      <Container className="solo-web pt-5">
         <nav
           aria-label="Ruta de navegación"
           className="mb-4 text-[13.5px] text-ink-500"

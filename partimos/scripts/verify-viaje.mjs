@@ -1,0 +1,196 @@
+#!/usr/bin/env node
+/**
+ * BATTERIE DE LA FICHE VIAJE ET DE LA RÉSERVATION — dans un vrai navigateur.
+ *
+ *   node scripts/verify-viaje.mjs [url]     (défaut : http://localhost:3100)
+ *
+ * Ce qu'elle protège :
+ *
+ *   · le SITE garde sa fiche large ; l'app a la sienne, et le HTML servi
+ *     contient les deux — la règle de la maison ;
+ *   · le TRONÇON de l'URL décide de tout : un lien Penonomé → Santiago ne
+ *     doit pas afficher le prix de Panamá → David ;
+ *   · le PRIX de la fiche est celui de la liste et celui de la feuille de
+ *     réservation — un seul moteur, trois affichages ;
+ *   · la feuille propose les TROIS canaux de paiement, et ne dit jamais
+ *     « gratis » ni « tarifa de reserva » (demande du propriétaire) ;
+ *   · aucun émoji dans l'interface.
+ */
+
+import { chromium, devices } from "playwright";
+
+const BASE = process.argv[2] ?? "http://localhost:3100";
+const CHROME = process.env.PLAYWRIGHT_CHROMIUM ?? "/opt/pw-browsers/chromium";
+
+let fallos = 0;
+const ok = (nom, cond, detalle = "") => {
+  console.log(`  ${cond ? "ok  " : "FALLA"}  ${nom}${detalle ? ` — ${detalle}` : ""}`);
+  if (!cond) fallos++;
+};
+
+const navegador = await chromium.launch({ executablePath: CHROME });
+
+/** Un viaje du jour, trouvé par la recherche elle-même : un identifiant
+ *  en dur périmerait la batterie au premier changement de calendrier. */
+const d = new Date();
+const HOY = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+
+async function primerViaje() {
+  const ctx = await navegador.newContext({ ...devices["iPhone 13"] });
+  const p = await ctx.newPage();
+  await p.goto(
+    `${BASE}/buscar?desde=panama-city&hacia=chitre&fecha=${HOY}&puestos=1`,
+    { waitUntil: "load" },
+  );
+  await p.locator(".solo-app header").first().waitFor({ state: "attached", timeout: 20_000 });
+  const carta = p.locator(".solo-app ul > li > a[href*='/viaje/']").first();
+  const href = await carta.getAttribute("href");
+  const precio = (((await carta.textContent()) ?? "").match(/\$\s?[\d.,]+/) ?? [""])[0];
+  await ctx.close();
+  return { href, precio };
+}
+
+async function abrir(href, { modo = "app" } = {}) {
+  const ctx = await navegador.newContext({ ...devices["iPhone 13"] });
+  const p = await ctx.newPage();
+  await p.goto(`${BASE}${href}`, { waitUntil: "load" });
+  /* On attend l'hydratation AVANT de forcer le mode app : `PWA.tsx`
+     repose la classe au montage et effacerait la nôtre. */
+  await p
+    .locator(".solo-app h2")
+    .first()
+    .waitFor({ state: "attached", timeout: 20_000 })
+    .catch(() => {});
+  if (modo === "app") {
+    await p.evaluate(() => document.documentElement.classList.add("app-instalada"));
+  }
+  await p.waitForTimeout(400);
+  return { ctx, p };
+}
+
+const app = (p) => p.locator(".solo-app").first();
+
+/** L'APORTE DU TRONÇON, lu dans SON bloc. Prendre « le premier montant
+ *  de la page » aurait attrapé le premier prix de la timeline — et le
+ *  test aurait mesuré autre chose que ce qu'il annonce. */
+const aporte = async (p) => {
+  const t = ((await app(p).textContent()) ?? "").replace(/\s+/g, " ");
+  return (t.match(/Aporte por puesto\s*(\$\s?[\d.,]+)/) ?? [null, ""])[1];
+};
+
+console.log(`\nViaje — ${BASE}\n`);
+
+const { href, precio } = await primerViaje();
+ok("on trouve un viaje depuis la recherche", Boolean(href), href ?? "aucun");
+
+/* 1. LE SITE garde sa fiche. */
+{
+  const { ctx, p } = await abrir(href, { modo: "sitio" });
+  ok(
+    "site — la fiche large est là",
+    await p.locator(".solo-web").first().isVisible().catch(() => false),
+  );
+  ok(
+    "site — la barre de réservation de l'app est masquée",
+    !(await app(p).getByRole("button", { name: /Reservar|Pedir el puesto/ }).first().isVisible().catch(() => false)),
+  );
+  await ctx.close();
+}
+
+/* 2. L'APP montre sa fiche, et elle dit le nécessaire. */
+{
+  const { ctx, p } = await abrir(href);
+  const texto = ((await app(p).textContent()) ?? "").replace(/\s+/g, " ");
+
+  ok("app — la route est en titre", /Panam.*→.*Chitr/.test(texto));
+  ok("app — le tracé est dessiné", (await app(p).locator("svg").count()) > 0);
+  ok("app — qui maneja, avec sa note", /\d\.\d/.test(texto));
+  ok("app — el recorrido", texto.includes("El recorrido"));
+  ok("app — les paradas intermédiaires sont nommées", /Coronado|Penonom/.test(texto));
+  ok("app — le carro est dit", /\d{4}/.test(texto) && /Kia|Toyota|Hyundai|Nissan|Honda|Mitsubishi|Suzuki|Chevrolet|Mazda|Kia/.test(texto));
+  ok("app — l'aporte est par puesto", texto.includes("Aporte por puesto") && texto.includes("por puesto"));
+  ok("app — d'où sort l'aporte est expliqué", /km de este tramo/.test(texto));
+  ok("app — le chat remplace le numéro", /Nadie da su n/.test(texto));
+
+  /* LE PRIX EST LE MÊME QU'À LA LISTE. Deux chemins de calcul qui
+     divergent sur l'argent, c'est le bug le plus coûteux du produit. */
+  ok("app — le prix est celui de la liste", (await aporte(p)) === precio, `${await aporte(p)} / ${precio}`);
+
+  /* LA BARRE DE RÉSERVATION est ancrée en bas et atteint le pouce. */
+  const barra = app(p).getByRole("button", { name: /Reservar|Pedir el puesto/ }).first();
+  const b = await barra.boundingBox();
+  const vp = p.viewportSize();
+  ok("app — le bouton réserver est visible", b !== null);
+  ok("app — il est dans le bas de l'écran", b !== null && b.y + b.height <= vp.height + 1 && b.y > vp.height * 0.6, b ? `y ${Math.round(b.y)} / ${vp.height}` : "absent");
+  ok("app — cible ≥ 44 px", b !== null && b.height >= 44, b ? `${Math.round(b.height)} px` : "");
+
+  await ctx.close();
+}
+
+/* 3. LA FEUILLE DE RÉSERVATION — les trois canaux, et les interdits. */
+{
+  const { ctx, p } = await abrir(href);
+  await app(p).getByRole("button", { name: /Reservar|Pedir el puesto/ }).first().click();
+  await p.waitForTimeout(700);
+
+  const hoja = p.locator("[role=dialog]").first();
+  ok("feuille — elle s'ouvre", await hoja.isVisible().catch(() => false));
+  const t = ((await hoja.textContent()) ?? "").replace(/\s+/g, " ");
+
+  ok("feuille — le prix par puesto", t.includes(precio) && t.includes("por puesto"), precio);
+  ok("feuille — on choisit combien de puestos", /Cuántos puestos/i.test(t));
+  ok("feuille — on choisit où on monte", /Dónde te recoge/i.test(t));
+
+  /* LES TROIS CANAUX, dans l'ordre de la maison. */
+  ok("feuille — Yappy", /Yappy/i.test(t));
+  ok("feuille — tarjeta", /Tarjeta/i.test(t));
+  ok("feuille — efectivo", /Efectivo/i.test(t));
+
+  /* LES INTERDITS DU PROPRIÉTAIRE, mot pour mot. */
+  ok("feuille — jamais « gratis »", !/gratis/i.test(t));
+  ok("feuille — jamais « tarifa de reserva »", !/tarifa de reserva/i.test(t));
+  ok("feuille — aucun émoji", !/\p{Extended_Pictographic}/u.test(t));
+
+  /* On peut la refermer : une feuille sans sortie est un piège. */
+  await p.getByRole("button", { name: "Cerrar" }).first().click();
+  await p.waitForTimeout(400);
+  ok("feuille — elle se referme", !(await hoja.isVisible().catch(() => false)));
+  await ctx.close();
+}
+
+/* 4. LE TRONÇON DE L'URL décide du prix. Descendre plus tôt coûte moins :
+      c'est la règle de prix du produit, vérifiée de bout en bout. */
+{
+  const base = href.split("?")[0];
+  const { ctx: c1, p: p1 } = await abrir(`${base}?desde=panama-city&hacia=penonome`);
+  const corto = await aporte(p1);
+  await c1.close();
+
+  const largo = precio;
+  const n = (s) => parseFloat(String(s).replace(/[^\d.]/g, ""));
+  ok(
+    "tronçon — bajarse antes cuesta menos",
+    Boolean(corto) && n(corto) < n(largo),
+    `${corto} < ${largo}`,
+  );
+
+  /* Un lien sans paramètres ne doit pas casser : on retombe sur le
+     trajet complet plutôt que sur une page vide. */
+  const { ctx: c2, p: p2 } = await abrir(base);
+  const solo = ((await app(p2).textContent()) ?? "").replace(/\s+/g, " ");
+  ok("tronçon — un lien nu retombe sur le trajet complet", /Aporte por puesto/.test(solo));
+  await c2.close();
+}
+
+/* 5. LE HTML SERVI ne dépend pas du mode. */
+{
+  const brut = await fetch(`${BASE}${href.split("?")[0]}`).then((r) => r.text());
+  const h1 = (brut.match(/<h1[\s>]/g) ?? []).length;
+  ok("SEO — au plus un h1 dans le HTML servi", h1 <= 1, `${h1} trouvé(s)`);
+  ok("SEO — la barre d'onglets est servie à tous", brut.includes("Navegación principal"));
+}
+
+await navegador.close();
+
+console.log(fallos === 0 ? "\nTout passe.\n" : `\n${fallos} vérification(s) en échec.\n`);
+process.exit(fallos === 0 ? 0 : 1);

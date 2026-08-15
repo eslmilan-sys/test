@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 import Link from "next/link";
 import { Icon } from "@/components/ui/Icon";
-import { MAP_LINKS, linkPath, mapCity } from "@/lib/map";
+import { MAP_LINKS, encuadre, linkPath, mapCity } from "@/lib/map";
 import { findSegment } from "@/lib/segments";
 import { formatTime, matchFor, type TripMatch } from "@/lib/trips";
 import { formatUsd } from "@/lib/pricing";
@@ -30,13 +30,6 @@ import { formatUsd } from "@/lib/pricing";
  * carte qui prétend suivre une voiture sans la suivre est pire que pas
  * de carte.
  */
-
-/** La marge autour du tracé, en unités de la projection. */
-const MARGEN = 70;
-/** Les proportions acceptables du cadre : au-delà, on l'élargit. Un
- *  trajet est-ouest donnerait sinon une bande de 40 px de haut. */
-const RATIO_MIN = 0.85;
-const RATIO_MAX = 1.35;
 
 type Props = {
   matches: TripMatch[];
@@ -93,40 +86,20 @@ export function Mapa({ matches, activo, onActivo, desde }: Props) {
 
   /* LE CADRE. Il se règle sur TOUS les résultats, pas sur le trajet
      choisi : changer de viaje dans la bande du bas ne doit pas faire
-     sauter la caméra. */
-  const caja = useMemo(() => {
-    const puntos = matches
-      .flatMap((x) =>
-        x.trip.servedStops.slice(x.segment.fromIndex, x.segment.toIndex + 1),
-      )
-      .map((s) => mapCity(s.citySlug))
-      .filter((c): c is NonNullable<typeof c> => Boolean(c));
-    if (puntos.length === 0) return null;
-
-    let minX = Math.min(...puntos.map((p) => p.x)) - MARGEN;
-    let maxX = Math.max(...puntos.map((p) => p.x)) + MARGEN;
-    let minY = Math.min(...puntos.map((p) => p.y)) - MARGEN;
-    let maxY = Math.max(...puntos.map((p) => p.y)) + MARGEN;
-
-    let w = maxX - minX;
-    let h = maxY - minY;
-    /* On n'écrase jamais la projection : pour corriger les proportions
-       on ÉLARGIT le cadre, on ne l'étire pas. */
-    if (w / h > RATIO_MAX) {
-      const objetivo = w / RATIO_MAX;
-      const extra = (objetivo - h) / 2;
-      minY -= extra;
-      maxY += extra;
-      h = objetivo;
-    } else if (w / h < RATIO_MIN) {
-      const objetivo = h * RATIO_MIN;
-      const extra = (objetivo - w) / 2;
-      minX -= extra;
-      maxX += extra;
-      w = objetivo;
-    }
-    return { x: minX, y: minY, w, h };
-  }, [matches]);
+     sauter la caméra. Le calcul vit dans `lib/map.ts` — la fiche viaje
+     cadre avec le même, sans quoi les deux écrans finiraient par ne plus
+     montrer le même pays. */
+  const caja = useMemo(
+    () =>
+      encuadre(
+        matches.flatMap((x) =>
+          x.trip.servedStops
+            .slice(x.segment.fromIndex, x.segment.toIndex + 1)
+            .map((s) => s.citySlug),
+        ),
+      ),
+    [matches],
+  );
 
   if (!m || !caja) {
     return (

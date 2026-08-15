@@ -103,3 +103,51 @@ export function linkPath(
   const cy = my + (dx / length) * bend;
   return `M ${from.x} ${from.y} Q ${cx} ${cy} ${to.x} ${to.y}`;
 }
+
+/**
+ * LE CADRAGE D'UN TRAJET — le viewBox qui contient une liste de villes.
+ *
+ * Deux écrans en ont besoin (la carte des résultats et l'en-tête de la
+ * fiche viaje) et ils doivent cadrer PAREIL : deux calculs séparés
+ * finiraient par diverger d'un pixel, puis d'un arrêt.
+ *
+ * On n'écrase jamais la projection. Quand le tracé est trop plat ou trop
+ * étroit pour le cadre disponible — un Panamá → Chitré donnerait une
+ * bande de quarante pixels de haut — on ÉLARGIT le cadre autour du
+ * centre. Étirer aurait été plus court à écrire et aurait menti sur les
+ * distances.
+ */
+export function encuadre(
+  slugs: string[],
+  {
+    margen = 70,
+    ratioMin = 0.85,
+    ratioMax = 1.35,
+  }: { margen?: number; ratioMin?: number; ratioMax?: number } = {},
+): { x: number; y: number; w: number; h: number } | null {
+  const puntos = slugs
+    .map((s) => mapCity(s))
+    .filter((c): c is MapCity => Boolean(c));
+  if (puntos.length === 0) return null;
+
+  let minX = Math.min(...puntos.map((p) => p.x)) - margen;
+  const maxX = Math.max(...puntos.map((p) => p.x)) + margen;
+  let minY = Math.min(...puntos.map((p) => p.y)) - margen;
+  const maxY = Math.max(...puntos.map((p) => p.y)) + margen;
+
+  let w = maxX - minX;
+  let h = maxY - minY;
+
+  if (w / h > ratioMax) {
+    const objetivo = w / ratioMax;
+    const extra = (objetivo - h) / 2;
+    minY -= extra;
+    h = objetivo;
+  } else if (w / h < ratioMin) {
+    const objetivo = h * ratioMin;
+    const extra = (objetivo - w) / 2;
+    minX -= extra;
+    w = objetivo;
+  }
+  return { x: minX, y: minY, w, h };
+}
