@@ -10,7 +10,8 @@
     "test": "node --test --experimental-strip-types 'src/**/*.test.ts'",
     "build:static": "node scripts/build-static.mjs",
     "verify:sw": "node scripts/verify-sw.mjs",
-    "verify:app": "node scripts/verify-app.mjs"
+    "verify:app": "node scripts/verify-app.mjs",
+    "verify:geo": "node scripts/verify-geo.mjs"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.23",
