@@ -1081,6 +1081,24 @@ html.app-instalada .solo-app {
   display: revert;
 }
 
+/* LE PREMIER ÉCRAN NE REMONTE PLUS QUAND LA BARRE HAUTE N'EST PAS LÀ.
+   `.sky` porte `margin-top: calc(-1 * var(--nav-space))` pour glisser SOUS
+   la barre flottante — sans quoi la barre survolerait une bande blanche.
+   En mode app cette barre est masquée, donc il ne reste rien à glisser
+   dessous : la marge négative faisait alors remonter le premier écran
+   PAR-DESSUS le cockpit, et le bouton Seguridad devenait incliquable —
+   mesuré au navigateur, pas supposé (le Hero interceptait le clic). */
+@media (display-mode: standalone) {
+  .sky {
+    margin-top: 0;
+    padding-top: 0;
+  }
+}
+html.app-instalada .sky {
+  margin-top: 0;
+  padding-top: 0;
+}
+
 /* La barre d'onglets couvre le bas de l'écran : sans cette réserve, le
    dernier élément de chaque page finit dessous. `safe-area-inset-bottom`
    ajoute la barre d'accueil de l'iPhone, qui n'est pas une invention — un

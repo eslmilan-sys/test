@@ -1,4 +1,5 @@
 import { Hero } from "@/components/home/Hero";
+import { Hoy } from "@/components/app/Hoy";
 import { RutasFrecuentes } from "@/components/home/RutasFrecuentes";
 import { Pasos } from "@/components/home/Pasos";
 import { Pago } from "@/components/home/Pago";
@@ -19,6 +20,13 @@ export default function Home() {
   return (
     <>
       <main id="contenido">
+        {/* LE COCKPIT DE L'APP. Quelqu'un qui a une reserva ouvre l'app
+            pour vérifier qu'elle tient — pas pour qu'on lui redemande où
+            il va. La carte n'existe qu'en mode app : sur le site,
+            l'accueil parle à un inconnu. */}
+        <div className="solo-app">
+          <Hoy />
+        </div>
         <Hero />
 
         {/* TOUT L'ARGUMENTAIRE EST `solo-web`.
