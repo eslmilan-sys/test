@@ -97,14 +97,6 @@ export function Hero() {
             plutôt qu'un second exemplaire : ses champs ont des `id` fixes
             (`desde`, `hacia`, `fecha`), et deux exemplaires dans la même
             page casseraient les `label` des deux. */}
-        {/* Troisième et dernier temps de l'ouverture de l'app : après le
-            salut et ton viaje vient la question. `--paso` porte le rang. */}
-        <p
-          className="solo-app entra-app mb-4 font-display text-[26px] leading-tight font-extrabold tracking-[-0.03em]"
-          style={{ ["--paso" as string]: 2 }}
-        >
-          ¿Para dónde vas?
-        </p>
         <div className="flex flex-col min-[960px]:grid min-[960px]:grid-cols-[1.08fr_0.92fr] min-[960px]:items-start min-[960px]:gap-x-16 min-[960px]:gap-y-8">
           <div className="solo-web order-1 min-[960px]:col-start-1 min-[960px]:row-start-1">
             {/* La pilule est revenue avec une RAISON d'exister : annoncer le

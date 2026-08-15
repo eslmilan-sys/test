@@ -1,6 +1,5 @@
 import { Hero } from "@/components/home/Hero";
-import { Hoy } from "@/components/app/Hoy";
-import { Saludo } from "@/components/app/Saludo";
+import { Inicio } from "@/components/app/Inicio";
 import { AppShell } from "@/components/app/AppShell";
 import { RutasFrecuentes } from "@/components/home/RutasFrecuentes";
 import { Pasos } from "@/components/home/Pasos";
@@ -31,18 +30,19 @@ export default function Home() {
         {/* LA PORTE. Pas de compte → l'écran d'entrée par-dessus tout ;
             compte + première ouverture → l'écran de bienvenue. Ne rend
             rien sur le site, ni avant hydratation. */}
+        {/* L'APP. Sa propre porte, son propre accueil. Elle ne partage
+            plus la carte de recherche du site : les deux surfaces ne
+            posent pas la même question — le site convainc un inconnu,
+            l'app sert quelqu'un qui a déjà décidé. */}
         <div className="solo-app">
           <AppShell />
+          <Inicio />
         </div>
-        <div className="solo-app">
-          <div style={{ ["--paso" as string]: 0 }}>
-            <Saludo />
-          </div>
-          <div style={{ ["--paso" as string]: 1 }}>
-            <Hoy />
-          </div>
+
+        {/* LE SITE. Entier, dans le HTML servi, pour Google. */}
+        <div className="solo-web">
+          <Hero />
         </div>
-        <Hero />
 
         {/* TOUT L'ARGUMENTAIRE EST `solo-web`.
             Il reste dans le HTML — Google le reçoit en entier, et c'est le

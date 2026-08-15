@@ -95,6 +95,7 @@ console.log(`\nMode app — ${BASE}\n`);
   ok("site — pas de barre d'onglets", !(await ve(p, 'nav[aria-label="Navegación principal"]')));
   ok("site — titre marketing présent", await tituloMarketing(p));
   ok("site — barre haute présente", await ve(p, 'nav[aria-label="Principal"]'));
+  ok("site — buscador du site", await ve(p, "#desde"));
   await ctx.close();
 }
 
@@ -104,7 +105,7 @@ console.log(`\nMode app — ${BASE}\n`);
   const cockpit = p.locator('[aria-label="Tu próximo viaje"]');
   ok("app — le cockpit apparaît", await ve(p, '[aria-label="Tu próximo viaje"]'));
   ok("app — marketing masqué", !(await tituloMarketing(p)));
-  ok("app — buscador toujours là", await ve(p, "#desde"));
+  ok("app — buscador propre à l'app", await ve(p, "#app-hacia"));
 
   const txt = (await cockpit.textContent().catch(() => "")) ?? "";
   ok("app — la route est nommée", /Panam|Chitr/i.test(txt), txt.replace(/\s+/g, " ").slice(0, 46));
@@ -112,10 +113,17 @@ console.log(`\nMode app — ${BASE}\n`);
   ok("app — le point de recogida est là", txt.includes("Te recoge"));
   ok("app — le chat est à un geste", txt.includes("Chat con"));
 
-  /* L'état DOIT être au-dessus du formulaire : c'est tout le propos. */
+  /* L'ORDRE DE LA MAQUETTE : la recherche d'abord — c'est le geste du
+     quotidien — puis TON viaje, puis seulement les suggestions. Ce qui
+     est fixé ici n'est pas une préférence de mise en page mais une
+     hiérarchie : un trajet réel passe toujours devant une suggestion. */
   const yCockpit = (await cockpit.boundingBox())?.y ?? 1e9;
-  const yBuscador = (await p.locator("#desde").boundingBox())?.y ?? -1;
-  ok("app — l'état passe avant la recherche", yCockpit < yBuscador, `${Math.round(yCockpit)} px < ${Math.round(yBuscador)} px`);
+  const yRutas = (await p.getByText("Rutas populares").first().boundingBox())?.y ?? -1;
+  ok(
+    "app — ton viaje passe avant les suggestions",
+    yCockpit < yRutas,
+    `viaje ${Math.round(yCockpit)} px < rutas ${Math.round(yRutas)} px`,
+  );
 
   /* La sécurité doit FAIRE quelque chose, pas décorer. */
   await p.getByRole("button", { name: "Seguridad" }).first().click();
@@ -130,7 +138,7 @@ console.log(`\nMode app — ${BASE}\n`);
 {
   const { ctx, p } = await abrir({ modo: "app", conSesion: false });
   ok("app sans reserva — pas de carte vide", !(await ve(p, '[aria-label="Tu próximo viaje"]')));
-  ok("app sans reserva — buscador présent", await ve(p, "#desde"));
+  ok("app sans reserva — buscador présent", await ve(p, "#app-hacia"));
   await ctx.close();
 }
 
@@ -146,7 +154,12 @@ console.log(`\nMode app — ${BASE}\n`);
     b !== null && Math.abs(b.y + b.height - vp.height) <= 2,
     b ? `bas = ${Math.round(b.y + b.height)} px / ${vp.height} px` : "absente",
   );
-  ok("app — 4 onglets", (await barra.locator("a").count()) === 4);
+  /* Quatre destinations + le bouton d'action central, qui n'est pas un
+     onglet : il publie. On les compte séparément pour que l'un ne masque
+     jamais la disparition de l'autre. */
+  const destinos = await barra.locator("a:not([aria-label='Publicar un viaje'])").count();
+  ok("app — 4 onglets", destinos === 4, `${destinos} trouvé(s)`);
+  ok("app — le bouton publier est là", await ve(p, "a[aria-label='Publicar un viaje']"));
   /* Chaque cible doit tenir le pouce : 44 px est le minimum d'Apple. */
   const altos = await barra.locator("a").evaluateAll((els) =>
     els.map((e) => Math.round(e.getBoundingClientRect().height)),
@@ -198,6 +211,13 @@ console.log(`\nMode app — ${BASE}\n`);
      promu en `h1` entrerait en concurrence avec celui que Google lit. */
   const h1 = (brut.match(/<h1[\s>]/g) ?? []).length;
   ok("SEO — un seul h1 dans le HTML servi", h1 === 1, `${h1} trouvé(s)`);
+  /* Les deux cartes de recherche coexistent dans le HTML servi — le mode
+     app ne masque qu'à l'affichage. Deux `id` identiques casseraient les
+     `label` des deux, et c'est invisible à l'œil. */
+  for (const id of ["desde", "hacia", "app-desde", "app-hacia"]) {
+    const n = (brut.match(new RegExp(`id="${id}"`, "g")) ?? []).length;
+    ok(`id « ${id} » unique dans le HTML`, n <= 1, `${n} occurrence(s)`);
+  }
 }
 
 await navegador.close();

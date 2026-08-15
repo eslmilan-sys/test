@@ -28,6 +28,7 @@ import {
   Check,
   Clock,
   Compass,
+  House,
   IdCard,
   MapPin,
   MessageSquare,
@@ -66,6 +67,7 @@ const ICONS = {
   swap: ArrowUpDown,
   bus: Bus,
   bell: Bell,
+  home: House,
   briefcase: Briefcase,
 } as const satisfies Record<string, LucideIcon>;
 

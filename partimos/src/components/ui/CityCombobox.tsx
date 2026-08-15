@@ -34,7 +34,10 @@ function normalize(value: string) {
 
 type Props = {
   id: string;
-  label: string;
+  /** Absent en variante `desnudo` : l'app pose son propre libellé et sa
+   *  propre pastille, parce que sa carte de recherche n'a pas la même
+   *  grammaire visuelle que celle du site. */
+  label?: string;
   value: string;
   onChange: (slug: string) => void;
   /** Ville à exclure — on ne va pas d'une ville à elle-même. */
@@ -44,6 +47,14 @@ type Props = {
    *  "" quand une ville nue est choisie. C'est ce qui permet à /ya de
    *  porter l'adresse exacte jusqu'au point de recogida proposé. */
   onPlace?: (place: string, citySlug: string) => void;
+  /** `desnudo` retire le libellé, la pastille et le rembourrage : le
+   *  champ se glisse alors dans une composition qui les fournit
+   *  elle-même. Toute la logique — réouverture au clic, géocodage,
+   *  sélection au clavier — reste la même, et c'est tout l'intérêt :
+   *  dupliquer ce composant aurait dupliqué ses trois corrections de
+   *  bugs. */
+  variant?: "completo" | "desnudo";
+  placeholder?: string;
 };
 
 export function CityCombobox({
@@ -54,7 +65,10 @@ export function CityCombobox({
   exclude,
   tone = "origin",
   onPlace,
+  variant = "completo",
+  placeholder = "Escribe tu ciudad",
 }: Props) {
+  const desnudo = variant === "desnudo";
   const [open, setOpen] = useState(false);
   /* LE MINUTEUR DE FERMETURE, retenu pour pouvoir l'ANNULER.
      `onBlur` programme la fermeture 120 ms plus tard — le temps qu'un tap
@@ -180,22 +194,32 @@ export function CityCombobox({
           La pastille passe donc en position ABSOLUE dans la gouttière :
           elle marque toujours l'origine et la destination, mais elle ne
           décale plus rien. */}
-      <div className="relative flex items-center rounded-[14px] px-5 py-3 transition-colors hover:bg-ink-50">
-        <span
-          aria-hidden
-          className={`absolute top-1/2 left-1.5 size-2.5 -translate-y-1/2 border-[3px] ${
-            tone === "origin"
-              ? "rounded-full border-accent"
-              : "rounded-[4px] border-brand-green-deep"
-          }`}
-        />
+      <div
+        className={
+          desnudo
+            ? "relative flex items-center"
+            : "relative flex items-center rounded-[14px] px-5 py-3 transition-colors hover:bg-ink-50"
+        }
+      >
+        {!desnudo && (
+          <span
+            aria-hidden
+            className={`absolute top-1/2 left-1.5 size-2.5 -translate-y-1/2 border-[3px] ${
+              tone === "origin"
+                ? "rounded-full border-accent"
+                : "rounded-[4px] border-brand-green-deep"
+            }`}
+          />
+        )}
         <div className="min-w-0 flex-1">
-          <label
-            htmlFor={id}
-            className="block text-[11.5px] font-bold tracking-[0.11em] text-ink-500 uppercase"
-          >
-            {label}
-          </label>
+          {!desnudo && label && (
+            <label
+              htmlFor={id}
+              className="block text-[11.5px] font-bold tracking-[0.11em] text-ink-500 uppercase"
+            >
+              {label}
+            </label>
+          )}
           <input
             id={id}
             type="text"
@@ -205,7 +229,7 @@ export function CityCombobox({
             aria-autocomplete="list"
             autoComplete="off"
             value={open ? query : (selected?.name ?? "")}
-            placeholder="Escribe tu ciudad"
+            placeholder={placeholder}
             /* ROUVRIR AU CLIC, pas seulement au focus. Après avoir choisi une
                ville, le champ GARDE le focus : le retoucher n'émettait donc
                aucun `focus`, la liste restait fermée pour toujours et la
