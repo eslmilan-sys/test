@@ -193,6 +193,71 @@ console.log(`\nBuscar — ${BASE}\n`);
   await ctx.close();
 }
 
+/* 2 bis. LA CARTE — la même recherche, vue sur le pays. */
+{
+  const { ctx, p } = await abrir(RUTA);
+  const zona = app(p).first();
+  /* Le prix de la première carte de la liste, lu SUR la carte : le
+     premier `.tnum` d'une carte est l'heure, pas le montant. */
+  const precioLista = (
+    ((await zona.locator("ul > li > a[href*='/viaje/']").first().textContent()) ?? "").match(
+      /\$\s?[\d.,]+/,
+    ) ?? [""]
+  )[0];
+
+  await zona.getByRole("button", { name: "Mapa" }).click();
+  await p.waitForTimeout(500);
+
+  ok("carte — la liste laisse la place", (await zona.locator("ul > li > a[href*='/viaje/']").count()) === 0);
+  ok("carte — le tracé est dessiné", await zona.locator("svg[role='img']").first().isVisible().catch(() => false));
+
+  /* LES PASTILLES DE PRIX. Ce qui doit être vrai : le point de montée
+     n'a pas de montant, et le montant MONTE à mesure qu'on s'éloigne —
+     l'aporte sort des kilomètres. Une carte qui montrerait l'inverse
+     contredirait la règle de prix du produit. */
+  const etiquetas = await zona.locator("span.shadow-card").allTextContents();
+  ok("carte — le départ est marqué, sans montant", etiquetas[0] === "Sales aquí", etiquetas[0]);
+  const montos = etiquetas.slice(1).map((t) => parseFloat(t.replace(/[^\d.]/g, "")));
+  ok("carte — au moins deux paradas chiffrées", montos.length >= 2, montos.join(" "));
+  ok(
+    "carte — el aporte sube con la distancia",
+    montos.every((v, i) => i === 0 || montos[i - 1] < v),
+    montos.join(" < "),
+  );
+
+  /* La carte et la liste doivent dire le MÊME prix pour le même viaje :
+     deux chemins de calcul qui divergent, c'est le bug le plus cher. */
+  const ultimo = montos[montos.length - 1];
+  ok(
+    "carte — le dernier montant est celui de la liste",
+    `$${ultimo.toFixed(2)}` === precioLista.trim() ||
+      Math.abs(ultimo - parseFloat(precioLista.replace(/[^\d.]/g, ""))) < 0.005,
+    `${ultimo} / ${precioLista.trim()}`,
+  );
+
+  /* Les villes sont nommées : un prix sans lieu ne se lit pas. */
+  const cuerpoMapa = (await zona.textContent()) ?? "";
+  ok("carte — les paradas sont nommées", /Coronado|Penonom|Chitr/.test(cuerpoMapa));
+
+  /* La bande du bas change le viaje mis en avant. */
+  /* La bande, et elle seule : `button[aria-pressed]` attrape aussi les
+     filtres et le segmenté Lista/Mapa. */
+  const fichas = zona.locator("ul[aria-label='Viajes en el mapa'] button");
+  const nFichas = await fichas.count();
+  ok("carte — la bande porte tous les viajes", nFichas >= 2, `${nFichas} fiche(s)`);
+  await fichas.nth(1).click();
+  await p.waitForTimeout(400);
+  ok(
+    "carte — changer de viaje change la sélection",
+    (await fichas.nth(1).getAttribute("aria-pressed")) === "true",
+  );
+
+  await zona.getByRole("button", { name: "Lista" }).click();
+  await p.waitForTimeout(400);
+  ok("carte — on revient à la liste", (await zona.locator("ul > li > a[href*='/viaje/']").count()) > 0);
+  await ctx.close();
+}
+
 /* 3. AUCUN RÉSULTAT : il reste une sortie. */
 {
   const { ctx, p } = await abrir(`desde=panama-city&hacia=chitre&fecha=${AYER}&puestos=1`);
