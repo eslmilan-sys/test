@@ -147,7 +147,7 @@ export default async function CorridorPage({ params }: Params) {
     <>
       {/* ---------- En-tête ---------- */}
       <main id="contenido">
-        <div id="ruta-hero" className="noche pt-8 pb-11 text-white">
+        <div id="ruta-hero" className="noche cima-app pt-8 pb-11 text-white">
           <Container>
             <nav
               aria-label="Ruta de navegación"

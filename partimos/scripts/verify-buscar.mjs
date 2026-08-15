@@ -41,6 +41,13 @@ const RUTA = `desde=panama-city&hacia=chitre&fecha=${HOY}&puestos=1`;
 const a = new Date(d.getTime() - 30 * 86_400_000);
 const AYER = `${a.getFullYear()}-${String(a.getMonth() + 1).padStart(2, "0")}-${String(a.getDate()).padStart(2, "0")}`;
 
+/** ÉMOJI, mais pas « tout ce qui est pictographique ».
+ *  `\p{Extended_Pictographic}` attrape aussi ©, ® et ™ — le pied de page
+ *  a fait tomber la batterie entière pour un signe de copyright. On ne
+ *  garde donc que ce qui s'AFFICHE en émoji : présentation émoji par
+ *  défaut, ou forcée par le sélecteur de variante U+FE0F. */
+const EMOJI = /\p{Emoji_Presentation}|\p{Extended_Pictographic}\uFE0F/u;
+
 const navegador = await chromium.launch({ executablePath: CHROME });
 
 async function abrir(query, { modo = "app" } = {}) {
@@ -276,7 +283,7 @@ console.log(`\nBuscar — ${BASE}\n`);
   const cuerpo = (await app(p).allTextContents()).join(" ");
   ok("règles — aucun « gratis »", !/gratis/i.test(cuerpo));
   ok("règles — aucune « tarifa de reserva »", !/tarifa de reserva/i.test(cuerpo));
-  ok("règles — aucun émoji", !/\p{Extended_Pictographic}/u.test(cuerpo));
+  ok("règles — aucun émoji", !EMOJI.test(cuerpo));
   ok("règles — le prix est dit PAR PUESTO", cuerpo.includes("por puesto"));
   await ctx.close();
 }

@@ -28,6 +28,13 @@ const ok = (nom, cond, detalle = "") => {
   if (!cond) fallos++;
 };
 
+/** ÉMOJI, mais pas « tout ce qui est pictographique ».
+ *  `\p{Extended_Pictographic}` attrape aussi ©, ® et ™ — le pied de page
+ *  a fait tomber la batterie entière pour un signe de copyright. On ne
+ *  garde donc que ce qui s'AFFICHE en émoji : présentation émoji par
+ *  défaut, ou forcée par le sélecteur de variante U+FE0F. */
+const EMOJI = /\p{Emoji_Presentation}|\p{Extended_Pictographic}\uFE0F/u;
+
 const navegador = await chromium.launch({ executablePath: CHROME });
 
 /** Un viaje du jour, trouvé par la recherche elle-même : un identifiant
@@ -149,7 +156,7 @@ ok("on trouve un viaje depuis la recherche", Boolean(href), href ?? "aucun");
   /* LES INTERDITS DU PROPRIÉTAIRE, mot pour mot. */
   ok("feuille — jamais « gratis »", !/gratis/i.test(t));
   ok("feuille — jamais « tarifa de reserva »", !/tarifa de reserva/i.test(t));
-  ok("feuille — aucun émoji", !/\p{Extended_Pictographic}/u.test(t));
+  ok("feuille — aucun émoji", !EMOJI.test(t));
 
   /* On peut la refermer : une feuille sans sortie est un piège. */
   await p.getByRole("button", { name: "Cerrar" }).first().click();
@@ -158,25 +165,35 @@ ok("on trouve un viaje depuis la recherche", Boolean(href), href ?? "aucun");
   await ctx.close();
 }
 
-/* 4. LE TRONÇON DE L'URL décide du prix. Descendre plus tôt coûte moins :
-      c'est la règle de prix du produit, vérifiée de bout en bout. */
+/* 4. DESCENDRE PLUS TÔT COÛTE MOINS — lu SUR la page, pas deviné.
+      La version d'avant demandait `?hacia=penonome` en dur : dès que le
+      premier résultat du jour changeait de corridor, elle mesurait le
+      repli sur le trajet complet et se comparait à elle-même. On lit
+      donc la ligne de temps, qui porte le prix jusqu'à CHAQUE arrêt de
+      ce viaje-là. */
 {
-  const base = href.split("?")[0];
-  const { ctx: c1, p: p1 } = await abrir(`${base}?desde=panama-city&hacia=penonome`);
-  const corto = await aporte(p1);
-  await c1.close();
-
-  const largo = precio;
-  const n = (s) => parseFloat(String(s).replace(/[^\d.]/g, ""));
-  ok(
-    "tronçon — bajarse antes cuesta menos",
-    Boolean(corto) && n(corto) < n(largo),
-    `${corto} < ${largo}`,
+  const { ctx, p } = await abrir(href);
+  const texto = ((await app(p).textContent()) ?? "").replace(/\s+/g, " ");
+  const montos = [...texto.matchAll(/\$\s?([\d.,]+) desde /g)].map((m) =>
+    parseFloat(m[1].replace(",", "")),
   );
+  ok("recorrido — chaque parada porte son prix", montos.length >= 2, montos.join(" "));
+  ok(
+    "recorrido — el aporte sube parada tras parada",
+    montos.every((v, i) => i === 0 || montos[i - 1] < v),
+    montos.join(" < "),
+  );
+  /* Et le dernier de la ligne de temps est bien l'aporte du tronçon. */
+  ok(
+    "recorrido — le dernier est celui du bloc aporte",
+    `$${montos[montos.length - 1].toFixed(2)}` === (await aporte(p)),
+    `${montos[montos.length - 1]} / ${await aporte(p)}`,
+  );
+  await ctx.close();
 
   /* Un lien sans paramètres ne doit pas casser : on retombe sur le
      trajet complet plutôt que sur une page vide. */
-  const { ctx: c2, p: p2 } = await abrir(base);
+  const { ctx: c2, p: p2 } = await abrir(href.split("?")[0]);
   const solo = ((await app(p2).textContent()) ?? "").replace(/\s+/g, " ");
   ok("tronçon — un lien nu retombe sur le trajet complet", /Aporte por puesto/.test(solo));
   await c2.close();

@@ -47,7 +47,7 @@ export default function PublicarPage() {
             Elle passe donc en haut, à côté du titre, avec les mêmes couleurs
             que l'accueil : le même ambre sur le même titre en trois temps,
             pour que la page ne ressemble pas à un autre site. */}
-        <div className="relative overflow-hidden pt-9 pb-12">
+        <div className="relative cima-app overflow-hidden pt-9 pb-12">
           {/* La lueur ambre de la maison, la même que sous la carte de
               recherche de l'accueil. */}
           <span

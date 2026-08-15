@@ -272,7 +272,7 @@ export function PublishFlow() {
 
   if (published && corridor && cap) {
     return (
-      <Container className="pt-10">
+      <Container className="cima-app pt-10">
         <div className="mx-auto max-w-[560px] rounded-[20px] border border-ink-200 bg-white p-7 text-center">
           <span className="mx-auto mb-4 flex size-14 items-center justify-center rounded-full bg-ink-900 text-white">
             <Icon name="check" className="size-6" />
@@ -350,7 +350,7 @@ export function PublishFlow() {
      beaucoup plus honnête : on sait tout de suite ce qu'on signe. */
   if (session && !puedePublicar) {
     return (
-      <Container className="pt-6">
+      <Container className="cima-app pt-6">
         <div className="mx-auto max-w-[620px]">
           <h1 className="mb-2 font-display text-[clamp(24px,5vw,32px)] leading-[1.08] font-extrabold tracking-[-0.03em]">
             Primero, confirmemos quién eres
@@ -377,7 +377,7 @@ export function PublishFlow() {
   }
 
   return (
-    <Container className="pt-6">
+    <Container className="cima-app pt-6">
       <div className="mx-auto max-w-[620px]">
         {/* Progression : quatre étapes nommées, pas une barre anonyme. */}
         <ol className="mb-6 flex gap-1.5">
@@ -1316,9 +1316,9 @@ export function PublishFlow() {
         </div>
 
         <p className="mt-4 text-center text-[12.5px] leading-relaxed text-ink-500">
-          Publicar es gratis y tu aporte te llega completo — en la mano, o
-          por la app si el pasajero eligió pagar en línea (la tarifa de
-          servicio la paga él, nunca tú).
+          Publicar no te cuesta nada y tu aporte te llega completo — en la
+          mano, o por la app si el pasajero eligió pagar en línea (la tarifa
+          de servicio la paga él, nunca tú).
         </p>
       </div>
     </Container>

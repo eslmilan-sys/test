@@ -70,6 +70,13 @@ const SESSION = {
   ],
 };
 
+/** ÉMOJI, mais pas « tout ce qui est pictographique ».
+ *  `\p{Extended_Pictographic}` attrape aussi ©, ® et ™ — le pied de page
+ *  a fait tomber la batterie entière pour un signe de copyright. On ne
+ *  garde donc que ce qui s'AFFICHE en émoji : présentation émoji par
+ *  défaut, ou forcée par le sélecteur de variante U+FE0F. */
+const EMOJI = /\p{Emoji_Presentation}|\p{Extended_Pictographic}\uFE0F/u;
+
 const navegador = await chromium.launch({ executablePath: CHROME });
 
 async function abrir(url, { modo = "app", conSesion = true } = {}) {
@@ -140,7 +147,7 @@ console.log(`\nCuenta — ${BASE}\n`);
   ok("chat — il ne réclame pas de numéro", /No hace falta dar tu número/.test(t));
   ok("chat — des questions toutes faites", (await hilo.locator("button").count()) > 2);
   ok("chat — on peut écrire", await hilo.locator("textarea").first().isVisible().catch(() => false));
-  ok("chat — aucun émoji", !/\p{Extended_Pictographic}/u.test(t));
+  ok("chat — aucun émoji", !EMOJI.test(t));
   await ctx.close();
 }
 
@@ -157,7 +164,7 @@ console.log(`\nCuenta — ${BASE}\n`);
   ok("perfil — 1 viaje hecho", /(?<!\d)1\s*viaje hecho/.test(t), t.match(/\d+\s*viajes? hechos?/)?.[0] ?? "");
   ok("perfil — 2 viajes por delante", /(?<!\d)2\s*viajes por delante/.test(t), t.match(/\d+\s*viajes? por delante/)?.[0] ?? "");
   ok("perfil — un menu qui mène quelque part", (await app(p).locator("a[href]").count()) >= 5);
-  ok("perfil — aucun émoji", !/\p{Extended_Pictographic}/u.test(t));
+  ok("perfil — aucun émoji", !EMOJI.test(t));
   await ctx.close();
 }
 
@@ -183,7 +190,7 @@ console.log(`\nCuenta — ${BASE}\n`);
   ok("descubre — les trois canaux de paiement", /Tres formas de pagar/.test(t));
   ok("descubre — jamais « gratis »", !/gratis/i.test(t));
   ok("descubre — jamais « tarifa de reserva »", !/tarifa de reserva/i.test(t));
-  ok("descubre — aucun émoji", !/\p{Extended_Pictographic}/u.test(t));
+  ok("descubre — aucun émoji", !EMOJI.test(t));
   ok("descubre — ce que nous ne sommes pas est dit", /No es una empresa de transporte/.test(t));
   await ctx.close();
 }

@@ -20,7 +20,7 @@ export function LegalPage({
   return (
     <>
       <main id="contenido">
-        <div className="noche pt-10 pb-11 text-white">
+        <div className="noche cima-app pt-10 pb-11 text-white">
           <Container>
             <h1 className="mb-4 max-w-[18ch] text-[clamp(30px,5.6vw,44px)] leading-[1.05] font-extrabold tracking-[-0.04em]">
               {title}

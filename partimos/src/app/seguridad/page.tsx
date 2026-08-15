@@ -4,6 +4,7 @@ import { TrustCard, TRUST_ITEMS } from "@/components/home/Confianza";
 import { ButtonLink } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
 import { canonical } from "@/lib/site";
+import { SeguridadPagina } from "@/components/app/SeguridadPagina";
 
 export const metadata: Metadata = {
   title: "Seguridad: con quién viajas y cómo te cuidamos",
@@ -43,6 +44,14 @@ export default function SeguridadPage() {
   return (
     <>
       <main id="contenido">
+        {/* DANS L'APP, seguridad n'est pas un argument : c'est l'écran
+            qu'on ouvre quand ça ne va pas. Le 911 passe donc en haut, et
+            l'explication après. */}
+        <div className="solo-app">
+          <SeguridadPagina />
+        </div>
+
+        <div className="solo-web">
         <div className="noche pt-10 pb-11 text-white">
           <Container>
             <h1 className="mb-4 max-w-[18ch] text-[clamp(32px,6.4vw,50px)] leading-[1.03] font-extrabold tracking-[-0.04em]">
@@ -121,6 +130,7 @@ export default function SeguridadPage() {
               </div>
             </Container>
           </section>
+        </div>
         </div>
       </main>
     </>

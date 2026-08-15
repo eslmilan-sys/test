@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { YaExpress } from "./YaExpress";
+import { Ya } from "@/components/app/Ya";
 
 /**
  * /ya — LA VOIE EXPRESS. La page qui réduit le temps-jusqu'au-viaje à
@@ -14,7 +15,16 @@ export const metadata: Metadata = {
 export default function YaPage() {
   return (
     <main id="contenido">
-      <YaExpress />
+      {/* L'ONGLET « BUSCAR » DE L'APP mène ici. Même moteur que le site
+          (`searchTrips`) et MÊME champ de recherche (`CityCombobox`,
+          avec son géocodage) — une autre composition, celle d'un écran
+          qu'on tient à la main. */}
+      <div className="solo-app">
+        <Ya />
+      </div>
+      <div className="solo-web">
+        <YaExpress />
+      </div>
     </main>
   );
 }

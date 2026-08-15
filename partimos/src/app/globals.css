@@ -1081,6 +1081,22 @@ html.app-instalada .solo-app {
   display: revert;
 }
 
+/* LA MARGE HAUTE DES ÉCRANS PARTAGÉS.
+   Certaines pages n'ont pas de version app séparée — publier un viaje,
+   les mentions légales : leur contenu est le même des deux côtés, et en
+   dupliquer un millier de lignes pour changer une marge serait pire que
+   le mal. Elles portent donc `.cima-app`, inerte sur le site, qui leur
+   rend la place de l'encoche quand la barre haute est masquée. Sans
+   elle, le premier titre passe sous l'heure de l'iPhone. */
+@media (display-mode: standalone) {
+  .cima-app {
+    padding-top: calc(14px + env(safe-area-inset-top)) !important;
+  }
+}
+html.app-instalada .cima-app {
+  padding-top: calc(14px + env(safe-area-inset-top)) !important;
+}
+
 /* ===========================================================================
    L'OUVERTURE DE L'APP
    ===========================================================================

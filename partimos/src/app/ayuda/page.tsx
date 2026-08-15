@@ -3,6 +3,7 @@ import { Container } from "@/components/site/Section";
 import { FaqList, FaqJsonLd } from "@/components/home/Faq";
 import { HELP_FAQ } from "@/lib/content";
 import { canonical } from "@/lib/site";
+import { Ayuda } from "@/components/app/Ayuda";
 
 export const metadata: Metadata = {
   title: "Ayuda y preguntas frecuentes",
@@ -15,6 +16,13 @@ export default function AyudaPage() {
   return (
     <>
       <main id="contenido">
+        {/* DANS L'APP, on arrive ici avec UNE question et souvent
+            pressé : la liste se filtre à mesure qu'on tape. */}
+        <div className="solo-app">
+          <Ayuda />
+        </div>
+
+        <div className="solo-web">
         <div className="noche pt-10 pb-11 text-white">
           <Container>
             <h1 className="mb-4 max-w-[16ch] text-[clamp(32px,6.4vw,50px)] leading-[1.03] font-extrabold tracking-[-0.04em]">
@@ -51,6 +59,7 @@ export default function AyudaPage() {
               </p>
             </div>
           </Container>
+        </div>
         </div>
       </main>
 
