@@ -28,6 +28,14 @@ import {
   type GeocodedPlace,
 } from "./mapbox";
 import { getSupabase, isSupabaseConfigured } from "./supabase";
+import {
+  adivinarKind,
+  ciudadDe,
+  contextoDe,
+  deduplicar,
+  ordenar,
+  type PlaceRef,
+} from "./place";
 
 const TOMTOM_KEY = process.env.NEXT_PUBLIC_TOMTOM_KEY ?? "";
 const LOCATIONIQ_KEY = process.env.NEXT_PUBLIC_LOCATIONIQ_KEY ?? "";
@@ -36,12 +44,36 @@ const LOCATIONIQ_KEY = process.env.NEXT_PUBLIC_LOCATIONIQ_KEY ?? "";
  *  pour l'instant (Mapbox suggest) — `mapboxId` permet de les obtenir. */
 export type FoundPlace = GeocodedPlace & { mapboxId?: string };
 
-const normalize = (value: string) =>
-  value
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .trim();
+/**
+ * BRUT → MODÈLE. C'est ici que « Multiplaza » cesse d'être une chaîne de
+ * caractères pour devenir un lieu qui connaît son type et sa ville — donc
+ * qui peut survivre au changement d'écran sans se faire remplacer par
+ * « Ciudad de Panamá ». Voir l'en-tête de place.ts.
+ *
+ * `lat/lng` à 0 signifie « inconnu » chez Mapbox suggest, pas « au large
+ * du golfe de Guinée » : on les traduit en `null` pour que le reste du
+ * code puisse faire la différence.
+ */
+function comoPlaceRef(bruto: FoundPlace, fuente: PlaceRef["fuente"]): PlaceRef {
+  const tienePunto =
+    Number.isFinite(bruto.lat) &&
+    Number.isFinite(bruto.lng) &&
+    !(bruto.lat === 0 && bruto.lng === 0);
+  const punto = tienePunto ? { lat: bruto.lat, lng: bruto.lng } : null;
+  const citySlug = ciudadDe(punto, bruto.context ?? "");
+  return {
+    nombre: bruto.name.trim(),
+    kind: adivinarKind(bruto.name, bruto.context ?? ""),
+    citySlug,
+    /* La ville connue l'emporte sur le contexte du fournisseur : « David
+       · Chiriquí » se lit mieux que « Av. Central, Distrito de David ». */
+    contexto: citySlug ? contextoDe(citySlug) : (bruto.context ?? ""),
+    lat: punto?.lat ?? null,
+    lng: punto?.lng ?? null,
+    fuente,
+    fuenteId: bruto.mapboxId,
+  };
+}
 
 async function tomtomSearch(
   query: string,
@@ -192,7 +224,7 @@ export async function searchEverywhere(
   signal?: AbortSignal,
   /** Ville de la recherche : elle départage deux « Super 99 ». */
   citySlug?: string,
-): Promise<FoundPlace[]> {
+): Promise<PlaceRef[]> {
   if (query.trim().length < 3) return [];
   const settled = await Promise.allSettled([
     ownPlaces(query, citySlug, signal),
@@ -202,22 +234,37 @@ export async function searchEverywhere(
       ? suggestPlaces(query, near, signal)
       : Promise.resolve([] as FoundPlace[]),
   ]);
-  const merged: FoundPlace[] = [];
-  const seen = new Set<string>();
-  for (const result of settled) {
-    if (result.status !== "fulfilled") continue;
-    for (const place of result.value) {
-      const key = normalize(place.name);
-      if (!key || seen.has(key)) continue;
-      seen.add(key);
-      merged.push(place);
+  /* LA FUSION — et la correction du bug « Super 99 ».
+
+     L'ancienne version dédoublonnait sur le NOM normalisé, dans l'ordre
+     où les fournisseurs répondaient. Deux conséquences, toutes deux
+     mauvaises : les quinze Super 99 du pays s'effondraient en un seul,
+     arbitrairement celui du réseau le plus rapide ; et le classement
+     était le hasard, pas la pertinence.
+
+     Maintenant : on convertit tout en `PlaceRef` (donc chaque lieu sait
+     son TYPE et sa VILLE), on dédoublonne sur nom + proximité, puis on
+     classe. Voir place.ts et sa batterie de tests. */
+  const FUENTES = ["propia", "tomtom", "locationiq", "mapbox"] as const;
+  const todos: PlaceRef[] = [];
+  settled.forEach((result, i) => {
+    if (result.status !== "fulfilled") return;
+    for (const bruto of result.value) {
+      if (!bruto.name?.trim()) continue;
+      todos.push(comoPlaceRef(bruto, FUENTES[i] ?? "libre"));
     }
-  }
+  });
+  const merged = ordenar(deduplicar(todos), query, near);
   /* Personne n'a répondu ? Le géocodeur v5 de Mapbox reste un dernier
      filet pour les rues. */
   if (merged.length === 0 && MAPBOX_TOKEN) {
     try {
-      return await geocodePlaces(query, near, signal);
+      const brutos = await geocodePlaces(query, near, signal);
+      return ordenar(
+        deduplicar(brutos.map((b) => comoPlaceRef(b, "mapbox"))),
+        query,
+        near,
+      ).slice(0, 6);
     } catch {
       return [];
     }

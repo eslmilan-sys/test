@@ -4,7 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { Command } from "cmdk";
 import { Icon } from "@/components/ui/Icon";
 import { placesForCity, searchPlaces, KIND_LABELS } from "@/lib/places";
-import { searchEverywhere, GEOSEARCH_ENABLED, type FoundPlace } from "@/lib/geosearch";
+import { searchEverywhere, GEOSEARCH_ENABLED } from "@/lib/geosearch";
+import type { PlaceRef } from "@/lib/place";
 import { ALL_CITIES } from "@/lib/corridors";
 import { nearestCity } from "@/lib/places";
 import { retrievePlace } from "@/lib/mapbox";
@@ -62,7 +63,7 @@ export function PlacePicker({
      paraissait morte dès le deuxième essai. */
   const cierre = useRef<number>(0);
   const [query, setQuery] = useState("");
-  const [remote, setRemote] = useState<FoundPlace[]>([]);
+  const [remote, setRemote] = useState<PlaceRef[]>([]);
   const debounce = useRef<number>(0);
 
   const city = ALL_CITIES.find((c) => c.slug === citySlug);
@@ -133,18 +134,20 @@ export function PlacePicker({
 
   /* Un lieu du géocodeur : ses coordonnées disent SA ville. Si elle n'est
      pas celle du champ, on prévient l'appelant — la ruta suit le lieu. */
-  const pickRemote = async (r: FoundPlace) => {
+  const pickRemote = async (r: PlaceRef) => {
+    /* `null` veut dire « on ne sait pas où c'est », pas « à l'équateur » :
+       Mapbox suggest rend les noms sans point, on le demande au clic. */
     const coords =
-      r.lat !== 0 || r.lng !== 0
+      r.lat !== null && r.lng !== null
         ? { lat: r.lat, lng: r.lng }
-        : r.mapboxId
-          ? await retrievePlace(r.mapboxId)
+        : r.fuenteId
+          ? await retrievePlace(r.fuenteId)
           : null;
     if (coords && onCityResolved) {
       const cityOfPlace = nearestCity(coords.lat, coords.lng, ALL_CITIES);
       if (cityOfPlace.slug !== citySlug) onCityResolved(cityOfPlace.slug);
     }
-    pick(r.name, coords);
+    pick(r.nombre, coords);
   };
 
   return (
@@ -253,18 +256,18 @@ export function PlacePicker({
               );
             })}
             {remoteShown
-              .filter((r) => !local.some((l) => l.name === r.name))
+              .filter((r) => !local.some((l) => l.name === r.nombre))
               .map((r) => (
                 <Command.Item
-                  key={`geo-${r.name}-${r.context}`}
-                  value={`geo-${r.name}-${r.context}`}
+                  key={`geo-${r.nombre}-${r.contexto}`}
+                  value={`geo-${r.nombre}-${r.contexto}`}
                   onMouseDown={(e) => e.preventDefault()}
                   onSelect={() => void pickRemote(r)}
                   className="flex cursor-pointer items-baseline justify-between gap-3 rounded-[10px] px-3 py-2.5 text-[14.5px] data-[selected=true]:bg-ink-50"
                 >
-                  <span className="font-semibold">{r.name}</span>
+                  <span className="font-semibold">{r.nombre}</span>
                   <span className="min-w-0 shrink truncate text-[12.5px] text-ink-500">
-                    {r.context}
+                    {r.contexto}
                   </span>
                 </Command.Item>
               ))}

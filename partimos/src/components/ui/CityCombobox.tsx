@@ -5,10 +5,10 @@ import { Command } from "cmdk";
 import { ALL_CITIES } from "@/lib/corridors";
 import { nearestCity, searchPlaces } from "@/lib/places";
 import { retrievePlace } from "@/lib/mapbox";
+import type { PlaceRef } from "@/lib/place";
 import {
   searchEverywhere,
   GEOSEARCH_ENABLED,
-  type FoundPlace,
 } from "@/lib/geosearch";
 import { Icon } from "@/components/ui/Icon";
 
@@ -112,7 +112,7 @@ export function CityCombobox({
      desservie la plus proche : chercher « Boquete » propose David,
      parce que c'est le corridor qui y mène. Débouncé, annulable,
      silencieux sans jeton. */
-  const [remote, setRemote] = useState<FoundPlace[]>([]);
+  const [remote, setRemote] = useState<PlaceRef[]>([]);
   const [resolving, setResolving] = useState<string | null>(null);
   /* Jamais un clic qui ne fait rien : quand un lieu ne peut pas devenir
      une ville (échec de résolution, ou même ville que l'autre champ),
@@ -139,33 +139,30 @@ export function CityCombobox({
       .filter(
         (r) =>
           /* Déjà proposé en ville ou en lieu connu : inutile en double. */
-          !results.some((c) => normalize(c.name) === normalize(r.name)) &&
-          !placeResults.some((p) => normalize(p.name) === normalize(r.name)),
+          !results.some((c) => normalize(c.name) === normalize(r.nombre)) &&
+          !placeResults.some((p) => normalize(p.name) === normalize(r.nombre)),
       )
-      .map((r) => ({
-        ...r,
-        /* Coordonnées connues (TomTom, LocationIQ) : la ville s'affiche
-           AVANT le clic — on sait où on va atterrir. Mapbox (coords au
-           retrieve) : résolue au clic. */
-        city:
-          r.lat !== 0 || r.lng !== 0
-            ? nearestCity(r.lat, r.lng, ALL_CITIES)
-            : null,
-      }))
       .slice(0, 4);
   }, [remote, query, results, placeResults]);
 
-  /* Le choix d'un lieu : ses coordonnées arrivent au moment du clic
-     (retrieve pour Search Box, déjà là pour v5), puis la ville desservie
-     la plus proche devient la valeur du champ. */
-  const pickRemote = async (r: FoundPlace) => {
-    setResolving(r.mapboxId || r.name);
+  /* LE CHOIX D'UN LIEU, ET CE QUI SURVIT AU CLIC.
+
+     La ville devient la valeur du champ, parce que c'est elle que le
+     moteur de recherche comprend. Mais le NOM CHOISI part avec, entier,
+     par `onPlace`. Sans cette seconde information, choisir « Multiplaza »
+     affichait « Ciudad de Panamá » à l'écran suivant : le lieu était
+     résolu, puis jeté. La ville est un complément d'adresse, jamais un
+     remplaçant — voir l'en-tête de lib/place.ts. */
+  const pickRemote = async (r: PlaceRef) => {
+    setResolving(r.fuenteId || r.nombre);
     setNotice(null);
+    /* Mapbox « suggest » ne rend pas de coordonnées : on les demande au
+       clic. Les autres fournisseurs les ont déjà données. */
     const coords =
-      r.lat !== 0 || r.lng !== 0
+      r.lat !== null && r.lng !== null
         ? { lat: r.lat, lng: r.lng }
-        : r.mapboxId
-          ? await retrievePlace(r.mapboxId)
+        : r.fuenteId
+          ? await retrievePlace(r.fuenteId)
           : null;
     setResolving(null);
     if (!coords) {
@@ -180,7 +177,7 @@ export function CityCombobox({
       return;
     }
     onChange(city.slug);
-    onPlace?.(r.name, city.slug);
+    onPlace?.(r.nombre, city.slug);
     setOpen(false);
   };
 
@@ -344,25 +341,30 @@ export function CityCombobox({
             })}
             {remoteResults.map((r) => (
               <Command.Item
-                key={`geo-${r.mapboxId || r.name}`}
-                value={`geo-${r.mapboxId || r.name}`}
+                key={`geo-${r.fuenteId || r.nombre}`}
+                value={`geo-${r.fuenteId || r.nombre}`}
                 onMouseDown={(e) => e.preventDefault()}
                 onSelect={() => void pickRemote(r)}
                 className="flex cursor-pointer items-baseline justify-between gap-3 rounded-[10px] px-3 py-2.5 text-[15px] data-[selected=true]:bg-ink-50"
               >
+                {/* LA HIÉRARCHIE QUI PORTE L'INTENTION : le nom choisi
+                    domine, la ville n'est qu'un complément d'adresse.
+                    « Multiplaza » au-dessus, « Panamá · Panamá » en
+                    dessous — jamais l'inverse, jamais l'un à la place
+                    de l'autre. */}
                 <span className="min-w-0">
                   <span className="block truncate font-semibold">
-                    {r.name}
+                    {r.nombre}
                   </span>
                   <span className="block truncate text-[12.5px] text-ink-500">
-                    {r.context}
+                    {r.contexto}
                   </span>
                 </span>
                 <span className="shrink-0 text-[12.5px] font-semibold text-accent-ink">
-                  {resolving === (r.mapboxId || r.name)
+                  {resolving === (r.fuenteId || r.nombre)
                     ? "…"
-                    : r.city
-                      ? `→ ${r.city.name.replace("Ciudad de ", "")}`
+                    : r.citySlug
+                      ? `→ ${(ALL_CITIES.find((c) => c.slug === r.citySlug)?.shortName ?? "")}`
                       : "→ elegir"}
                 </span>
               </Command.Item>
