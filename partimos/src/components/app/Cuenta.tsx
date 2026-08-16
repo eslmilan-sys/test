@@ -12,6 +12,11 @@ import { formatUsd } from "@/lib/pricing";
 import { formatDayLabel, formatTime, localIso } from "@/lib/trips";
 import { bookingKey, carsOf, useSession, type Booking } from "@/lib/session";
 import { LEGAL_FOOTER } from "@/lib/content";
+import {
+  abrirVerificacion,
+  isDiditHostedAvailable,
+  isSupabaseConfigured,
+} from "@/lib/didit";
 import { useAhora } from "@/lib/reloj";
 import { marcarBienvenidaLeida, useBienvenidaSinLeer } from "@/lib/avisos";
 
@@ -610,8 +615,38 @@ const PIEZAS: Pieza[] = [
 ];
 
 function Verificacion() {
-  const { session } = useSession();
+  const { session, updateSession } = useSession();
   const carros = session ? carsOf(session) : [];
+  const [abriendo, setAbriendo] = useState(false);
+  const [aviso, setAviso] = useState<string | null>(null);
+
+  /* OUVRIR LE PARCOURS DIDIT — le vrai. Le document est lu et le visage
+     comparé chez eux ; ce qui manque sans Supabase, c'est le RETOUR du
+     verdict, et l'écran le dit au lieu de faire semblant. */
+  async function verificar() {
+    setAbriendo(true);
+    setAviso(null);
+    const r = await abrirVerificacion("cedula");
+    setAbriendo(false);
+    if ("error" in r) {
+      setAviso(
+        r.error === "not_configured"
+          ? "La verificación todavía no está conectada en esta versión."
+          : `Didit no respondió: ${r.error}`,
+      );
+      return;
+    }
+    /* On note qu'un dossier est parti. Sans session liée, c'est tout ce
+       qu'on peut savoir honnêtement : « enviado », jamais « verificado ». */
+    updateSession({ verificacionEnviada: new Date().toISOString() });
+    if (!r.ligada) {
+      setAviso(
+        "Abrimos tu verificación con Didit. Como esta versión todavía no está conectada a nuestra base, el resultado no vuelve solo: te lo activamos a mano.",
+      );
+    }
+    window.open(r.url, "_blank", "noopener,noreferrer");
+  }
+
   /* On n'invente aucun état : ce que la session sait, elle le dit ; ce
      qu'elle ignore reste « pendiente ». Un badge « vérifié » posé par
      défaut serait le pire mensonge possible sur cet écran. */
@@ -683,15 +718,55 @@ function Verificacion() {
         })}
       </ul>
 
-      {/* CE QUE CE BOUTON FAIT VRAIMENT, aujourd'hui. Le prestataire
-          n'est pas branché : le dire vaut mieux qu'un bouton qui tourne
-          dans le vide. */}
-      <p className="mt-3 rounded-[18px] bg-naranja-suave p-4 text-[13px] leading-relaxed text-ink-600">
-        <b className="font-semibold text-naranja-hondo">
-          La verificación se abre pronto.
-        </b>{" "}
-        El proveedor externo está en conexión. Mientras tanto puedes buscar,
-        reservar y publicar: la insignia solo cambia cuánto te aceptan.
+      {/* LE BOUTON OUVRE LE VRAI PARCOURS DIDIT. */}
+      {isDiditHostedAvailable || isSupabaseConfigured ? (
+        <>
+          <button
+            type="button"
+            onClick={() => void verificar()}
+            disabled={abriendo}
+            className="mt-3 flex h-[54px] w-full items-center justify-center gap-2.5 rounded-[16px] bg-naranja font-display text-[16px] font-bold text-white transition-colors hover:bg-naranja-hondo disabled:opacity-50"
+          >
+            <Icon name="id" className="size-5" />
+            {abriendo ? "Abriendo…" : "Verificar mi cédula ahora"}
+          </button>
+          <p className="mt-2 px-1 text-[12px] leading-snug text-ink-400">
+            Se abre el recorrido de Didit, nuestro proveedor certificado. La
+            foto del documento y tu cara se quedan en Didit — a nosotros no nos
+            llegan nunca.
+          </p>
+          {session?.verificacionEnviada && (
+            <p className="mt-2 rounded-[14px] bg-verde-suave px-4 py-3 text-[12.5px] leading-snug text-ink-600">
+              Ya enviaste un expediente. Didit lo revisa; te avisamos cuando
+              tengamos el veredicto.
+            </p>
+          )}
+          {aviso && (
+            <p
+              role="alert"
+              className="mt-2 rounded-[14px] bg-naranja-suave px-4 py-3 text-[12.5px] leading-snug text-ink-600"
+            >
+              {aviso}
+            </p>
+          )}
+        </>
+      ) : (
+        <p className="mt-3 rounded-[18px] bg-naranja-suave p-4 text-[13px] leading-relaxed text-ink-600">
+          <b className="font-semibold text-naranja-hondo">
+            La verificación se abre pronto.
+          </b>{" "}
+          El proveedor externo está en conexión.
+        </p>
+      )}
+
+      {/* LA LICENCIA, LE CARRO ET LA PLAQUE attendent le retour
+          automatique du verdict : ils se demandent dans le MÊME dossier,
+          et sans session liée on ne saurait pas à qui l'attribuer. Le
+          dire vaut mieux qu'un bouton qui n'aboutit pas. */}
+      <p className="mt-3 rounded-[18px] border border-ink-200 bg-white p-4 text-[12.5px] leading-relaxed text-ink-500">
+        La licencia, la foto del carro y la placa se piden en el mismo
+        expediente, y para eso hace falta que el veredicto vuelva solo. Es lo
+        que falta conectar.
       </p>
 
       <Link

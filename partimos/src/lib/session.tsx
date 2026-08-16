@@ -65,6 +65,10 @@ export type Session = {
    *  `lib/clave.ts`). Avec Supabase branché, c'est le serveur qui garde
    *  et vérifie — ce champ n'est alors jamais écrit. */
   claveHuella?: string | null;
+  /** ISO du moment où un dossier de vérification est parti chez Didit.
+   *  Ce n'est PAS un verdict : c'est « envoyé ». Le verdict vient du
+   *  webhook, jamais du navigateur. */
+  verificacionEnviada?: string | null;
   /** Insigne employeur ou université, si l'utilisateur l'a connecté. */
   affiliation: string | null;
   since: string;
@@ -259,6 +263,10 @@ function startAuth(): void {
    *  `lib/clave.ts`). Avec Supabase branché, c'est le serveur qui garde
    *  et vérifie — ce champ n'est alors jamais écrit. */
   claveHuella?: string | null;
+  /** ISO du moment où un dossier de vérification est parti chez Didit.
+   *  Ce n'est PAS un verdict : c'est « envoyé ». Le verdict vient du
+   *  webhook, jamais du navigateur. */
+  verificacionEnviada?: string | null;
     created_at?: string;
     /* Le numéro donné à l'inscription vit ICI : on ne l'enregistre pas
        comme identité téléphonique (ça coûterait un SMS de vérification

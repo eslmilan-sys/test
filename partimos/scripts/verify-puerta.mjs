@@ -306,6 +306,46 @@ console.log("\n  Con cuenta :\n");
   await ctx.close();
 }
 
+/* ═══ 4 bis. LA VÉRIFICATION OUVRE LE VRAI DIDIT ═══ */
+{
+  const ctx = await navegador.newContext({ ...devices["iPhone 13"] });
+  await ctx.addInitScript((s) => {
+    window.localStorage.setItem("partimos.demo-session", JSON.stringify(s));
+  }, SESSION);
+  /* On intercepte `window.open` : le conteneur de développement bloque
+     `verify.didit.me`, donc suivre le lien montrerait une page d'erreur
+     réseau. Ce qui compte n'est pas d'y arriver, c'est d'y ENVOYER. */
+  await ctx.addInitScript(() => {
+    window.__abierto = null;
+    window.open = (u) => {
+      window.__abierto = u;
+      return null;
+    };
+  });
+  const p = await ctx.newPage();
+  await p.goto(`${BASE}/cuenta/verificacion`, { waitUntil: "load" }).catch(() => {});
+  await p.waitForTimeout(900);
+  await p.evaluate(() => document.documentElement.classList.add("app-instalada"));
+  await p.waitForTimeout(600);
+
+  const boton = p.locator(".solo-app").first().getByRole("button", { name: /Verificar mi cédula/ });
+  ok("didit — le bouton existe", await boton.isVisible().catch(() => false));
+  await boton.click();
+  await p.waitForTimeout(800);
+  const abierto = await p.evaluate(() => window.__abierto);
+  ok("didit — il ouvre le parcours de Didit", /verify\.didit\.me\/u\//.test(String(abierto)), String(abierto));
+
+  /* CE QU'ON DIT DU VERDICT. Sans base branchée il ne revient pas tout
+     seul, et présenter la vérification comme terminée serait exactement
+     le mensonge qui coûte cher le jour d'un incident. */
+  const t = await texto(p);
+  ok("didit — il ne prétend pas que c'est fini",
+    /no vuelve solo|te lo activamos a mano|Didit lo revisa/.test(t));
+  ok("didit — il dit que la photo reste chez Didit",
+    /se quedan en Didit/.test(t));
+  await ctx.close();
+}
+
 /* ═══ 5. LE PAVÉ LÉGAL A QUITTÉ LE BAS DE CHAQUE ÉCRAN ═══ */
 {
   const marca = "no emplea conductores";

@@ -106,4 +106,54 @@ export async function getVerificationState(
   };
 }
 
+/* ══════════════════════════════════════════════════════════════════════
+   LE PARCOURS HÉBERGÉ — Didit sans serveur.
+
+   Le chemin ci-dessus est le bon : une fonction Edge ouvre une session
+   LIÉE à l'utilisateur, et le verdict revient par webhook. Il exige
+   Supabase, qui n'est pas branché dans la démonstration publiée.
+
+   Didit publie aussi un lien de parcours HÉBERGÉ, rattaché au workflow
+   publié de l'organisation. Il ne connaît pas notre utilisateur et ne
+   nous renvoie rien — mais le document est RÉELLEMENT lu, le visage
+   RÉELLEMENT comparé, chez Didit. C'est donc une vraie vérification, pas
+   une maquette : la seule chose qui manque est le retour automatique du
+   verdict.
+
+   On le dit sans détour à l'écran. Une vérification dont le résultat
+   n'arrive jamais, présentée comme terminée, serait exactement le genre
+   de mensonge qui coûte cher le jour d'un incident.
+   ══════════════════════════════════════════════════════════════════════ */
+
+/** Le lien du workflow publié. Public par nature : c'est une adresse
+ *  que Didit affiche elle-même dans son tableau de bord. */
+export const DIDIT_HOSTED_URL =
+  process.env.NEXT_PUBLIC_DIDIT_URL ?? "";
+
+export const isDiditHostedAvailable = Boolean(DIDIT_HOSTED_URL);
+
+/**
+ * Où envoyer quelqu'un pour vérifier son identité, MAINTENANT.
+ *
+ * Avec Supabase : la session liée, dont le verdict nous revient.
+ * Sans : le parcours hébergé, réel mais muet de notre côté.
+ */
+export async function abrirVerificacion(
+  kind: DocKind = "cedula",
+): Promise<{ url: string; ligada: boolean } | { error: string }> {
+  if (isSupabaseConfigured) {
+    const r = await startIdVerification(kind);
+    if ("url" in r) return { url: r.url, ligada: true };
+    /* La session liée a échoué : plutôt que de bloquer, on retombe sur
+       le parcours hébergé s'il existe. Une vérification muette vaut
+       mieux qu'une vérification impossible. */
+    if (isDiditHostedAvailable)
+      return { url: DIDIT_HOSTED_URL, ligada: false };
+    return { error: r.error };
+  }
+  if (isDiditHostedAvailable)
+    return { url: DIDIT_HOSTED_URL, ligada: false };
+  return { error: "not_configured" };
+}
+
 export { isSupabaseConfigured };
