@@ -18,7 +18,7 @@ import { ChatThread } from "@/components/trip/ChatThread";
 import {
   getVerificationState,
   isSupabaseConfigured,
-  startIdVerification,
+  abrirVerificacion,
   type DocKind,
   type VerificationState,
 } from "@/lib/didit";
@@ -1160,7 +1160,10 @@ function DocumentoRow({
   const launch = async () => {
     setLaunching(true);
     setError(null);
-    const result = await startIdVerification(kind);
+    /* Le repli du parcours hébergé, comme partout ailleurs : une session
+       liée qui ne s'ouvre pas ne doit pas fermer la porte à une
+       vérification qui, elle, marche. */
+    const result = await abrirVerificacion(kind);
     if ("url" in result) {
       window.location.assign(result.url);
       return;

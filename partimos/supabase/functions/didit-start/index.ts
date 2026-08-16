@@ -24,23 +24,86 @@ const DIDIT_API = "https://verification.didit.me/v2/session/";
 
 /* L'export statique appelle depuis le domaine GitHub Pages ; en local,
    depuis localhost. Le JWT fait l'authentification — CORS ne fait que
-   laisser passer l'en-tête. */
-const CORS = {
-  "Access-Control-Allow-Origin": Deno.env.get("SITE_ORIGIN") ?? "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-};
+   laisser passer l'en-tête.
+   ────────────────────────────────────────────────────────────────────────
+   LE BUG QUE CETTE FONCTION A CAUSÉ, ET QU'ELLE NE CAUSERA PLUS.
 
-const json = (status: number, body: unknown) =>
+   L'en-tête valait `Deno.env.get("SITE_ORIGIN") ?? "*"`, c'est-à-dire un
+   secret recopié à la main. Un secret qui contient l'ADRESSE du site
+   (« https://exemple.github.io/test/partimos/ ») au lieu de son ORIGINE
+   (« https://exemple.github.io ») est refusé par le navigateur — et le
+   symptôme est atroce à diagnostiquer : côté serveur tout réussit, la
+   session Didit est bien créée, la ligne est bien écrite, la fonction
+   répond 200 sans une seule erreur dans les journaux ; côté téléphone on
+   lit « Failed to send a request to the Edge Function ». Le travail est
+   fait, la réponse est jetée par le navigateur avant d'être lue.
+
+   La parade : on ne fait plus confiance à la forme du secret. On le
+   NORMALISE (on n'en garde que le schéma + l'hôte), on accepte plusieurs
+   origines séparées par des virgules, et on RENVOIE L'ORIGINE DEMANDÉE
+   quand elle est connue. `Vary: Origin` évite qu'un cache serve à un
+   domaine la réponse taillée pour un autre.
+
+   Refléter l'origine n'ouvre rien : l'authentification est le JWT dans
+   l'en-tête, pas un cookie. Un site tiers qui appellerait cette fonction
+   depuis le navigateur de quelqu'un n'aurait toujours pas son jeton. */
+
+/** « https://x.github.io/test/ » → « https://x.github.io ». Rend au
+ *  secret la forme que le navigateur exige, quelle que soit celle qu'on
+ *  lui a donnée. */
+function soloOrigen(valor: string): string | null {
+  const limpio = valor.trim();
+  if (!limpio) return null;
+  try {
+    return new URL(limpio).origin;
+  } catch {
+    return null;
+  }
+}
+
+const PERMITIDAS = new Set(
+  [
+    /* Ce que le projet déclare, sous n'importe quelle forme, et autant
+       d'entrées qu'on veut : « a.com, b.com ». */
+    ...(Deno.env.get("SITE_ORIGIN") ?? "").split(","),
+    /* Et ce qu'on sait déjà : le site publié et le développement. Les
+       écrire ici évite qu'un secret oublié casse la vérification. */
+    Deno.env.get("SITE_URL") ?? "",
+    "https://eslmilan-sys.github.io",
+    "http://localhost:3000",
+    "http://localhost:3100",
+  ]
+    .map(soloOrigen)
+    .filter((o): o is string => o !== null),
+);
+
+function cors(req: Request): Record<string, string> {
+  const origen = req.headers.get("Origin");
+  return {
+    /* Une origine connue : on la renvoie telle quelle. Inconnue ou
+       absente (appel serveur à serveur, curl) : `*`, qui suffit puisque
+       rien ici ne repose sur un cookie. */
+    "Access-Control-Allow-Origin":
+      origen && PERMITIDAS.has(origen) ? origen : "*",
+    "Access-Control-Allow-Headers":
+      "authorization, x-client-info, apikey, content-type",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Access-Control-Max-Age": "86400",
+    Vary: "Origin",
+  };
+}
+
+const json = (req: Request, status: number, body: unknown) =>
   new Response(JSON.stringify(body), {
     status,
-    headers: { ...CORS, "Content-Type": "application/json" },
+    headers: { ...cors(req), "Content-Type": "application/json" },
   });
 
 Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
-  if (req.method !== "POST") return json(405, { error: "method_not_allowed" });
+  if (req.method === "OPTIONS")
+    return new Response("ok", { headers: cors(req) });
+  if (req.method !== "POST")
+    return json(req, 405, { error: "method_not_allowed" });
 
   const apiKey = Deno.env.get("DIDIT_API_KEY");
 
@@ -66,8 +129,8 @@ Deno.serve(async (req) => {
   };
   const docType = DOC_TYPE[kind];
   const workflowId = WORKFLOWS[kind];
-  if (!apiKey || !docType) return json(503, { error: "didit_not_configured" });
-  if (!workflowId) return json(503, { error: `sin_flujo_${kind}` });
+  if (!apiKey || !docType) return json(req, 503, { error: "didit_not_configured" });
+  if (!workflowId) return json(req, 503, { error: `sin_flujo_${kind}` });
 
   /* Qui demande ? Le JWT du porteur, vérifié par Supabase avant d'arriver
      ici, redevient un utilisateur via le client anon + en-tête. */
@@ -78,7 +141,7 @@ Deno.serve(async (req) => {
   );
   const { data: userData, error: userError } =
     await supabaseAuth.auth.getUser();
-  if (userError || !userData.user) return json(401, { error: "unauthorized" });
+  if (userError || !userData.user) return json(req, 401, { error: "unauthorized" });
   const userId = userData.user.id;
 
   /* Écritures : la clé service. `identity_verifications` n'a aucune policy
@@ -101,7 +164,7 @@ Deno.serve(async (req) => {
     .or("expires_at.is.null,expires_at.gt.now()")
     .limit(1);
   if (existing && existing.length > 0) {
-    return json(409, { error: "already_verified" });
+    return json(req, 409, { error: "already_verified" });
   }
 
   /* La session Didit. `vendor_data` = notre identifiant de profil : c'est
@@ -122,7 +185,7 @@ Deno.serve(async (req) => {
   });
   if (!diditRes.ok) {
     console.error("didit session creation failed", diditRes.status);
-    return json(502, { error: "didit_unavailable" });
+    return json(req, 502, { error: "didit_unavailable" });
   }
   const diditSession = (await diditRes.json()) as {
     session_id: string;
@@ -138,6 +201,10 @@ Deno.serve(async (req) => {
         provider: "didit",
         provider_ref: diditSession.session_id,
         status: "pending",
+        /* LE TYPE DE DOCUMENT, sans quoi le dossier du permis serait
+           indiscernable de celui de la cédula et l'écran afficherait
+           « pendiente » pour un document déjà présenté. */
+        document_type: docType,
         document_country: "PA",
         updated_at: new Date().toISOString(),
       },
@@ -145,8 +212,8 @@ Deno.serve(async (req) => {
     );
   if (insertError) {
     console.error("kyc row upsert failed", insertError.message);
-    return json(500, { error: "storage_failed" });
+    return json(req, 500, { error: "storage_failed" });
   }
 
-  return json(200, { url: diditSession.url });
+  return json(req, 200, { url: diditSession.url });
 });

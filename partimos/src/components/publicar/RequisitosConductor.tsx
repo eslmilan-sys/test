@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Icon } from "@/components/ui/Icon";
-import { startIdVerification, type DocKind } from "@/lib/didit";
+import { abrirVerificacion, type DocKind } from "@/lib/didit";
 
 /**
  * CE QU'IL FAUT POUR PUBLIER — annoncé AU DÉBUT, pas à la fin.
@@ -46,7 +46,13 @@ export function RequisitosConductor({
   const verificar = async (doc: DocKind) => {
     setError("");
     setAbriendo(doc);
-    const r = await startIdVerification(doc);
+    /* `abrirVerificacion` PLUTÔT QUE `startIdVerification`. La différence
+       n'est pas cosmétique : la seconde échoue sèchement si la session
+       liée ne s'ouvre pas, la première retombe sur le parcours hébergé de
+       Didit. C'est exactement ce qui manquait le jour où la fonction Edge
+       répondait bien mais où le navigateur refusait sa réponse : le
+       document POUVAIT être vérifié, et l'écran disait le contraire. */
+    const r = await abrirVerificacion(doc);
     if ("url" in r) {
       window.location.assign(r.url);
       return;
