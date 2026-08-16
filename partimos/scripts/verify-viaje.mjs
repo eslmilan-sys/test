@@ -50,7 +50,14 @@ async function primerViaje() {
     { waitUntil: "load" },
   );
   await p.locator(".solo-app header").first().waitFor({ state: "attached", timeout: 20_000 });
-  const carta = p.locator(".solo-app ul > li > a[href*='/viaje/']").first();
+  /* UN VIAJE AVEC DES ARRÊTS INTERMÉDIAIRES. L'inventaire tourne avec
+     la date : « le premier résultat » est parfois direct, et la ligne de
+     temps n'a alors qu'un seul prix à montrer. On cherche donc celui qui
+     porte le mot « parada ». */
+  const todas = p.locator(".solo-app ul > li > a[href*='/viaje/']");
+  const textos = await todas.allTextContents();
+  const i = textos.findIndex((t) => /parada/.test(t));
+  const carta = todas.nth(i >= 0 ? i : 0);
   const href = await carta.getAttribute("href");
   const precio = (((await carta.textContent()) ?? "").match(/\$\s?[\d.,]+/) ?? [""])[0];
   await ctx.close();
@@ -113,7 +120,11 @@ ok("on trouve un viaje depuis la recherche", Boolean(href), href ?? "aucun");
   ok("app — le tracé est dessiné", (await app(p).locator("svg").count()) > 0);
   ok("app — qui maneja, avec sa note", /\d\.\d/.test(texto));
   ok("app — el recorrido", texto.includes("El recorrido"));
-  ok("app — les paradas intermédiaires sont nommées", /Coronado|Penonom/.test(texto));
+  /* Les arrêts sont NOMMÉS — lesquels dépend du viaje et du jour. Ce
+     qu'on vérifie, c'est que la ligne de temps porte au moins les deux
+     extrémités, avec leurs vrais noms. */
+  ok("app — les paradas sont nommées",
+    /Panam/.test(texto) && /Chitr|David|Santiago|Penonom|Coronado|Las Tablas/.test(texto));
   ok("app — le carro est dit", /\d{4}/.test(texto) && /Kia|Toyota|Hyundai|Nissan|Honda|Mitsubishi|Suzuki|Chevrolet|Mazda|Kia/.test(texto));
   ok("app — l'aporte est par puesto", texto.includes("Aporte por puesto") && texto.includes("por puesto"));
   ok("app — d'où sort l'aporte est expliqué", /km de este tramo/.test(texto));

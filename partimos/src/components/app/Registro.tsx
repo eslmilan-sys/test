@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Icon } from "@/components/ui/Icon";
 import { useSession } from "@/lib/session";
-import { isSupabaseConfigured } from "@/lib/supabase";
+import { getSupabase, isSupabaseConfigured } from "@/lib/supabase";
 import { huella, LARGO_MINIMO } from "@/lib/clave";
 
 /**
@@ -73,6 +73,9 @@ export function Registro({ onCerrar }: { onCerrar: () => void }) {
   const [celular, setCelular] = useState("");
   const [clave, setClave] = useState("");
   const [tocado, setTocado] = useState(false);
+  const [enviando, setEnviando] = useState(false);
+  const [correoEnviado, setCorreoEnviado] = useState(false);
+  const [degradado, setDegradado] = useState<string | null>(null);
 
   /* La date du jour est lue AU MOMENT DE VALIDER, jamais pendant le
      rendu : `new Date()` en corps de composant est impur, et le
@@ -112,11 +115,9 @@ export function Registro({ onCerrar }: { onCerrar: () => void }) {
     void terminar();
   }
 
-  async function terminar() {
-    /* Avec la base branchée, la session vient du serveur : l'ouvrir ici
-       ferait croire à une connexion qui n'existe pas. `signIn` le sait
-       déjà et ne fait rien dans ce cas — on garde le même appel pour ne
-       pas avoir deux chemins à maintenir. */
+  /** Le compte local — le chemin de la démonstration, quand il n'y a
+   *  pas de base du tout. */
+  async function abrirLocal() {
     const marca = await huella(clave);
     signIn(correo.trim(), nombre.trim(), apellido.trim(), null);
     updateSession({
@@ -125,6 +126,70 @@ export function Registro({ onCerrar }: { onCerrar: () => void }) {
       phone: celular.trim() || null,
       claveHuella: marca,
     });
+  }
+
+  async function terminar() {
+    setEnviando(true);
+    setDegradado(null);
+
+    const supabase = getSupabase();
+    if (isSupabaseConfigured && supabase) {
+      /* LE VRAI COMPTE. Supabase crée l'utilisateur et envoie le courriel
+         de confirmation ; la session n'existera qu'une fois le lien
+         ouvert. On ne l'ouvre donc PAS nous-mêmes — le faire ferait
+         croire à une connexion que le serveur ne connaît pas.
+
+         Les données du parcours partent dans `options.data` : elles
+         atterrissent dans `raw_user_meta_data`, d'où le déclencheur de
+         la base compose le profil. */
+      const { data, error } = await supabase.auth.signUp({
+        email: correo.trim(),
+        password: clave,
+        options: {
+          emailRedirectTo: `${window.location.origin}${window.location.pathname}`,
+          data: {
+            first_name: nombre.trim(),
+            last_name: apellido.trim(),
+            birth_date: nacimiento,
+            trato,
+            phone: celular.trim() || null,
+          },
+        },
+      });
+      setEnviando(false);
+
+      if (!error) {
+        /* Session immédiate = confirmation par courriel désactivée côté
+           projet. Sinon, on attend le lien, et on le dit. */
+        if (data.session) {
+          onCerrar();
+          return;
+        }
+        setCorreoEnviado(true);
+        return;
+      }
+
+      /* ÇA N'A PAS MARCHÉ — ON LE DIT, ET ON S'ARRÊTE LÀ.
+         J'ai d'abord voulu ouvrir un compte local en repli. C'était une
+         mauvaise idée : dès que Supabase est branché, la session vient
+         de LUI, et une session locale posée à côté ne serait lue par
+         personne — on aurait affiché « c'est bon » devant un compte qui
+         n'existe nulle part. Un message exact et un bouton qu'on peut
+         réessayer valent mieux qu'un faux succès. */
+      const ya = /already registered|already exists|User already/i.test(error.message);
+      const red = /Failed to fetch|NetworkError|load failed/i.test(error.message);
+      setDegradado(
+        ya
+          ? "Ese correo ya tiene cuenta. Vuelve atrás y entra con « Iniciar sesión »."
+          : red
+            ? "No pudimos hablar con el servidor. Revisa tu conexión y vuelve a intentar."
+            : `El servidor no pudo crear la cuenta: ${error.message}`,
+      );
+      return;
+    }
+
+    setEnviando(false);
+    await abrirLocal();
     onCerrar();
   }
 
@@ -331,6 +396,29 @@ export function Registro({ onCerrar }: { onCerrar: () => void }) {
           </Pregunta>
         )}
 
+        {correoEnviado && (
+          <div className="mt-5 rounded-[18px] bg-verde-suave p-4">
+            <p className="font-display text-[16px] font-bold text-verde-ok">
+              Revisa tu correo
+            </p>
+            <p className="mt-1.5 text-[13.5px] leading-relaxed text-ink-600">
+              Le mandamos un enlace a{" "}
+              <b className="font-semibold text-ink-900">{correo.trim()}</b>.
+              Ábrelo en este teléfono y tu cuenta queda lista. Si no llega en
+              un minuto, mira en spam.
+            </p>
+          </div>
+        )}
+
+        {degradado && (
+          <p
+            role="alert"
+            className="mt-3 rounded-[12px] bg-naranja-suave px-3.5 py-2.5 text-[13.5px] leading-snug text-ink-600"
+          >
+            {degradado}
+          </p>
+        )}
+
         {error && (
           <p
             role="alert"
@@ -351,7 +439,7 @@ export function Registro({ onCerrar }: { onCerrar: () => void }) {
         <button
           type="button"
           onClick={siguiente}
-          disabled={!valido[paso]}
+          disabled={!valido[paso] || enviando || correoEnviado}
           aria-label={paso === 5 ? "Crear mi cuenta" : "Siguiente"}
           className="flex size-[58px] items-center justify-center rounded-full bg-naranja text-white transition-colors hover:bg-naranja-hondo disabled:cursor-not-allowed disabled:opacity-35"
         >

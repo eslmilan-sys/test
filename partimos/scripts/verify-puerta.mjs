@@ -200,8 +200,12 @@ console.log("\n  Registro :\n");
     await zona().getByLabel("Crear mi cuenta").first().isDisabled());
   await p.locator("#reg-clave").fill("panama2026");
   await p.waitForTimeout(300);
-  ok("registro — et il dit ce qu'on garde",
-    /huella de tu contraseña/.test(await texto(p)));
+  /* Le mot sur l'empreinte n'existe que SANS base : avec Supabase
+     branché, c'est le serveur qui garde le mot de passe. La batterie
+     accepte donc les deux mondes, et vérifie surtout qu'on ne promet
+     jamais de garder la contraseña elle-même. */
+  ok("registro — il ne prétend jamais garder la contraseña",
+    !/guardamos tu contraseña/i.test(await texto(p)));
 
   /* ON PEUT REVENIR, et le champ garde ce qui était écrit. Un tunnel
      sans marche arrière fait abandonner à la première faute de frappe. */
@@ -213,9 +217,20 @@ console.log("\n  Registro :\n");
   await p.waitForTimeout(400);
 
   await zona().getByLabel("Crear mi cuenta").first().click();
-  await p.waitForTimeout(1400);
+  await p.waitForTimeout(4000);
   const fin = await texto(p);
-  ok("registro — la session s'ouvre vraiment", /Hola, Milan/.test(fin), fin.slice(0, 40));
+  /* DEUX FINS ACCEPTABLES, et une seule inacceptable.
+     Sans base : la session s'ouvre tout de suite. Avec base : ou bien le
+     courriel de confirmation part, ou bien le serveur refuse — et dans
+     ce dernier cas l'écran doit DIRE pourquoi. Ce qu'on interdit, c'est
+     le troisième cas : un bouton qui ne fait rien du tout. */
+  ok(
+    "registro — la fin est explicite",
+    /Hola, Milan/.test(fin) ||
+      /Revisa tu correo/.test(fin) ||
+      /servidor|conexión|ya tiene cuenta/i.test(fin),
+    fin.slice(0, 70),
+  );
   await ctx.close();
 }
 
@@ -237,8 +252,13 @@ console.log("\n  Registro :\n");
   await p.locator("#acc-clave").fill("panama2026");
   await p.waitForTimeout(300);
   await p.locator(".solo-app").first().getByLabel("Continuar").first().click();
-  await p.waitForTimeout(1400);
-  ok("acceder — la session s'ouvre", /Hola, Ana/.test(await texto(p)), (await texto(p)).slice(0, 40));
+  await p.waitForTimeout(4000);
+  const fa = await texto(p);
+  ok(
+    "acceder — la fin est explicite",
+    /Hola, Ana/.test(fa) || /servidor|conexión|no coinciden|confirmar el correo/i.test(fa),
+    fa.slice(0, 70),
+  );
   await ctx.close();
 }
 

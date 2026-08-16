@@ -352,10 +352,24 @@ function getSnapshot(): string | null {
     return merged;
   }
 
-  /* Base branchée : sans session Supabase, personne n'est connecté —
-     quoi que dise le stockage local. */
+  /* BASE BRANCHÉE, MAIS PAS DE SESSION SERVEUR.
+     La règle stricte — « personne n'est connecté, quoi que dise le
+     stockage local » — est la bonne pour de vrais comptes : une session
+     locale posée à côté ferait croire à une connexion que le serveur ne
+     connaît pas.
+
+     Elle a pourtant un angle mort qui a failli coûter cher : le jour où
+     l'on branche le serveur, tout compte ouvert AVANT disparaît sans
+     préavis, et si l'inscription serveur échoue pour une raison
+     quelconque (réglage de confirmation, adresse de retour non
+     autorisée, réseau), il ne reste AUCUNE porte d'entrée.
+
+     On garde donc une session locale préexistante, et une seule
+     condition : qu'elle ait été écrite avant. On n'en crée jamais de
+     nouvelle dans ce mode (`signIn` s'y refuse). C'est un filet, pas un
+     chemin — et il s'efface dès que le serveur répond. */
   if (!remote) {
-    merged = null;
+    merged = readLocal();
     return merged;
   }
   let prefs: Partial<Session> = {};
@@ -406,8 +420,9 @@ export function useSession() {
       payPref: PayChannel | null = null,
     ) => {
       /* Avec la base branchée, on n'ouvre PAS de session soi-même : c'est
-         le code reçu par courriel qui la crée. Écrire ici ferait croire à
-         une connexion qui n'existe pas côté serveur. */
+         le courriel de confirmation qui la crée. Écrire ici ferait croire
+         à une connexion que le serveur ne connaît pas — et elle ne serait
+         même pas lue, puisque la session vient alors de Supabase. */
       if (isSupabaseConfigured) return;
       const next: Session = {
         contact,
@@ -457,6 +472,16 @@ export function useSession() {
     if (client) {
       void client.auth.signOut().then(() => {
         remote = null;
+        /* ON EFFACE AUSSI LE FILET LOCAL. Sans cette ligne, se
+           déconnecter fermait la session serveur et laissait la session
+           locale de secours prendre le relais : on restait connecté
+           après avoir cliqué « Cerrar sesión ». Le filet sert à ne
+           jamais rester dehors, jamais à empêcher de sortir. */
+        try {
+          window.localStorage.removeItem(STORAGE_KEY);
+        } catch {
+          // rien à nettoyer
+        }
         emit();
       });
       return;

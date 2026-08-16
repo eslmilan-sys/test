@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Icon } from "@/components/ui/Icon";
 import { useSession } from "@/lib/session";
-import { isSupabaseConfigured } from "@/lib/supabase";
+import { getSupabase, isSupabaseConfigured } from "@/lib/supabase";
 import { huella } from "@/lib/clave";
 
 /**
@@ -44,7 +44,6 @@ export function Acceder({
   const [correo, setCorreo] = useState("");
   const [clave, setClave] = useState("");
   const [tocado, setTocado] = useState(false);
-  const [enviado, setEnviado] = useState(false);
   const [fallo, setFallo] = useState<string | null>(null);
 
   const valido = CORREO.test(correo.trim()) && clave.length > 0;
@@ -55,11 +54,33 @@ export function Acceder({
       return;
     }
     setFallo(null);
-    if (isSupabaseConfigured) {
-      /* Avec la base, c'est le serveur qui vérifie. On envoie le lien et
-         on s'arrête là — ouvrir la session ici ferait croire à une
-         connexion qui n'existe pas côté serveur. */
-      setEnviado(true);
+
+    const supabase = getSupabase();
+    if (isSupabaseConfigured && supabase) {
+      /* LE SERVEUR VÉRIFIE. C'est lui qui sait si le mot de passe est
+         bon, et lui seul : la session naît de sa réponse. */
+      const { error } = await supabase.auth.signInWithPassword({
+        email: correo.trim(),
+        password: clave,
+      });
+      if (!error) {
+        onCerrar();
+        return;
+      }
+      /* LA VRAIE CAUSE, jamais « inténtalo de nuevo ». Un compte non
+         confirmé et un mot de passe faux sont deux problèmes opposés :
+         l'un se règle dans la boîte mail, l'autre au clavier. */
+      if (/email not confirmed/i.test(error.message)) {
+        setFallo(
+          "Tu cuenta existe pero falta confirmar el correo. Abre el enlace que te mandamos — si no lo encuentras, mira en spam.",
+        );
+        return;
+      }
+      if (/invalid login credentials/i.test(error.message)) {
+        setFallo("Ese correo y esa contraseña no coinciden.");
+        return;
+      }
+      setFallo(`El servidor no respondió bien: ${error.message}`);
       return;
     }
     /* SANS BASE : on recompare l'empreinte gardée sur ce téléphone. Ce
@@ -144,14 +165,6 @@ export function Acceder({
               (CORREO.test(correo.trim())
                 ? "Escribe tu contraseña."
                 : "Revisa el correo — falta la arroba o el punto.")}
-          </p>
-        )}
-
-        {enviado && (
-          <p className="mt-3 rounded-[14px] bg-verde-suave px-4 py-3 text-[13.5px] leading-snug text-ink-600">
-            Te mandamos un enlace a{" "}
-            <b className="font-semibold text-ink-900">{correo.trim()}</b>. Ábrelo
-            en este teléfono y la sesión se abre sola.
           </p>
         )}
 
