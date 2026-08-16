@@ -1081,6 +1081,47 @@ html.app-instalada .solo-app {
   display: revert;
 }
 
+/* ===========================================================================
+   UNE SEULE PALETTE DANS L'APP
+   ===========================================================================
+
+   Le site a deux couleurs d'accent héritées : un bleu (`accent`, pour les
+   liens et le focus) et un ambre (`action`, pour les boutons et les
+   étoiles). L'app, elle, a l'orange de la maquette. Tant que les deux
+   cohabitent, chaque composant PARTAGÉ ramène ses couleurs avec lui : le
+   lien « Ofrecer otro aporte » sortait en bleu au milieu d'un écran
+   orange, les étoiles en ambre, l'anneau de focus en bleu.
+
+   La correction se fait ICI, en un point, et pas en repeignant vingt
+   composants : on redéfinit les VARIABLES sous le mode app. Tout ce qui
+   écrit `text-accent` ou `bg-action` suit, y compris le code qu'on
+   n'écrira que plus tard. Repeindre composant par composant aurait
+   garanti d'en oublier — et d'en réintroduire au prochain écran.
+
+   Le site garde ses couleurs : ce bloc ne s'applique qu'en mode app. */
+@media (display-mode: standalone) {
+  :root {
+    --color-accent: var(--color-naranja);
+    --color-accent-ink: var(--color-naranja-hondo);
+    --color-accent-soft: var(--color-naranja-suave);
+    --color-action: var(--color-naranja);
+    --color-action-bright: var(--color-naranja-vivo);
+    --color-action-deep: var(--color-naranja-hondo);
+    --color-action-ink: var(--color-naranja-hondo);
+    --color-action-soft: var(--color-naranja-suave);
+  }
+}
+html.app-instalada {
+  --color-accent: var(--color-naranja);
+  --color-accent-ink: var(--color-naranja-hondo);
+  --color-accent-soft: var(--color-naranja-suave);
+  --color-action: var(--color-naranja);
+  --color-action-bright: var(--color-naranja-vivo);
+  --color-action-deep: var(--color-naranja-hondo);
+  --color-action-ink: var(--color-naranja-hondo);
+  --color-action-soft: var(--color-naranja-suave);
+}
+
 /* LA MARGE HAUTE DES ÉCRANS PARTAGÉS.
    Certaines pages n'ont pas de version app séparée — publier un viaje,
    les mentions légales : leur contenu est le même des deux côtés, et en
@@ -1123,21 +1164,48 @@ html.app-instalada .cima-app {
    Sur le SITE, rien de tout ça : une page web qu'on visite n'a pas à
    « s'ouvrir ». */
 @media (prefers-reduced-motion: no-preference) {
+  /* LE MOUVEMENT D'ENTRÉE, revu.
+     La version d'avant montait de 15 px en fondu : correct, et sans
+     caractère — n'importe quelle page fait ça. Trois changements, chacun
+     pour une raison :
+
+       · UN LÉGER RECUL D'ÉCHELLE (0,97 → 1). Un bloc qui monte SEULEMENT
+         glisse ; un bloc qui monte en s'approchant ARRIVE. C'est la
+         différence entre un texte qui défile et un objet qui se pose.
+       · UN FLOU QUI SE DISSIPE. Deux pixels, le temps du mouvement. L'œil
+         le lit comme une mise au point, pas comme un effet — et c'est ce
+         qui donne l'impression que l'écran se compose au lieu de
+         s'afficher.
+       · UNE COURBE QUI DÉPASSE À PEINE. `cubic-bezier(0.2, 0.9, 0.2, 1)`
+         freine tard : le bloc arrive vite puis se pose, au lieu de
+         ralentir mollement sur toute la durée. */
   @keyframes entraApp {
     from {
       opacity: 0;
-      transform: translate3d(0, 15px, 0);
+      transform: translate3d(0, 18px, 0) scale(0.97);
+      filter: blur(2px);
+    }
+    60% {
+      filter: blur(0);
     }
     to {
       opacity: 1;
       transform: none;
+      filter: blur(0);
     }
   }
+  /* LA BARRE ARRIVE DU BORD OÙ ELLE VIT, et un peu plus tard que le
+     contenu : on lit d'abord ce qu'on est venu voir, la navigation se
+     présente ensuite. Elle apparaît en fondu EN MÊME TEMPS qu'elle
+     monte — une pilule flottante qui surgit opaque du bas de l'écran
+     ressemble à un bandeau publicitaire. */
   @keyframes entraBarra {
     from {
-      transform: translate3d(0, 100%, 0);
+      opacity: 0;
+      transform: translate3d(0, calc(100% + 12px), 0);
     }
     to {
+      opacity: 1;
       transform: none;
     }
   }
@@ -1146,22 +1214,22 @@ html.app-instalada .cima-app {
      pour lire une séquence, trop peu pour attendre. */
   html.app-instalada .entra-app,
   html.app-instalada .solo-app .entra-app {
-    animation: entraApp 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
-    animation-delay: calc(var(--paso, 0) * 80ms);
+    animation: entraApp 0.5s cubic-bezier(0.2, 0.9, 0.2, 1) both;
+    animation-delay: calc(var(--paso, 0) * 70ms);
   }
   html.app-instalada nav[aria-label="Navegación principal"] {
-    animation: entraBarra 0.44s cubic-bezier(0.16, 1, 0.3, 1) both;
-    animation-delay: 200ms;
+    animation: entraBarra 0.5s cubic-bezier(0.2, 0.9, 0.2, 1) both;
+    animation-delay: 260ms;
   }
 }
 @media (prefers-reduced-motion: no-preference) and (display-mode: standalone) {
   .entra-app {
-    animation: entraApp 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
-    animation-delay: calc(var(--paso, 0) * 80ms);
+    animation: entraApp 0.5s cubic-bezier(0.2, 0.9, 0.2, 1) both;
+    animation-delay: calc(var(--paso, 0) * 70ms);
   }
   nav[aria-label="Navegación principal"] {
-    animation: entraBarra 0.44s cubic-bezier(0.16, 1, 0.3, 1) both;
-    animation-delay: 200ms;
+    animation: entraBarra 0.5s cubic-bezier(0.2, 0.9, 0.2, 1) both;
+    animation-delay: 260ms;
   }
 }
 

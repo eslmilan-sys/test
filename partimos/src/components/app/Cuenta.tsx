@@ -3,7 +3,9 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import * as Dialog from "@radix-ui/react-dialog";
 import { Icon, type IconName } from "@/components/ui/Icon";
+import { LogoMark } from "@/components/site/Logo";
 import { ChatThread } from "@/components/trip/ChatThread";
 import { ALL_CITIES } from "@/lib/corridors";
 import { formatUsd } from "@/lib/pricing";
@@ -47,12 +49,17 @@ function estadoDe(b: Booking, ahora: number): Estado {
   return "historial";
 }
 
-export function Cuenta() {
+export function Cuenta({ panel: pedidoProp }: { panel?: Panel } = {}) {
   const params = useSearchParams();
   const { session } = useSession();
   const ahora = useAhora();
 
-  const pedido = params.get("panel");
+  /* Le panneau vient de la ROUTE (`/cuenta/perfil`), pas d'un paramètre.
+     C'est ce qui permet à la barre d'onglets de savoir où l'on est : avec
+     `?panel=`, les quatre écrans partageaient un chemin, et « Mis viajes »
+     s'allumait sur Mensajes comme sur Perfil. `?panel=` reste accepté —
+     des liens partagés l'utilisent peut-être déjà. */
+  const pedido = pedidoProp ?? params.get("panel");
   const PANELES: Panel[] = [
     "viajes",
     "mensajes",
@@ -281,10 +288,14 @@ function Mensajes({ reservas }: { reservas: Booking[] }) {
         mensaje después.
       </p>
 
+      <ul className="mt-4 grid gap-2.5">
+        <Bienvenida />
+      </ul>
+
       {reservas.length === 0 ? (
-        <div className="mt-4 rounded-[18px] border border-ink-200 bg-white px-5 py-8 text-center">
-          <p className="font-display text-[16.5px] font-bold">
-            Todavía no hay conversaciones
+        <div className="mt-2.5 rounded-[18px] border border-ink-200 bg-white px-5 py-7 text-center">
+          <p className="font-display text-[16px] font-bold">
+            Todavía no hay viajes de qué hablar
           </p>
           <p className="mx-auto mt-1.5 max-w-[34ch] text-[13.5px] leading-relaxed text-ink-500">
             Cuando reserves un puesto, aquí hablas con quien maneja — sin dar
@@ -292,7 +303,7 @@ function Mensajes({ reservas }: { reservas: Booking[] }) {
           </p>
         </div>
       ) : (
-        <ul className="mt-4 grid gap-2.5 pb-4">
+        <ul className="mt-2.5 grid gap-2.5 pb-4">
           {reservas.map((b, i) => (
             <li
               key={`${b.tripId}-${b.boardingAt}-${i}`}
@@ -328,6 +339,136 @@ function Mensajes({ reservas }: { reservas: Booking[] }) {
   );
 }
 
+
+
+/**
+ * LE MOT DE BIENVENUE — il est DÉJÀ là quand on arrive.
+ *
+ * Demande du propriétaire, exemple à l'appui : la boîte ne doit pas être
+ * vide au premier jour. Une boîte vide n'apprend rien et ne donne rien à
+ * faire ; un premier message dit ce que l'app sait faire, au moment
+ * exact où l'on cherche quoi faire.
+ *
+ * IL NE MENT PAS SUR SA NATURE. Ce n'est pas une conversation : personne
+ * ne répondra, et le fil le dit. Un message d'accueil déguisé en
+ * discussion fait écrire dans le vide, et c'est la première mauvaise
+ * impression qu'on laisse.
+ */
+function Bienvenida() {
+  const { session } = useSession();
+  const nombre = session?.firstName?.trim();
+
+  return (
+    <li>
+      <Dialog.Root>
+        <Dialog.Trigger asChild>
+          <button
+            type="button"
+            className="flex w-full items-center gap-3 rounded-[18px] border border-ink-200 bg-white p-4 text-left transition-colors hover:border-naranja"
+          >
+            <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-naranja-suave">
+              <LogoMark gradientId="brand-bienvenida" className="h-[24px] w-[20px]" />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block font-display text-[15.5px] font-bold">
+                Partimos
+              </span>
+              <span className="block truncate text-[12.5px] text-ink-500">
+                Bienvenido a bordo{nombre ? `, ${nombre}` : ""}
+              </span>
+            </span>
+            <Icon name="arrowRight" className="size-4 shrink-0 text-ink-300" />
+          </button>
+        </Dialog.Trigger>
+
+        <Dialog.Portal>
+          <Dialog.Overlay className="panel-fondo fixed inset-0 z-[90] bg-ink-900/45 backdrop-blur-[3px]" />
+          <Dialog.Content
+            aria-describedby={undefined}
+            className="panel-derecha fixed inset-y-0 right-0 z-[100] flex w-full max-w-[520px] flex-col bg-ink-50 focus:outline-none"
+          >
+            <header className="glass-noche flex items-start gap-3 bg-night-900 px-5 pt-[calc(16px+env(safe-area-inset-top))] pb-4 text-white">
+              <Dialog.Close asChild>
+                <button
+                  type="button"
+                  aria-label="Volver"
+                  className="-ml-1.5 flex size-9 shrink-0 items-center justify-center rounded-full text-white/70 transition-colors hover:bg-white/10 hover:text-white"
+                >
+                  <Icon name="arrowRight" className="size-5 rotate-180" />
+                </button>
+              </Dialog.Close>
+              <Dialog.Title className="font-display text-[19px] leading-tight font-bold">
+                Partimos
+              </Dialog.Title>
+            </header>
+
+            <div className="flex-1 overflow-y-auto px-4 py-4">
+              <div className="max-w-[86%] rounded-[16px] rounded-bl-[6px] border border-ink-200 bg-white px-4 py-3.5">
+                <p className="text-[14.5px] leading-relaxed">
+                  {nombre ? `¡Bienvenido a bordo, ${nombre}!` : "¡Bienvenido a bordo!"}{" "}
+                  Aquí van las tres cosas que puedes hacer desde ya.
+                </p>
+              </div>
+
+              <ul className="mt-3 grid gap-2">
+                {[
+                  {
+                    icon: "search" as const,
+                    href: "/",
+                    titulo: "Busca a dónde vas",
+                    texto:
+                      "Escribe tu punto exacto — un PH, un mall, una esquina. Ves el aporte antes de reservar.",
+                  },
+                  {
+                    icon: "plusCircle" as const,
+                    href: "/publicar/nuevo",
+                    titulo: "Publica tu viaje",
+                    texto:
+                      "Si eres tú quien maneja, recuperas parte de lo que ibas a gastar de todos modos.",
+                  },
+                  {
+                    icon: "shield" as const,
+                    href: "/seguridad",
+                    titulo: "Mira cómo te cuidamos",
+                    texto:
+                      "Cédula verificada fuera de aquí, chat que queda escrito, y el 911 a un toque.",
+                  },
+                ].map((a) => (
+                  <li key={a.href}>
+                    <Link
+                      href={a.href}
+                      className="flex items-start gap-3 rounded-[16px] border border-ink-200 bg-white p-3.5 transition-colors hover:border-naranja"
+                    >
+                      <span className="flex size-9 shrink-0 items-center justify-center rounded-[12px] bg-naranja-suave text-naranja">
+                        <Icon name={a.icon} className="size-[18px]" />
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block font-display text-[14.5px] font-bold">
+                          {a.titulo}
+                        </span>
+                        <span className="mt-0.5 block text-[13px] leading-snug text-ink-600">
+                          {a.texto}
+                        </span>
+                      </span>
+                      <Icon name="arrowRight" className="mt-1 size-4 shrink-0 text-ink-300" />
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+
+              {/* CE QUE CE FIL N'EST PAS. Laisser croire qu'on peut
+                  répondre ici, c'est faire écrire dans le vide. */}
+              <p className="mt-4 px-1 text-[12.5px] leading-snug text-ink-400">
+                Este es un mensaje nuestro, no una conversación: aquí no
+                contestamos. Para escribirnos, Perfil → Ayuda.
+              </p>
+            </div>
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
+    </li>
+  );
+}
 
 /* ------------------------------------------------------------------ */
 /* VERIFICACIÓN                                                        */
@@ -485,7 +626,7 @@ function Verificacion() {
       </p>
 
       <Link
-        href="/cuenta?panel=perfil"
+        href="/cuenta/perfil"
         className="mt-3 flex items-center justify-center gap-2 rounded-[16px] border border-ink-200 bg-white px-5 py-3.5 text-[14px] font-semibold text-ink-600 transition-colors hover:border-naranja"
       >
         Volver a mi perfil
@@ -560,7 +701,7 @@ function Legal() {
 function Volver() {
   return (
     <Link
-      href="/cuenta?panel=perfil"
+      href="/cuenta/perfil"
       aria-label="Volver a mi perfil"
       className="-ml-1.5 flex size-10 items-center justify-center rounded-full text-ink-500 transition-colors hover:bg-ink-100"
     >
@@ -575,7 +716,7 @@ function Volver() {
 
 const MENU: { href: string; label: string; icon: IconName }[] = [
   { href: "/cuenta", label: "Mis viajes", icon: "route" },
-  { href: "/cuenta?panel=verificacion", label: "Verificación", icon: "id" },
+  { href: "/cuenta/verificacion", label: "Verificación", icon: "id" },
   { href: "/publicar/nuevo", label: "Publicar un viaje", icon: "plus" },
   { href: "/como-funciona", label: "Cómo funciona", icon: "compass" },
   { href: "/seguridad", label: "Seguridad", icon: "shield" },
@@ -583,7 +724,7 @@ const MENU: { href: string; label: string; icon: IconName }[] = [
   /* LE TEXTE LÉGAL A SA PAGE. Il traînait en bas de CHAQUE écran de
      l'app — six lignes de conformité sous une liste de viajes, à
      répétition. Il reste obligatoire, il reste lisible : il est ici. */
-  { href: "/cuenta?panel=legal", label: "Legal", icon: "briefcase" },
+  { href: "/cuenta/legal", label: "Legal", icon: "briefcase" },
 ];
 
 function Perfil({
@@ -593,7 +734,7 @@ function Perfil({
   reservas: Booking[];
   ahora: number | null;
 }) {
-  const { session } = useSession();
+  const { session, signOut } = useSession();
   if (!session) return null;
 
   const hechos =
@@ -659,7 +800,7 @@ function Perfil({
 
         {!session.isVerified && (
           <Link
-            href="/cuenta?panel=verificacion"
+            href="/cuenta/verificacion"
             className="mt-3 flex items-center gap-3 rounded-[18px] bg-naranja-suave p-4 transition-colors hover:bg-naranja-suave/70"
           >
             <Icon name="id" className="size-5 shrink-0 text-naranja" />
@@ -693,6 +834,19 @@ function Perfil({
             </li>
           ))}
         </ul>
+
+        {/* SE DÉCONNECTER — il manquait, et c'est le genre d'absence qui
+            inquiète : ne pas trouver la sortie fait douter de tout le
+            reste. En bas, discret, mais présent sur l'écran où on le
+            cherche. */}
+        <button
+          type="button"
+          onClick={signOut}
+          className="mt-3 flex w-full items-center justify-center gap-2 rounded-[16px] border border-ink-200 bg-white px-5 py-3.5 text-[14px] font-semibold text-ink-600 transition-colors hover:border-naranja hover:text-naranja"
+        >
+          <Icon name="salir" className="size-[17px]" />
+          Cerrar sesión
+        </button>
 
         <p className="mt-3 px-1 text-[12px] leading-snug text-ink-400">
           Tu apellido completo no se muestra nunca en público: los demás ven{" "}

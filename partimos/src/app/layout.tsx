@@ -156,7 +156,15 @@ export default function RootLayout({
           {/* Le retour du lien du courriel : muet sur une visite normale. */}
           <AuthLanding />
           {children}
-          <Footer />
+          {/* LE PIED DE PAGE EST UNE CONVENTION DU WEB, et il n'entre
+              pas dans l'app : on n'y défile pas « jusqu'au bout » d'une
+              page, on change d'écran. Ce qui doit rester atteignable —
+              les pages légales, le texte de conformité — a son écran,
+              Perfil → Legal. Le HTML servi ne change pas : c'est
+              `.solo-web` qui décide, à l'affichage seulement. */}
+          <div className="solo-web">
+            <Footer />
+          </div>
           {/* La mesure : muette sans Supabase, jamais bloquante. */}
           <Suspense fallback={null}>
             <PageView />

@@ -22,11 +22,15 @@ import { Icon, type IconName } from "@/components/ui/Icon";
  * Le verre n'est pas décoratif non plus : on doit deviner que la liste
  * continue dessous, sinon on croit être arrivé au bas de l'écran.
  *
- * CINQ DESTINATIONS ET UNE ACTION. Le `+` central n'est pas un sixième
- * onglet : il publie. C'est aussi la réponse à la question du switcher
- * conducteur/passager — il n'y en a pas besoin. Un switcher global
- * obligerait à déclarer un rôle à chaque ouverture, alors que le rôle se
- * déduit : on cherche par défaut, on publie quand on appuie sur le +.
+ * CINQ ONGLETS, ET C'EST LA LISTE DU PROPRIÉTAIRE, mot pour mot :
+ * rechercher, publier, mes viajes, messages, profil. Il n'y a plus de
+ * bouton d'action central : publier EST une destination, au même titre
+ * que le reste, et lui donner une pastille orange qui déborde en faisait
+ * une exception qu'aucune règle ne justifiait.
+ *
+ * Plus d'onglet « Inicio » non plus, et ce n'est pas une perte : la
+ * page d'accueil de l'app EST la recherche. Deux onglets qui mènent au
+ * même geste, c'est un onglet gaspillé sur cinq.
  *
  * Les libellés restent sous les icônes. Une icône seule est une
  * devinette — « route » et « chat » ne veulent rien dire hors contexte —
@@ -42,28 +46,33 @@ import { Icon, type IconName } from "@/components/ui/Icon";
  */
 type Tab = { href: string; label: string; icon: IconName; rutas: string[] };
 
-/** Deux à gauche du bouton, deux à droite : le + tombe au centre exact. */
-const IZQUIERDA: Tab[] = [
-  { href: "/", label: "Inicio", icon: "home", rutas: ["/"] },
+const TABS: Tab[] = [
   {
-    href: "/ya",
+    href: "/",
     label: "Buscar",
     icon: "search",
-    rutas: ["/ya", "/buscar", "/viajes", "/viaje"],
+    rutas: ["=", "/ya", "/buscar", "/viajes", "/viaje"],
   },
-];
-const DERECHA: Tab[] = [
-  /* `rutas: []` veut dire « n'allume jamais ». Mensajes n'ouvre pas une
-     page mais un panneau par-dessus /cuenta : le juger sur le chemin
-     l'allumerait en même temps que Viajes, et deux onglets actifs disent
-     moins que zéro. */
   {
-    href: "/cuenta?panel=mensajes",
-    label: "Mensajes",
-    icon: "chat",
-    rutas: [],
+    href: "/publicar/nuevo",
+    label: "Publicar",
+    icon: "plusCircle",
+    rutas: ["/publicar"],
   },
-  { href: "/cuenta", label: "Viajes", icon: "route", rutas: ["/cuenta"] },
+  /* `/cuenta` EXACTEMENT — pas en préfixe. Les panneaux ont maintenant
+     leurs propres routes (`/cuenta/perfil`, `/cuenta/mensajes`) : un
+     préfixe allumerait « Mis viajes » sur les trois, et trois onglets
+     actifs disent moins que zéro. */
+  { href: "/cuenta", label: "Mis viajes", icon: "route", rutas: ["="] },
+  { href: "/cuenta/mensajes", label: "Mensajes", icon: "chat", rutas: ["/cuenta/mensajes"] },
+  {
+    href: "/cuenta/perfil",
+    label: "Perfil",
+    icon: "userCircle",
+    /* Le profil coiffe ses sous-écrans : vérification et légal s'ouvrent
+       depuis lui, et l'onglet doit rester allumé pendant qu'on y est. */
+    rutas: ["/cuenta/perfil", "/cuenta/verificacion", "/cuenta/legal"],
+  },
 ];
 
 export function TabBar() {
@@ -71,21 +80,29 @@ export function TabBar() {
 
   /* L'onglet actif se juge sur le PRÉFIXE, sauf l'accueil : « / » est
      préfixe de tout, et l'allumer partout ne dirait plus rien. */
-  const activo = (rutas: string[]) =>
-    rutas.some((r) => (r === "/" ? pathname === "/" : pathname.startsWith(r)));
+  /* « = » demande une correspondance EXACTE avec le `href` de l'onglet ;
+     tout le reste est un préfixe. Sans ce cas, « / » et « /cuenta »
+     s'allumeraient partout, chacun étant préfixe de la moitié du site. */
+  const activo = (t: Tab) =>
+    t.rutas.some((r) =>
+      r === "=" || r === "/" ? pathname === t.href.split("?")[0] : pathname.startsWith(r),
+    );
 
   const item = (t: Tab) => {
-    const on = activo(t.rutas);
+    const on = activo(t);
     return (
       <li key={t.href} className="flex-1">
         <Link
           href={t.href}
           aria-current={on ? "page" : undefined}
-          className={`mx-auto flex h-full max-w-[74px] flex-col items-center justify-center gap-0.5 rounded-[18px] text-[10.5px] font-semibold transition-colors ${
+          /* Le libellé descend à 10 px : « Mis viajes » doit tenir sur
+             une ligne dans un cinquième de 390 px, et un mot coupé en
+             deux se lit plus mal qu'un mot petit. */
+          className={`mx-auto flex h-full w-full flex-col items-center justify-center gap-0.5 rounded-[18px] px-0.5 text-[10px] font-semibold whitespace-nowrap transition-colors ${
             on ? "bg-naranja-suave text-naranja" : "text-ink-500"
           }`}
         >
-          <Icon name={t.icon} className="size-[21px]" />
+          <Icon name={t.icon} className="size-[20px]" />
           {t.label}
         </Link>
       </li>
@@ -102,23 +119,7 @@ export function TabBar() {
       style={{ paddingBottom: "calc(10px + env(safe-area-inset-bottom))" }}
     >
       <ul className="glass relative mx-auto flex h-[64px] max-w-[440px] items-stretch rounded-[24px] px-1.5">
-        {IZQUIERDA.map(item)}
-
-        {/* PUBLIER — l'action, pas une destination. Il déborde vers le
-            haut pour être atteint sans viser : c'est la cible la plus
-            grande de l'écran, et celle qu'on touche le plus mal si elle
-            est alignée avec les autres. */}
-        <li className="flex w-[72px] shrink-0 items-start justify-center">
-          <Link
-            href="/publicar/nuevo"
-            aria-label="Publicar un viaje"
-            className="tab-mas -mt-5 flex size-[54px] items-center justify-center rounded-full bg-naranja text-white shadow-[0_6px_18px_-4px_rgba(226,84,12,0.55)] transition-colors hover:bg-naranja-hondo"
-          >
-            <Icon name="plus" className="size-6" />
-          </Link>
-        </li>
-
-        {DERECHA.map(item)}
+        {TABS.map(item)}
       </ul>
     </nav>
   );

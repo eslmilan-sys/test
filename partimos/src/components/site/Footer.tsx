@@ -106,32 +106,14 @@ export function Footer() {
           </ul>
         </nav>
 
-        {/* Dans l'app, les deux pages légales ne sont plus atteignables par
-            le plan du site qu'on vient de masquer. Elles reviennent ici, en
-            une ligne : masquer un lien de navigation est une décision de
-            confort, rendre un texte légal introuvable n'en est pas une. */}
-        {/* `solo-app` sur un CONTENEUR, pas sur la liste elle-même : la règle
-            qui la révèle rend son `display` au navigateur, ce qui écraserait
-            le `flex` de la liste et empilerait les trois liens l'un sous
-            l'autre. Le conteneur est un bloc, la liste garde sa disposition. */}
-        <div className="solo-app">
-          <ul className="mb-5 flex flex-wrap gap-x-5 gap-y-1.5 text-[13px]">
-            {[
-              { href: "/terminos", label: "Términos" },
-              { href: "/privacidad", label: "Privacidad" },
-              { href: "/seguridad", label: "Seguridad" },
-            ].map((l) => (
-              <li key={l.href}>
-                <Link
-                  href={l.href}
-                  className="py-1 transition-colors hover:text-white"
-                >
-                  {l.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
+        {/* PAS DE PIED DE PAGE DANS L'APP. Les trois liens légaux
+            vivaient encore ici : trois mots gris sur une bande sombre,
+            au bas de chaque écran, sous la barre d'onglets. Un pied de
+            page est une convention du WEB — on y arrive en défilant
+            jusqu'au bout d'une page qu'on lit une fois. Dans une app on
+            ne défile pas « jusqu'au bout », on change d'écran ; ce qui
+            traîne en bas n'est pas consulté, il encombre.
+            Ils ont leur écran : Perfil → Legal. */}
 
         {/* LE PAVÉ DE CONFORMITÉ EST `solo-web`, ET C'EST RÉFLÉCHI.
             Le §8 l'impose sur toutes les pages du SITE, et il y reste

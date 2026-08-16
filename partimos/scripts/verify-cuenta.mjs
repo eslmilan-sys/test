@@ -124,7 +124,17 @@ console.log(`\nCuenta — ${BASE}\n`);
   ok("viajes — une seule carte dans Próximos", (await tarjetas.count()) === 1, `${await tarjetas.count()}`);
   ok("viajes — c'est bien celle de demain", ((await tarjetas.first().textContent()) ?? "").includes("Chitré"));
   ok("viajes — le point de recogida est dit", /Te recoge/.test(t));
-  ok("viajes — la date coiffe le groupe, pas chaque carte", /MAÑANA|Mañana|mañana/.test(t));
+  /* LA DATE COIFFE LE GROUPE, ELLE N'EST PAS SUR CHAQUE CARTE. La
+     version d'avant cherchait le mot « mañana » : selon l'heure à
+     laquelle tournait la batterie, la reserva de « dans 20 h » tombait
+     le jour même et le test échouait sans qu'aucun code n'ait bougé. On
+     vérifie donc la STRUCTURE, qui est ce qui compte : un en-tête de
+     jour au-dessus, aucune date dans la carte. */
+  const encabezado = ((await zona.locator("section h2").first().textContent()) ?? "").trim();
+  ok("viajes — un en-tête de jour coiffe le groupe",
+    /^(Hoy|Mañana|[A-Za-zÁÉÍÓÚáéíóúñ]+ \d{1,2})/i.test(encabezado), encabezado);
+  const carta = ((await tarjetas.first().innerText()) ?? "").replace(/\s+/g, " ");
+  ok("viajes — la carte ne répète pas la date", !/Hoy|Mañana/i.test(carta), carta.slice(0, 50));
 
   /* On peut changer de groupe, et l'historial ne montre pas le futur. */
   await zona.getByRole("button", { name: /Historial/ }).click();
@@ -153,7 +163,7 @@ console.log(`\nCuenta — ${BASE}\n`);
 
 /* 3. PERFIL — des chiffres comptés, et l'identité publique protégée. */
 {
-  const { ctx, p } = await abrir("/cuenta?panel=perfil");
+  const { ctx, p } = await abrir("/cuenta/perfil");
   const t = ((await app(p).textContent()) ?? "").replace(/\s+/g, " ");
   ok("perfil — le nom public est « Ana R. »", t.includes("Ana R."));
   ok("perfil — le nom de famille entier n'apparaît pas", !t.includes("Ruiz"));
@@ -170,11 +180,17 @@ console.log(`\nCuenta — ${BASE}\n`);
 
 /* 4. MENSAJES — une conversation par reserva. */
 {
-  const { ctx, p } = await abrir("/cuenta?panel=mensajes");
+  const { ctx, p } = await abrir("/cuenta/mensajes");
   const t = ((await app(p).textContent()) ?? "").replace(/\s+/g, " ");
   ok("mensajes — le titre", t.includes("Mensajes"));
+  /* Trois reservas + le mot de bienvenue de Partimos, qui est posé dans
+     la boîte dès l'inscription : une boîte vide au premier jour
+     n'apprend rien et ne donne rien à faire. */
   const filas = app(p).locator("ul > li");
-  ok("mensajes — une par reserva", (await filas.count()) === 3, `${await filas.count()}`);
+  ok("mensajes — une par reserva, plus le mot de bienvenue",
+    (await filas.count()) === 4, `${await filas.count()}`);
+  ok("mensajes — le mot de bienvenue est en tête",
+    ((await filas.first().innerText()) ?? "").includes("Partimos"));
   ok("mensajes — les trois conducteurs", /Carlos/.test(t) && /Rita/.test(t) && /Moisés/.test(t));
   await ctx.close();
 }

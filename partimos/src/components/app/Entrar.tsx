@@ -72,15 +72,15 @@ function LinkedInGlyph() {
   );
 }
 
-/** Les quatre choses qu'on peut faire avec un compte, en pictogrammes
- *  posés sur la photo. Elles ne remplacent pas le titre : elles disent en
- *  un coup d'œil que l'app couvre le trajet entier, pas juste la
- *  recherche. */
+/** TROIS pictogrammes, et trois seulement — demande du propriétaire.
+ *  Quatre ronds alignés se lisent comme une barre d'outils ; trois se
+ *  lisent comme trois idées. Ce sont les trois qui décident vraiment :
+ *  la voiture (ce qu'on partage), le bouclier (avec qui), l'aporte (ce
+ *  que ça coûte). Ils ne remplacent pas le titre — ils le préparent. */
 const CAPACIDADES = [
-  { icon: "car", label: "Reservar un puesto" },
-  { icon: "plus", label: "Publicar tu viaje" },
-  { icon: "chat", label: "Hablar sin dar tu número" },
-  { icon: "shield", label: "Viajar con gente verificada" },
+  { icon: "car", label: "Comparte el carro" },
+  { icon: "shield", label: "Con gente verificada" },
+  { icon: "cash", label: "Solo el aporte" },
 ] as const;
 
 export function Entrar({
@@ -167,22 +167,29 @@ export function Entrar({
           </button>
         )}
 
-        <ul className="absolute inset-x-0 bottom-5 z-10 flex items-center justify-center gap-2.5">
+      </div>
+
+      {/* LA FEUILLE — elle monte par-dessus la photo, coins arrondis.
+          Elle est EN VERRE : la photo se devine derrière son bord, ce qui
+          la pose sur l'image au lieu de la couper en deux. */}
+      <div className="glass relative z-20 -mt-8 rounded-t-[28px] px-6 pt-6 pb-[calc(22px+env(safe-area-inset-bottom))]">
+        {/* LES TROIS IDÉES, DANS la feuille et non à cheval sur le bord.
+            Collées au bas de la photo, elles tombaient dans la couture
+            entre l'image et le texte — l'endroit exact où l'œil ne
+            s'arrête pas. Ici elles ouvrent la feuille, avec leur mot :
+            un rond sans légende est une devinette. */}
+        <ul className="mb-5 flex items-start justify-between gap-2">
           {CAPACIDADES.map((c) => (
-            <li key={c.label}>
-              <span
-                title={c.label}
-                className="glass flex size-11 items-center justify-center rounded-full text-ink-900"
-              >
-                <Icon name={c.icon} className="size-[19px]" title={c.label} />
+            <li key={c.label} className="flex w-full flex-col items-center gap-1.5">
+              <span className="flex size-11 items-center justify-center rounded-full bg-naranja-suave text-naranja">
+                <Icon name={c.icon} className="size-[19px]" />
+              </span>
+              <span className="text-center text-[11.5px] leading-tight font-semibold text-ink-600">
+                {c.label}
               </span>
             </li>
           ))}
         </ul>
-      </div>
-
-      {/* LA FEUILLE — elle monte par-dessus la photo, coins arrondis. */}
-      <div className="relative z-20 -mt-6 rounded-t-[26px] bg-white px-6 pt-7 pb-[calc(22px+env(safe-area-inset-bottom))]">
         <h1 className="font-display text-[27px] leading-[1.12] font-extrabold tracking-[-0.035em]">
           {motivo ?? (
             <>

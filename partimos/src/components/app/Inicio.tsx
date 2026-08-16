@@ -108,7 +108,7 @@ export function Inicio() {
               comme « entre ». Le lien est le même — la porte s'occupe du
               reste. */}
           <Link
-            href="/cuenta?panel=perfil"
+            href="/cuenta/perfil"
             aria-label={nombre ? "Mi perfil" : "Entrar en mi cuenta"}
             className={`flex size-10 items-center justify-center rounded-full font-display text-[15px] font-bold ${
               nombre

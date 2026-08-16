@@ -74,7 +74,11 @@ async function abrir({ modo, conSesion }) {
   if (modo === "app") {
     await p.evaluate(() => document.documentElement.classList.add("app-instalada"));
   }
-  await p.waitForTimeout(500);
+  /* ON ATTEND LA FIN DE L'ANIMATION D'OUVERTURE. Elle dure 500 ms après
+     un décalage de 260 : mesurer plus tôt attrape la barre en plein
+     mouvement, et la position lue est fausse d'une dizaine de pixels.
+     Ça a fait échouer « ancrée en bas » pour rien. */
+  await p.waitForTimeout(1000);
   return { ctx, p };
 }
 
@@ -154,12 +158,11 @@ console.log(`\nMode app — ${BASE}\n`);
     b !== null && Math.abs(b.y + b.height - vp.height) <= 2,
     b ? `bas = ${Math.round(b.y + b.height)} px / ${vp.height} px` : "absente",
   );
-  /* Quatre destinations + le bouton d'action central, qui n'est pas un
-     onglet : il publie. On les compte séparément pour que l'un ne masque
-     jamais la disparition de l'autre. */
-  const destinos = await barra.locator("a:not([aria-label='Publicar un viaje'])").count();
-  ok("app — 4 onglets", destinos === 4, `${destinos} trouvé(s)`);
-  ok("app — le bouton publier est là", await ve(p, "a[aria-label='Publicar un viaje']"));
+  /* CINQ DESTINATIONS, plus de bouton d'action central : publier est
+     devenu un onglet comme les autres. Le détail des libellés et du
+     « vous êtes ici » est vérifié par verify-puerta. */
+  const destinos = await barra.locator("a").count();
+  ok("app — 5 onglets", destinos === 5, `${destinos} trouvé(s)`);
   /* Chaque cible doit tenir le pouce : 44 px est le minimum d'Apple. */
   const altos = await barra.locator("a").evaluateAll((els) =>
     els.map((e) => Math.round(e.getBoundingClientRect().height)),

@@ -44,7 +44,7 @@ const SESSION = {
 };
 
 const RUTAS = [
-  "/", "/ya", "/buscar", "/cuenta", "/cuenta?panel=mensajes", "/cuenta?panel=perfil",
+  "/", "/ya", "/buscar", "/cuenta", "/cuenta/mensajes", "/cuenta/perfil",
   "/como-funciona", "/seguridad", "/ayuda", "/publicar", "/publicar/nuevo",
   "/terminos", "/privacidad",
 ];

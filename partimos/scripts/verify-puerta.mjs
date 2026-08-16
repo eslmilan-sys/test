@@ -221,9 +221,9 @@ for (const [url, nombre] of [
 /** Ce qui exige un compte : tout ce qui engage quelqu'un. */
 for (const [url, nombre] of [
   ["/cuenta", "Mis viajes"],
-  ["/cuenta?panel=mensajes", "Mensajes"],
-  ["/cuenta?panel=perfil", "Perfil"],
-  ["/cuenta?panel=verificacion", "Verificación"],
+  ["/cuenta/mensajes", "Mensajes"],
+  ["/cuenta/perfil", "Perfil"],
+  ["/cuenta/verificacion", "Verificación"],
   ["/publicar/nuevo", "Publicar"],
 ]) {
   const { ctx, p } = await abrir(url, "invitado");
@@ -240,10 +240,10 @@ console.log("\n  Con cuenta :\n");
 {
   for (const [url, marca] of [
     ["/cuenta", "Mis viajes"],
-    ["/cuenta?panel=mensajes", "Mensajes"],
-    ["/cuenta?panel=perfil", "Milan R."],
-    ["/cuenta?panel=verificacion", "Verificación"],
-    ["/cuenta?panel=legal", "Legal"],
+    ["/cuenta/mensajes", "Mensajes"],
+    ["/cuenta/perfil", "Milan R."],
+    ["/cuenta/verificacion", "Verificación"],
+    ["/cuenta/legal", "Legal"],
   ]) {
     const { ctx, p } = await abrir(url, "socio");
     const t = await texto(p);
@@ -254,7 +254,7 @@ console.log("\n  Con cuenta :\n");
 
 /* ═══ 4. LA VÉRIFICATION A QUATRE PIÈCES ═══ */
 {
-  const { ctx, p } = await abrir("/cuenta?panel=verificacion", "socio");
+  const { ctx, p } = await abrir("/cuenta/verificacion", "socio");
   const t = await texto(p);
   for (const pieza of ["Cédula", "Licencia de conducir", "Foto del carro", "Número de placa"]) {
     ok(`verificación — ${pieza}`, t.includes(pieza));
@@ -278,7 +278,7 @@ console.log("\n  Con cuenta :\n");
   /* MAIS IL EXISTE, et il a une adresse. Le sortir du pied de page sans
      lui donner de page serait le rendre introuvable — ça, ce serait une
      faute. */
-  const { ctx, p } = await abrir("/cuenta?panel=legal", "socio");
+  const { ctx, p } = await abrir("/cuenta/legal", "socio");
   ok("legal — présent dans sa page", (await texto(p)).includes(marca));
   await ctx.close();
 }
@@ -314,13 +314,106 @@ console.log("\n  Con cuenta :\n");
   await ctx.close();
 }
 
+/* ═══ 7 bis. LES CINQ ONGLETS, ET UN SEUL ALLUMÉ ═══ */
+{
+  const ESPERADOS = ["Buscar", "Publicar", "Mis viajes", "Mensajes", "Perfil"];
+  const { ctx, p } = await abrir("/", "socio");
+  const barra = p.locator('nav[aria-label="Navegación principal"]');
+  const etiquetas = (await barra.locator("a").allInnerTexts()).map((t) => t.trim());
+  ok("barra — les cinq onglets du propriétaire", 
+    JSON.stringify(etiquetas) === JSON.stringify(ESPERADOS), etiquetas.join(" · "));
+  await ctx.close();
+
+  /* UN SEUL « vous êtes ici » À LA FOIS. Avec `?panel=`, les quatre
+     écrans de compte partageaient un chemin et « Mis viajes » restait
+     allumé sur Mensajes comme sur Perfil. */
+  for (const [url, esperado] of [
+    ["/", "Buscar"],
+    ["/ya", "Buscar"],
+    ["/publicar/nuevo", "Publicar"],
+    ["/cuenta", "Mis viajes"],
+    ["/cuenta/mensajes", "Mensajes"],
+    ["/cuenta/perfil", "Perfil"],
+    ["/cuenta/verificacion", "Perfil"],
+    ["/cuenta/legal", "Perfil"],
+  ]) {
+    const { ctx, p } = await abrir(url, "socio");
+    const activos = (
+      await p
+        .locator('nav[aria-label="Navegación principal"] a[aria-current="page"]')
+        .allInnerTexts()
+    ).map((t) => t.trim());
+    ok(
+      `barra — ${url} allume « ${esperado} », et lui seul`,
+      activos.length === 1 && activos[0] === esperado,
+      activos.join(", ") || "aucun",
+    );
+    await ctx.close();
+  }
+}
+
+/* ═══ 7 ter. LE PIED DE PAGE A QUITTÉ L'APP ═══ */
+{
+  for (const url of ["/", "/cuenta", "/ya"]) {
+    const { ctx, p } = await abrir(url, "socio");
+    const visible = await p.evaluate(() => document.body.innerText ?? "");
+    /* Les trois liens légaux traînaient sur une bande sombre au bas de
+       chaque écran. Ils ont leur page : Perfil → Legal. */
+    const pie = /Términos\s+Privacidad\s+Seguridad/.test(visible);
+    ok(`pied de page — absent de ${url}`, !pie);
+    await ctx.close();
+  }
+  const { ctx, p } = await abrir("/cuenta/legal", "socio");
+  const t = await texto(p);
+  ok("legal — les trois pages y sont", /Términos de uso/.test(t) && /Privacidad/.test(t) && /Seguridad/.test(t));
+  await ctx.close();
+}
+
+/* ═══ 7 quater. SE DÉCONNECTER EXISTE ═══ */
+{
+  const { ctx, p } = await abrir("/cuenta/perfil", "socio");
+  const salir = p.locator(".solo-app").first().getByRole("button", { name: "Cerrar sesión" }).first();
+  ok("perfil — le bouton de déconnexion existe", await salir.isVisible().catch(() => false));
+  await salir.click();
+  await p.waitForTimeout(900);
+  ok("perfil — il déconnecte vraiment", esPuerta(await texto(p)), (await texto(p)).slice(0, 40));
+  await ctx.close();
+}
+
+/* ═══ 7 quinquies. LE MOT DE BIENVENUE EST DÉJÀ LÀ ═══ */
+{
+  const { ctx, p } = await abrir("/cuenta/mensajes", "socio");
+  const t = await texto(p);
+  ok("mensajes — le mot de Partimos est là", /Bienvenido a bordo, Milan/.test(t));
+  await p.locator(".solo-app").first().getByRole("button", { name: /Partimos/ }).first().click();
+  await p.waitForTimeout(700);
+  const hilo = ((await p.locator("[role=dialog]").first().innerText()) ?? "").replace(/\s+/g, " ");
+  ok("mensajes — il dit quoi faire", /Busca a dónde vas/.test(hilo) && /Publica tu viaje/.test(hilo));
+  /* IL NE SE FAIT PAS PASSER POUR UNE CONVERSATION. */
+  ok("mensajes — il dit qu'on n'y répond pas", /aquí no contestamos/.test(hilo));
+  await ctx.close();
+}
+
+/* ═══ 7 sexies. UNE SEULE PALETTE ═══ */
+{
+  /* Le bleu du site (#0284c7) ne doit apparaître nulle part dans l'app :
+     il entrait par les composants PARTAGÉS — le lien « Ofrecer otro
+     aporte », l'anneau de focus, les étoiles en ambre. */
+  const { ctx, p } = await abrir("/", "socio");
+  const acento = await p.evaluate(() =>
+    getComputedStyle(document.documentElement).getPropertyValue("--color-accent").trim(),
+  );
+  ok("palette — l'accent de l'app n'est pas le bleu du site", !/0284c7/i.test(acento), acento);
+  await ctx.close();
+}
+
 /* ═══ 8. AUCUN LIEN MORT DANS L'APP ═══ */
 console.log("\n  Enlaces :\n");
 {
   const PARTIDA = [
     "/", "/ya", "/buscar?desde=panama-city&hacia=chitre", "/cuenta",
-    "/cuenta?panel=mensajes", "/cuenta?panel=perfil", "/cuenta?panel=verificacion",
-    "/cuenta?panel=legal", "/como-funciona", "/seguridad", "/ayuda",
+    "/cuenta/mensajes", "/cuenta/perfil", "/cuenta/verificacion",
+    "/cuenta/legal", "/como-funciona", "/seguridad", "/ayuda",
     "/publicar", "/publicar/nuevo", "/terminos", "/privacidad",
     "/viaje/panama-chitre-2026-08-15-2?desde=panama-city&hacia=chitre",
   ];

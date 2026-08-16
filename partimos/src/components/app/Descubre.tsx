@@ -52,7 +52,7 @@ const COSAS: {
     titulo: "Sabes quién maneja",
     texto:
       "La cédula se verifica con un proveedor externo. En público solo se ve el nombre y la inicial del apellido — nunca el apellido completo.",
-    href: "/cuenta?panel=perfil",
+    href: "/cuenta/perfil",
     accion: "Verificar la mía",
   },
   {
@@ -60,7 +60,7 @@ const COSAS: {
     titulo: "El chat queda escrito",
     texto:
       "Coordinas la hora y el punto sin dar tu número. Ninguno de los dos puede cambiar un mensaje después de enviarlo.",
-    href: "/cuenta?panel=mensajes",
+    href: "/cuenta/mensajes",
     accion: "Ver mis mensajes",
   },
   {
