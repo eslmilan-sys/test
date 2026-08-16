@@ -10,7 +10,6 @@ import {
   RequisitosConductor,
   type Requisito,
 } from "@/components/publicar/RequisitosConductor";
-import { RouteMap } from "@/components/map/RouteMap";
 import { CityCombobox } from "@/components/ui/CityCombobox";
 import { PlacePicker } from "@/components/ui/PlacePicker";
 import { AuthDialog } from "@/components/site/AuthDialog";
@@ -105,7 +104,6 @@ export function PublishFlow() {
   );
   const from = fromChoice ?? last?.from ?? "panama-city";
   const to = toChoice ?? last?.to ?? "chitre";
-  const [picking, setPicking] = useState<"origin" | "destination">("origin");
   const [stops, setStops] = useState<string[]>([]);
   const [exactFrom, setExactFrom] = useState("");
   const [exactTo, setExactTo] = useState("");
@@ -495,26 +493,15 @@ export function PublishFlow() {
                 </div>
               </div>
 
-              <div className="rounded-[14px] border border-ink-200 bg-ink-50/60 p-3">
-                <RouteMap
-                  originSlug={from}
-                  destinationSlug={to}
-                  route={corridor ?? undefined}
-                  picking={picking}
-                  onPick={(slug) => {
-                    if (picking === "origin") {
-                      setFromChoice(slug);
-                      if (slug === to) setToChoice("");
-                      setPicking("destination");
-                    } else {
-                      setToChoice(slug);
-                      setPicking("origin");
-                    }
-                    setStops([]);
-                    setCityStops([]);
-                  }}
-                />
-              </div>
+              {/* LA CARTE A ÉTÉ RETIRÉE — décision du propriétaire, et
+                  elle était justifiée. Sur fond nu (pas de clé Mapbox au
+                  build), elle affichait une trentaine de villes reliées
+                  par des pointillés gris : un diagramme abstrait, pas une
+                  carte. Elle prétendait aider à choisir sa route alors que
+                  les deux champs juste au-dessus le font déjà mieux, et
+                  elle occupait le tiers du premier écran de publication.
+                  Le tracé RÉEL du trajet, lui, existe là où il sert : sur
+                  la fiche viaje et sur les résultats de recherche. */}
               {corridor && (
                 <p className="tnum mt-3 rounded-[14px] bg-ink-50 px-4 py-3 text-[13.5px] leading-relaxed text-ink-500">
                   <b className="font-semibold text-ink-900">

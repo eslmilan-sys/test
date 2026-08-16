@@ -1,10 +1,9 @@
 "use client";
 
-import { useState } from "react";
 import { Icon } from "@/components/ui/Icon";
+import { GlassIcon } from "@/components/ui/GlassIcon";
 import { Photo } from "@/components/ui/Photo";
 import { PHOTOS } from "@/lib/photos";
-import { getSupabase, isSupabaseConfigured } from "@/lib/supabase";
 
 /**
  * LA PORTE DE L'APP — le premier écran, avant tout le reste.
@@ -34,44 +33,6 @@ import { getSupabase, isSupabaseConfigured } from "@/lib/supabase";
  * quelque chose qui ne marchera jamais.
  */
 
-type Estado = { tipo: "error" | "espera"; texto: string } | null;
-
-/** Les marques ont leur glyphe officiel : un logo approximatif se
- *  remarque, et un bouton social qu'on ne reconnaît pas ne se clique pas. */
-function GoogleGlyph() {
-  return (
-    <svg viewBox="0 0 48 48" className="size-[19px]" aria-hidden>
-      <path
-        fill="#4285F4"
-        d="M45.1 24.5c0-1.6-.1-2.7-.4-3.9H24v7.1h12.1c-.2 1.8-1.6 4.5-4.5 6.3l6.9 5.4c4.1-3.8 6.6-9.4 6.6-15z"
-      />
-      <path
-        fill="#34A853"
-        d="M24 46c5.9 0 10.9-2 14.5-5.3l-6.9-5.4c-1.9 1.3-4.4 2.2-7.6 2.2-5.8 0-10.7-3.8-12.5-9.1l-7.1 5.5C8.1 41.1 15.4 46 24 46z"
-      />
-      <path
-        fill="#FBBC05"
-        d="M11.5 28.4c-.5-1.4-.7-2.9-.7-4.4s.3-3 .7-4.4l-7.1-5.5C2.9 17 2 20.4 2 24s.9 7 2.4 9.9l7.1-5.5z"
-      />
-      <path
-        fill="#EA4335"
-        d="M24 10.5c4.1 0 6.9 1.8 8.5 3.3l6.1-6C34.9 4.4 29.9 2 24 2 15.4 2 8.1 6.9 4.4 14.1l7.1 5.5c1.8-5.3 6.7-9.1 12.5-9.1z"
-      />
-    </svg>
-  );
-}
-
-function LinkedInGlyph() {
-  return (
-    <svg viewBox="0 0 24 24" className="size-[19px]" aria-hidden>
-      <path
-        fill="#0A66C2"
-        d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.42v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13zM7.12 20.45H3.55V9h3.57v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0z"
-      />
-    </svg>
-  );
-}
-
 /** TROIS pictogrammes, et trois seulement — demande du propriétaire.
  *  Quatre ronds alignés se lisent comme une barre d'outils ; trois se
  *  lisent comme trois idées. Ce sont les trois qui décident vraiment :
@@ -99,38 +60,6 @@ export function Entrar({
   onCerrar?: () => void;
   motivo?: string;
 }) {
-  const [estado, setEstado] = useState<Estado>(null);
-  const [cargando, setCargando] = useState<string | null>(null);
-
-  async function social(provider: "google" | "linkedin_oidc") {
-    const nombre = provider === "google" ? "Google" : "LinkedIn";
-    const supabase = getSupabase();
-    if (!supabase || !isSupabaseConfigured) {
-      setEstado({
-        tipo: "error",
-        texto: `${nombre} necesita la base conectada. Mientras tanto, entra con tu correo.`,
-      });
-      return;
-    }
-    setCargando(provider);
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider,
-      options: { redirectTo: window.location.origin + window.location.pathname },
-    });
-    if (error) {
-      setCargando(null);
-      /* La cause EXACTE, pas « inténtalo de nuevo ». Un provider
-         désactivé dans Supabase renvoie « provider is not enabled » : le
-         dire évite de réessayer cent fois quelque chose d'impossible. */
-      setEstado({
-        tipo: "error",
-        texto: /not enabled|disabled/i.test(error.message)
-          ? `${nombre} todavía no está activado. Entra con tu correo — funciona ahora mismo.`
-          : `${nombre} no respondió: ${error.message}`,
-      });
-    }
-  }
-
   return (
     <div className="flex min-h-[100dvh] flex-col bg-white">
       {/* LA PHOTO — elle occupe le haut, elle est coupée par la feuille. */}
@@ -181,9 +110,13 @@ export function Entrar({
         <ul className="mb-5 flex items-start justify-between gap-2">
           {CAPACIDADES.map((c) => (
             <li key={c.label} className="flex w-full flex-col items-center gap-1.5">
-              <span className="flex size-11 items-center justify-center rounded-full bg-naranja-suave text-naranja">
-                <Icon name={c.icon} className="size-[19px]" />
-              </span>
+              {/* LA SIGNATURE DU SITE, enfin dans l'app : un rectangle
+                  orange incliné qui dépasse d'une tuile de verre dépoli.
+                  Là où la tuile le recouvre, le flou le fond en lumière ;
+                  le coin qui dépasse reste net. C'est ce contraste sur un
+                  MÊME objet qui fait « verre » — la transparence seule
+                  n'y suffit pas. */}
+              <GlassIcon name={c.icon} tone="naranja" />
               <span className="text-center text-[11.5px] leading-tight font-semibold text-ink-600">
                 {c.label}
               </span>
@@ -220,42 +153,6 @@ export function Entrar({
           >
             Iniciar sesión
           </button>
-
-          <div className="my-0.5 flex items-center gap-3 text-[12.5px] text-ink-400">
-            <span className="h-px flex-1 bg-ink-200" />o
-            <span className="h-px flex-1 bg-ink-200" />
-          </div>
-
-          <div className="grid grid-cols-2 gap-2.5">
-            <button
-              type="button"
-              onClick={() => void social("google")}
-              disabled={cargando !== null}
-              className="flex h-[50px] items-center justify-center gap-2.5 rounded-full border-[1.5px] border-ink-200 bg-white text-[14.5px] font-semibold transition-colors hover:border-ink-300 disabled:opacity-60"
-            >
-              <GoogleGlyph />
-              {cargando === "google" ? "Abriendo…" : "Google"}
-            </button>
-            <button
-              type="button"
-              onClick={() => void social("linkedin_oidc")}
-              disabled={cargando !== null}
-              className="flex h-[50px] items-center justify-center gap-2.5 rounded-full border-[1.5px] border-ink-200 bg-white text-[14.5px] font-semibold transition-colors hover:border-ink-300 disabled:opacity-60"
-            >
-              <LinkedInGlyph />
-              {cargando === "linkedin_oidc" ? "Abriendo…" : "LinkedIn"}
-            </button>
-          </div>
-
-          {estado && (
-            <p
-              role="alert"
-              className="mt-1 flex items-start gap-2 rounded-[12px] bg-danger-soft px-3.5 py-2.5 text-[13.5px] leading-snug text-danger"
-            >
-              <Icon name="shield" className="mt-0.5 size-4 shrink-0" />
-              {estado.texto}
-            </p>
-          )}
 
           {onCerrar && (
             <button

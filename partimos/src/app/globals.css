@@ -1081,6 +1081,15 @@ html.app-instalada .solo-app {
   display: revert;
 }
 
+/* QUAND UNE PORTE EST OUVERTE, IL N'Y A PAS DE NAVIGATION.
+   Le `z-index` suffisait à la couvrir, pas à la désactiver : elle restait
+   dans l'ordre de tabulation et attrapait les touches sur son bord. Et
+   surtout elle se voyait — le propriétaire a photographié « Paso 1 de 5 »
+   avec les cinq onglets par-dessus. `:has()` la retire pour de bon. */
+body:has(.puerta) nav[aria-label="Navegación principal"] {
+  display: none !important;
+}
+
 /* ===========================================================================
    UNE SEULE PALETTE DANS L'APP
    ===========================================================================

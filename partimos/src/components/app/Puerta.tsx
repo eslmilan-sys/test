@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useSession } from "@/lib/session";
 import { useHydrated } from "@/lib/lastsearch";
 import { Entrar } from "./Entrar";
+import { ComoEntrar } from "./ComoEntrar";
 import { Registro } from "./Registro";
 import { Acceder } from "./Acceder";
 
@@ -38,28 +39,48 @@ export function Puerta({
   const { session } = useSession();
   const hidratado = useHydrated();
   const router = useRouter();
-  const [puerta, setPuerta] = useState<"entrar" | "registro" | "acceder">(
+  const [puerta, setPuerta] = useState<"entrar" | "como" | "registro" | "acceder">(
     "entrar",
   );
 
   if (!hidratado) return null;
   if (session) return <>{children}</>;
 
+  /* PLEIN ÉCRAN, ET AU-DESSUS DE TOUT. Posée en flux normal, la porte
+     laissait la barre d'onglets flotter PAR-DESSUS l'inscription : on
+     voyait « Paso 1 de 5 » sous les cinq onglets. Une porte est un
+     écran, pas un bloc de page — d'où `fixed inset-0`, la classe
+     `puerta` (qui masque la barre, voir globals.css) et un `z` au-dessus
+     d'elle. */
+  const marco = (contenido: React.ReactNode) => (
+    <div className="puerta fixed inset-0 z-[200] overflow-y-auto bg-white">
+      {contenido}
+    </div>
+  );
+
+  if (puerta === "como")
+    return marco(
+      <ComoEntrar
+        onCorreo={() => setPuerta("registro")}
+        onAcceder={() => setPuerta("acceder")}
+        onCerrar={() => setPuerta("entrar")}
+      />,
+    );
   if (puerta === "registro")
-    return <Registro onCerrar={() => setPuerta("entrar")} />;
+    return marco(<Registro onCerrar={() => setPuerta("entrar")} />);
   if (puerta === "acceder")
-    return (
+    return marco(
       <Acceder
         onCerrar={() => setPuerta("entrar")}
-        onRegistro={() => setPuerta("registro")}
-      />
+        onRegistro={() => setPuerta("como")}
+      />,
     );
 
-  return (
+  return marco(
     <>
       <Entrar
         motivo={motivo}
-        onRegistro={() => setPuerta("registro")}
+        onRegistro={() => setPuerta("como")}
         onAcceder={() => setPuerta("acceder")}
         /* Fermer ici, c'est revenir d'où l'on vient — pas « rester sur
            une page vide ». Sans historique (lien ouvert de l'extérieur),
@@ -70,6 +91,6 @@ export function Puerta({
           else router.push("/ya");
         }}
       />
-    </>
+    </>,
   );
 }

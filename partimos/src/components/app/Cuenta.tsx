@@ -714,13 +714,26 @@ function Volver() {
 /* PERFIL                                                              */
 /* ------------------------------------------------------------------ */
 
-const MENU: { href: string; label: string; icon: IconName }[] = [
-  { href: "/cuenta", label: "Mis viajes", icon: "route" },
+/**
+ * DEUX ONGLETS DANS LE PROFIL — « Sobre ti » et « Cuenta ».
+ *
+ * Demande du propriétaire, exemple à l'appui, et la coupure n'est pas
+ * arbitraire : d'un côté ce que les AUTRES voient de toi (ton nom
+ * public, tes vérifications, tes viajes faits), de l'autre ce que TOI
+ * seul règles (paiement, sécurité, aide, légal, déconnexion).
+ *
+ * Sans cette coupure, une seule liste mélangeait « Super conductor » et
+ * « Términos y privacidad » — deux natures qui n'ont rien à faire à la
+ * même hauteur, et un écran où l'on ne trouve rien parce que tout s'y
+ * ressemble.
+ */
+const MENU_CUENTA: { href: string; label: string; icon: IconName }[] = [
   { href: "/cuenta/verificacion", label: "Verificación", icon: "id" },
+  { href: "/cuenta", label: "Mis viajes", icon: "route" },
   { href: "/publicar/nuevo", label: "Publicar un viaje", icon: "plus" },
   { href: "/como-funciona", label: "Cómo funciona", icon: "compass" },
   { href: "/seguridad", label: "Seguridad", icon: "shield" },
-  { href: "/ayuda", label: "Ayuda", icon: "chat" },
+  { href: "/ayuda", label: "Ayuda y contacto", icon: "chat" },
   /* LE TEXTE LÉGAL A SA PAGE. Il traînait en bas de CHAQUE écran de
      l'app — six lignes de conformité sous une liste de viajes, à
      répétition. Il reste obligatoire, il reste lisible : il est ici. */
@@ -735,6 +748,7 @@ function Perfil({
   ahora: number | null;
 }) {
   const { session, signOut } = useSession();
+  const [pestana, setPestana] = useState<"ti" | "cuenta">("ti");
   if (!session) return null;
 
   const hechos =
@@ -788,9 +802,40 @@ function Perfil({
         </div>
       </header>
 
+      {/* LES DEUX ONGLETS, posés à cheval sur le bas de l'en-tête vert :
+          ils appartiennent au profil, pas au contenu qui suit. */}
       <div className="mx-auto w-full max-w-[520px] px-4">
+        <div
+          role="group"
+          aria-label="Qué parte del perfil"
+          className="-mt-5 flex gap-1.5 rounded-[18px] border border-ink-200 bg-white p-1 shadow-card"
+        >
+          {(
+            [
+              ["ti", "Sobre ti"],
+              ["cuenta", "Cuenta"],
+            ] as const
+          ).map(([id, label]) => (
+            <button
+              key={id}
+              type="button"
+              onClick={() => setPestana(id)}
+              aria-pressed={pestana === id}
+              className={`flex-1 rounded-[14px] py-2.5 text-[14px] font-bold transition-colors ${
+                pestana === id
+                  ? "bg-naranja text-white"
+                  : "text-ink-500 hover:bg-ink-50"
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className={`mx-auto w-full max-w-[520px] px-4 ${pestana === "ti" ? "" : "hidden"}`}>
         {/* LES CHIFFRES SONT COMPTÉS, PAS INVENTÉS. */}
-        <ul className="-mt-4 grid grid-cols-2 gap-2.5">
+        <ul className="mt-3 grid grid-cols-2 gap-2.5">
           <Dato valor={hechos} label={hechos === 1 ? "viaje hecho" : "viajes hechos"} />
           <Dato
             valor={proximos}
@@ -816,8 +861,15 @@ function Perfil({
           </Link>
         )}
 
+        <p className="mt-3 px-1 text-[12px] leading-snug text-ink-400">
+          Tu apellido completo no se muestra nunca en público: los demás ven{" "}
+          {session.firstName} {session.lastInitial}.
+        </p>
+      </div>
+
+      <div className={`mx-auto w-full max-w-[520px] px-4 ${pestana === "cuenta" ? "" : "hidden"}`}>
         <ul className="mt-3 overflow-hidden rounded-[18px] border border-ink-200 bg-white">
-          {MENU.map((m, i) => (
+          {MENU_CUENTA.map((m, i) => (
             <li key={m.href + m.label}>
               <Link
                 href={m.href}
@@ -848,10 +900,6 @@ function Perfil({
           Cerrar sesión
         </button>
 
-        <p className="mt-3 px-1 text-[12px] leading-snug text-ink-400">
-          Tu apellido completo no se muestra nunca en público: los demás ven{" "}
-          {session.firstName} {session.lastInitial}.
-        </p>
       </div>
     </div>
   );

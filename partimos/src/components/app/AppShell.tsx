@@ -5,6 +5,7 @@ import { useSession } from "@/lib/session";
 import { useHydrated } from "@/lib/lastsearch";
 import { entrarComoInvitado, useInvitado } from "@/lib/invitado";
 import { Entrar } from "./Entrar";
+import { ComoEntrar } from "./ComoEntrar";
 import { Registro } from "./Registro";
 import { Acceder } from "./Acceder";
 import { Bienvenida } from "./Bienvenida";
@@ -36,7 +37,7 @@ export function AppShell() {
   /* Trois écrans de porte, jamais deux à la fois. Un état plutôt que
      deux booléens : deux booléens finissent toujours par être vrais
      ensemble, et on se retrouve avec deux plein-écrans superposés. */
-  const [puerta, setPuerta] = useState<"entrar" | "registro" | "acceder">(
+  const [puerta, setPuerta] = useState<"entrar" | "como" | "registro" | "acceder">(
     "entrar",
   );
 
@@ -46,12 +47,19 @@ export function AppShell() {
 
   if (!session && !invitado) {
     return (
-      <div className="fixed inset-0 z-[150] overflow-y-auto bg-white">
+      <div className="puerta fixed inset-0 z-[200] overflow-y-auto bg-white">
         {puerta === "entrar" && (
           <Entrar
-            onRegistro={() => setPuerta("registro")}
+            onRegistro={() => setPuerta("como")}
             onAcceder={() => setPuerta("acceder")}
             onCerrar={entrarComoInvitado}
+          />
+        )}
+        {puerta === "como" && (
+          <ComoEntrar
+            onCorreo={() => setPuerta("registro")}
+            onAcceder={() => setPuerta("acceder")}
+            onCerrar={() => setPuerta("entrar")}
           />
         )}
         {puerta === "registro" && (
@@ -60,7 +68,7 @@ export function AppShell() {
         {puerta === "acceder" && (
           <Acceder
             onCerrar={() => setPuerta("entrar")}
-            onRegistro={() => setPuerta("registro")}
+            onRegistro={() => setPuerta("como")}
           />
         )}
       </div>

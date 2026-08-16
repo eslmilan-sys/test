@@ -100,7 +100,11 @@ console.log(`\nPuerta, invitado y enlaces — ${BASE}\n`);
 
   ok("porte — l'inscription passe avant la connexion",
     (await texto(p)).indexOf("Crear cuenta") < (await texto(p)).indexOf("Iniciar sesi"));
-  ok("porte — Google et LinkedIn", /Google/.test(await texto(p)) && /LinkedIn/.test(await texto(p)));
+  /* TROIS ARGUMENTS, PAS QUATRE, et chacun avec son mot : un rond sans
+     légende est une devinette. */
+  const t0 = await texto(p);
+  ok("porte — trois arguments nommés",
+    /Comparte el carro/.test(t0) && /Con gente verificada/.test(t0) && /Solo el aporte/.test(t0));
 
   /* LA CROIX FAIT QUELQUE CHOSE. */
   await cruz.click();
@@ -118,9 +122,26 @@ console.log("\n  Registro :\n");
   const zona = () => p.locator(".solo-app").first();
   const siguiente = () => zona().getByLabel("Siguiente").first();
 
+  /* LE CHOIX DU CANAL D'ABORD — un écran à part, comme demandé. Sur la
+     porte, le titre, la photo, les trois arguments ET quatre boutons de
+     connexion se disputaient le même écran. */
   await p.getByRole("button", { name: "Crear cuenta" }).click();
   await p.waitForTimeout(600);
+  const tc = await texto(p);
+  ok("canal — l'écran du choix s'ouvre", /Cómo quieres crear tu cuenta/.test(tc));
+  ok("canal — les trois canaux", /correo/i.test(tc) && /Google/.test(tc) && /LinkedIn/.test(tc));
+  ok("canal — le légal est ICI, où l'on s'engage", /aceptas los términos de uso/i.test(tc));
+  ok("canal — et la connexion pour qui a déjà un compte", /Ya tienes cuenta/.test(tc));
+
+  await p.getByRole("button", { name: /Continuar con mi correo/ }).click();
+  await p.waitForTimeout(600);
   ok("registro — il s'ouvre", /Cómo te llamas/.test(await texto(p)));
+
+  /* LA BARRE D'ONGLETS N'EXISTE PAS PENDANT L'INSCRIPTION. Le
+     propriétaire a photographié « Paso 1 de 5 » avec les cinq onglets
+     par-dessus : une porte est un écran, pas un bloc de page. */
+  ok("registro — pas de barre d'onglets par-dessus",
+    !(await p.locator('nav[aria-label="Navegación principal"]').first().isVisible().catch(() => false)));
   ok("registro — la progression se compte", /Paso 1 de 5/.test(await texto(p)));
 
   /* LE BOUTON NE MENT PAS : éteint tant que la réponse ne va pas. */
@@ -189,7 +210,7 @@ console.log("\n  Registro :\n");
 /* ═══ 1 ter. LA CONNEXION a la même forme ═══ */
 {
   const { ctx, p } = await abrir("/", "nadie");
-  await p.getByRole("button", { name: "Iniciar sesión" }).click();
+  await p.getByRole("button", { name: "Iniciar sesión" }).first().click();
   await p.waitForTimeout(600);
   ok("acceder — il s'ouvre", /Cuál es tu correo/.test(await texto(p)));
   ok("acceder — il renvoie vers l'inscription",
@@ -372,6 +393,10 @@ console.log("\n  Con cuenta :\n");
 /* ═══ 7 quater. SE DÉCONNECTER EXISTE ═══ */
 {
   const { ctx, p } = await abrir("/cuenta/perfil", "socio");
+  /* La déconnexion vit sous l'onglet « Cuenta » : c'est un réglage, pas
+     une information publique. Il faut donc y aller. */
+  await p.locator(".solo-app").first().getByRole("button", { name: "Cuenta", exact: true }).click();
+  await p.waitForTimeout(400);
   const salir = p.locator(".solo-app").first().getByRole("button", { name: "Cerrar sesión" }).first();
   ok("perfil — le bouton de déconnexion existe", await salir.isVisible().catch(() => false));
   await salir.click();
@@ -404,6 +429,30 @@ console.log("\n  Con cuenta :\n");
     getComputedStyle(document.documentElement).getPropertyValue("--color-accent").trim(),
   );
   ok("palette — l'accent de l'app n'est pas le bleu du site", !/0284c7/i.test(acento), acento);
+  await ctx.close();
+}
+
+/* ═══ 7 septies. LE PROFIL EST COUPÉ EN DEUX ═══ */
+{
+  const { ctx, p } = await abrir("/cuenta/perfil", "socio");
+  const zona = p.locator(".solo-app").first();
+  const t = await texto(p);
+  ok("perfil — deux onglets", /Sobre ti/.test(t) && /Cuenta/.test(t));
+  /* « Sobre ti » d'abord : ce que les AUTRES voient. */
+  ok("perfil — « Sobre ti » montre les chiffres", /viajes? hechos?/.test(t));
+  await zona.getByRole("button", { name: "Cuenta", exact: true }).click();
+  await p.waitForTimeout(400);
+  const tc = await texto(p);
+  ok("perfil — « Cuenta » montre les réglages",
+    /Verificación/.test(tc) && /Legal/.test(tc) && /Cerrar sesión/.test(tc));
+  await ctx.close();
+}
+
+/* ═══ 7 octies. PLUS DE CARTE DANS LA PUBLICATION ═══ */
+{
+  const { ctx, p } = await abrir("/publicar/nuevo", "socio");
+  const mapas = await p.locator('.solo-app svg[aria-label*="Mapa"]').count();
+  ok("publicar — la carte a disparu", mapas === 0, `${mapas} carte(s)`);
   await ctx.close();
 }
 

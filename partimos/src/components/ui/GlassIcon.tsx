@@ -18,7 +18,7 @@ import { Icon, type IconName } from "./Icon";
  * sens. Un lecteur d'écran n'a rien à faire de deux gouttes floutées.
  */
 
-export type GlassTone = "amber" | "sky" | "green";
+export type GlassTone = "amber" | "sky" | "green" | "naranja";
 
 /** UN rectangle de couleur, incliné, à moitié sous le verre — le même
  *  geste que le grand carré ambre de la carte de recherche, en petit.
@@ -27,6 +27,12 @@ const RECT: Record<GlassTone, string> = {
   amber: "bg-[linear-gradient(135deg,#fde68a,#f59e0b_62%,#d97706)]",
   sky: "bg-[linear-gradient(135deg,#bae6fd,#0ea5e9_62%,#0369a1)]",
   green: "bg-[linear-gradient(135deg,#d9f99d,#84cc16_62%,#4d7c0f)]",
+  /* L'ORANGE DE L'APP, dans la même grammaire que les trois autres :
+     clair en haut à gauche, saturé au milieu, sombre en bas à droite.
+     Le geste du site — le rectangle incliné qui dépasse de la tuile de
+     verre — était absent de l'app, et c'est ce qui faisait qu'elle ne
+     ressemblait pas à la même maison. */
+  naranja: "bg-[linear-gradient(135deg,#fdba74,#f26419_62%,#b8420a)]",
 };
 
 export function GlassIcon({
