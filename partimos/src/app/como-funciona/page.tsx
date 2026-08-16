@@ -10,7 +10,7 @@ import type { Faq } from "@/lib/content";
 export const metadata: Metadata = {
   title: "Cómo se paga un viaje, paso a paso",
   description:
-    "Del primer clic al pago: buscas, reservas gratis, se abre el chat con el conductor, coordinan el punto y le pagas a la persona el día del viaje, en efectivo o por Yappy.",
+    "Del primer clic al pago: buscas, reservas, se abre el chat con el conductor, coordinan el punto y le pagas a la persona el día del viaje, en efectivo o por Yappy.",
   alternates: { canonical: canonical("/como-funciona") },
 };
 
@@ -54,7 +54,7 @@ const STEPS: Step[] = [
     icon: "chat",
     when: "Ahora",
     title: "Reservas tu puesto",
-    body: "Reservar es gratis. Pagas como prefieras: en la mano el día del viaje, o en la app con cobro protegido. Al confirmar, se abre el chat con el conductor.",
+    body: "Pagas como prefieras: por Yappy o con tarjeta en la app, con cobro protegido, o en efectivo en la mano el día del viaje. Al confirmar, se abre el chat con el conductor.",
     money: "No pagas nada",
   },
   {
@@ -121,8 +121,8 @@ export default function ComoFuncionaPage() {
               Pagas una sola vez, y no es en la app
             </h1>
             <p className="max-w-[56ch] text-[16.5px] leading-relaxed text-night-200">
-              Buscar es gratis. Reservar es gratis. El dinero cambia de manos
-              una vez, el día del viaje, entre tú y el conductor. Aquí está todo
+              El dinero cambia de manos una sola vez, el día del viaje,
+              entre tú y el conductor. Aquí está todo
               el recorrido.
             </p>
           </Container>

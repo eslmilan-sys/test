@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Icon } from "@/components/ui/Icon";
+import { GlassIcon, type GlassTone } from "@/components/ui/GlassIcon";
 import { LogoMark } from "@/components/site/Logo";
 import { useSession } from "@/lib/session";
 import { useAhora } from "@/lib/reloj";
@@ -36,10 +37,14 @@ import { Hoy } from "./Hoy";
  *  « desde » n'est pas un prix d'appel : c'est le plancher réel des
  *  trajets publiés sur cette route, et il monte avec la distance et le
  *  véhicule — jamais avec la demande. */
-const RUTAS = [
-  { from: "panama-city", to: "david", label: "Panamá → David", desde: 15 },
-  { from: "panama-city", to: "chitre", label: "Panamá → Chitré", desde: 11 },
-  { from: "panama-city", to: "santiago", label: "Panamá → Santiago", desde: 12 },
+/* Trois routes, trois tons de verre — les mêmes que les trois tuiles de
+   la page d'accueil du site. C'est le seul endroit de l'écran d'accueil
+   où le geste de marque revient, et c'est voulu : répété sur chaque
+   ligne de chaque liste, il cesserait d'être une signature. */
+const RUTAS: { from: string; to: string; label: string; desde: number; tono: GlassTone }[] = [
+  { from: "panama-city", to: "david", label: "Panamá → David", desde: 15, tono: "naranja" },
+  { from: "panama-city", to: "chitre", label: "Panamá → Chitré", desde: 11, tono: "amber" },
+  { from: "panama-city", to: "santiago", label: "Panamá → Santiago", desde: 12, tono: "sky" },
 ];
 
 const nombreCiudad = (slug: string) =>
@@ -269,9 +274,7 @@ export function Inicio() {
                 href={`/buscar?desde=${r.from}&hacia=${r.to}&fecha=${fechaUsada}&puestos=1`}
                 className="flex items-center gap-3 rounded-[16px] border border-ink-200 bg-white px-3.5 py-3 transition-colors hover:border-naranja"
               >
-                <span className="flex size-9 shrink-0 items-center justify-center rounded-[11px] bg-naranja-suave text-naranja">
-                  <Icon name="route" className="size-[18px]" />
-                </span>
+                <GlassIcon name="route" tone={r.tono} size="sm" />
                 <span className="min-w-0 flex-1 truncate text-[14.5px] font-semibold">
                   {r.label}
                 </span>

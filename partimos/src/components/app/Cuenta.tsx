@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import * as Dialog from "@radix-ui/react-dialog";
 import { Icon, type IconName } from "@/components/ui/Icon";
+import { GlassIcon, type GlassTone } from "@/components/ui/GlassIcon";
 import { LogoMark } from "@/components/site/Logo";
 import { ChatThread } from "@/components/trip/ChatThread";
 import { ALL_CITIES } from "@/lib/corridors";
@@ -375,9 +376,7 @@ function AvisoPapeles() {
       href="/cuenta/verificacion"
       className="mt-4 flex items-start gap-3 rounded-[18px] border border-naranja bg-naranja-suave p-4 transition-colors hover:bg-naranja-suave/70"
     >
-      <span className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-[12px] bg-white text-naranja">
-        <Icon name="id" className="size-[18px]" />
-      </span>
+      <GlassIcon name="id" tone="naranja" size="sm" className="mt-0.5" />
       <span className="min-w-0 flex-1">
         <span className="block font-display text-[14.5px] font-bold text-naranja-hondo">
           {faltaIdentidad
@@ -570,6 +569,9 @@ function Bienvenida() {
  */
 type Pieza = {
   icon: IconName;
+  /** Le ton du rectangle de verre. Décoratif — l'état « lista /
+   *  pendiente » se lit sur la pastille de droite, pas sur la couleur. */
+  tono: GlassTone;
   titulo: string;
   texto: string;
   /** Qui doit la fournir. */
@@ -582,6 +584,7 @@ type Pieza = {
 const PIEZAS: Pieza[] = [
   {
     icon: "id",
+    tono: "green",
     titulo: "Cédula o pasaporte",
     texto:
       "Un proveedor certificado confirma que el documento es real y que corresponde a tu cara.",
@@ -590,6 +593,7 @@ const PIEZAS: Pieza[] = [
   },
   {
     icon: "car",
+    tono: "sky",
     titulo: "Licencia de conducir",
     texto:
       "Vigente y a tu nombre. La revisa el mismo proveedor, en el mismo paso.",
@@ -598,6 +602,7 @@ const PIEZAS: Pieza[] = [
   },
   {
     icon: "camera",
+    tono: "amber",
     titulo: "Foto del carro",
     texto:
       "Como se ve por fuera. Es lo que mira el pasajero cuando un carro se detiene.",
@@ -606,6 +611,7 @@ const PIEZAS: Pieza[] = [
   },
   {
     icon: "hash",
+    tono: "naranja",
     titulo: "Número de placa",
     texto:
       "Se le muestra al pasajero que ya reservó, nunca en la búsqueda abierta.",
@@ -679,13 +685,16 @@ function Verificacion() {
               className="rounded-[18px] border border-ink-200 bg-white p-4"
             >
               <div className="flex items-start gap-3">
-                <span
-                  className={`flex size-10 shrink-0 items-center justify-center rounded-[13px] ${
-                    ok ? "bg-verde-suave text-verde-ok" : "bg-ink-100 text-ink-400"
-                  }`}
-                >
-                  <Icon name={p.icon} className="size-[19px]" />
-                </span>
+                {/* LE VERRE DE LA MARQUE, et l'état par la lumière : une
+                    pièce qui manque est éteinte, pas grise. La mention
+                    « Pendiente » à droite reste le porteur du sens — la
+                    couleur ne fait que l'appuyer. */}
+                <GlassIcon
+                  name={p.icon}
+                  tone={p.tono}
+                  size="sm"
+                  className={ok ? "" : "opacity-75 saturate-[0.25]"}
+                />
                 <div className="min-w-0 flex-1">
                   <p className="flex flex-wrap items-center gap-x-2 gap-y-1 font-display text-[15.5px] font-bold">
                     {p.titulo}
@@ -992,7 +1001,7 @@ function Perfil({
             href="/cuenta/verificacion"
             className="mt-3 flex items-center gap-3 rounded-[18px] bg-naranja-suave p-4 transition-colors hover:bg-naranja-suave/70"
           >
-            <Icon name="id" className="size-5 shrink-0 text-naranja" />
+            <GlassIcon name="id" tone="naranja" size="sm" />
             <span className="min-w-0 flex-1">
               <span className="block font-display text-[14.5px] font-bold text-naranja-hondo">
                 Verifica tu cédula

@@ -65,8 +65,8 @@ export function Pago() {
         <div className="mt-5 grid gap-2 text-[14.5px] leading-snug text-ink-500 sm:grid-cols-2 sm:gap-7">
           <p>
             <b className="font-display font-bold text-ink-900">Pasajero</b> —
-            apartas tu puesto gratis. Pagas por Yappy o tarjeta en la app, o
-            en la mano si prefieres el efectivo.
+            apartas tu puesto y pagas como prefieras: por Yappy o tarjeta en la
+            app, o en la mano si prefieres el efectivo.
           </p>
           <p className="sm:text-right">
             <b className="font-display font-bold text-ink-900">Conductor</b> —

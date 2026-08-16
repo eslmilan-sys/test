@@ -293,8 +293,9 @@ export function SearchCard() {
         <p className="px-1.5 pt-3 pb-1 text-center text-[12.5px] text-ink-500">
           {mode === "buscar" ? (
             <>
-              Buscar y reservar es <b className="text-ink-900">gratis</b>. Le
-              pagas directo a la persona.
+              Pagas como prefieras:{" "}
+              <b className="text-ink-900">Yappy, tarjeta o efectivo</b>,
+              directo a la persona.
             </>
           ) : (
             <>

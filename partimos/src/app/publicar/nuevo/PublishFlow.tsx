@@ -1091,7 +1091,7 @@ export function PublishFlow() {
                   className="mt-3 h-1.5 w-full cursor-pointer appearance-none rounded-full bg-ink-200 [&::-moz-range-thumb]:size-6 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-4 [&::-moz-range-thumb]:border-accent [&::-moz-range-thumb]:bg-white [&::-webkit-slider-thumb]:size-6 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-4 [&::-webkit-slider-thumb]:border-accent [&::-webkit-slider-thumb]:bg-white"
                 />
                 <p className="tnum mt-1 flex justify-between text-[12.5px] text-ink-500">
-                  <span>Gratis</span>
+                  <span>{formatUsd(0)}</span>
                   <span>Tope {formatUsd(cap.maxPriceCents)}</span>
                 </p>
               </div>

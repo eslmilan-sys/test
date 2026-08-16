@@ -67,8 +67,8 @@ const PROOF: {
   {
     icon: "check",
     tone: "amber",
-    title: "Reservar es gratis",
-    detail: "Le pagas a la persona",
+    title: "Pagas una sola vez",
+    detail: "Yappy, tarjeta o efectivo",
   },
 ];
 

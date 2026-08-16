@@ -7,7 +7,7 @@ import { canonical } from "@/lib/site";
 export const metadata: Metadata = {
   title: "Buscar un viaje",
   description:
-    "Quién sale hoy hacia el interior, a qué hora y cuánto se aporta. Reservar es gratis y le pagas directo al conductor.",
+    "Quién sale hoy hacia el interior, a qué hora y cuánto se aporta. Le pagas directo al conductor: Yappy, tarjeta o efectivo.",
   alternates: { canonical: canonical("/buscar") },
   // Une page de résultats n'a rien d'indexable : son contenu dépend de
   // paramètres. Les pages corridor sont là pour le référencement.

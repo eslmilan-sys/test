@@ -3,6 +3,7 @@
 import { useMemo } from "react";
 import Link from "next/link";
 import { Icon, type IconName } from "@/components/ui/Icon";
+import { GlassIcon, type GlassTone } from "@/components/ui/GlassIcon";
 import { ALL_CITIES } from "@/lib/corridors";
 import { formatDayLabel, formatTime, localIso } from "@/lib/trips";
 import { useSession } from "@/lib/session";
@@ -29,27 +30,36 @@ const nombre = (slug: string) =>
   ALL_CITIES.find((c) => c.slug === slug)?.shortName ?? slug;
 
 /** Ce que nous faisons, et qui est vrai aujourd'hui. */
-const HECHOS: { icon: IconName; titulo: string; texto: string }[] = [
+const HECHOS: {
+  icon: IconName;
+  tono: GlassTone;
+  titulo: string;
+  texto: string;
+}[] = [
   {
     icon: "id",
+    tono: "green",
     titulo: "La cédula se verifica fuera de aquí",
     texto:
       "Un proveedor certificado confirma que es real y que corresponde a la persona. Nosotros recibimos dos cosas: si pasó o no, y una referencia. La foto del documento y el número nunca llegan a nuestros servidores.",
   },
   {
     icon: "chat",
+    tono: "sky",
     titulo: "Nadie da su número",
     texto:
       "La coordinación pasa por el chat de la reserva. Queda escrita y ninguno de los dos puede cambiar un mensaje después de enviarlo — por eso sirve de prueba.",
   },
   {
     icon: "star",
+    tono: "amber",
     titulo: "Las calificaciones no se borran",
     texto:
       "Al terminar se califican los dos, y el historial se queda en el perfil. Un conductor que cancela tarde varias veces deja de poder publicar: la consecuencia es de reputación, nunca una multa.",
   },
   {
     icon: "users",
+    tono: "naranja",
     titulo: "Modo solo mujeres",
     texto:
       "Una conductora puede marcar su viaje como exclusivo para mujeres, y una pasajera puede buscar solo esos. Es opcional en los dos sentidos y no cambia el aporte.",
@@ -147,8 +157,8 @@ export function SeguridadPagina() {
             key={h.titulo}
             className="rounded-[18px] border border-ink-200 bg-white p-4"
           >
-            <p className="flex items-center gap-2.5 font-display text-[15.5px] font-bold">
-              <Icon name={h.icon} className="size-[18px] shrink-0 text-verde-ok" />
+            <p className="flex items-center gap-3 font-display text-[15.5px] leading-tight font-bold">
+              <GlassIcon name={h.icon} tone={h.tono} size="sm" />
               {h.titulo}
             </p>
             <p className="mt-1.5 text-[13.5px] leading-relaxed text-ink-600">

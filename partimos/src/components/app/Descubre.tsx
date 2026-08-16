@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { Icon, type IconName } from "@/components/ui/Icon";
+import { GlassIcon, type GlassTone } from "@/components/ui/GlassIcon";
 
 /**
  * TODO LO QUE NECESITAS PARA VIAJAR MEJOR — l'écran de découverte.
@@ -16,8 +17,14 @@ import { Icon, type IconName } from "@/components/ui/Icon";
  * rassure ensuite. Et chaque carte mène quelque part.
  */
 
+/* LE TON DE VERRE de chaque carte. Il ne code aucune information — c'est
+   de la variété, comme les six tuiles de la page d'accueil du site. On
+   alterne pour que deux cartes voisines ne portent jamais le même
+   rectangle : c'est ce qui empêche une liste d'icônes de ressembler à un
+   tableau de bord. */
 const COSAS: {
   icon: IconName;
+  tono: GlassTone;
   titulo: string;
   texto: string;
   href: string;
@@ -25,6 +32,7 @@ const COSAS: {
 }[] = [
   {
     icon: "search",
+    tono: "naranja",
     titulo: "Te recogen donde quieras",
     texto:
       "Escoges el punto exacto al reservar, o propones el tuyo si le queda de paso al conductor. Sin terminal y sin trasbordos.",
@@ -33,6 +41,7 @@ const COSAS: {
   },
   {
     icon: "cash",
+    tono: "amber",
     titulo: "El aporte sale de los kilómetros",
     texto:
       "De la distancia, del carro y de los peajes, repartidos entre los ocupantes. No sube con la demanda, ni con la hora, ni con la fecha.",
@@ -41,6 +50,7 @@ const COSAS: {
   },
   {
     icon: "phone",
+    tono: "sky",
     titulo: "Tres formas de pagar",
     texto:
       "Yappy o tarjeta dentro de la app, con comprobante y reembolso según las reglas de cancelación. O en la mano el día del viaje.",
@@ -49,6 +59,7 @@ const COSAS: {
   },
   {
     icon: "id",
+    tono: "green",
     titulo: "Sabes quién maneja",
     texto:
       "La cédula se verifica con un proveedor externo. En público solo se ve el nombre y la inicial del apellido — nunca el apellido completo.",
@@ -57,6 +68,7 @@ const COSAS: {
   },
   {
     icon: "chat",
+    tono: "sky",
     titulo: "El chat queda escrito",
     texto:
       "Coordinas la hora y el punto sin dar tu número. Ninguno de los dos puede cambiar un mensaje después de enviarlo.",
@@ -65,6 +77,7 @@ const COSAS: {
   },
   {
     icon: "shield",
+    tono: "naranja",
     titulo: "Seguridad a un toque",
     texto:
       "Desde tu viaje del día llamas al 911 o compartes con quien tú quieras a dónde vas, con quién y a qué hora.",
@@ -93,9 +106,7 @@ export function Descubre() {
               className="block rounded-[18px] border border-ink-200 bg-white p-4 transition-colors hover:border-naranja"
             >
               <span className="flex items-center gap-3">
-                <span className="flex size-10 shrink-0 items-center justify-center rounded-[13px] bg-naranja-suave text-naranja">
-                  <Icon name={c.icon} className="size-[19px]" />
-                </span>
+                <GlassIcon name={c.icon} tone={c.tono} size="sm" />
                 <span className="min-w-0 flex-1 font-display text-[16px] leading-tight font-bold">
                   {c.titulo}
                 </span>
