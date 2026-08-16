@@ -1110,6 +1110,35 @@ body:has(.puerta) nav[aria-label="Navegación principal"] {
   display: none !important;
 }
 
+/* MÊME RÈGLE POUR LA LISTE DE SUGGESTIONS, ET POUR LA MÊME RAISON.
+
+   Le bug rapporté : « le bouton Buscar reste devant la liste ». La cause
+   n'était pas un z-index mal réglé mais un choix d'architecture manquant.
+   La barre d'onglets est `fixed z-50` — donc dans le contexte
+   d'empilement racine — et la liste `absolute z-30` dans le flux du
+   formulaire. Aucune valeur de z-index sur la liste ne peut gagner de
+   façon fiable, et même si elle gagnait, la barre resterait tactile et
+   dans l'ordre de tabulation sous les suggestions.
+
+   La règle, énoncée une fois pour toutes : UNE COUCHE MODALE MASQUE LA
+   NAVIGATION, ELLE NE SE BAT PAS AVEC ELLE. Choisir un lieu est une
+   tâche modale — on est en train de répondre à une question, pas de
+   naviguer. Pendant ce temps, les onglets n'ont rien à faire là.
+
+   Le clavier ouvert rendait le problème pire : la liste s'étendait sous
+   une barre qui, elle, ne bouge pas. En la retirant, la liste récupère
+   toute la hauteur disponible. */
+body:has(.lista-lugares) nav[aria-label="Navegación principal"] {
+  display: none !important;
+}
+
+/* Et la liste monte au-dessus de tout ce qui pourrait rester : un CTA
+   collant, une carte, un en-tête. Au-dessus des onglets (50) et des
+   feuilles (90–120), en dessous de la porte (200). */
+.lista-lugares {
+  z-index: 140;
+}
+
 /* ===========================================================================
    UNE SEULE PALETTE DANS L'APP
    ===========================================================================

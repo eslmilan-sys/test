@@ -17,7 +17,8 @@
     "verify:cuenta": "node scripts/verify-cuenta.mjs",
     "verify:paginas": "node scripts/verify-paginas.mjs",
     "verify:puerta": "node scripts/verify-puerta.mjs",
-    "verify:geo": "node scripts/verify-geo.mjs"
+    "verify:geo": "node scripts/verify-geo.mjs",
+    "verify:lugares": "node scripts/verify-lugares.mjs"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.23",

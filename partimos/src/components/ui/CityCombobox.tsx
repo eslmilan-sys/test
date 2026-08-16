@@ -287,7 +287,7 @@ export function CityCombobox({
         <Command
           id={`${id}-list`}
           shouldFilter={false}
-          className="absolute inset-x-0 top-full z-30 mt-1 overflow-hidden rounded-[14px] border border-ink-200 bg-white shadow-lift"
+          className="lista-lugares absolute inset-x-0 top-full mt-1 overflow-hidden rounded-[14px] border border-ink-200 bg-white shadow-lift"
         >
           <Command.List className="max-h-64 overflow-y-auto p-1.5">
             {results.length === 0 &&
