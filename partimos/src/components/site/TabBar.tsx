@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Icon, type IconName } from "@/components/ui/Icon";
+import { useSinLeer } from "@/lib/avisos";
 
 /**
  * LA BARRE D'ONGLETS — visible seulement dans l'app installée.
@@ -77,6 +78,7 @@ const TABS: Tab[] = [
 
 export function TabBar() {
   const pathname = usePathname();
+  const sinLeer = useSinLeer();
 
   /* L'onglet actif se juge sur le PRÉFIXE, sauf l'accueil : « / » est
      préfixe de tout, et l'allumer partout ne dirait plus rien. */
@@ -99,11 +101,28 @@ export function TabBar() {
              une ligne dans un cinquième de 390 px, et un mot coupé en
              deux se lit plus mal qu'un mot petit. */
           className={`mx-auto flex h-full w-full flex-col items-center justify-center gap-0.5 rounded-[18px] px-0.5 text-[10px] font-semibold whitespace-nowrap transition-colors ${
-            on ? "bg-naranja-suave text-naranja" : "text-ink-500"
+            on ? "text-naranja" : "text-ink-500"
           }`}
         >
-          <Icon name={t.icon} className="size-[20px]" />
+          {/* LA PASTILLE — sur l'icône, pas à côté du mot. C'est là que
+              l'œil va, et c'est là qu'elle tient sans pousser le
+              libellé. Au-delà de 9, « 9+ » : un nombre à trois chiffres
+              dans un rond de 16 px ne se lit plus. */}
+          <span className="relative">
+            <Icon name={t.icon} className="size-[20px]" />
+            {t.href === "/cuenta/mensajes" && sinLeer > 0 && (
+              <span
+                className="tnum absolute -top-1.5 -right-2 flex min-w-[16px] items-center justify-center rounded-full bg-naranja px-1 text-[10px] leading-[16px] font-bold text-white"
+                aria-hidden
+              >
+                {sinLeer > 9 ? "9+" : sinLeer}
+              </span>
+            )}
+          </span>
           {t.label}
+          {t.href === "/cuenta/mensajes" && sinLeer > 0 && (
+            <span className="sr-only">{sinLeer} sin leer</span>
+          )}
         </Link>
       </li>
     );

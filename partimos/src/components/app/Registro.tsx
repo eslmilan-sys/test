@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Icon } from "@/components/ui/Icon";
 import { useSession } from "@/lib/session";
 import { isSupabaseConfigured } from "@/lib/supabase";
+import { huella, LARGO_MINIMO } from "@/lib/clave";
 
 /**
  * L'INSCRIPTION — UNE QUESTION PAR ÉCRAN.
@@ -39,7 +40,7 @@ import { isSupabaseConfigured } from "@/lib/supabase";
  *      le chat s'en charge. Il sert aux avis de reserva.
  */
 
-type Paso = 0 | 1 | 2 | 3 | 4;
+type Paso = 0 | 1 | 2 | 3 | 4 | 5;
 
 const TRATOS = [
   { id: "senora", label: "Señora" },
@@ -70,6 +71,7 @@ export function Registro({ onCerrar }: { onCerrar: () => void }) {
   const [trato, setTrato] = useState<(typeof TRATOS)[number]["id"] | null>(null);
   const [correo, setCorreo] = useState("");
   const [celular, setCelular] = useState("");
+  const [clave, setClave] = useState("");
   const [tocado, setTocado] = useState(false);
 
   /* La date du jour est lue AU MOMENT DE VALIDER, jamais pendant le
@@ -94,6 +96,7 @@ export function Registro({ onCerrar }: { onCerrar: () => void }) {
        un vrai numéro. Un champ obligatoire de plus ici coûterait plus
        d'inscriptions qu'il n'apporterait de contacts. */
     4: celular.trim() === "" || celular.replace(/\D/g, "").length >= 7,
+    5: clave.length >= LARGO_MINIMO,
   };
 
   function siguiente() {
@@ -102,23 +105,25 @@ export function Registro({ onCerrar }: { onCerrar: () => void }) {
       return;
     }
     setTocado(false);
-    if (paso < 4) {
+    if (paso < 5) {
       setPaso((paso + 1) as Paso);
       return;
     }
-    terminar();
+    void terminar();
   }
 
-  function terminar() {
+  async function terminar() {
     /* Avec la base branchée, la session vient du serveur : l'ouvrir ici
        ferait croire à une connexion qui n'existe pas. `signIn` le sait
        déjà et ne fait rien dans ce cas — on garde le même appel pour ne
        pas avoir deux chemins à maintenir. */
+    const marca = await huella(clave);
     signIn(correo.trim(), nombre.trim(), apellido.trim(), null);
     updateSession({
       birthDate: nacimiento,
       trato,
       phone: celular.trim() || null,
+      claveHuella: marca,
     });
     onCerrar();
   }
@@ -147,6 +152,10 @@ export function Registro({ onCerrar }: { onCerrar: () => void }) {
       celular.trim().length > 0 && celular.replace(/\D/g, "").length < 7
         ? "Ese número parece corto."
         : null,
+    5:
+      clave.length > 0 && clave.length < LARGO_MINIMO
+        ? `Al menos ${LARGO_MINIMO} caracteres. Una frase que recuerdes vale más que un signo raro.`
+        : null,
   };
   const error = tocado || errores[paso] ? errores[paso] : null;
 
@@ -167,8 +176,8 @@ export function Registro({ onCerrar }: { onCerrar: () => void }) {
         {/* LA PROGRESSION — cinq segments, pas une barre continue : on
             doit pouvoir COMPTER ce qui reste. « Encore trois » se
             supporte, « 60 % » ne veut rien dire dans un formulaire. */}
-        <ol className="flex flex-1 gap-1.5" aria-label={`Paso ${paso + 1} de 5`}>
-          {[0, 1, 2, 3, 4].map((i) => (
+        <ol className="flex flex-1 gap-1.5" aria-label={`Paso ${paso + 1} de 6`}>
+          {[0, 1, 2, 3, 4, 5].map((i) => (
             <li
               key={i}
               className={`h-1 flex-1 rounded-full ${
@@ -290,14 +299,33 @@ export function Registro({ onCerrar }: { onCerrar: () => void }) {
               inputMode="tel"
               placeholder="6000-0000"
             />
+          </Pregunta>
+        )}
+
+        {paso === 5 && (
+          <Pregunta
+            titulo="Crea tu contraseña"
+            ayuda="Con ella entras la próxima vez. Una frase que recuerdes vale más que un signo raro."
+          >
+            <Campo
+              id="reg-clave"
+              label="Contraseña"
+              type="password"
+              value={clave}
+              onChange={setClave}
+              autoComplete="new-password"
+              autoFocus
+            />
             {!isSupabaseConfigured && (
-              /* CE QUE CE BOUTON FAIT VRAIMENT. La base n'est pas
-                 branchée dans cette version : la cuenta vit dans ce
-                 téléphone. Le taire ferait croire à un compte
-                 récupérable ailleurs. */
-              <p className="mt-4 rounded-[14px] bg-ink-50 px-4 py-3 text-[12.5px] leading-snug text-ink-500">
-                En esta demostración tu cuenta se guarda en este teléfono. No
-                pedimos contraseña y no mandamos correos todavía.
+              /* CE QUE CETTE ÉTAPE FAIT VRAIMENT. La base n'est pas
+                 branchée : on garde une empreinte sur le téléphone et on
+                 la recompare à la connexion. Ça reproduit fidèlement le
+                 parcours, ça ne protège de personne — et le dire vaut
+                 mieux que laisser croire à un compte gardé ailleurs. */
+              <p className="mt-2 rounded-[14px] bg-ink-50 px-4 py-3 text-[12.5px] leading-snug text-ink-500">
+                En esta demostración tu cuenta vive en este teléfono: guardamos
+                una huella de tu contraseña aquí mismo, nunca la contraseña. No
+                mandamos correos todavía.
               </p>
             )}
           </Pregunta>
@@ -319,15 +347,15 @@ export function Registro({ onCerrar }: { onCerrar: () => void }) {
           pas d'un écran à l'autre : c'est ce qui rend la suite
           d'écrans rapide au lieu de laborieuse. */}
       <div className="flex items-center justify-between gap-4 pt-4">
-        <span className="text-[13px] text-ink-400">Paso {paso + 1} de 5</span>
+        <span className="text-[13px] text-ink-400">Paso {paso + 1} de 6</span>
         <button
           type="button"
           onClick={siguiente}
           disabled={!valido[paso]}
-          aria-label={paso === 4 ? "Crear mi cuenta" : "Siguiente"}
+          aria-label={paso === 5 ? "Crear mi cuenta" : "Siguiente"}
           className="flex size-[58px] items-center justify-center rounded-full bg-naranja text-white transition-colors hover:bg-naranja-hondo disabled:cursor-not-allowed disabled:opacity-35"
         >
-          <Icon name={paso === 4 ? "check" : "arrowRight"} className="size-6" />
+          <Icon name={paso === 5 ? "check" : "arrowRight"} className="size-6" />
         </button>
       </div>
     </div>

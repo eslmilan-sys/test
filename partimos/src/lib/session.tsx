@@ -61,6 +61,10 @@ export type Session = {
   /** Celular, si la personne l'a donné. Jamais public — il sert aux
    *  avis de reserva, pas à la mise en relation : le chat s'en charge. */
   phone?: string | null;
+  /** Empreinte SHA-256 du mot de passe, en DÉMONSTRATION seulement (voir
+   *  `lib/clave.ts`). Avec Supabase branché, c'est le serveur qui garde
+   *  et vérifie — ce champ n'est alors jamais écrit. */
+  claveHuella?: string | null;
   /** Insigne employeur ou université, si l'utilisateur l'a connecté. */
   affiliation: string | null;
   since: string;
@@ -251,6 +255,10 @@ function startAuth(): void {
     id: string;
     email?: string | null;
     phone?: string | null;
+  /** Empreinte SHA-256 du mot de passe, en DÉMONSTRATION seulement (voir
+   *  `lib/clave.ts`). Avec Supabase branché, c'est le serveur qui garde
+   *  et vérifie — ce champ n'est alors jamais écrit. */
+  claveHuella?: string | null;
     created_at?: string;
     /* Le numéro donné à l'inscription vit ICI : on ne l'enregistre pas
        comme identité téléphonique (ça coûterait un SMS de vérification

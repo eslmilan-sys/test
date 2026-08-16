@@ -39,9 +39,9 @@ import { PHOTOS } from "@/lib/photos";
  *  la voiture (ce qu'on partage), le bouclier (avec qui), l'aporte (ce
  *  que ça coûte). Ils ne remplacent pas le titre — ils le préparent. */
 const CAPACIDADES = [
-  { icon: "car", label: "Comparte el carro" },
-  { icon: "shield", label: "Con gente verificada" },
-  { icon: "cash", label: "Solo el aporte" },
+  { icon: "pin", label: "Viaja a donde quieras" },
+  { icon: "shield", label: "Viaja protegido" },
+  { icon: "cash", label: "Paga mucho menos" },
 ] as const;
 
 export function Entrar({
@@ -101,7 +101,7 @@ export function Entrar({
       {/* LA FEUILLE — elle monte par-dessus la photo, coins arrondis.
           Elle est EN VERRE : la photo se devine derrière son bord, ce qui
           la pose sur l'image au lieu de la couper en deux. */}
-      <div className="glass relative z-20 -mt-8 rounded-t-[28px] px-6 pt-6 pb-[calc(22px+env(safe-area-inset-bottom))]">
+      <div className="hoja-entrada relative z-20 -mt-8 rounded-t-[28px] px-6 pt-6 pb-[calc(22px+env(safe-area-inset-bottom))]">
         {/* LES TROIS IDÉES, DANS la feuille et non à cheval sur le bord.
             Collées au bas de la photo, elles tombaient dans la couture
             entre l'image et le texte — l'endroit exact où l'œil ne

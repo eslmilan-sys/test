@@ -13,6 +13,7 @@ import { formatDayLabel, formatTime, localIso } from "@/lib/trips";
 import { bookingKey, carsOf, useSession, type Booking } from "@/lib/session";
 import { LEGAL_FOOTER } from "@/lib/content";
 import { useAhora } from "@/lib/reloj";
+import { marcarBienvenidaLeida, useBienvenidaSinLeer } from "@/lib/avisos";
 
 /**
  * MIS VIAJES · MENSAJES · PERFIL — les trois écrans de compte de l'app.
@@ -288,7 +289,9 @@ function Mensajes({ reservas }: { reservas: Booking[] }) {
         mensaje después.
       </p>
 
-      <ul className="mt-4 grid gap-2.5">
+      <AvisoPapeles />
+
+      <ul className="mt-3 grid gap-2.5">
         <Bienvenida />
       </ul>
 
@@ -342,6 +345,55 @@ function Mensajes({ reservas }: { reservas: Booking[] }) {
 
 
 /**
+ * LES PAPIERS QUI MANQUENT — un bandeau, pas une conversation.
+ *
+ * Demande du propriétaire : prévenir qu'il faut la cédula, et le permis
+ * plus le carro si l'on veut conduire. Il vit dans Mensajes parce que
+ * c'est là qu'on va voir « ce qu'on me veut », mais il ne prend PAS la
+ * forme d'un fil : on ne répond pas à une pièce manquante, on la
+ * fournit. Un faux message aurait fait écrire dans le vide.
+ *
+ * Il disparaît quand tout est fourni, et il ne compte pas dans la
+ * pastille des messages — mélanger les deux ferait chercher une
+ * conversation qui n'existe pas.
+ */
+function AvisoPapeles() {
+  const { session } = useSession();
+  if (!session) return null;
+  const carros = carsOf(session);
+  const faltaIdentidad = !session.isVerified;
+  const faltaCarro = carros.length === 0;
+  if (!faltaIdentidad && !faltaCarro) return null;
+
+  return (
+    <Link
+      href="/cuenta/verificacion"
+      className="mt-4 flex items-start gap-3 rounded-[18px] border border-naranja bg-naranja-suave p-4 transition-colors hover:bg-naranja-suave/70"
+    >
+      <span className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-[12px] bg-white text-naranja">
+        <Icon name="id" className="size-[18px]" />
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block font-display text-[14.5px] font-bold text-naranja-hondo">
+          {faltaIdentidad
+            ? "Falta verificar tu cédula"
+            : "Falta el carro y la placa"}
+        </span>
+        <span className="mt-0.5 block text-[13px] leading-snug text-ink-600">
+          {faltaIdentidad
+            ? "Los conductores aceptan antes a quien está verificado."
+            : "Para publicar hace falta la licencia, la foto del carro y la placa."}
+          {faltaIdentidad && faltaCarro
+            ? " Y si vas a manejar, también la licencia, el carro y la placa."
+            : ""}
+        </span>
+      </span>
+      <Icon name="arrowRight" className="mt-1 size-4 shrink-0 text-naranja" />
+    </Link>
+  );
+}
+
+/**
  * LE MOT DE BIENVENUE — il est DÉJÀ là quand on arrive.
  *
  * Demande du propriétaire, exemple à l'appui : la boîte ne doit pas être
@@ -357,14 +409,23 @@ function Mensajes({ reservas }: { reservas: Booking[] }) {
 function Bienvenida() {
   const { session } = useSession();
   const nombre = session?.firstName?.trim();
+  const sinLeer = useBienvenidaSinLeer();
 
   return (
     <li>
-      <Dialog.Root>
+      <Dialog.Root onOpenChange={(abierto) => abierto && marcarBienvenidaLeida()}>
         <Dialog.Trigger asChild>
           <button
             type="button"
-            className="flex w-full items-center gap-3 rounded-[18px] border border-ink-200 bg-white p-4 text-left transition-colors hover:border-naranja"
+            /* NON LU = EN RELIEF. Le bord orange et le fond teinté
+               distinguent d'un coup d'œil ce qui reste à lire de ce qui
+               est déjà ouvert. Une liste où tout se ressemble oblige à
+               tout rouvrir pour savoir. */
+            className={`flex w-full items-center gap-3 rounded-[18px] border p-4 text-left transition-colors ${
+              sinLeer
+                ? "border-naranja bg-naranja-suave"
+                : "border-ink-200 bg-white hover:border-naranja"
+            }`}
           >
             <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-naranja-suave">
               <LogoMark gradientId="brand-bienvenida" className="h-[24px] w-[20px]" />
@@ -373,11 +434,19 @@ function Bienvenida() {
               <span className="block font-display text-[15.5px] font-bold">
                 Partimos
               </span>
-              <span className="block truncate text-[12.5px] text-ink-500">
+              <span
+                className={`block truncate text-[12.5px] ${
+                  sinLeer ? "font-semibold text-ink-900" : "text-ink-500"
+                }`}
+              >
                 Bienvenido a bordo{nombre ? `, ${nombre}` : ""}
               </span>
             </span>
-            <Icon name="arrowRight" className="size-4 shrink-0 text-ink-300" />
+            {sinLeer ? (
+              <span className="size-2.5 shrink-0 rounded-full bg-naranja" aria-label="Sin leer" />
+            ) : (
+              <Icon name="arrowRight" className="size-4 shrink-0 text-ink-300" />
+            )}
           </button>
         </Dialog.Trigger>
 

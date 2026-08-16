@@ -113,6 +113,26 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="es-PA" className={`${gabarito.variable} ${nunito.variable}`}>
+      <head>
+        {/* L'OUVERTURE NE JOUE QU'UNE FOIS PAR SESSION.
+            Le propriétaire l'a signalé : « à chaque fois que j'appuie sur
+            Buscar j'ai l'animation du début ». Une chorégraphie d'entrée
+            est un plaisir la première fois et un péage la vingtième.
+
+            Ce script est INLINE ET SYNCHRONE, dans le `head`, et c'est la
+            seule façon correcte : posée depuis un effet, la classe
+            arriverait APRÈS la première peinture, et l'animation aurait
+            déjà commencé — on verrait un début de mouvement se couper.
+            Il ne fait rien d'autre que lire un drapeau et poser une
+            classe ; sans JavaScript, l'animation joue, ce qui est le bon
+            repli. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "try{var k='partimos.abierta';if(sessionStorage.getItem(k)==='1'){document.documentElement.classList.add('ya-abierta')}else{sessionStorage.setItem(k,'1')}}catch(e){}",
+          }}
+        />
+      </head>
       <body>
         <a
           href="#contenido"

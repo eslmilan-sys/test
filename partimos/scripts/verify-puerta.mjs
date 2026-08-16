@@ -104,7 +104,7 @@ console.log(`\nPuerta, invitado y enlaces — ${BASE}\n`);
      légende est une devinette. */
   const t0 = await texto(p);
   ok("porte — trois arguments nommés",
-    /Comparte el carro/.test(t0) && /Con gente verificada/.test(t0) && /Solo el aporte/.test(t0));
+    /Viaja a donde quieras/.test(t0) && /Viaja protegido/.test(t0) && /Paga mucho menos/.test(t0), t0.slice(0, 60));
 
   /* LA CROIX FAIT QUELQUE CHOSE. */
   await cruz.click();
@@ -142,7 +142,7 @@ console.log("\n  Registro :\n");
      par-dessus : une porte est un écran, pas un bloc de page. */
   ok("registro — pas de barre d'onglets par-dessus",
     !(await p.locator('nav[aria-label="Navegación principal"]').first().isVisible().catch(() => false)));
-  ok("registro — la progression se compte", /Paso 1 de 5/.test(await texto(p)));
+  ok("registro — la progression se compte", /Paso 1 de 6/.test(await texto(p)));
 
   /* LE BOUTON NE MENT PAS : éteint tant que la réponse ne va pas. */
   ok("registro — suivant est éteint à vide", await siguiente().isDisabled());
@@ -188,15 +188,27 @@ console.log("\n  Registro :\n");
   await siguiente().click();
   await p.waitForTimeout(400);
   ok("registro — 5. le celular, facultatif", /Y tu celular/.test(await texto(p)));
-  ok("registro — on peut finir sans le donner",
-    !(await zona().getByLabel("Crear mi cuenta").first().isDisabled()));
+  ok("registro — on peut passer sans le donner", !(await siguiente().isDisabled()));
+  await siguiente().click();
+  await p.waitForTimeout(400);
+  ok("registro — 6. le mot de passe", /Crea tu contraseña/.test(await texto(p)));
+  /* LE PROPRIÉTAIRE L'A RÉCLAMÉ : entrer un courriel et se retrouver
+     connecté sans rien d'autre ne ressemble à aucun service sérieux. */
+  await p.locator("#reg-clave").fill("corto");
+  await p.waitForTimeout(300);
+  ok("registro — un mot de passe court est refusé",
+    await zona().getByLabel("Crear mi cuenta").first().isDisabled());
+  await p.locator("#reg-clave").fill("panama2026");
+  await p.waitForTimeout(300);
+  ok("registro — et il dit ce qu'on garde",
+    /huella de tu contraseña/.test(await texto(p)));
 
   /* ON PEUT REVENIR, et le champ garde ce qui était écrit. Un tunnel
      sans marche arrière fait abandonner à la première faute de frappe. */
   await zona().getByLabel("Atrás").first().click();
   await p.waitForTimeout(400);
   ok("registro — la marche arrière garde la réponse",
-    (await p.locator("#reg-correo").inputValue()) === "milan@ejemplo.com");
+    (await p.locator("#reg-celular").inputValue()) === "");
   await siguiente().click();
   await p.waitForTimeout(400);
 
@@ -215,7 +227,14 @@ console.log("\n  Registro :\n");
   ok("acceder — il s'ouvre", /Cuál es tu correo/.test(await texto(p)));
   ok("acceder — il renvoie vers l'inscription",
     /Todavía no tengo cuenta/.test(await texto(p)));
+  /* Le libellé est peint en capitales par la CSS, et `innerText` rend ce
+     qui est PEINT : la comparaison doit ignorer la casse. */
+  ok("acceder — il demande un mot de passe", /contraseña/i.test(await texto(p)));
   await p.locator("#acc-correo").fill("ana@ejemplo.com");
+  await p.waitForTimeout(300);
+  ok("acceder — sans mot de passe on ne passe pas",
+    await p.locator(".solo-app").first().getByLabel("Continuar").first().isDisabled());
+  await p.locator("#acc-clave").fill("panama2026");
   await p.waitForTimeout(300);
   await p.locator(".solo-app").first().getByLabel("Continuar").first().click();
   await p.waitForTimeout(1400);
@@ -340,7 +359,12 @@ console.log("\n  Con cuenta :\n");
   const ESPERADOS = ["Buscar", "Publicar", "Mis viajes", "Mensajes", "Perfil"];
   const { ctx, p } = await abrir("/", "socio");
   const barra = p.locator('nav[aria-label="Navegación principal"]');
-  const etiquetas = (await barra.locator("a").allInnerTexts()).map((t) => t.trim());
+  /* On réduit chaque onglet à SON MOT. `innerText` y colle la pastille
+     de non-lus et le texte réservé au lecteur d'écran : sans ce nettoyage
+     le test comparerait « 1 Mensajes 1 sin leer » à « Mensajes ». */
+  const limpiar = (t) =>
+    t.replace(/\d+/g, "").replace(/\+|sin leer/g, "").replace(/\s+/g, " ").trim();
+  const etiquetas = (await barra.locator("a").allInnerTexts()).map(limpiar);
   ok("barra — les cinq onglets du propriétaire", 
     JSON.stringify(etiquetas) === JSON.stringify(ESPERADOS), etiquetas.join(" · "));
   await ctx.close();
@@ -363,7 +387,9 @@ console.log("\n  Con cuenta :\n");
       await p
         .locator('nav[aria-label="Navegación principal"] a[aria-current="page"]')
         .allInnerTexts()
-    ).map((t) => t.trim());
+    ).map((t) =>
+      t.replace(/\d+/g, "").replace(/\+|sin leer/g, "").replace(/\s+/g, " ").trim(),
+    );
     ok(
       `barra — ${url} allume « ${esperado} », et lui seul`,
       activos.length === 1 && activos[0] === esperado,

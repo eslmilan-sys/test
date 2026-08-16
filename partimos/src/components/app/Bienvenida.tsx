@@ -87,17 +87,25 @@ export function Bienvenida({ nombre }: { nombre: string | null }) {
          place dans la page. */
       aria-hidden
       onClick={() => setCerrado(true)}
-      className="bienvenida fixed inset-0 z-[200] flex flex-col items-center justify-center bg-verde-perfil px-8 text-white"
+      /* LE FOND VIENT DU SITE, plus du vert du profil.
+         Le vert est la couleur de l'IDENTITÉ (l'avatar, l'en-tête du
+         profil) : l'employer pour l'écran d'ouverture disait « compte »
+         là où il fallait dire « Partimos ». Ici c'est le ciel clair de
+         l'accueil du site, avec sa lumière ambre en haut à droite et son
+         grain — la première chose qu'on voit est donc la marque, dans
+         ses vraies couleurs. */
+      className="bienvenida sky grain fixed inset-0 z-[200] flex flex-col items-center justify-center overflow-hidden px-8"
     >
+      <span aria-hidden className="halos" />
       {/* Le logo est un lien vers l'accueil ; ici il ne doit mener nulle
           part — l'écran se ferme tout seul. */}
-      <div className="bienvenida-marca pointer-events-none">
-        <Logo gradientId="brand-bienvenida" dotColor="#1f4d2e" />
+      <div className="bienvenida-marca pointer-events-none relative z-[1]">
+        <Logo gradientId="brand-bienvenida" />
       </div>
-      <p className="bienvenida-linea mt-7 text-[15px] font-semibold text-white/70">
+      <p className="bienvenida-linea relative z-[1] mt-7 text-[15px] font-semibold text-ink-500">
         ¡Bienvenido de vuelta!
       </p>
-      <p className="bienvenida-nombre font-display text-[38px] leading-tight font-extrabold tracking-[-0.035em]">
+      <p className="bienvenida-nombre relative z-[1] font-display text-[38px] leading-tight font-extrabold tracking-[-0.035em]">
         {nombre}
       </p>
     </div>

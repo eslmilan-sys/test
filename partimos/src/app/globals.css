@@ -1081,6 +1081,26 @@ html.app-instalada .solo-app {
   display: revert;
 }
 
+/* LA FEUILLE DE LA PORTE.
+   Elle portait `.glass`, dont le reflet diagonal s'éteint à 52 % de la
+   surface. Sur une petite pastille c'est un éclat ; sur une feuille de
+   400 px de haut, la fin du dégradé devient une BARRE FRANCHE en travers
+   — le propriétaire l'a vue passer juste derrière les trois icônes.
+   Ici le blanc est plein (la feuille n'a rien à laisser voir : elle
+   couvre le bas de la photo), et le reflet part du haut pour mourir bien
+   au-delà du bord visible. */
+.hoja-entrada {
+  background-color: #ffffff;
+  background-image: linear-gradient(
+    to bottom,
+    rgb(255 253 247 / 0.9),
+    #ffffff 34%
+  );
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.9),
+    0 -18px 44px -20px rgb(38 34 28 / 0.35);
+}
+
 /* QUAND UNE PORTE EST OUVERTE, IL N'Y A PAS DE NAVIGATION.
    Le `z-index` suffisait à la couvrir, pas à la désactiver : elle restait
    dans l'ordre de tabulation et attrapait les touches sur son bord. Et
@@ -1221,6 +1241,10 @@ html.app-instalada .cima-app {
 
   /* `--paso` échelonne : chaque bloc part 80 ms après le précédent. Assez
      pour lire une séquence, trop peu pour attendre. */
+  html.ya-abierta .entra-app,
+  html.ya-abierta nav[aria-label="Navegación principal"] {
+    animation: none !important;
+  }
   html.app-instalada .entra-app,
   html.app-instalada .solo-app .entra-app {
     animation: entraApp 0.5s cubic-bezier(0.2, 0.9, 0.2, 1) both;
@@ -1232,6 +1256,10 @@ html.app-instalada .cima-app {
   }
 }
 @media (prefers-reduced-motion: no-preference) and (display-mode: standalone) {
+  html.ya-abierta .entra-app,
+  html.ya-abierta nav[aria-label="Navegación principal"] {
+    animation: none !important;
+  }
   .entra-app {
     animation: entraApp 0.5s cubic-bezier(0.2, 0.9, 0.2, 1) both;
     animation-delay: calc(var(--paso, 0) * 70ms);
@@ -1240,6 +1268,25 @@ html.app-instalada .cima-app {
     animation: entraBarra 0.5s cubic-bezier(0.2, 0.9, 0.2, 1) both;
     animation-delay: 260ms;
   }
+}
+
+/* L'ONGLET ACTIF EST UNE TUILE DE VERRE, pas un rectangle de couleur
+   plate. Le remplissage `naranja-suave` posait un bloc opaque au milieu
+   d'une pilule translucide : deux matières différentes dans le même
+   objet, et ça se voyait. Ici la pastille active est du verre TEINTÉ —
+   même matière que la barre, une nuance plus dense — avec le liseré de
+   lumière sur sa tranche haute. */
+nav[aria-label="Navegación principal"] a[aria-current="page"] {
+  background-color: rgb(226 84 12 / 0.13);
+  background-image: linear-gradient(
+    160deg,
+    rgb(255 255 255 / 0.55),
+    rgb(255 255 255 / 0) 60%
+  );
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.75),
+    inset 0 -1px 0 rgb(184 66 10 / 0.1),
+    0 6px 14px -8px rgb(184 66 10 / 0.4);
 }
 
 /* LES ONGLETS RÉPONDENT AU DOIGT. Sur un téléphone il n'y a pas de survol :
