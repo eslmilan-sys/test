@@ -20,6 +20,7 @@ import {
 } from "@/lib/didit";
 import { useAhora } from "@/lib/reloj";
 import { marcarBienvenidaLeida, useBienvenidaSinLeer } from "@/lib/avisos";
+import { useVerificacion, COPIA } from "@/lib/verificacion";
 
 /**
  * MIS VIAJES · MENSAJES · PERFIL — les trois écrans de compte de l'app.
@@ -625,6 +626,11 @@ function Verificacion() {
   const carros = session ? carsOf(session) : [];
   const [abriendo, setAbriendo] = useState(false);
   const [aviso, setAviso] = useState<string | null>(null);
+  /* L'ÉTAT VIENT DU SERVEUR, pas de la session locale. C'est ce qui
+     permet de distinguer « en cours » de « refusé » — deux situations
+     opposées que l'ancien booléen affichait de la même façon. */
+  const cedula = useVerificacion("cedula");
+  const licencia = useVerificacion("licencia");
 
   /* OUVRIR LE PARCOURS DIDIT — le vrai. Le document est lu et le visage
      comparé chez eux ; ce qui manque sans Supabase, c'est le RETOUR du
@@ -658,10 +664,33 @@ function Verificacion() {
      défaut serait le pire mensonge possible sur cet écran. */
   const hecho = (p: Pieza) =>
     p.icon === "id"
-      ? Boolean(session?.isVerified)
-      : p.icon === "camera" || p.icon === "hash"
-        ? carros.length > 0
-        : false;
+      ? cedula.estado === "verificado" || Boolean(session?.isVerified)
+      : p.icon === "car"
+        ? licencia.estado === "verificado"
+        : p.icon === "camera" || p.icon === "hash"
+          ? carros.length > 0
+          : false;
+
+  /* L'ÉTIQUETTE DE DROITE. Elle porte le sens, donc elle doit dire la
+     VÉRITÉ : « Pendiente » pour un dossier qu'on n'a jamais ouvert et
+     pour un dossier refusé, c'est le même mot pour deux situations qui
+     n'appellent pas la même action. */
+  const marca = (p: Pieza): { texto: string; clase: string } => {
+    if (hecho(p)) {
+      return { texto: "Lista", clase: "bg-verde-suave text-verde-ok" };
+    }
+    const v = p.icon === "id" ? cedula : p.icon === "car" ? licencia : null;
+    if (v?.estado === "en_proceso") {
+      return { texto: "En proceso", clase: "bg-ink-100 text-ink-600" };
+    }
+    if (v?.estado === "rechazado") {
+      return { texto: "Rechazada", clase: "bg-danger-soft text-danger" };
+    }
+    if (v?.estado === "vencido") {
+      return { texto: "Vencida", clase: "bg-danger-soft text-danger" };
+    }
+    return { texto: "Pendiente", clase: "bg-naranja-suave text-naranja" };
+  };
 
   const listas = PIEZAS.filter(hecho).length;
 
@@ -713,13 +742,9 @@ function Verificacion() {
                   </p>
                 </div>
                 <span
-                  className={`shrink-0 rounded-full px-2.5 py-1 text-[11.5px] font-bold ${
-                    ok
-                      ? "bg-verde-suave text-verde-ok"
-                      : "bg-naranja-suave text-naranja"
-                  }`}
+                  className={`shrink-0 rounded-full px-2.5 py-1 text-[11.5px] font-bold ${marca(p).clase}`}
                 >
-                  {ok ? "Lista" : "Pendiente"}
+                  {marca(p).texto}
                 </span>
               </div>
             </li>
@@ -744,12 +769,47 @@ function Verificacion() {
             foto del documento y tu cara se quedan en Didit — a nosotros no nos
             llegan nunca.
           </p>
-          {session?.verificacionEnviada && (
-            <p className="mt-2 rounded-[14px] bg-verde-suave px-4 py-3 text-[12.5px] leading-snug text-ink-600">
-              Ya enviaste un expediente. Didit lo revisa; te avisamos cuando
-              tengamos el veredicto.
-            </p>
-          )}
+          {/* CE QUE LE SERVEUR DIT, pas ce que ce téléphone se rappelle.
+              L'ancien encart s'affichait dès qu'un dossier était PARTI et
+              ne changeait plus jamais : un refus et une attente avaient
+              le même écran vert. */}
+          {(() => {
+            const v =
+              cedula.estado !== "sin_empezar" && cedula.estado !== "desconocido"
+                ? cedula
+                : licencia.estado !== "sin_empezar" &&
+                    licencia.estado !== "desconocido"
+                  ? licencia
+                  : null;
+            if (!v) return null;
+            const c = COPIA[v.estado];
+            const fondo =
+              c.tono === "bien"
+                ? "bg-verde-suave text-ink-600"
+                : c.tono === "problema"
+                  ? "bg-danger-soft text-danger"
+                  : "bg-ink-50 text-ink-600";
+            return (
+              <div className={`mt-2 rounded-[14px] px-4 py-3 ${fondo}`}>
+                <p className="font-display text-[13.5px] font-bold">
+                  {c.etiqueta}
+                </p>
+                <p className="mt-0.5 text-[12.5px] leading-snug">{c.detalle}</p>
+                {/* On ne prétend PAS que l'écran se met à jour tout seul :
+                    le verdict arrive par webhook, et un webhook peut
+                    tomber. Un bouton honnête vaut mieux qu'une attente
+                    qui ne finit jamais. */}
+                <button
+                  type="button"
+                  onClick={() => void cedula.releer()}
+                  disabled={cedula.cargando}
+                  className="mt-2 text-[12.5px] font-bold underline underline-offset-2 disabled:opacity-50"
+                >
+                  {cedula.cargando ? "Consultando…" : "Volver a revisar"}
+                </button>
+              </div>
+            );
+          })()}
           {aviso && (
             <p
               role="alert"
