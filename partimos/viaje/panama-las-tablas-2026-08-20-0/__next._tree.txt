@@ -1,5 +1,5 @@
 :HL["/test/partimos/_next/static/chunks/3k_03dkzu02-c.css","style"]
-:HL["/test/partimos/_next/static/chunks/1ejj4vqq9t539.css","style"]
+:HL["/test/partimos/_next/static/chunks/04n-t_sobf17f.css","style"]
 :HL["/test/partimos/_next/static/media/67af958a78cfd7ea-s.p.1lywp3x9jvm8e.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
 :HL["/test/partimos/_next/static/media/f141b5b7abe57afc-s.p.380f-mwhk0aej.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
-0:{"tree":{"name":"","param":null,"prefetchHints":4112,"slots":{"children":{"name":"viaje","param":null,"prefetchHints":4160,"slots":{"children":{"name":"id","param":{"type":"d","key":"panama-las-tablas-2026-08-20-0","siblings":[]},"prefetchHints":4192,"slots":{"children":{"name":"__PAGE__","param":null,"prefetchHints":4256,"slots":null}}}}}}},"staleTime":300,"buildId":"LnsSy6N1k9fn2o0OtObW8"}
+0:{"tree":{"name":"","param":null,"prefetchHints":4112,"slots":{"children":{"name":"viaje","param":null,"prefetchHints":4160,"slots":{"children":{"name":"id","param":{"type":"d","key":"panama-las-tablas-2026-08-20-0","siblings":[]},"prefetchHints":4192,"slots":{"children":{"name":"__PAGE__","param":null,"prefetchHints":4256,"slots":null}}}}}}},"staleTime":300,"buildId":"zHR4hQ0Whwf49NxrlY506"}
