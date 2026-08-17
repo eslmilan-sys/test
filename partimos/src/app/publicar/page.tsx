@@ -89,23 +89,79 @@ export default function PublicarPage() {
                 </div>
               </div>
 
-              {/* LA CALCULETTE, en haut et avec le choix des villes :
-                  personne ne sait de tête que Panamá → Chitré fait 250 km. */}
-              <div id="calculadora" className="scroll-mt-24">
-                <Calculadora conRuta />
-                <ButtonLink
-                  href="/publicar/nuevo"
-                  size="lg"
-                  className="mt-3 w-full"
-                >
-                  Proponer este viaje
-                </ButtonLink>
-              </div>
             </div>
           </Container>
         </div>
 
         <div>
+          {/* CUÁNTO RECUPERAS Y CÓMO — remis à plat.
+
+              Avant : la calculette et un mur d'explication juridique
+              côte à côte, sous un titre (« Por qué hay un tope ») qui
+              répondait à une question que personne ne s'était encore
+              posée. On expliquait la règle avant d'avoir montré le
+              chiffre.
+
+              Maintenant, l'ordre de la curiosité : combien → comment →
+              pourquoi il y a une limite → et le bouton, à portée de
+              pouce au moment où l'envie est là. Le « pourquoi » reste,
+              raccourci : c'est la garantie juridique du produit, la
+              retirer serait perdre la seule chose qui distingue Partimos
+              d'un service de transport. */}
+          <section id="tope" className="scroll-mt-24 bg-ink-50 py-12 md:py-16">
+            <Container>
+              <div className="mx-auto max-w-[640px]">
+                <h2 className="mb-2 max-w-[18ch] text-[clamp(26px,4.4vw,36px)] leading-[1.04] font-extrabold tracking-[-0.035em]">
+                  Cuánto recuperas, y cómo
+                </h2>
+                <p className="mb-7 max-w-[50ch] text-[16.5px] leading-relaxed text-ink-600">
+                  Escoge tu ruta y tu carro. El tope sale del costo real del
+                  recorrido — no de la demanda, ni de la fecha, ni de lo lleno
+                  que vaya el carro.
+                </p>
+
+                <Calculadora conRuta />
+
+                {/* LE BOUTON ICI, pas en bas de page : c'est l'instant où
+                    quelqu'un vient de voir son chiffre. Le faire défiler
+                    encore pour agir, c'est perdre exactement les gens
+                    qu'on venait de convaincre. */}
+                <ButtonLink
+                  href="/publicar/nuevo"
+                  size="lg"
+                  className="mt-4 w-full"
+                >
+                  Proponer este viaje
+                </ButtonLink>
+                <p className="mt-2 text-center text-[13px] text-ink-500">
+                  Publicar toma menos de un minuto.
+                </p>
+
+                <div className="mt-9 border-t border-ink-200 pt-6">
+                  <h3 className="mb-2.5 font-display text-[18px] font-bold">
+                    Por qué hay un tope
+                  </h3>
+                  <div className="space-y-3.5 text-[14.5px] leading-relaxed text-ink-500">
+                    <p>
+                      Compartir los gastos de un viaje que ya ibas a hacer es
+                      una cosa. Cobrar un pasaje es otra, y para eso hace falta
+                      un permiso de transporte que ni tú ni nosotros tenemos.
+                    </p>
+                    <p>
+                      La diferencia está en un detalle del cálculo: el costo se
+                      divide entre{" "}
+                      <b className="font-semibold text-ink-900">
+                        los puestos que ofreces más uno
+                      </b>
+                      . Ese «uno» eres tú. Por eso, aunque lleves el carro
+                      lleno, siempre terminas poniendo una parte.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </Container>
+          </section>
+
           <section id="como" className="scroll-mt-24 py-12 md:py-16">
             <Container>
               <h2 className="mb-8 max-w-[20ch] text-[clamp(24px,4vw,34px)] font-extrabold">
@@ -141,127 +197,74 @@ export default function PublicarPage() {
           {/* LA SÉCURITÉ DU COBRO, côté conducteur d'abord : c'est lui
               qu'il faut convaincre — sans carros publiés il n'y a pas de
               plateforme. Quatre garanties concrètes, pas des slogans. */}
+          {/* LE COBRO — QUATRE CARTES DEVENUES QUATRE LIGNES.
+
+              Elles disaient quatre choses justes dans quatre boîtes de
+              cent quarante mots. Sur téléphone, ça faisait quatre écrans
+              de défilement pour une idée qui tient en une phrase : tu
+              pars payé, et on ne te retient rien.
+
+              Titre, sous-titre, quatre lignes, une phrase de clôture.
+              Même rythme que le haut de page — c'est ce qui manquait :
+              la section était conçue comme une grille de features de
+              SaaS, pas comme la suite d'un argumentaire. */}
           <section className="py-12 md:py-16">
             <Container>
-              <h2 className="mb-2 max-w-[22ch] text-[clamp(24px,4vw,34px)] font-extrabold">
+              <h2 className="mb-2 max-w-[22ch] text-[clamp(24px,4vw,34px)] leading-[1.06] font-extrabold tracking-[-0.03em]">
                 El cobro, asegurado antes de salir
               </h2>
-              <p className="mb-8 max-w-[58ch] text-[15px] leading-relaxed text-ink-500">
+              <p className="mb-7 max-w-[52ch] text-[16px] leading-relaxed text-ink-600">
                 Manejar ya es poner el carro, la gasolina y el volante. Cobrar
                 no debería ser otro trabajo.
               </p>
-              <div className="grid gap-3.5 min-[680px]:grid-cols-2 min-[1000px]:grid-cols-4">
-                <div className="rounded-[20px] border border-ink-200 p-5.5">
-                  <span className="mb-3.5 flex size-10.5 items-center justify-center rounded-xl bg-ink-50 text-ink-900">
-                    <Icon name="shield" className="size-5.5" />
-                  </span>
-                  <h3 className="mb-1.5 font-display text-[16.5px] font-bold">
-                    Sales con el cobro ya hecho
-                  </h3>
-                  <p className="text-sm leading-relaxed text-ink-500">
-                    Si el pasajero pagó en la app, su aporte quedó cobrado al
-                    confirmar el puesto. No hay «te pago llegando», no hay
-                    vueltos, no hay excusas.
-                  </p>
-                </div>
-                <div className="rounded-[20px] border border-ink-200 p-5.5">
-                  <span className="mb-3.5 flex size-10.5 items-center justify-center rounded-xl bg-ink-50 text-ink-900">
-                    <Icon name="cash" className="size-5.5" />
-                  </span>
-                  <h3 className="mb-1.5 font-display text-[16.5px] font-bold">
-                    Tu aporte llega completo
-                  </h3>
-                  <p className="text-sm leading-relaxed text-ink-500">
-                    La tarifa de servicio la paga el pasajero que elige el
-                    cobro en la app — de lo tuyo no se descuenta nada, nunca.
-                    Y si no viaja, las reglas de cancelación te cubren.
-                  </p>
-                </div>
-                <div className="rounded-[20px] border border-ink-200 p-5.5">
-                  <span className="mb-3.5 flex size-10.5 items-center justify-center rounded-xl bg-ink-50 text-ink-900">
-                    <Icon name="check" className="size-5.5" />
-                  </span>
-                  <h3 className="mb-1.5 font-display text-[16.5px] font-bold">
-                    Tú eliges cómo te pagan
-                  </h3>
-                  <p className="text-sm leading-relaxed text-ink-500">
-                    En la app siempre; Yappy directo y efectivo, solo si tú los
-                    aceptas. Puedes manejar «solo por la app» y no tocar plata
-                    en todo el viaje.
-                  </p>
-                </div>
-                <div className="rounded-[20px] border border-ink-200 p-5.5">
-                  <span className="mb-3.5 flex size-10.5 items-center justify-center rounded-xl bg-ink-50 text-ink-900">
-                    <Icon name="id" className="size-5.5" />
-                  </span>
-                  <h3 className="mb-1.5 font-display text-[16.5px] font-bold">
-                    Sabes a quién llevas
-                  </h3>
-                  <p className="text-sm leading-relaxed text-ink-500">
-                    Nadie reserva sin cédula verificada. Ves el perfil y las
-                    calificaciones antes de aceptar, y hablan por el chat de la
-                    reserva — sin dar tu celular a nadie.
-                  </p>
-                </div>
-              </div>
-              <p className="mt-5 max-w-[70ch] text-[13.5px] leading-relaxed text-ink-500">
-                ¿Y el pasajero? Las mismas garantías al revés: cobro protegido
-                con la tarifa a la vista, comprobante, reembolso según las
-                reglas de cancelación — y jamás le pedimos la tarjeta fuera de
-                la app.
+
+              <ul className="max-w-[62ch] divide-y divide-ink-200 border-y border-ink-200">
+                {[
+                  {
+                    icon: "shield" as const,
+                    que: "Sales con el cobro hecho",
+                    como: "Si pagó en la app, su aporte quedó cobrado al confirmar. Sin «te pago llegando».",
+                  },
+                  {
+                    icon: "cash" as const,
+                    que: "Tu aporte llega completo",
+                    como: "La tarifa la paga quien elige pagar en la app. De lo tuyo no se descuenta nada, nunca.",
+                  },
+                  {
+                    icon: "check" as const,
+                    que: "Tú eliges cómo te pagan",
+                    como: "Yappy directo y efectivo solo si los aceptas. Puedes manejar sin tocar plata.",
+                  },
+                  {
+                    icon: "id" as const,
+                    que: "Sabes a quién llevas",
+                    como: "Nadie reserva sin cédula verificada. Hablan por el chat, sin dar tu celular.",
+                  },
+                ].map((f) => (
+                  <li key={f.que} className="flex items-start gap-3.5 py-4">
+                    <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-[10px] bg-ink-50 text-ink-900">
+                      <Icon name={f.icon} className="size-4" />
+                    </span>
+                    <span className="min-w-0">
+                      <b className="block font-display text-[15.5px] font-bold">
+                        {f.que}
+                      </b>
+                      <span className="mt-0.5 block text-[14px] leading-relaxed text-ink-500">
+                        {f.como}
+                      </span>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+
+              <p className="mt-5 max-w-[62ch] text-[13.5px] leading-relaxed text-ink-400">
+                El pasajero tiene las mismas garantías al revés: cobro
+                protegido con la tarifa a la vista, comprobante y reembolso
+                según las reglas de cancelación.
               </p>
             </Container>
           </section>
 
-          <section
-            id="tope"
-            className="scroll-mt-24 bg-ink-50 py-12 md:py-16"
-          >
-            <Container>
-              <div className="grid gap-9 min-[900px]:grid-cols-[1.04fr_0.96fr] min-[900px]:items-start min-[900px]:gap-12">
-                <Calculadora conRuta />
-                <div>
-                  <h2 className="mb-4 max-w-[20ch] text-[clamp(24px,4vw,34px)] font-extrabold">
-                    Por qué hay un tope
-                  </h2>
-                  <div className="max-w-[50ch] space-y-4 text-[15px] leading-relaxed text-ink-500">
-                    <p>
-                      Compartir los gastos de un viaje que ya ibas a hacer es
-                      una cosa. Cobrar un pasaje es otra, y para eso hace falta
-                      un permiso de transporte que ni tú ni nosotros tenemos.
-                    </p>
-                    <p>
-                      La diferencia se sostiene en un detalle del cálculo: el
-                      costo del recorrido se divide entre{" "}
-                      <b className="font-semibold text-ink-900">
-                        los puestos que ofreces más uno
-                      </b>
-                      . Ese «uno» eres tú. Por eso, aunque lleves el carro
-                      lleno, siempre terminas poniendo una parte.
-                    </p>
-                    <p>
-                      El tope no es una sugerencia de la pantalla: está escrito
-                      en la base de datos. Un viaje por encima del tope,
-                      sencillamente, no se puede guardar.
-                    </p>
-                  </div>
-
-                  <div className="mt-6 rounded-[20px] border border-ink-200 bg-white px-5 py-4.5">
-                    <p className="text-[14.5px] leading-relaxed text-ink-500">
-                      <b className="font-semibold text-ink-900">
-                        Si alguien te pide un desvío
-                      </b>
-                      <br />
-                      No se cobra un extra por recogerlo: lo que cambia es la
-                      distancia. Esos kilómetros de más los asume quien los
-                      pidió, nunca tú. Y si el desvío pasa de 15 % de
-                      kilometraje o de 15 minutos, la app no lo permite.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </Container>
-          </section>
 
           <section className="py-12 md:py-16">
             <Container>
