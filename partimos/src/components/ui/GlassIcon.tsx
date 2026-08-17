@@ -18,21 +18,33 @@ import { Icon, type IconName } from "./Icon";
  * sens. Un lecteur d'écran n'a rien à faire de deux gouttes floutées.
  */
 
-export type GlassTone = "amber" | "sky" | "green" | "naranja";
+export type GlassTone = "amber" | "tostado" | "green" | "naranja";
 
 /** UN rectangle de couleur, incliné, à moitié sous le verre — le même
  *  geste que le grand carré ambre de la carte de recherche, en petit.
  *  Un seul objet par icône : le motif vaut par sa rareté. */
+/* TROIS POSITIONS SUR LA MÊME RAMPE, ET LE VERT DE LA MARQUE.
+   ─────────────────────────────────────────────────────────────────────
+   Il y avait un ton `sky` — un dégradé bleu ciel — au milieu d'une liste
+   de cartes d'un produit orange. Il servait à varier, et c'est un bon
+   réflexe : trois cartes du même bleu se lisent comme une seule. Mais on
+   ne varie pas en changeant de FAMILLE, on varie en se déplaçant DANS la
+   sienne. Trois positions bien écartées sur la rampe donnent la même
+   variété sans donner l'impression que deux produits se sont mélangés.
+
+   Le vert reste, et lui seul est hors rampe : il ne décore pas, il dit
+   « vérifié ». Une couleur qui porte un sens n'est pas interchangeable. */
 const RECT: Record<GlassTone, string> = {
-  amber: "bg-[linear-gradient(135deg,#fde68a,#f59e0b_62%,#d97706)]",
-  sky: "bg-[linear-gradient(135deg,#bae6fd,#0ea5e9_62%,#0369a1)]",
+  /* Le jaune du matin — le plus clair, celui qui accroche le moins. */
+  amber:
+    "bg-[linear-gradient(135deg,var(--color-sol-200),var(--color-sol-400)_62%,var(--color-sol-600))]",
+  /* L'orange de la maison — celui de la marque et des actions. */
+  naranja:
+    "bg-[linear-gradient(135deg,var(--color-sol-300),var(--color-sol-500)_62%,var(--color-sol-700))]",
+  /* Le brûlé du soir — le plus profond, pour ce qui doit peser. */
+  tostado:
+    "bg-[linear-gradient(135deg,var(--color-sol-400),var(--color-sol-600)_62%,var(--color-sol-900))]",
   green: "bg-[linear-gradient(135deg,#d9f99d,#84cc16_62%,#4d7c0f)]",
-  /* L'ORANGE DE L'APP, dans la même grammaire que les trois autres :
-     clair en haut à gauche, saturé au milieu, sombre en bas à droite.
-     Le geste du site — le rectangle incliné qui dépasse de la tuile de
-     verre — était absent de l'app, et c'est ce qui faisait qu'elle ne
-     ressemblait pas à la même maison. */
-  naranja: "bg-[linear-gradient(135deg,#fdba74,#f26419_62%,#b8420a)]",
 };
 
 export function GlassIcon({

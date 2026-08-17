@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Icon } from "@/components/ui/Icon";
 import { useSession } from "@/lib/session";
 import { getSupabase, isSupabaseConfigured } from "@/lib/supabase";
@@ -66,7 +67,21 @@ function edad(iso: string, hoy: Date): number {
 
 const CORREO = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
-export function Registro({ onCerrar }: { onCerrar: () => void }) {
+export function Registro({
+  onListo,
+  onAtras,
+  /** `false` retire l'écran plein et la marge d'encoche : le composant se
+   *  glisse alors dans la feuille du site, qui les fournit elle-même. */
+  pantallaCompleta = true,
+}: {
+  /** Le compte est créé ET la session ouverte. */
+  onListo: () => void;
+  /** « Atrás » depuis la première question : on remonte d'un cran dans le
+   *  parcours, on ne quitte pas le produit. Les deux étaient le MÊME
+   *  rappel, et revenir en arrière fermait donc tout. */
+  onAtras: () => void;
+  pantallaCompleta?: boolean;
+}) {
   const { signIn, updateSession } = useSession();
 
   const [paso, setPaso] = useState<Paso>(0);
@@ -167,7 +182,7 @@ export function Registro({ onCerrar }: { onCerrar: () => void }) {
         /* Session immédiate = confirmation par courriel désactivée côté
            projet. Sinon, on attend le lien, et on le dit. */
         if (data.session) {
-          onCerrar();
+          onListo();
           return;
         }
         setCorreoEnviado(true);
@@ -195,13 +210,13 @@ export function Registro({ onCerrar }: { onCerrar: () => void }) {
 
     setEnviando(false);
     await abrirLocal();
-    onCerrar();
+    onListo();
   }
 
   function atras() {
     setTocado(false);
     if (paso === 0) {
-      onCerrar();
+      onAtras();
       return;
     }
     setPaso((paso - 1) as Paso);
@@ -230,7 +245,13 @@ export function Registro({ onCerrar }: { onCerrar: () => void }) {
   const error = tocado || errores[paso] ? errores[paso] : null;
 
   return (
-    <div className="flex min-h-[100dvh] flex-col bg-white px-6 pt-[calc(14px+env(safe-area-inset-top))] pb-[calc(20px+env(safe-area-inset-bottom))]">
+    <div
+      className={
+        pantallaCompleta
+          ? "flex min-h-[100dvh] flex-col bg-white px-6 pt-[calc(14px+env(safe-area-inset-top))] pb-[calc(20px+env(safe-area-inset-bottom))]"
+          : "flex flex-col px-1 pb-1"
+      }
+    >
       <div className="flex items-center gap-3">
         <button
           type="button"
@@ -386,6 +407,23 @@ export function Registro({ onCerrar }: { onCerrar: () => void }) {
               autoComplete="new-password"
               autoFocus
             />
+            {/* LE TEXTE LÉGAL VIT ICI AUSSI, et il le faut.
+                Il n'était que sur « ¿cómo quieres crear tu cuenta? » —
+                un écran qu'on saute désormais quand il n'y a qu'une
+                porte. Une mention d'acceptation qui dépend d'un écran
+                facultatif n'est pas une mention d'acceptation. Elle est
+                à sa place : juste au-dessus du geste qui engage. */}
+            <p className="mt-1 text-[12px] leading-relaxed text-ink-400">
+              Al crear tu cuenta aceptas los{" "}
+              <Link href="/terminos" className="font-semibold text-ink-600 underline">
+                términos de uso
+              </Link>{" "}
+              y el{" "}
+              <Link href="/privacidad" className="font-semibold text-ink-600 underline">
+                aviso de privacidad
+              </Link>
+              .
+            </p>
             {!isSupabaseConfigured && (
               /* CE QUE CETTE ÉTAPE FAIT VRAIMENT. La base n'est pas
                  branchée : on garde une empreinte sur le téléphone et on
@@ -446,7 +484,7 @@ export function Registro({ onCerrar }: { onCerrar: () => void }) {
           onClick={siguiente}
           disabled={!valido[paso] || enviando || correoEnviado}
           aria-label={paso === 5 ? "Crear mi cuenta" : "Siguiente"}
-          className="cta-naranja flex size-[58px] items-center justify-center rounded-full text-white disabled:cursor-not-allowed disabled:opacity-35"
+          className="cta-naranja flex size-[58px] items-center justify-center rounded-full disabled:cursor-not-allowed"
         >
           <Icon name={paso === 5 ? "check" : "arrowRight"} className="size-6" />
         </button>
@@ -507,7 +545,7 @@ function Campo({
         type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded-[16px] border-[1.5px] border-ink-200 bg-ink-50 px-4 py-3.5 text-[16px] outline-none focus:border-naranja focus:bg-white"
+        className="w-full rounded-[16px] border-[1.5px] border-ink-200 bg-ink-50 px-4 py-3.5 text-[16px] text-ink-900 outline-none transition-colors placeholder:text-ink-400 focus:border-sol-600 focus:bg-white focus:ring-4 focus:ring-sol-100"
         {...resto}
       />
     </label>

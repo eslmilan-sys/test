@@ -46,7 +46,7 @@ import { Hoy } from "./Hoy";
 const RUTAS: { from: string; to: string; label: string; desde: number; tono: GlassTone }[] = [
   { from: "panama-city", to: "david", label: "Panamá → David", desde: 15, tono: "naranja" },
   { from: "panama-city", to: "chitre", label: "Panamá → Chitré", desde: 11, tono: "amber" },
-  { from: "panama-city", to: "santiago", label: "Panamá → Santiago", desde: 12, tono: "sky" },
+  { from: "panama-city", to: "santiago", label: "Panamá → Santiago", desde: 12, tono: "tostado" },
 ];
 
 const nombreCiudad = (slug: string) =>

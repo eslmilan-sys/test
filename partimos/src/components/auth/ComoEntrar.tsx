@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Icon } from "@/components/ui/Icon";
 import { getSupabase, isSupabaseConfigured } from "@/lib/supabase";
+import { useProveedores } from "./proveedores";
 
 /**
  * « ¿CÓMO QUIERES CREAR TU CUENTA? » — le choix du canal, à part.
@@ -11,17 +12,34 @@ import { getSupabase, isSupabaseConfigured } from "@/lib/supabase";
  * Demande du propriétaire, exemple à l'appui. Ce n'est pas un écran de
  * plus pour le plaisir : sur la porte, le titre, la photo, les trois
  * arguments ET quatre boutons de connexion se disputaient le même
- * écran. Ici la question est seule, et les trois canaux ont la même
- * taille — celui qui n'a pas de compte Google ne doit pas avoir
- * l'impression d'emprunter la porte de service.
+ * écran. Ici la question est seule, et les canaux ont la même taille —
+ * celui qui n'a pas de compte Google ne doit pas avoir l'impression
+ * d'emprunter la porte de service.
  *
  * LE COURRIEL EN PREMIER, et c'est réfléchi : c'est le seul qui marche
- * quel que soit l'état de la base. Google et LinkedIn dépendent d'un
- * fournisseur activé côté serveur, et quand il ne l'est pas on le DIT
- * avec sa vraie cause plutôt que « inténtalo de nuevo ».
+ * quel que soit l'état de la base.
+ *
+ * ─────────────────────────────────────────────────────────────────────
+ * ON N'AFFICHE QUE CE QUI EXISTE.
+ *
+ * Le site montrait Google et Apple, l'app Google et LinkedIn : deux
+ * listes écrites à la main, dans deux fichiers, dont aucune ne
+ * correspondait forcément au projet. Un bouton qui mène à « provider is
+ * not enabled » au milieu d'un écran de connexion est pire qu'un bouton
+ * absent — c'est une impasse au moment précis où l'on s'engage.
+ *
+ * La configuration publique de Supabase dit la vérité ; on la lit. En
+ * cas de doute (réseau coupé, réponse illisible) on n'affiche AUCUN
+ * bouton social : le courriel, lui, marche toujours.
  */
 
 type Estado = { texto: string } | null;
+
+type Puerta = {
+  id: "google" | "apple" | "linkedin_oidc";
+  nombre: string;
+  glifo: React.ReactNode;
+};
 
 function GoogleGlyph() {
   return (
@@ -34,6 +52,17 @@ function GoogleGlyph() {
   );
 }
 
+function AppleGlyph() {
+  return (
+    <svg viewBox="0 0 384 512" className="size-[19px]" aria-hidden>
+      <path
+        fill="currentColor"
+        d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"
+      />
+    </svg>
+  );
+}
+
 function LinkedInGlyph() {
   return (
     <svg viewBox="0 0 24 24" className="size-[20px]" aria-hidden>
@@ -42,49 +71,63 @@ function LinkedInGlyph() {
   );
 }
 
+const PUERTAS: Puerta[] = [
+  { id: "google", nombre: "Google", glifo: <GoogleGlyph /> },
+  { id: "apple", nombre: "Apple", glifo: <AppleGlyph /> },
+  { id: "linkedin_oidc", nombre: "LinkedIn", glifo: <LinkedInGlyph /> },
+];
+
 export function ComoEntrar({
   onCorreo,
   onAcceder,
   onCerrar,
+  pantallaCompleta = true,
 }: {
   onCorreo: () => void;
   onAcceder: () => void;
   onCerrar: () => void;
+  pantallaCompleta?: boolean;
 }) {
   const [estado, setEstado] = useState<Estado>(null);
   const [cargando, setCargando] = useState<string | null>(null);
+  const { proveedores } = useProveedores();
 
-  async function social(provider: "google" | "linkedin_oidc") {
-    const nombre = provider === "google" ? "Google" : "LinkedIn";
+  const disponibles = PUERTAS.filter((p) => proveedores?.[p.id]);
+
+  async function social(p: Puerta) {
     const supabase = getSupabase();
     if (!supabase || !isSupabaseConfigured) {
       setEstado({
-        texto: `${nombre} necesita la base conectada. Con tu correo funciona ahora mismo.`,
+        texto: `${p.nombre} necesita la base conectada. Con tu correo funciona ahora mismo.`,
       });
       return;
     }
-    setCargando(provider);
+    setCargando(p.id);
     const { error } = await supabase.auth.signInWithOAuth({
-      provider,
+      provider: p.id,
       options: { redirectTo: window.location.origin + window.location.pathname },
     });
     if (error) {
       setCargando(null);
       setEstado({
         texto: /not enabled|disabled/i.test(error.message)
-          ? `${nombre} todavía no está activado. Con tu correo funciona ahora mismo.`
-          : `${nombre} no respondió: ${error.message}`,
+          ? `${p.nombre} todavía no está activado. Con tu correo funciona ahora mismo.`
+          : `${p.nombre} no respondió: ${error.message}`,
       });
     }
   }
 
+  const marco = pantallaCompleta
+    ? "flex min-h-[100dvh] flex-col bg-white px-6 pt-[calc(14px+env(safe-area-inset-top))] pb-[calc(20px+env(safe-area-inset-bottom))]"
+    : "flex flex-col px-1 pb-1";
+
   return (
-    <div className="flex min-h-[100dvh] flex-col bg-white px-6 pt-[calc(14px+env(safe-area-inset-top))] pb-[calc(20px+env(safe-area-inset-bottom))]">
+    <div className={marco}>
       <button
         type="button"
         onClick={onCerrar}
         aria-label="Cerrar"
-        className="glass -ml-1 flex size-12 shrink-0 items-center justify-center rounded-full"
+        className="glass -ml-1 flex size-11 shrink-0 items-center justify-center rounded-full"
       >
         <Icon name="cross" className="size-5" />
       </button>
@@ -98,31 +141,26 @@ export function ComoEntrar({
           <button
             type="button"
             onClick={onCorreo}
-            className="cta-naranja flex h-[56px] items-center justify-center gap-3 rounded-full px-6 font-display text-[16px] font-bold text-white transition-colors"
+            className="cta-naranja flex h-[56px] items-center justify-center gap-3 rounded-full px-6 font-display text-[16px] font-bold"
           >
             <Icon name="mail" className="size-5" />
             Continuar con mi correo
           </button>
 
-          <button
-            type="button"
-            onClick={() => void social("google")}
-            disabled={cargando !== null}
-            className="flex h-[56px] items-center justify-center gap-3 rounded-full border-[1.5px] border-ink-200 bg-white px-6 text-[15.5px] font-semibold transition-colors hover:border-ink-300 disabled:opacity-60"
-          >
-            <GoogleGlyph />
-            {cargando === "google" ? "Abriendo Google…" : "Continuar con Google"}
-          </button>
-
-          <button
-            type="button"
-            onClick={() => void social("linkedin_oidc")}
-            disabled={cargando !== null}
-            className="flex h-[56px] items-center justify-center gap-3 rounded-full border-[1.5px] border-ink-200 bg-white px-6 text-[15.5px] font-semibold transition-colors hover:border-ink-300 disabled:opacity-60"
-          >
-            <LinkedInGlyph />
-            {cargando === "linkedin_oidc" ? "Abriendo LinkedIn…" : "Continuar con LinkedIn"}
-          </button>
+          {disponibles.map((p) => (
+            <button
+              key={p.id}
+              type="button"
+              onClick={() => void social(p)}
+              disabled={cargando !== null}
+              className="flex h-[56px] items-center justify-center gap-3 rounded-full border-[1.5px] border-ink-200 bg-white px-6 text-[15.5px] font-semibold transition-colors hover:border-ink-300 disabled:opacity-60"
+            >
+              {p.glifo}
+              {cargando === p.id
+                ? `Abriendo ${p.nombre}…`
+                : `Continuar con ${p.nombre}`}
+            </button>
+          ))}
 
           {estado && (
             <p
@@ -139,7 +177,7 @@ export function ComoEntrar({
         <button
           type="button"
           onClick={onAcceder}
-          className="mt-1 text-[15px] font-bold text-naranja underline-offset-2 hover:underline"
+          className="mt-1 text-[15px] font-bold text-sol-700 underline-offset-2 hover:underline"
         >
           Iniciar sesión
         </button>

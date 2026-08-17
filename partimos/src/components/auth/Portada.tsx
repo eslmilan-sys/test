@@ -44,7 +44,7 @@ const CAPACIDADES = [
   { icon: "cash", label: "Paga mucho menos" },
 ] as const;
 
-export function Entrar({
+export function Portada({
   onRegistro,
   onAcceder,
   onCerrar,
@@ -53,17 +53,35 @@ export function Entrar({
    *  Un écran de connexion qui ne dit pas POURQUOI il s'affiche se lit
    *  comme un mur. */
   motivo,
+  /** `false` : la portada tient dans une feuille bornée (le dialogue du
+   *  site) au lieu de prendre l'écran. La photo devient une bande, et
+   *  c'est tout ce qui change — même image, mêmes mots, mêmes boutons.
+   *  Deux composants auraient garanti deux vérités. */
+  pantallaCompleta = true,
 }: {
   onRegistro: () => void;
   onAcceder: () => void;
   /** Absent = pas de sortie (première ouverture d'une session). */
   onCerrar?: () => void;
   motivo?: string;
+  pantallaCompleta?: boolean;
 }) {
   return (
-    <div className="flex min-h-[100dvh] flex-col bg-white">
+    <div
+      className={
+        pantallaCompleta
+          ? "flex min-h-[100dvh] flex-col bg-white"
+          : "flex flex-col bg-white"
+      }
+    >
       {/* LA PHOTO — elle occupe le haut, elle est coupée par la feuille. */}
-      <div className="relative min-h-0 flex-1">
+      <div
+        className={
+          pantallaCompleta
+            ? "relative min-h-0 flex-1"
+            : "relative h-[190px] shrink-0"
+        }
+      >
         <Photo
           photo={PHOTOS.carroLleno}
           sizes="100vw"
@@ -78,7 +96,7 @@ export function Entrar({
           className="absolute inset-x-0 bottom-0 h-40 bg-[linear-gradient(to_top,rgba(20,16,12,0.55),transparent)]"
         />
 
-        {onCerrar && (
+        {onCerrar && pantallaCompleta && (
           /* LA CROIX, EN HAUT À GAUCHE — demande explicite du
              propriétaire, et c'est aussi la convention : à gauche on
              quitte, à droite on agit. En verre, pour rester lisible quelle
@@ -89,7 +107,11 @@ export function Entrar({
             aria-label="Seguir sin cuenta"
             /* 48 px et non 44 : le propriétaire l'a vue rater. Sur une
                photo, sans bord net, on vise moins bien qu'on croit — et
-               une croix qu'on rate deux fois passe pour cassée. */
+               une croix qu'on rate deux fois passe pour cassée.
+
+             ELLE DISPARAÎT DANS LA FEUILLE DU SITE : celle-ci porte
+             déjà sa propre fermeture, et deux croix sur le même écran
+             font hésiter au lieu de rassurer. */
             className="glass absolute top-[calc(14px+env(safe-area-inset-top))] left-4 z-20 flex size-12 items-center justify-center rounded-full"
           >
             <Icon name="cross" className="size-5" />
@@ -126,7 +148,7 @@ export function Entrar({
         <h1 className="font-display text-[27px] leading-[1.12] font-extrabold tracking-[-0.035em]">
           {motivo ?? (
             <>
-              Alguien ya va <span className="text-naranja">para allá</span>
+              Alguien ya va <span className="text-sol-700">para allá</span>
             </>
           )}
         </h1>
@@ -138,7 +160,7 @@ export function Entrar({
           <button
             type="button"
             onClick={onRegistro}
-            className="cta-naranja flex h-[54px] items-center justify-center rounded-full px-6 font-display text-[16.5px] font-bold text-white transition-colors"
+            className="cta-naranja flex h-[54px] items-center justify-center rounded-full px-6 font-display text-[16.5px] font-bold"
           >
             Crear cuenta
           </button>
@@ -149,12 +171,16 @@ export function Entrar({
           <button
             type="button"
             onClick={onAcceder}
-            className="flex h-[46px] items-center justify-center rounded-full font-display text-[15.5px] font-bold text-naranja transition-colors hover:bg-naranja-suave"
+            className="flex h-[46px] items-center justify-center rounded-full font-display text-[15.5px] font-bold text-sol-700 transition-colors hover:bg-sol-50"
           >
             Iniciar sesión
           </button>
 
-          {onCerrar && (
+          {/* « Je veux juste chercher » n'a de sens que dans l'APP, où la
+              porte s'interpose. Sur le site on est déjà en train de
+              chercher : la même phrase y proposerait de faire ce qu'on
+              est en train de faire. */}
+          {onCerrar && pantallaCompleta && (
             <button
               type="button"
               onClick={onCerrar}

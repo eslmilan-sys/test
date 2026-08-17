@@ -50,7 +50,7 @@ const COSAS: {
   },
   {
     icon: "phone",
-    tono: "sky",
+    tono: "tostado",
     titulo: "Tres formas de pagar",
     texto:
       "Yappy o tarjeta dentro de la app, con comprobante y reembolso según las reglas de cancelación. O en la mano el día del viaje.",
@@ -68,7 +68,7 @@ const COSAS: {
   },
   {
     icon: "chat",
-    tono: "sky",
+    tono: "tostado",
     titulo: "El chat queda escrito",
     texto:
       "Coordinas la hora y el punto sin dar tu número. Ninguno de los dos puede cambiar un mensaje después de enviarlo.",

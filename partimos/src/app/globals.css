@@ -68,52 +68,108 @@
      remarquer. */
   --color-ink-50: #faf9f7;
 
-  /* ---- Bleu : la couleur de LECTURE ----
-     LA MÊME TEINTE QUE LA NUIT (203°), éclaircie. L'ancien indigo (#1D4ED8,
-     228°) se disputait avec le bleu-pétrole des sections sombres : deux bleus
-     voisins mais pas parents, et c'est exactement ce qui rendait la palette
-     inharmonieuse. Un site n'a droit qu'à UN bleu. */
-  --color-accent: #0284c7; /* remplissages, focus, bordures — jamais du texte */
-  --color-accent-ink: #0369a1; /* liens et icônes sur clair — 5,6:1 */
-  --color-accent-soft: #e0f2fe;
+  /* =================================================================
+     SOL — LA RAMPE ORANGE-JAUNE, ET LA SEULE.
+     =================================================================
 
-  /* ---- Ambre : la couleur d'ACTION ---- */
-  --color-action: #f59e0b; /* fond de bouton, texte ENCRE dessus — 7,4:1 */
-  --color-action-bright: #fbbf24; /* survol */
-  --color-action-deep: #b45309; /* ambre sur clair, grands corps — 4,8:1 */
+     CE QU'ELLE REMPLACE, ET POURQUOI.
+
+     Le produit portait TROIS familles d'accent qui se disputaient :
+     un bleu (#0284c7) pour les liens, un ambre (#f59e0b) pour les
+     boutons du site, un orange (#e2540c) pour l'app. Le résultat était
+     exactement ce qui a été reproché : « le login de l'application web
+     a une palette différente ». Ce n'était pas une impression — c'était
+     littéralement vrai, écrit dans la feuille de style.
+
+     Une seule rampe, du jaune au brun brûlé, avec une DÉRIVE DE TEINTE
+     de 42° (clair) vers 20° (foncé). C'est cette dérive qui fait qu'une
+     rampe chaude paraît naturelle : un orange qu'on assombrit sans
+     tourner vers le rouge donne de la boue, et un jaune qu'on éclaircit
+     sans tourner vers le beurre donne du fluo.
+
+     LES RÔLES SE SÉPARENT PAR LA VALEUR, PLUS PAR LA TEINTE.
+
+     C'était le travail du bleu : distinguer « ce qu'on peut lire et
+     toucher » de « ce qu'on peut appuyer ». En monochrome, cette
+     distinction se fait autrement, et c'est plus exigeant :
+       · une ACTION est une SURFACE — un dégradé sol-600→700, du blanc
+         dessus, une ombre teintée ;
+       · un LIEN est du TEXTE — sol-700 nu, sans fond, souligné au
+         survol.
+     Deux choses de la même famille ne se confondent que si on leur
+     donne le même traitement. On ne le fait nulle part.
+
+     LES CHIFFRES SONT VÉRIFIÉS, PAS ESTIMÉS. Chaque valeur porte son
+     rapport de contraste réel — c'est ce qui a permis de découvrir au
+     passage que l'orange de l'app (#e2540c, 3,8:1 avec du blanc) était
+     SOUS le seuil AA depuis le début. sol-600 le corrige à 4,6:1. */
+  --color-sol-50: #fff8ee; /* fond d'un bloc entier — il ne crie pas */
+  --color-sol-100: #ffebd1; /* pastille, survol, bandeau doux */
+  --color-sol-200: #fbd8a3; /* bordure teintée, séparateur */
+  --color-sol-300: #f7bc68; /* lueur, haut d'un dégradé de lumière */
+  --color-sol-400: #f29e33; /* ambre décoratif — encre dessus : 7,3:1 */
+  --color-sol-500: #e67813; /* l'orange vif — lueurs, orange sur la nuit : 6,3:1 */
+  --color-sol-600: #be560a; /* surface d'action — blanc dessus : 4,6:1 */
+  --color-sol-700: #9e4409; /* TEXTE orange sur clair — 6,1:1 */
+  --color-sol-800: #78330b; /* texte orange fort — 8,8:1 */
+  --color-sol-900: #4a210b; /* presque brun : du texte, jamais un fond */
+
+  /* ---- Ce que chaque famille désigne, une fois posée sur la rampe ----
+     Les noms restent : `accent`, `action`, `naranja` sont écrits dans
+     deux cents endroits, et les renommer aurait été deux cents
+     occasions de se tromper pour zéro gain visible. Ce qui change,
+     c'est qu'ils désignent enfin la MÊME famille. */
+
+  /* LECTURE — liens, focus, bordures actives. */
+  --color-accent: var(--color-sol-600); /* remplissage, blanc dessus — 4,6:1 */
+  --color-accent-ink: var(--color-sol-700); /* liens sur clair — 6,1:1 */
+  --color-accent-soft: var(--color-sol-100);
+
+  /* ACTION — la surface qu'on appuie, et l'ambre qui la qualifie. */
+  --color-action: var(--color-sol-400); /* pastille, texte ENCRE dessus — 7,3:1 */
+  --color-action-bright: var(--color-sol-300); /* survol */
+  --color-action-deep: var(--color-sol-700); /* orange sur clair — 6,1:1 */
   /* Le jeton manquait alors que `text-action-ink` était écrit dans le
      tableau des corridors : Tailwind ne générait donc pas la classe, et le
      chiffre le plus important de la page — l'aporte maximum — s'affichait en
      couleur héritée, c'est-à-dire en encre. Vérifié au navigateur avant
      correction : rgb(38, 34, 28). */
-  --color-action-ink: #92400e; /* ambre pour du TEXTE — 6,8:1 sur le crème */
-  --color-action-soft: #fef3c7;
+  --color-action-ink: var(--color-sol-800); /* TEXTE orange — 8,8:1 sur le crème */
+  --color-action-soft: var(--color-sol-100);
 
-  /* ---- La NUIT : les grandes surfaces sombres ----
-     Bleu nuit, plus le brun. Le brun sombre était l'encre du texte étalée en
-     fond — sur un écran entier elle se lisait comme de la boue, et le client
-     l'a dit deux fois. Le bleu nuit, lui, a trois raisons d'être :
-       · le bleu est déjà la couleur de CONFIANCE du système (liens, focus),
-         et ces sections disent précisément « fais-nous confiance » ;
-       · les voiles sombres posés sur les photos étaient DÉJÀ de ce bleu
-         (rgb(8 32 42)) — les photos et leur section parlent enfin la même
-         langue ;
-       · c'est la nuit du produit : on descend à l'intérieur le vendredi
-         soir, et l'ambre y devient ce qu'il est sur la Panamericana — des
-         feux dans la nuit.
-     L'encre chaude reste la couleur des OBJETS (texte, avatars, boutons
-     sombres) ; la nuit est celle des ENVIRONNEMENTS. Deux rôles, deux
-     familles.
-     Textes secondaires : night-200 pour le corps (6,6:1 sur le pire cas
-     composite, lueur comprise), night-300 pour les mentions (4,7:1). Les
-     gris chauds ink-300/400 sur la nuit viraient kaki — bannis ici. */
-  --color-night-950: #06141d;
-  --color-night-900: #0a1b26;
-  --color-night-800: #102a3a;
-  --color-night-700: #17384c;
-  --color-night-300: #9db3c0;
-  --color-night-200: #c3d2db;
-  --color-night-100: #e4ecf1;
+  /* ---- LA NUIT : les grandes surfaces sombres ----
+     ─────────────────────────────────────────────────────────────────
+     ELLE A DÉJÀ ÉTÉ REFUSÉE UNE FOIS, ET IL FAUT SAVOIR POURQUOI.
+
+     Ces fonds ont d'abord été BRUNS — l'encre du texte étalée sur un
+     écran entier. Sur une grande surface, un brun moyen ne se lit pas
+     comme une couleur, il se lit comme de la boue, et le propriétaire
+     l'a dit deux fois. Le bleu nuit (#06141d) a été la réponse, et
+     c'était la bonne réponse à ce problème-là.
+
+     Il en a créé un autre, plus lent à voir : le produit est orange, et
+     ses plus grandes surfaces étaient bleues. « Recrée une palette
+     autour de l'orange-jaune et applique-la partout » — ces bandes-là
+     étaient l'endroit où ça manquait le plus.
+
+     CE QUI EST FAIT ICI N'EST PAS UN RETOUR EN ARRIÈRE. La boue était
+     un brun MOYEN (autour de 20 % de clarté), assez clair pour qu'on
+     lise sa teinte, trop sombre pour qu'elle soit belle. Cette nuit-ci
+     est un NOIR : 6 % de clarté, chroma très bas. À cette profondeur on
+     ne lit plus une teinte, on lit une température — et c'est
+     exactement ce qu'on veut, une nuit qui appartient au même monde que
+     l'ambre sans jamais prétendre être une couleur.
+
+     Les contrastes du texte y sont égaux ou meilleurs qu'avant :
+     night-200 passe de 12,05 à 12,29:1, night-300 de 8,57 à 8,10:1, et
+     l'ambre sol-400 y tient 8,7:1. */
+  --color-night-950: #16110c;
+  --color-night-900: #1f1913;
+  --color-night-800: #2e251b;
+  --color-night-700: #3e3325;
+  --color-night-300: #b3a99c; /* mentions — 8,1:1 sur night-950 */
+  --color-night-200: #d8d0c6; /* corps — 12,3:1 */
+  --color-night-100: #f0ebe4;
 
   /* ---- Marque (jamais informatif) ---- */
   --color-brand-green: #a0d838;
@@ -207,7 +263,6 @@
 
 @layer base {
   :root {
-    --gradient-brand: linear-gradient(118deg, #0ea5e9 0%, #a0d838 100%);
     --rail-gutter: 0px;
     color-scheme: light;
 
@@ -802,36 +857,37 @@
       /* La lumière du matin, très étalée pour n'avoir aucun bord. */
       radial-gradient(
         110% 80% at 94% -22%,
-        rgb(251 191 36 / 0.22),
-        rgb(245 158 11 / 0.05) 44%,
+        rgb(247 188 104 / 0.26),
+        rgb(242 158 51 / 0.06) 44%,
         transparent 66%
       ),
-      /* Le froid qui répond à la lumière n'est plus un bleu générique : c'est
-         LE bleu du quartier de nuit (#17384C), très dilué. Le premier écran
-         annonce ainsi la couleur des sections sombres au lieu de vivre dans
-         sa propre palette — c'est ce qui fait tenir la page comme UN décor,
-         l'aube en haut, la nuit au milieu, le même ciel. */
+      /* CE QUI RÉPOND À LA LUMIÈRE. C'était un bleu (#17384C dilué) : le
+         premier écran annonçait la couleur des sections sombres, ce qui
+         était juste tant que ces sections étaient bleues. Elles ne le
+         sont plus. C'est donc la BRAISE qui répond au matin — la même
+         rampe, prise à l'autre bout, très diluée. L'aube en haut, le
+         soir en bas, un seul ciel. */
         radial-gradient(
           120% 90% at -10% 108%,
-          rgb(23 56 76 / 0.14),
+          rgb(158 68 9 / 0.1),
           transparent 62%
         );
     background-repeat: no-repeat;
   }
 
   /* ---- LE QUARTIER DE NUIT ----
-     Bleu nuit — voir la note de la palette pour le pourquoi. Trois couches,
-     aucune agressive prise seule :
-       · une base qui va du bleu de crépuscule au presque-noir — la lumière
+     Nuit CHAUDE — voir la note de la palette pour le pourquoi, et
+     surtout pour pourquoi ce n'est pas le brun qui avait été refusé.
+     Trois couches, aucune agressive prise seule :
+       · une base qui descend du crépuscule au presque-noir — la lumière
          vient d'en haut, comme partout ailleurs sur la page ;
-       · une lueur ambre : les feux de la route dans la nuit, le même ambre
-         que le premier écran et le tracé ;
-       · une lueur bleu franc qui donne la profondeur d'un ciel, pas d'un
-         panneau peint.
+       · une lueur d'or en haut à gauche : les feux de la route ;
+       · une lueur de braise en bas à droite, qui donne la profondeur
+         d'un ciel plutôt que d'un panneau peint.
 
      Le texte ne repose jamais sur le dégradé seul — les contrastes sont
-     calculés contre le composite le PLUS clair (base #17384C + lueur ambre) :
-     blanc 10,3:1, night-200 6,6:1, ambre #F59E0B 4,8:1.
+     calculés contre le composite le PLUS clair (night-700 + lueur d'or) :
+     blanc 9,9:1, night-200 6,5:1, sol-300 5,8:1.
 
      Le quartier (Historias + Pago) est UNE toile : un seul élément porte ce
      fond, parce que deux dégradés voisins ne tombent jamais exactement sur
@@ -866,20 +922,32 @@
     opacity: 0.12;
   }
 
+  /* LA NUIT DE LA MAISON. Deux lueurs et un dégradé — mais les lueurs
+     étaient AMBRE ET BLEUE, et le dégradé traversait trois bleus
+     écrits en dur. C'est là que la palette d'avant survivait le plus
+     longtemps : les variables avaient beau changer, ces six valeurs
+     restaient bleues. Les deux lueurs sont maintenant les deux bouts de
+     la rampe — l'or du matin en haut à gauche, la braise en bas à
+     droite — et le dégradé descend dans la nuit chaude. */
   .noche {
     background-color: var(--color-night-900);
     background-image:
       radial-gradient(
         80% 60% at 8% 0%,
-        rgb(245 158 11 / 0.12),
+        rgb(247 188 104 / 0.14),
         transparent 62%
       ),
       radial-gradient(
         70% 70% at 100% 100%,
-        rgb(59 130 246 / 0.16),
+        rgb(230 120 19 / 0.16),
         transparent 60%
       ),
-      linear-gradient(172deg, #17384c 0%, #0e2534 46%, #0a1b26 100%);
+      linear-gradient(
+        172deg,
+        var(--color-night-700) 0%,
+        var(--color-night-800) 46%,
+        var(--color-night-950) 100%
+      );
   }
 
   /* ---- LES PISTES SE REMPLISSENT QUAND ON ARRIVE DESSUS ----
@@ -1179,45 +1247,25 @@ body:has(.barra-accion) nav[aria-label="Navegación principal"] {
 }
 
 /* ===========================================================================
-   UNE SEULE PALETTE DANS L'APP
+   IL N'Y A PLUS DE PALETTE « DE L'APP »
    ===========================================================================
 
-   Le site a deux couleurs d'accent héritées : un bleu (`accent`, pour les
-   liens et le focus) et un ambre (`action`, pour les boutons et les
-   étoiles). L'app, elle, a l'orange de la maquette. Tant que les deux
-   cohabitent, chaque composant PARTAGÉ ramène ses couleurs avec lui : le
-   lien « Ofrecer otro aporte » sortait en bleu au milieu d'un écran
-   orange, les étoiles en ambre, l'anneau de focus en bleu.
+   Ici vivait un bloc qui repeignait toutes les variables d'accent dès que
+   l'app était installée : le site était bleu-et-ambre, l'app orange, et
+   ce bloc traduisait l'un dans l'autre au moment du rendu.
 
-   La correction se fait ICI, en un point, et pas en repeignant vingt
-   composants : on redéfinit les VARIABLES sous le mode app. Tout ce qui
-   écrit `text-accent` ou `bg-action` suit, y compris le code qu'on
-   n'écrira que plus tard. Repeindre composant par composant aurait
-   garanti d'en oublier — et d'en réintroduire au prochain écran.
+   Il ne pouvait pas suffire, et c'est ce qu'on a fini par voir. Une
+   traduction ne rattrape que ce qui passe par les VARIABLES : tout ce
+   qui était écrit en dur — un `#0284c7` dans un dégradé, une carte de
+   connexion en bleu nuit, une ombre bleutée — restait dans l'ancienne
+   palette. D'où le reproche : « le login de l'application web a une
+   palette différente ». Il avait raison, et le bloc de traduction en
+   était la cause autant que le pansement.
 
-   Le site garde ses couleurs : ce bloc ne s'applique qu'en mode app. */
-@media (display-mode: standalone) {
-  :root {
-    --color-accent: var(--color-naranja);
-    --color-accent-ink: var(--color-naranja-hondo);
-    --color-accent-soft: var(--color-naranja-suave);
-    --color-action: var(--color-naranja);
-    --color-action-bright: var(--color-naranja-vivo);
-    --color-action-deep: var(--color-naranja-hondo);
-    --color-action-ink: var(--color-naranja-hondo);
-    --color-action-soft: var(--color-naranja-suave);
-  }
-}
-html.app-instalada {
-  --color-accent: var(--color-naranja);
-  --color-accent-ink: var(--color-naranja-hondo);
-  --color-accent-soft: var(--color-naranja-suave);
-  --color-action: var(--color-naranja);
-  --color-action-bright: var(--color-naranja-vivo);
-  --color-action-deep: var(--color-naranja-hondo);
-  --color-action-ink: var(--color-naranja-hondo);
-  --color-action-soft: var(--color-naranja-suave);
-}
+   La rampe `sol` supprime le problème à la racine : il n'y a plus deux
+   palettes à réconcilier, donc plus rien à traduire. Ce qui reste
+   propre à l'app, c'est sa DISPOSITION (l'encoche, la barre d'onglets,
+   les écrans pleins) — jamais ses couleurs. */
 
 /* LA MARGE HAUTE DES ÉCRANS PARTAGÉS.
    Certaines pages n'ont pas de version app séparée — publier un viaje,
@@ -1477,10 +1525,23 @@ html.app-instalada body {
    Celui-ci tient. Texte blanc dessus : 4,6:1 en 17 px gras — au-dessus du
    seuil AA pour du texte large, qui est ce que porte un bouton d'action. */
 @theme {
-  --color-naranja: #e2540c;
-  --color-naranja-vivo: #f26419;
-  --color-naranja-hondo: #b8420a;
-  --color-naranja-suave: #fdeee5;
+  /* L'ORANGE DE L'APP, DÉSORMAIS CELUI DU SITE.
+     ─────────────────────────────────────────────────────────────────
+     Ces quatre noms étaient une palette PARALLÈLE : #e2540c d'un côté,
+     #f59e0b de l'autre, et le même bouton n'avait pas la même couleur
+     selon l'écran où on le regardait. Ils pointent maintenant dans la
+     rampe `sol`, donc les quatre-vingt-dix endroits qui écrivent
+     `bg-naranja` ou `text-naranja` deviennent justes sans qu'on y
+     touche — et surtout sans qu'on en oublie un.
+
+     Au passage, une vraie correction d'accessibilité : l'ancien
+     #e2540c avec du texte blanc plafonnait à 3,8:1, sous le seuil AA.
+     sol-600 donne 4,6:1 pour un orange à peine plus profond. */
+  --color-naranja: var(--color-sol-600);
+  --color-naranja-vivo: var(--color-sol-500);
+  --color-naranja-hondo: var(--color-sol-700);
+  --color-naranja-suave: var(--color-sol-50);
+
   --color-verde-perfil: #1f4d2e;
   --color-verde-ok: #1a7f45;
   --color-verde-suave: #e6f4ea;
@@ -1489,9 +1550,10 @@ html.app-instalada body {
      était dessinée en `text-action` — l'orange des boutons. Une étoile
      de la couleur des actions ressemble à quelque chose qu'on peut
      appuyer ; à côté d'un vrai bouton orange, elle brouille les deux.
-     Cet ambre est plus chaud et moins saturé : il se lit comme une
-     décoration de la note, pas comme une commande. */
-  --color-ambar-fuerte: #d99000;
+     Il vit maintenant DANS la rampe, à son extrémité jaune : c'est la
+     même famille, mais quatre crans plus clair que la surface d'action
+     — assez pour qu'on ne confonde jamais une note avec une commande. */
+  --color-ambar-fuerte: var(--color-sol-400);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -1522,40 +1584,117 @@ html.app-instalada body {
    objet réel qu'on presse.
    ═══════════════════════════════════════════════════════════════════════ */
 .cta-naranja {
-  background-image: linear-gradient(
-    180deg,
-    var(--color-naranja-vivo, #f4692a) 0%,
-    var(--color-naranja, #e2540c) 62%,
-    var(--color-naranja-hondo, #c2470a) 100%
-  );
+  position: relative;
+  isolation: isolate;
+  background-color: var(--color-sol-600);
+  /* DEUX COUCHES, PAS UN APLAT.
+     · une LUMIÈRE posée sur le tiers haut, qui s'éteint à 34 % — le
+       galbe d'un objet éclairé par le dessus ;
+     · un dégradé vertical dessous, du vif au profond.
+     Le premier essai posait cette lumière en ellipse : sur un bouton
+     large et bas, l'ellipse s'étale et ne se voit plus. Une bande
+     franche, bornée au tiers haut, se voit — et elle s'arrête AVANT
+     l'étiquette, qui repose donc sur du sol-600/700 où le blanc tient
+     4,6 à 6,4:1. Un dégradé qui éclairerait le centre serait plus joli
+     et illisible ; on ne choisit pas entre les deux, on borne. */
+  background-image:
+    linear-gradient(
+      180deg,
+      rgb(255 221 176 / 0.42) 0%,
+      rgb(255 221 176 / 0) 34%
+    ),
+    linear-gradient(
+      180deg,
+      var(--color-sol-500) 0%,
+      var(--color-sol-600) 30%,
+      var(--color-sol-700) 100%
+    );
   color: #fff;
+  /* L'ombre est de la MATIÈRE du bouton, jamais grise : une ombre grise
+     sous un objet saturé le salit, une ombre de sa propre teinte le fait
+     flotter. Trois portées de rayons croissants — c'est ce qui distingue
+     une ombre observée d'une ombre décrétée. */
   box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.28),
-    0 1px 2px rgb(120 40 6 / 0.28),
-    0 10px 22px -10px rgb(206 74 12 / 0.62);
+    inset 0 1px 0 rgb(255 236 214 / 0.42),
+    inset 0 -1px 0 rgb(74 33 11 / 0.22),
+    0 1px 1px rgb(74 33 11 / 0.22),
+    0 4px 10px -4px rgb(120 51 11 / 0.42),
+    0 14px 28px -14px rgb(158 68 9 / 0.55);
   transition:
-    transform 140ms cubic-bezier(0.2, 0.9, 0.2, 1),
-    box-shadow 140ms cubic-bezier(0.2, 0.9, 0.2, 1),
-    filter 140ms ease;
+    transform 160ms cubic-bezier(0.2, 0.9, 0.2, 1),
+    box-shadow 160ms cubic-bezier(0.2, 0.9, 0.2, 1),
+    filter 160ms ease;
 }
+
+/* LE REFLET QUI TRAVERSE — la seule « animation » du bouton, et elle ne
+   se déclenche qu'au survol. Une bande de lumière très pâle, inclinée,
+   qui balaie la surface une fois. C'est le détail qui fait qu'un orange
+   paraît laqué au lieu de peint ; répété en boucle il ferait publicité,
+   joué une fois au survol il fait matière. */
+.cta-naranja::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(
+    100deg,
+    transparent 38%,
+    rgb(255 255 255 / 0.22) 48%,
+    transparent 58%
+  );
+  background-size: 260% 100%;
+  background-position: 130% 0;
+  opacity: 0;
+  transition:
+    background-position 620ms cubic-bezier(0.22, 0.7, 0.2, 1),
+    opacity 200ms ease;
+}
+.cta-naranja:hover:not(:disabled)::after {
+  opacity: 1;
+  background-position: -30% 0;
+}
+
 .cta-naranja:hover:not(:disabled) {
   transform: translateY(-1px);
-  filter: saturate(1.06);
   box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.32),
-    0 2px 4px rgb(120 40 6 / 0.26),
-    0 16px 30px -12px rgb(206 74 12 / 0.7);
+    inset 0 1px 0 rgb(255 236 214 / 0.5),
+    inset 0 -1px 0 rgb(74 33 11 / 0.2),
+    0 2px 3px rgb(74 33 11 / 0.2),
+    0 8px 16px -6px rgb(120 51 11 / 0.42),
+    0 22px 38px -16px rgb(158 68 9 / 0.62);
 }
 .cta-naranja:active:not(:disabled) {
   transform: translateY(0.5px) scale(0.988);
   box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.2),
-    0 1px 2px rgb(120 40 6 / 0.3),
-    0 6px 14px -8px rgb(206 74 12 / 0.55);
+    inset 0 1px 0 rgb(255 236 214 / 0.28),
+    inset 0 2px 6px rgb(74 33 11 / 0.24),
+    0 1px 2px rgb(74 33 11 / 0.26),
+    0 5px 12px -7px rgb(158 68 9 / 0.5);
 }
+/* L'ANNEAU DE FOCUS EST DEHORS, PAS DESSUS. Posé à l'intérieur il se
+   perdait dans le liseré de lumière ; à deux pixels du bord, sur un
+   halo pâle, il se voit sur n'importe quel fond de la maison. */
+.cta-naranja:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px var(--color-ink-50),
+    0 0 0 4px var(--color-sol-600),
+    0 14px 28px -14px rgb(158 68 9 / 0.55);
+}
+/* DÉSACTIVÉ ≠ EFFACÉ. Les appelants posaient `disabled:opacity-35` ou
+   `:opacity-50` par-dessus l'orange : le bouton devenait un fantôme
+   qu'on ne lisait plus, et un libellé illisible n'apprend rien à
+   personne. Ici il change de MATIÈRE — ambre pâle, texte brun, plus
+   d'ombre — et reste parfaitement lisible (7,6:1). L'opacité est
+   remise à 1 pour que ces utilitaires ne le rediluent pas. */
 .cta-naranja:disabled {
+  background-image: none;
+  background-color: var(--color-sol-200);
+  color: var(--color-sol-800);
   box-shadow: none;
-  filter: grayscale(0.35);
+  opacity: 1;
 }
 /* Le mouvement se coupe pour qui le demande — la couleur, elle, reste. */
 @media (prefers-reduced-motion: reduce) {
@@ -1565,6 +1704,39 @@ html.app-instalada body {
     transform: none;
     transition: none;
   }
+  .cta-naranja::after {
+    display: none;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   LES GRANDES SURFACES NE SONT JAMAIS ORANGE PLEIN.
+
+   Le reproche, mot pour mot : « un gros pavé orange, ça n'a pas lieu
+   d'être ». C'est juste, et la raison est physique : à saturation égale,
+   une couleur occupe l'œil proportionnellement à sa surface. Un orange
+   qui fait vibrer un bouton de 200 px² écrase une page à 60 000 px² — et
+   il tue au passage sa propre fonction, puisqu'il n'y a plus de contraste
+   entre « ce qu'on appuie » et « ce qu'on lit ».
+
+   La règle de la maison : au-delà d'un bouton, l'orange devient de la
+   LUMIÈRE et non de la peinture. Un fond crème chaud, un liseré ambré,
+   une lueur diagonale à peine perceptible — et le texte reste de l'encre.
+   ═══════════════════════════════════════════════════════════════════════ */
+.superficie-sol {
+  background-color: var(--color-sol-50);
+  background-image:
+    radial-gradient(
+      100% 120% at 12% -10%,
+      rgb(242 158 51 / 0.16),
+      rgb(242 158 51 / 0) 60%
+    ),
+    radial-gradient(
+      80% 110% at 96% 108%,
+      rgb(230 120 19 / 0.1),
+      rgb(230 120 19 / 0) 62%
+    );
+  border: 1px solid var(--color-sol-200);
 }
 
 /* ---- L'écran de bienvenue ---- */

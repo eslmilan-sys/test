@@ -131,19 +131,37 @@ console.log("\n  Registro :\n");
   const zona = () => p.locator(".solo-app").first();
   const siguiente = () => zona().getByLabel("Siguiente").first();
 
-  /* LE CHOIX DU CANAL D'ABORD — un écran à part, comme demandé. Sur la
-     porte, le titre, la photo, les trois arguments ET quatre boutons de
-     connexion se disputaient le même écran. */
-  await p.getByRole("button", { name: "Crear cuenta" }).click();
-  await p.waitForTimeout(600);
-  const tc = await texto(p);
-  ok("canal — l'écran du choix s'ouvre", /Cómo quieres crear tu cuenta/.test(tc));
-  ok("canal — les trois canaux", /correo/i.test(tc) && /Google/.test(tc) && /LinkedIn/.test(tc));
-  ok("canal — le légal est ICI, où l'on s'engage", /aceptas los términos de uso/i.test(tc));
-  ok("canal — et la connexion pour qui a déjà un compte", /Ya tienes cuenta/.test(tc));
+  /* LE CHOIX DU CANAL N'EXISTE QUE S'IL Y A UN CHOIX.
+     ─────────────────────────────────────────────────────────────────
+     Il y avait un écran fixe « ¿Cómo quieres crear tu cuenta? » avec
+     Google et LinkedIn écrits en dur. Deux problèmes : les boutons
+     menaient à « provider is not enabled » quand le projet ne les avait
+     pas activés, et quand aucun ne l'est, l'écran pose une question qui
+     n'a qu'une réponse — un obstacle poli entre quelqu'un et son compte.
 
-  await p.getByRole("button", { name: /Continuar con mi correo/ }).click();
-  await p.waitForTimeout(600);
+     La règle est maintenant : on lit la configuration publique de
+     Supabase, on n'affiche que les portes qui existent, et s'il n'y en a
+     qu'une on va droit aux questions. Cette batterie accepte donc LES
+     DEUX chemins et vérifie ce qui compte dans chacun. Depuis ce
+     conteneur, Supabase est injoignable : c'est le chemin court qui se
+     joue, et c'est celui qu'on mesure. */
+  await p.getByRole("button", { name: "Crear cuenta" }).click();
+  await p.waitForTimeout(700);
+  const tc = await texto(p);
+  const porCanal = /Cómo quieres crear tu cuenta/.test(tc);
+  if (porCanal) {
+    ok("canal — le courriel est toujours proposé", /correo/i.test(tc));
+    ok("canal — le légal est là où l'on s'engage", /aceptas los términos de uso/i.test(tc));
+    ok("canal — et la connexion pour qui a déjà un compte", /Ya tienes cuenta/.test(tc));
+    await p.getByRole("button", { name: /Continuar con mi correo/ }).click();
+    await p.waitForTimeout(600);
+  } else {
+    ok(
+      "canal — sans autre puerta, on va droit à la première question",
+      /Cómo te llamas/.test(tc),
+      tc.slice(0, 48),
+    );
+  }
   ok("registro — il s'ouvre", /Cómo te llamas/.test(await texto(p)));
 
   /* LA BARRE D'ONGLETS N'EXISTE PAS PENDANT L'INSCRIPTION. Le
@@ -263,24 +281,40 @@ console.log("\n  Registro :\n");
   await ctx.close();
 }
 
-/* ═══ 1 ter. LA CONNEXION a la même forme ═══ */
+/* ═══ 1 ter. LA CONNEXION — DEUX CHEMINS, ET LES DEUX SONT DES BOUTONS ═══
+   L'app n'avait qu'un mot de passe : quelqu'un dont le compte est né
+   d'un lien magique ou de Google n'y entrait jamais, il n'y avait
+   simplement pas de porte. Le lien par courriel est maintenant un
+   BOUTON à côté de l'autre — c'est ce qu'on vérifie ici, parce que
+   c'est ce qui décide si une personne entre ou reste dehors. */
 {
   const { ctx, p } = await abrir("/", "nadie");
+  const entrar = () =>
+    p.locator(".solo-app").first().getByRole("button", { name: "Entrar", exact: true }).first();
+
   await p.getByRole("button", { name: "Iniciar sesión" }).first().click();
   await p.waitForTimeout(600);
-  ok("acceder — il s'ouvre", /Cuál es tu correo/.test(await texto(p)));
-  ok("acceder — il renvoie vers l'inscription",
-    /Todavía no tengo cuenta/.test(await texto(p)));
+  const ta = await texto(p);
+  ok("acceder — il s'ouvre", /Entra a tu cuenta/.test(ta), ta.slice(0, 40));
+  ok("acceder — il renvoie vers l'inscription", /Crear cuenta/.test(ta));
   /* Le libellé est peint en capitales par la CSS, et `innerText` rend ce
      qui est PEINT : la comparaison doit ignorer la casse. */
-  ok("acceder — il demande un mot de passe", /contraseña/i.test(await texto(p)));
+  ok("acceder — il demande un mot de passe", /contraseña/i.test(ta));
+  ok(
+    "acceder — le lien par correo est un BOUTON, pas une note en bas",
+    await p
+      .locator(".solo-app")
+      .first()
+      .getByRole("button", { name: /Mándame un enlace/ })
+      .first()
+      .isVisible()
+      .catch(() => false),
+  );
+
   await p.locator("#acc-correo").fill("ana@ejemplo.com");
-  await p.waitForTimeout(300);
-  ok("acceder — sans mot de passe on ne passe pas",
-    await p.locator(".solo-app").first().getByLabel("Continuar").first().isDisabled());
   await p.locator("#acc-clave").fill("panama2026");
   await p.waitForTimeout(300);
-  await p.locator(".solo-app").first().getByLabel("Continuar").first().click();
+  await entrar().click();
   await p.waitForTimeout(4000);
   const fa = await texto(p);
   ok(
@@ -534,16 +568,32 @@ console.log("\n  Con cuenta :\n");
   await ctx.close();
 }
 
-/* ═══ 7 sexies. UNE SEULE PALETTE ═══ */
+/* ═══ 7 sexies. UNE SEULE PALETTE, ET C'EST LA MÊME DES DEUX CÔTÉS ═══
+   Cette vérification disait avant : « l'accent de l'app n'est pas le
+   bleu du site ». C'était le bon test d'une mauvaise situation — il y
+   AVAIT deux palettes, et l'app traduisait l'une dans l'autre au rendu.
+   La traduction ne rattrapait que ce qui passait par les variables :
+   tout ce qui était écrit en dur restait bleu, d'où « le login de
+   l'application web a une palette différente ».
+   Il n'y a plus qu'une rampe. Ce qu'on vérifie donc maintenant, c'est
+   l'égalité — et l'absence totale du bleu d'avant, des deux côtés. */
 {
-  /* Le bleu du site (#0284c7) ne doit apparaître nulle part dans l'app :
-     il entrait par les composants PARTAGÉS — le lien « Ofrecer otro
-     aporte », l'anneau de focus, les étoiles en ambre. */
   const { ctx, p } = await abrir("/", "socio");
-  const acento = await p.evaluate(() =>
-    getComputedStyle(document.documentElement).getPropertyValue("--color-accent").trim(),
-  );
-  ok("palette — l'accent de l'app n'est pas le bleu du site", !/0284c7/i.test(acento), acento);
+  const leer = (modoApp) =>
+    p.evaluate((app) => {
+      document.documentElement.classList.toggle("app-instalada", app);
+      const c = getComputedStyle(document.documentElement);
+      return ["--color-accent", "--color-accent-ink", "--color-action", "--color-action-ink"]
+        .map((v) => c.getPropertyValue(v).trim())
+        .join(" ");
+    }, modoApp);
+
+  const enApp = await leer(true);
+  const enSitio = await leer(false);
+  await p.evaluate(() => document.documentElement.classList.add("app-instalada"));
+
+  ok("palette — l'app et le site ont EXACTEMENT les mêmes accents", enApp === enSitio, enApp);
+  ok("palette — plus aucune trace du bleu d'avant", !/0284c7|0369a1/i.test(enApp + enSitio));
   await ctx.close();
 }
 

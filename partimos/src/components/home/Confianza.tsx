@@ -104,7 +104,7 @@ export function Confianza() {
             >
               <GlassIcon
                 name={item.icon}
-                tone="sky"
+                tone="tostado"
                 size="sm"
               />
               <div className="min-w-0">

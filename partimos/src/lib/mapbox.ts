@@ -67,7 +67,7 @@ export function corridorMapUrl(
   const origin = cityBySlug(corridor.origin.slug);
   const destination = cityBySlug(corridor.destination.slug);
   const pins =
-    `pin-s+0369a1(${origin.lng},${origin.lat})` +
+    `pin-s+9e4409(${origin.lng},${origin.lat})` +
     `,pin-s+4d7c0f(${destination.lng},${destination.lat})`;
 
   return (
@@ -286,7 +286,7 @@ export function corridorStopsMapUrl(
     })
     .join("");
   const pins =
-    `pin-s+0369a1(${origin.lng},${origin.lat})` +
+    `pin-s+9e4409(${origin.lng},${origin.lat})` +
     `,pin-s+4d7c0f(${destination.lng},${destination.lat})` +
     stopPins;
 

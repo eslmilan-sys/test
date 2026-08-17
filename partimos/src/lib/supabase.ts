@@ -64,10 +64,9 @@ export function getSupabase(): SupabaseClient | null {
  * affiché : mieux vaut un bouton de trop qu'un écran amputé par une
  * requête ratée.
  */
-export async function fetchProveedores(): Promise<{
-  google: boolean;
-  apple: boolean;
-} | null> {
+export type Proveedores = Record<string, boolean>;
+
+export async function fetchProveedores(): Promise<Proveedores | null> {
   if (!url || !anonKey) return null;
   try {
     const r = await fetch(`${url}/auth/v1/settings`, {
@@ -76,10 +75,12 @@ export async function fetchProveedores(): Promise<{
     if (!r.ok) return null;
     const j = (await r.json()) as { external?: Record<string, boolean> };
     if (!j.external) return null;
-    return {
-      google: Boolean(j.external.google),
-      apple: Boolean(j.external.apple),
-    };
+    /* On rend la table ENTIÈRE et non deux booléens choisis d'avance.
+       Les deux moitiés du produit ne proposaient pas les mêmes portes —
+       Google et Apple sur le site, Google et LinkedIn dans l'app — parce
+       que chacune avait codé sa propre liste. Une seule source, et
+       l'écran affiche ce qui existe vraiment. */
+    return j.external;
   } catch {
     return null;
   }
