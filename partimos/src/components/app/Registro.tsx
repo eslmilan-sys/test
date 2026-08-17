@@ -36,8 +36,13 @@ import { huella, LARGO_MINIMO } from "@/lib/clave";
  *      choix déclaré, jamais d'une déduction sur le prénom. D'où la
  *      troisième porte, « prefiero no decirlo » ;
  *   4. correo — c'est la clé du compte ;
- *   5. celular — facultatif, et il ne sert PAS à la mise en relation :
- *      le chat s'en charge. Il sert aux avis de reserva.
+ *   5. celular — OBLIGATOIRE depuis le 2026-08-17, décision du
+ *      propriétaire. Il ne sert toujours PAS à la mise en relation — le
+ *      chat s'en charge et personne ne donne son numéro à personne — mais
+ *      il est le seul canal qui atteigne quelqu'un le jour du viaje quand
+ *      la notification n'arrive pas : un conducteur qui annule à 5 h du
+ *      matin ne peut pas laisser un passager sur le trottoir faute de
+ *      moyen de le prévenir.
  */
 
 type Paso = 0 | 1 | 2 | 3 | 4 | 5;
@@ -95,10 +100,10 @@ export function Registro({ onCerrar }: { onCerrar: () => void }) {
     1: Boolean(nacimiento) && errorNacimiento() === null,
     2: trato !== null,
     3: CORREO.test(correo.trim()),
-    /* Le celular est facultatif : soit vide, soit assez long pour être
+    /* Le celular est OBLIGATOIRE : au moins sept chiffres — le format
        un vrai numéro. Un champ obligatoire de plus ici coûterait plus
        d'inscriptions qu'il n'apporterait de contacts. */
-    4: celular.trim() === "" || celular.replace(/\D/g, "").length >= 7,
+    4: celular.replace(/\D/g, "").length >= 7,
     5: clave.length >= LARGO_MINIMO,
   };
 
@@ -123,7 +128,7 @@ export function Registro({ onCerrar }: { onCerrar: () => void }) {
     updateSession({
       birthDate: nacimiento,
       trato,
-      phone: celular.trim() || null,
+      phone: celular.trim(),
       claveHuella: marca,
     });
   }
@@ -152,7 +157,7 @@ export function Registro({ onCerrar }: { onCerrar: () => void }) {
             last_name: apellido.trim(),
             birth_date: nacimiento,
             trato,
-            phone: celular.trim() || null,
+            phone: celular.trim(),
           },
         },
       });
@@ -215,7 +220,7 @@ export function Registro({ onCerrar }: { onCerrar: () => void }) {
         : null,
     4:
       celular.trim().length > 0 && celular.replace(/\D/g, "").length < 7
-        ? "Ese número parece corto."
+        ? "Ese número parece corto — faltan dígitos."
         : null,
     5:
       clave.length > 0 && clave.length < LARGO_MINIMO
@@ -351,12 +356,12 @@ export function Registro({ onCerrar }: { onCerrar: () => void }) {
 
         {paso === 4 && (
           <Pregunta
-            titulo="¿Y tu celular?"
-            ayuda="Opcional. No se lo damos a nadie: la coordinación pasa por el chat de la reserva."
+            titulo="¿Cuál es tu celular?"
+            ayuda="No se lo damos a nadie y la coordinación sigue pasando por el chat. Lo usamos solo para avisarte de tu viaje si falla la notificación."
           >
             <Campo
               id="reg-celular"
-              label="Celular (opcional)"
+              label="Celular"
               type="tel"
               value={celular}
               onChange={setCelular}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { PlacePicker } from "@/components/ui/PlacePicker";
@@ -18,6 +18,8 @@ import {
 import { CashMark, TarjetaMark, YappyBubbles } from "@/components/ui/PayMark";
 import { quoteDetour } from "@/lib/detour";
 import { detourKm, type Punto } from "@/lib/desvio";
+import { proponerPuntos, type Propuesta } from "@/lib/recogida";
+import { lugaresCerca } from "@/lib/geosearch";
 import { bookingDisclaimer } from "@/lib/content";
 import { TRIPS_ARE_DEMO } from "@/lib/config";
 import { track } from "@/lib/analytics";
@@ -117,6 +119,51 @@ export function BookingPanel({
      dans un état par un effet. Zéro est une réponse valable et c'est même
      la meilleure nouvelle du panneau : le point est SUR son chemin, il ne
      coûte rien de plus. */
+  /* LES RECOMMANDATIONS AUTOUR DE TOI.
+     ─────────────────────────────────────────────────────────────────
+     Reproche : « dès que je sélectionne une course, je n'ai aucune
+     recommandation de lieu, je devrais en avoir ».
+
+     La formule, puisque le choix m'était laissé : on part du point de la
+     personne, on demande au géocodeur ce qu'il y a autour (stations,
+     malls, supermarchés, parcs — des endroits qui se trouvent de nuit et
+     se décrivent au téléphone), et on ne garde que ceux qui sont sur le
+     chemin du conducteur SANS le faire reculer. `recogida.ts` classe :
+     le plus proche de toi d'abord, le moindre détour pour départager.
+
+     Deux passagers à cent et à quatre cents mètres verront donc deux
+     listes différentes, chacune calculée depuis SA position — ce qui
+     était tout le sujet. Et le détour affiché sur chaque ligne dit
+     honnêtement ce que ça coûte : zéro quand c'est sur la route. */
+  const [sugeridos, setSugeridos] = useState<Propuesta[]>([]);
+  /* DÉRIVÉ, pas remis à zéro par un effet : vider l'état de façon
+     synchrone dans l'effet déclenche des rendus en cascade (le
+     compilateur React le refuse, à raison). Sans point, il n'y a rien à
+     proposer — ça se lit, ça ne s'écrit pas. */
+  const cercanos = pointCoords ? sugeridos : [];
+  useEffect(() => {
+    if (!pointCoords || route.length === 0) return;
+    const ctrl = new AbortController();
+    let vivo = true;
+    void lugaresCerca(pointCoords, ctrl.signal).then((lugares) => {
+      if (!vivo) return;
+      setSugeridos(
+        proponerPuntos(
+          pointCoords,
+          route,
+          lugares
+            .filter((l) => l.lat !== null && l.lng !== null)
+            .map((l) => ({ nombre: l.nombre, punto: { lat: l.lat!, lng: l.lng! } })),
+          4,
+        ),
+      );
+    });
+    return () => {
+      vivo = false;
+      ctrl.abort();
+    };
+  }, [pointCoords, route]);
+
   const measuredKm =
     pointCoords && route.length > 0 ? detourKm(pointCoords, route) : null;
   /* PAS DE MESURE, PAS DE KILOMÈTRES INVENTÉS. Zéro veut dire « on
@@ -325,7 +372,44 @@ export function BookingPanel({
               onCoords={setPointCoords}
               placeholder="Ej. Multiplaza, Vía Israel, frente al parque…"
             />
-            <p className="mt-1.5 text-[12.5px] leading-snug text-ink-500">
+            {cercanos.length > 0 && (
+              <div className="mt-2.5">
+                <p className="mb-1.5 text-[11.5px] font-bold tracking-[0.09em] text-ink-500 uppercase">
+                  Cerca de ti, en su camino
+                </p>
+                <div className="flex flex-wrap gap-1.5">
+                  {cercanos.map((c) => (
+                    <button
+                      key={`${c.nombre}-${c.avanceKm.toFixed(2)}`}
+                      type="button"
+                      onClick={() => {
+                        setCustomPoint(c.nombre);
+                        setPointCoords(c.punto);
+                      }}
+                      className={`rounded-full border px-3 py-1.5 text-left text-[13px] transition-colors ${
+                        customPoint === c.nombre
+                          ? "border-ink-900 bg-ink-900 text-white"
+                          : "border-ink-200 bg-white hover:border-accent"
+                      }`}
+                    >
+                      <span className="font-semibold">{c.nombre}</span>
+                      <span
+                        className={
+                          customPoint === c.nombre
+                            ? "ml-1.5 text-white/70"
+                            : "ml-1.5 text-ink-500"
+                        }
+                      >
+                        {c.desvioKm === 0
+                          ? "sin desvío"
+                          : `+${c.desvioKm.toFixed(1)} km`}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+            <p className="mt-2 text-[12.5px] leading-snug text-ink-500">
               {flexibleStops
                 ? `${driverName} deja en cualquier punto de su camino: si te queda de paso, no hay nada que negociar. Un desvío de verdad sí lo decide ${driverName}.`
                 : `${driverName} decide si le queda de paso — el recorrido es suyo.`}

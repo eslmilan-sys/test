@@ -196,8 +196,22 @@ console.log("\n  Registro :\n");
   await p.waitForTimeout(300);
   await siguiente().click();
   await p.waitForTimeout(400);
-  ok("registro — 5. le celular, facultatif", /Y tu celular/.test(await texto(p)));
-  ok("registro — on peut passer sans le donner", !(await siguiente().isDisabled()));
+  ok(
+    "registro — 5. le celular",
+    /[Cc]uál es tu celular/.test(await texto(p)),
+  );
+  /* LE CELULAR EST OBLIGATOIRE depuis le 2026-08-17 (décision du
+     propriétaire). Ce test disait l'inverse et il avait raison de le
+     dire à l'époque : c'est la RÈGLE qui a changé, pas le code qui a
+     régressé. On vérifie donc les deux sens — on ne passe pas sans, et
+     un numéro trop court ne passe pas non plus. */
+  ok("registro — on ne passe PAS sans le donner", await siguiente().isDisabled());
+  await p.locator("#reg-celular").fill("600");
+  await p.waitForTimeout(300);
+  ok("registro — un numéro trop court est refusé", await siguiente().isDisabled());
+  await p.locator("#reg-celular").fill("6000-0000");
+  await p.waitForTimeout(300);
+  ok("registro — un numéro complet passe", !(await siguiente().isDisabled()));
   await siguiente().click();
   await p.waitForTimeout(400);
   ok("registro — 6. le mot de passe", /Crea tu contraseña/.test(await texto(p)));
@@ -220,8 +234,14 @@ console.log("\n  Registro :\n");
      sans marche arrière fait abandonner à la première faute de frappe. */
   await zona().getByLabel("Atrás").first().click();
   await p.waitForTimeout(400);
-  ok("registro — la marche arrière garde la réponse",
-    (await p.locator("#reg-celular").inputValue()) === "");
+  /* Maintenant qu'un numéro est saisi, ce test vérifie enfin ce qu'il
+     annonçait : le champ REND ce qui avait été écrit. Avant, il
+     comparait à la chaîne vide — il passait sans rien prouver. */
+  ok(
+    "registro — la marche arrière garde la réponse",
+    (await p.locator("#reg-celular").inputValue()).replace(/\D/g, "") === "60000000",
+    await p.locator("#reg-celular").inputValue(),
+  );
   await siguiente().click();
   await p.waitForTimeout(400);
 

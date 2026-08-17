@@ -1139,6 +1139,45 @@ body:has(.lista-lugares) nav[aria-label="Navegación principal"] {
   z-index: 140;
 }
 
+/* ═══════════════════════════════════════════════════════════════════════
+   LE VRAI COUPABLE DU « BOUTON BUSCAR DEVANT LA LISTE ».
+
+   Ce n'était JAMAIS un z-index. La carte de recherche porte `.entra-app`,
+   dont l'animation d'entrée applique `translate3d` et `blur` — et
+   `animation-fill-mode: both` garde cet état APRÈS la fin. Un élément
+   transformé ou filtré crée un CONTEXTE D'EMPILEMENT : la liste, qui vit
+   à l'intérieur, ne peut alors PAS passer au-dessus d'un frère situé
+   plus loin dans le document, quelle que soit sa valeur de z-index.
+   140, 1400 ou 14000 : aucune ne sort d'une prison qu'on ne voit pas.
+
+   D'où les trois corrections précédentes qui « marchaient » en test et
+   pas sur le téléphone : la batterie mesurait la barre d'onglets (qui
+   est ailleurs dans le document) et pas le bouton, lui bien à
+   l'intérieur du même contexte.
+
+   La parade : pendant qu'une liste est ouverte, on ANNULE l'animation
+   sur les ancêtres. Elle a de toute façon fini de jouer — la retirer ne
+   coûte rien visuellement et rend à la liste sa liberté d'empilement. */
+body:has(.lista-lugares) .entra-app {
+  animation: none !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   DEUX BARRES FIXES AU MÊME ENDROIT, C'EST UNE DE TROP.
+
+   L'écran d'un viaje pose sa propre barre d'action (le prix et
+   « Reservar ») en `fixed bottom-0 z-[60]`. La barre d'onglets est en
+   `fixed bottom-0 z-50`. Elles se superposaient : on voyait « Buscar »
+   et « Publicar » transparaître DERRIÈRE le prix — c'est ce qui a été
+   photographié et qualifié de moche, à juste titre.
+
+   Même règle que partout ailleurs dans ce fichier : quand un écran
+   assume sa propre action principale, il remplace la navigation, il ne
+   se pose pas dessus. On ne navigue pas pendant qu'on décide de réserver. */
+body:has(.barra-accion) nav[aria-label="Navegación principal"] {
+  display: none !important;
+}
+
 /* ===========================================================================
    UNE SEULE PALETTE DANS L'APP
    ===========================================================================

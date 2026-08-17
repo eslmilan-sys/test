@@ -272,6 +272,82 @@ export async function searchEverywhere(
   return merged.slice(0, 6);
 }
 
+/**
+ * LES LIEUX AUTOUR D'UN POINT — pour proposer un ramassage qui ait du sens.
+ *
+ * ─────────────────────────────────────────────────────────────────────
+ * Demande répétée : « quand je sélectionne une course, je devrais avoir
+ * trois ou quatre recommandations de lieux communs autour de moi ».
+ * Elle n'était pas satisfaite parce qu'aucune source ne savait répondre
+ * à « qu'est-ce qu'il y a près d'ici ? » — les autres fonctions de ce
+ * fichier cherchent un NOM, pas un voisinage.
+ *
+ * `/nearby` de LocationIQ le fait, sur OpenStreetMap, pour tout le
+ * Panama et sans base à tenir à jour. On se limite à des catégories qui
+ * font de vrais points de rendez-vous : une station-service, un mall, un
+ * supermarché ou un parc se trouvent de nuit, se décrivent au téléphone
+ * et ont un parking. Une pharmacie ou un salon de coiffure, non.
+ *
+ * TOUT ÉCHEC REND UNE LISTE VIDE. Pas de clé, quota dépassé, réseau
+ * coupé, format inattendu : l'écran retombe sur ce qu'il faisait avant —
+ * la personne écrit son point elle-même. Une recommandation absente est
+ * un confort en moins ; une recommandation fausse envoie quelqu'un
+ * attendre au mauvais endroit.
+ * ─────────────────────────────────────────────────────────────────────
+ */
+export async function lugaresCerca(
+  centro: { lat: number; lng: number },
+  signal?: AbortSignal,
+): Promise<PlaceRef[]> {
+  if (!LOCATIONIQ_KEY) return [];
+  const params = new URLSearchParams({
+    key: LOCATIONIQ_KEY,
+    lat: String(centro.lat),
+    lon: String(centro.lng),
+    /* Des points de rendez-vous, pas des commerces au hasard. */
+    tag: "amenity:fuel,shop:mall,shop:supermarket,leisure:park",
+    radius: "4000",
+    limit: "12",
+    format: "json",
+  });
+  try {
+    const res = await fetch(`https://api.locationiq.com/v1/nearby?${params}`, {
+      signal,
+    });
+    if (!res.ok) return [];
+    const data = (await res.json()) as unknown;
+    if (!Array.isArray(data)) return [];
+    const salida: PlaceRef[] = [];
+    for (const bruto of data) {
+      {
+        const r = bruto as {
+          name?: string;
+          display_name?: string;
+          lat?: string | number;
+          lon?: string | number;
+        };
+        const nombre = (r.name ?? r.display_name ?? "").split(",")[0].trim();
+        const lat = Number(r.lat);
+        const lng = Number(r.lon);
+        if (!nombre || !Number.isFinite(lat) || !Number.isFinite(lng)) continue;
+        const citySlug = ciudadDe({ lat, lng });
+        salida.push({
+          nombre,
+          kind: adivinarKind(nombre),
+          citySlug,
+          contexto: citySlug ? contextoDe(citySlug) : "",
+          lat,
+          lng,
+          fuente: "locationiq",
+        });
+      }
+    }
+    return salida;
+  } catch {
+    return [];
+  }
+}
+
 export const GEOSEARCH_ENABLED = Boolean(
   TOMTOM_KEY || LOCATIONIQ_KEY || MAPBOX_TOKEN,
 );

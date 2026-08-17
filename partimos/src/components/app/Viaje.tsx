@@ -231,7 +231,7 @@ export function Viaje({ trip, corridor }: { trip: Trip; corridor: Corridor }) {
 
       {/* LA BARRE DE RÉSERVATION. Elle est au-dessus de la barre
           d'onglets — sur cet écran, l'action est réserver, pas naviguer. */}
-      <div className="glass fixed inset-x-0 bottom-0 z-[60] rounded-t-[22px] px-4 pt-3" style={{ paddingBottom: "calc(12px + env(safe-area-inset-bottom))" }}>
+      <div className="barra-accion glass fixed inset-x-0 bottom-0 z-[60] rounded-t-[22px] px-4 pt-3" style={{ paddingBottom: "calc(12px + env(safe-area-inset-bottom))" }}>
         <div className="mx-auto flex w-full max-w-[520px] items-center gap-3">
           <span className="min-w-0">
             <span className="tnum block font-display text-[21px] leading-none font-extrabold">
