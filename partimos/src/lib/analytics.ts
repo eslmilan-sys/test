@@ -31,6 +31,23 @@ type Origin = {
   referrer_host?: string;
 };
 
+/**
+ * L'IDENTIFIANT ANONYME DU NAVIGATEUR.
+ *
+ * Exporté parce qu'un deuxième module en a besoin : la señal de demanda
+ * (`lib/publicar.ts`) s'en sert pour ne PAS compter dix fois la même
+ * personne qui rafraîchit. Le chiffre « N búsquedas de esta ruta » est
+ * montré à un conducteur pour le décider à publier — un chiffre qu'on
+ * peut gonfler en appuyant sur F5 serait un mensonge à retardement.
+ *
+ * C'est le même identifiant que celui des événements, à dessein : deux
+ * identifiants pour la même personne, ce serait deux traces au lieu
+ * d'une, donc plus de données pour moins de sens.
+ */
+export function idDeSesion(): string {
+  return sessionId();
+}
+
 function sessionId(): string {
   try {
     let id = window.localStorage.getItem(SESSION_KEY);
@@ -83,6 +100,12 @@ export type EventName =
   | "busqueda_vacia"
   | "viaje_visto"
   | "reserva_pedida"
+  /* CHAQUE ÉTAPE DE LA PUBLICATION, une par une. Sans ça, on savait
+     seulement combien de viajes étaient publiés — jamais où les autres
+     s'arrêtaient. Un formulaire qui perd 60 % des gens à l'étape « tu
+     carro » et un formulaire qui les perd à « aporte » demandent deux
+     corrections opposées, et rien ne permettait de les distinguer. */
+  | "publicacion_paso"
   | "publicacion_hecha"
   | "cuenta_creada"
   | "sesion_iniciada";

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
-import { ALL_CITIES, buildRoute } from "@/lib/corridors";
+import { ALL_CITIES } from "@/lib/corridors";
 import { CityCombobox } from "@/components/ui/CityCombobox";
 import { Button } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";

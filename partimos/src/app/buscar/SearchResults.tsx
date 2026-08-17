@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { irArriba } from "@/lib/navegar";
 import { saveLastSearch } from "@/lib/lastsearch";
 import { track } from "@/lib/analytics";
+import { registrarBusqueda } from "@/lib/publicar";
 import Link from "next/link";
 import { Container } from "@/components/site/Section";
 import { SearchSummary } from "@/components/search/SearchSummary";
@@ -108,6 +109,19 @@ export function SearchResults() {
     };
     track("busqueda_hecha", context);
     if (matches.length === 0) track("busqueda_vacia", context);
+    /* LA SEÑAL DE DEMANDA. `events` mesure le produit ; `demand_signals`
+       mesure le MARCHÉ — et c'est elle qu'on montre au conducteur au
+       moment de publier (« 12 búsquedas de esta ruta »). La table
+       existait depuis le premier jour avec zéro ligne, parce que
+       personne ne l'écrivait. C'est ici que ça se répare : le seul
+       endroit où quelqu'un exprime vraiment un besoin de trajet. */
+    registrarBusqueda({
+      from: criteria.from,
+      to: criteria.to,
+      date: criteria.date,
+      seats: criteria.seats,
+      resultados: matches.length,
+    });
   }, [
     criteria.from,
     criteria.to,

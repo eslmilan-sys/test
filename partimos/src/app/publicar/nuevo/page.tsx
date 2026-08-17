@@ -7,7 +7,7 @@ import { Puerta } from "@/components/app/Puerta";
 export const metadata: Metadata = {
   title: "Publicar un viaje",
   description:
-    "Cuatro pasos: la ruta, las paradas, la hora y los puestos, el aporte. Menos de un minuto.",
+    "Una pregunta por pantalla: la ruta, dónde sales, dónde llegas, cuándo y cuánto. Menos de un minuto.",
   alternates: { canonical: canonical("/publicar/nuevo") },
   robots: { index: false, follow: true },
 };
