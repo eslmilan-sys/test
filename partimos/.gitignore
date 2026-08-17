@@ -44,3 +44,6 @@ next-env.d.ts
 /out
 /.api-parked
 .impeccable/
+
+.mapa.json
+plano.html

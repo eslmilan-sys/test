@@ -21,7 +21,9 @@
     "verify:lugares": "node scripts/verify-lugares.mjs",
     "verify:publicar": "node scripts/verify-publicar.mjs",
     "verify:acceso": "node scripts/verify-acceso.mjs",
-    "verify:auditoria": "node scripts/verify-auditoria.mjs"
+    "verify:auditoria": "node scripts/verify-auditoria.mjs",
+    "verify:mapa": "node scripts/verify-mapa.mjs",
+    "mapa": "MAPA_JSON=.mapa.json node scripts/verify-mapa.mjs && MAPA_JSON=.mapa.json node scripts/mapa-artefacto.mjs > plano.html && echo 'plano.html listo'"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.23",

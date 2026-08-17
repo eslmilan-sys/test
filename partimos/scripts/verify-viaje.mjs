@@ -53,10 +53,16 @@ async function primerViaje() {
   /* UN VIAJE AVEC DES ARRÊTS INTERMÉDIAIRES. L'inventaire tourne avec
      la date : « le premier résultat » est parfois direct, et la ligne de
      temps n'a alors qu'un seul prix à montrer. On cherche donc celui qui
-     porte le mot « parada ». */
+     en porte, et on le reconnaît à son COMPTE.
+
+     Le mot « parada » seul ne suffit plus : la carte directe s'appelle
+     maintenant « Sin paradas en tu tramo » (« Directo » se lisait comme
+     « le conducteur part d'ici », juste au-dessus de « viene desde
+     Panamá »). Chercher le mot attrapait donc exactement la carte qu'on
+     voulait éviter. Un chiffre devant, et l'ambiguïté disparaît. */
   const todas = p.locator(".solo-app ul > li > a[href*='/viaje/']");
   const textos = await todas.allTextContents();
-  const i = textos.findIndex((t) => /parada/.test(t));
+  const i = textos.findIndex((t) => /\d+ paradas? intermedia/.test(t));
   const carta = todas.nth(i >= 0 ? i : 0);
   const href = await carta.getAttribute("href");
   const precio = (((await carta.textContent()) ?? "").match(/\$\s?[\d.,]+/) ?? [""])[0];
