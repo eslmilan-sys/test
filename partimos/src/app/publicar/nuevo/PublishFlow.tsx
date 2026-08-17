@@ -12,6 +12,7 @@ import {
 } from "@/components/publicar/RequisitosConductor";
 import { CityCombobox } from "@/components/ui/CityCombobox";
 import { PlacePicker } from "@/components/ui/PlacePicker";
+import type { PlaceRef } from "@/lib/place";
 import { AuthDialog } from "@/components/site/AuthDialog";
 import { carsOf, useSession } from "@/lib/session";
 import { ALL_CITIES, buildRoute, getCorridor } from "@/lib/corridors";
@@ -27,7 +28,6 @@ import {
   type VehicleCategory,
 } from "@/lib/pricing";
 import { formatDayLabel, localIso, servedPairCount } from "@/lib/trips";
-import { MAPBOX_TOKEN, corridorStopsMapUrl } from "@/lib/mapbox";
 import {
   CAR_MAKES,
   CAR_YEARS,
@@ -105,8 +105,29 @@ export function PublishFlow() {
   const from = fromChoice ?? last?.from ?? "panama-city";
   const to = toChoice ?? last?.to ?? "chitre";
   const [stops, setStops] = useState<string[]>([]);
-  const [exactFrom, setExactFrom] = useState("");
-  const [exactTo, setExactTo] = useState("");
+  /* LE LIEU PRÉCIS NE SE REDEMANDE PAS.
+     ─────────────────────────────────────────────────────────────────
+     Le reproche, mot pour mot : « si je mets un départ précis, il doit
+     déjà être là — je ne veux pas chercher deux fois, c'est frustrant ».
+     Exact. L'étape « Ruta » recueillait déjà « Ph Metropolitan Park »,
+     et l'étape « Paradas » rouvrait un champ vide en redemandant la
+     même chose. Deux écrans plus loin, la personne a l'impression que
+     le premier n'a servi à rien.
+
+     `exactFrom` est donc PRÉ-REMPLI par ce qui a été choisi en Ruta, et
+     reste modifiable — c'est bien un point de départ, pas une valeur
+     imposée. Les deux états restent distincts : le lieu de la recherche
+     et le point de ramassage exact PEUVENT différer (« je pars de chez
+     moi mais je récupère à Multiplaza »), et les confondre enlèverait
+     cette liberté. */
+  const [exactFromTocado, setExactFromTocado] = useState<string | null>(null);
+  const [exactToTocado, setExactToTocado] = useState<string | null>(null);
+  const [lugarFrom, setLugarFrom] = useState<PlaceRef | null>(null);
+  const [lugarTo, setLugarTo] = useState<PlaceRef | null>(null);
+  const exactFrom = exactFromTocado ?? lugarFrom?.nombre ?? "";
+  const exactTo = exactToTocado ?? lugarTo?.nombre ?? "";
+  const setExactFrom = setExactFromTocado;
+  const setExactTo = setExactToTocado;
   const [cityStops, setCityStops] = useState<string[]>([]);
   /* « Dejo en cualquier punto del camino » — un seul geste au lieu de
      cocher dix villes. Il coche TOUT le trajet d'un coup et le déclare
@@ -457,6 +478,13 @@ export function PublishFlow() {
                   value={from}
                   exclude={to}
                   tone="origin"
+                  lugar={lugarFrom}
+                  onPlaceRef={(l) => {
+                    setLugarFrom(l);
+                    /* Un nouveau lieu remplace le point pré-rempli ; ce
+                       que la personne a tapé à la main, lui, reste. */
+                    setExactFromTocado(null);
+                  }}
                   onChange={(slug) => {
                     setFromChoice(slug);
                     if (slug === to) setToChoice("");
@@ -484,6 +512,11 @@ export function PublishFlow() {
                     value={to}
                     exclude={from}
                     tone="destination"
+                    lugar={lugarTo}
+                    onPlaceRef={(l) => {
+                      setLugarTo(l);
+                      setExactToTocado(null);
+                    }}
                     onChange={(slug) => {
                       setToChoice(slug);
                       setStops([]);
@@ -576,29 +609,21 @@ export function PublishFlow() {
                 />
               </section>
 
-              {/* LA CARTE DU RECORRIDO, vivante : le tracé suit la route,
-                  l'origine est bleue, la destination verte, et chaque ville
-                  cochée ci-dessous pose son épingle ambre À LA SECONDE où on
-                  la coche. C'est l'API qui redessine — un échange de src,
-                  zéro bibliothèque. */}
-              {MAPBOX_TOKEN && (
-                <figure className="glass liquid mb-6 overflow-hidden rounded-[14px] p-2 [--glass-alpha:0.82]">
-                  {/* eslint-disable-next-line @next/next/no-img-element -- image statique Mapbox, dynamique par src */}
-                  <img
-                    src={corridorStopsMapUrl(corridor, cityStops)}
-                    alt={`Recorrido ${corridor.origin.shortName} → ${corridor.destination.shortName} con tus paradas marcadas`}
-                    width={720}
-                    height={300}
-                    loading="lazy"
-                    decoding="async"
-                    className="h-auto w-full rounded-[10px] object-cover"
-                  />
-                  <figcaption className="px-2 pt-1.5 pb-0.5 text-[12.5px] text-ink-500">
-                    Azul: sales · Verde: llegas · Ámbar: donde aceptas parar y
-                    recoger — se dibujan al marcar.
-                  </figcaption>
-                </figure>
-              )}
+              {/* LA CARTE DU RECORRIDO A ÉTÉ RETIRÉE — la dernière de
+                  l'application, signalée en photo.
+
+                  Elle était pourtant la moins mauvaise : une vraie tuile
+                  Mapbox avec le tracé routier. Mais elle demandait une
+                  clé au build, occupait le tiers de l'écran sur
+                  téléphone, et répétait en image ce que les deux champs
+                  au-dessus disaient déjà en toutes lettres. Sur un écran
+                  où l'on remplit un formulaire, une illustration qui
+                  n'ajoute aucune information coûte du défilement.
+
+                  La légende « Azul : sales · Verde : llegas · Ámbar :
+                  donde aceptas parar » était le signe : quand une image
+                  a besoin d'une légende pour être lue, la liste en
+                  dessous fait déjà le travail. */}
 
               {/* Villes de passage — le multiplicateur de couverture. Un
                   conducteur qui déclare deux arrêts répond à six recherches au

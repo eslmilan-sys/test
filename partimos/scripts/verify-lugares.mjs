@@ -30,6 +30,14 @@ const BASE = process.argv[2] ?? "http://localhost:3100";
 const CHROME = process.env.PLAYWRIGHT_CHROMIUM ?? "/opt/pw-browsers/chromium";
 
 let fallos = 0;
+/* SAUTÉ ≠ RÉUSSI. Certaines vérifications ne peuvent pas s'exécuter
+   dans ce conteneur (la porte du conducteur exige un dossier vérifié
+   chez Supabase, injoignable ici). Les compter comme réussies serait un
+   mensonge ; les compter comme échouées ferait chercher une régression
+   qui n'existe pas. On les nomme, et on dit pourquoi. */
+const saltado = (nom, porque) =>
+  console.log(`  SAUTÉ   ${nom} — ${porque}`);
+
 const ok = (nom, cond, detalle = "") => {
   console.log(`  ${cond ? "ok  " : "FALLA"}  ${nom}${detalle ? ` — ${detalle}` : ""}`);
   if (!cond) fallos++;
@@ -238,7 +246,94 @@ console.log(`\nLugares — ${BASE}\n`);
 }
 
 /* ══════════════════════════════════════════════════════════════════
-   4. LE MODE SITE N'EST PAS ABÎMÉ.
+   4. LE LIEU NE SE REDEMANDE PAS À L'ÉTAPE SUIVANTE.
+
+   Reproche exact : « si je mets un départ précis, il doit déjà être là,
+   je ne veux pas chercher deux fois ». Le flux de publication recueille
+   la ruta à l'étape 1 et rouvrait un champ VIDE à l'étape 2 pour
+   redemander la même chose.
+   ══════════════════════════════════════════════════════════════════ */
+{
+  const ctx = await navegador.newContext({ ...devices["iPhone 13"] });
+  /* Publier exige un compte : sans session, l'écran montre la porte et
+     pas le formulaire. On en pose une, comme les autres batteries. */
+  await ctx.addInitScript(() => {
+    window.localStorage.setItem(
+      "partimos.demo-session",
+      JSON.stringify({
+        contact: "milan@ejemplo.com",
+        firstName: "Milan",
+        lastName: "Ruiz",
+        lastInitial: "R",
+        isVerified: true,
+        affiliation: null,
+        since: "2026-01-05T00:00:00.000Z",
+        payPref: "yappy",
+        bookings: [],
+      }),
+    );
+    window.sessionStorage.setItem("partimos.ya-abierta", "1");
+  });
+  const p = await ctx.newPage();
+  await p.goto(`${BASE}/publicar/nuevo?desde=panama-city&hacia=chitre`, {
+    waitUntil: "load",
+  });
+  await p.waitForTimeout(1200);
+
+  const desde = p.locator("#pub-desde");
+  if ((await desde.count()) === 0) {
+    saltado(
+      "publier — le point exact est pré-rempli",
+      "la porte du conducteur bloque : elle exige un dossier vérifié chez Supabase, injoignable depuis ce conteneur",
+    );
+  }
+  if (await desde.count()) {
+    await desde.click();
+    await desde.fill("albrook");
+    await p.waitForTimeout(800);
+    const item = p.locator(".lista-lugares [cmdk-item]").first();
+    if (await item.count()) {
+      await item.click();
+      await p.waitForTimeout(500);
+      ok(
+        "publier — la ruta garde le lieu choisi",
+        /albrook/i.test(await desde.inputValue()),
+        await desde.inputValue(),
+      );
+
+      /* On passe à « Paradas » et on vérifie que le point exact est
+         DÉJÀ rempli — c'est tout le sujet. */
+      const siguiente = p.getByRole("button", { name: /siguiente|continuar/i }).first();
+      if (await siguiente.count()) {
+        await siguiente.click();
+        await p.waitForTimeout(900);
+        const exacta = p.locator("#pub-salida-exacta");
+        if (await exacta.count()) {
+          const v = await exacta.inputValue();
+          ok(
+            "publier — le point exact est PRÉ-REMPLI, pas redemandé",
+            /albrook/i.test(v),
+            v ? `le champ dit « ${v} »` : "le champ est vide",
+          );
+        } else {
+          ok("publier — l'étape Paradas a son champ", false);
+        }
+      }
+    } else {
+      ok("publier — « albrook » propose un résultat", false);
+    }
+  }
+
+  /* Et plus aucune carte dans tout le flux. */
+  ok(
+    "publier — aucune carte ne subsiste",
+    (await p.locator("img[src*='mapbox']").count()) === 0,
+  );
+  await ctx.close();
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   5. LE MODE SITE N'EST PAS ABÎMÉ.
    La règle `:has(.lista-lugares)` retire la navigation ; sur le site,
    l'en-tête n'est pas la barre d'onglets et doit RESTER.
    ══════════════════════════════════════════════════════════════════ */
