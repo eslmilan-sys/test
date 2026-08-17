@@ -5,7 +5,7 @@ import { Command } from "cmdk";
 import { ALL_CITIES } from "@/lib/corridors";
 import { nearestCity, searchPlaces } from "@/lib/places";
 import { retrievePlace } from "@/lib/mapbox";
-import type { PlaceRef } from "@/lib/place";
+import { adivinarKind, contextoDe, type PlaceRef } from "@/lib/place";
 import {
   searchEverywhere,
   GEOSEARCH_ENABLED,
@@ -47,6 +47,23 @@ type Props = {
    *  "" quand une ville nue est choisie. C'est ce qui permet à /ya de
    *  porter l'adresse exacte jusqu'au point de recogida proposé. */
   onPlace?: (place: string, citySlug: string) => void;
+  /** LE LIEU CHOISI, tel que la personne l'a choisi.
+   *
+   *  C'EST LA CORRECTION DU BUG LE PLUS SIGNALÉ. Le champ affichait
+   *  `selected?.name`, c'est-à-dire le nom de la VILLE déduite du slug :
+   *  on tapait « Multiplaza », on validait, et le champ se redessinait
+   *  en « Ciudad de Panamá ». Le lieu était résolu puis jeté à l'écran
+   *  même où on venait de le choisir.
+   *
+   *  Quand cette prop est fournie, c'est ELLE qui s'affiche, et la ville
+   *  passe en dessous, en petit. La ville reste la valeur de `value` —
+   *  c'est elle qui fait le matching — mais elle n'usurpe plus le
+   *  libellé. Voir lib/place.ts. */
+  lugar?: PlaceRef | null;
+  /** Le lieu choisi, ENTIER. `onPlace` ne rendait qu'un nom et un slug —
+   *  assez pour un point de rendez-vous, pas assez pour réafficher le
+   *  choix, le classer ou le mettre dans l'URL. */
+  onPlaceRef?: (lugar: PlaceRef | null) => void;
   /** `desnudo` retire le libellé, la pastille et le rembourrage : le
    *  champ se glisse alors dans une composition qui les fournit
    *  elle-même. Toute la logique — réouverture au clic, géocodage,
@@ -60,6 +77,8 @@ type Props = {
 export function CityCombobox({
   id,
   label,
+  lugar,
+  onPlaceRef,
   value,
   onChange,
   exclude,
@@ -178,6 +197,9 @@ export function CityCombobox({
     }
     onChange(city.slug);
     onPlace?.(r.nombre, city.slug);
+    /* L'OBJET ENTIER, avec les coordonnées enfin résolues : c'est lui
+       qui sera réaffiché dans le champ et transporté dans l'URL. */
+    onPlaceRef?.({ ...r, citySlug: city.slug, lat: coords.lat, lng: coords.lng });
     setOpen(false);
   };
 
@@ -225,7 +247,11 @@ export function CityCombobox({
             aria-controls={`${id}-list`}
             aria-autocomplete="list"
             autoComplete="off"
-            value={open ? query : (selected?.name ?? "")}
+            /* CE QUE LA PERSONNE A CHOISI, pas ce qu'on en a déduit.
+               `lugar?.nombre` d'abord ; la ville seulement quand aucun
+               lieu précis n'a été choisi — c'est-à-dire quand la ville
+               EST le choix, le seul cas où l'afficher est honnête. */
+            value={open ? query : (lugar?.nombre ?? selected?.name ?? "")}
             placeholder={placeholder}
             /* ROUVRIR AU CLIC, pas seulement au focus. Après avoir choisi une
                ville, le champ GARDE le focus : le retoucher n'émettait donc
@@ -264,6 +290,7 @@ export function CityCombobox({
                 if (results[0]) {
                   onChange(results[0].slug);
                   onPlace?.("", results[0].slug);
+                  onPlaceRef?.(null);
                   setOpen(false);
                 } else if (placeResults[0]) {
                   onChange(placeResults[0].citySlug);
@@ -276,6 +303,15 @@ export function CityCombobox({
             }}
             className="w-full border-none bg-transparent py-px text-[16.5px] font-semibold text-ink-900 placeholder:font-medium placeholder:text-ink-500 focus:outline-none"
           />
+
+          {/* LA VILLE SOUS LE LIEU. Elle reste lisible — on veut savoir
+              d'où part le viaje — mais en secondaire, parce qu'elle est
+              un complément d'adresse et pas l'intention. */}
+          {!open && lugar && lugar.contexto && (
+            <span className="mt-0.5 block truncate text-[12px] leading-tight text-ink-400">
+              {lugar.contexto}
+            </span>
+          )}
         </div>
         <Icon
           name="search"
@@ -306,6 +342,7 @@ export function CityCombobox({
                 onSelect={() => {
                   onChange(city.slug);
                   onPlace?.("", city.slug);
+                  onPlaceRef?.(null);
                   setOpen(false);
                 }}
                 className="flex cursor-pointer items-baseline justify-between gap-3 rounded-[10px] px-3 py-2.5 text-[15px] data-[selected=true]:bg-ink-50"
@@ -328,6 +365,19 @@ export function CityCombobox({
                   onSelect={() => {
                     onChange(place.citySlug);
                     onPlace?.(place.name, place.citySlug);
+                    /* LE CATALOGUE LOCAL AUSSI. C'est lui qui rend
+                       « Albrook Mall » : sans cette ligne, le lieu le
+                       plus sûr de tous était justement celui qui se
+                       faisait remplacer par sa ville. */
+                    onPlaceRef?.({
+                      nombre: place.name,
+                      kind: adivinarKind(place.name),
+                      citySlug: place.citySlug,
+                      contexto: contextoDe(place.citySlug),
+                      lat: placeCity.lat,
+                      lng: placeCity.lng,
+                      fuente: "catalogo",
+                    });
                     setOpen(false);
                   }}
                   className="flex cursor-pointer items-baseline justify-between gap-3 rounded-[10px] px-3 py-2.5 text-[15px] data-[selected=true]:bg-ink-50"

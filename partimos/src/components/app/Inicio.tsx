@@ -11,6 +11,7 @@ import { useAhora } from "@/lib/reloj";
 import { ALL_CITIES } from "@/lib/corridors";
 import { localIso } from "@/lib/trips";
 import { CityCombobox } from "@/components/ui/CityCombobox";
+import { aParams, type PlaceRef } from "@/lib/place";
 import { Hoy } from "./Hoy";
 
 /**
@@ -59,6 +60,14 @@ export function Inicio() {
   const [hacia, setHacia] = useState("");
   const [puestos, setPuestos] = useState(1);
 
+  /* LE LIEU CHOISI, à côté de la ville — et pas à sa place.
+     La ville fait le matching (c'est elle que le moteur comprend), le
+     lieu porte l'intention. Les garder tous les deux est exactement ce
+     qui manquait : « Multiplaza » disparaissait à la seconde où il était
+     résolu en « panama-city ». Voir lib/place.ts. */
+  const [desdeLugar, setDesdeLugar] = useState<PlaceRef | null>(null);
+  const [haciaLugar, setHaciaLugar] = useState<PlaceRef | null>(null);
+
   const hoy = ahora === null ? "" : localIso(new Date(ahora));
   const [fecha, setFecha] = useState<string | null>(null);
   const fechaUsada = fecha ?? hoy;
@@ -67,9 +76,20 @@ export function Inicio() {
 
   function buscar() {
     if (!hacia) return;
-    router.push(
-      `/buscar?desde=${desde}&hacia=${hacia}&fecha=${fechaUsada}&puestos=${puestos}`,
-    );
+    /* LE LIEU PART DANS L'URL. C'est ce qui lui permet de survivre au
+       changement d'écran ET au bouton retour — et accessoirement de se
+       partager par WhatsApp, ce qui compte au Panama. Les anciens
+       paramètres restent : les liens déjà envoyés continuent de
+       marcher. */
+    const params = new URLSearchParams({
+      desde,
+      hacia,
+      fecha: fechaUsada,
+      puestos: String(puestos),
+      ...aParams(desdeLugar, "o"),
+      ...aParams(haciaLugar, "d"),
+    });
+    router.push(`/buscar?${params}`);
   }
 
   /* « Hoy, 15 ago » — la date longue ne tient pas dans la moitié d'une
@@ -169,7 +189,14 @@ export function Inicio() {
             <CityCombobox
               id="app-desde"
               value={desde}
-              onChange={setDesde}
+              lugar={desdeLugar}
+              onChange={(slug) => {
+                setDesde(slug);
+                /* Choisir une VILLE efface le lieu précis : garder
+                   « Multiplaza » sous « David » serait un mensonge. */
+                setDesdeLugar(null);
+              }}
+              onPlaceRef={setDesdeLugar}
               variant="desnudo"
             />
           </span>
@@ -189,7 +216,12 @@ export function Inicio() {
             <CityCombobox
               id="app-hacia"
               value={hacia}
-              onChange={setHacia}
+              lugar={haciaLugar}
+              onChange={(slug) => {
+                setHacia(slug);
+                setHaciaLugar(null);
+              }}
+              onPlaceRef={setHaciaLugar}
               variant="desnudo"
               placeholder="¿A dónde quieres ir?"
             />

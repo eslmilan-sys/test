@@ -34,12 +34,21 @@ const ok = (nom, cond, detalle = "") => {
 };
 
 const manana = new Date(Date.now() + 20 * 3_600_000).toISOString();
+
+/* L'IDENTIFIANT DU VIAJE SE DÉDUIT DE SA DATE, il ne s'écrit pas à la
+   main. Le format est `${corridor}-${aaaa-mm-jj}-${index}` (trips.ts), et
+   le catalogue ne génère que des dates À VENIR. Une date écrite en dur
+   fonctionne donc jusqu'au jour où elle est dépassée — puis la batterie
+   signale un lien mort qui n'en est pas un, et on va chercher une
+   régression inexistante. C'est arrivé. */
+const diaViaje = manana.slice(0, 10);
+const VIAJE_DEMO = `panama-chitre-${diaViaje}-2`;
 const SESSION = {
   contact: "milan@ejemplo.com", firstName: "Milan", lastName: "Ruiz", lastInitial: "R",
   isVerified: false, affiliation: null, since: "2026-01-05T00:00:00.000Z", payPref: "yappy",
   bookings: [{
     id: "demo-11111111-2222-3333-4444-555555555555",
-    tripId: "panama-chitre-2026-08-15-2", from: "panama-city", to: "chitre",
+    tripId: VIAJE_DEMO, from: "panama-city", to: "chitre",
     boardingAt: manana, seats: 1, totalCents: 1900, feeCents: 95, channel: "yappy",
     driverName: "Carlos M", point: "Albrook, entrada norte", status: "confirmado",
   }],
@@ -550,7 +559,7 @@ console.log("\n  Enlaces :\n");
     "/cuenta/mensajes", "/cuenta/perfil", "/cuenta/verificacion",
     "/cuenta/legal", "/como-funciona", "/seguridad", "/ayuda",
     "/publicar", "/publicar/nuevo", "/terminos", "/privacidad",
-    "/viaje/panama-chitre-2026-08-15-2?desde=panama-city&hacia=chitre",
+    `/viaje/${VIAJE_DEMO}?desde=panama-city&hacia=chitre`,
   ];
   const destinos = new Set();
   for (const url of PARTIDA) {

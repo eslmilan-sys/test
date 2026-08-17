@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { deParams } from "@/lib/place";
 import { Icon } from "@/components/ui/Icon";
 import { ALL_CITIES } from "@/lib/corridors";
 import {
@@ -174,6 +175,13 @@ export function Buscar() {
 
   const desde = params.get("desde") ?? "panama-city";
   const hacia = params.get("hacia") ?? "";
+  /* LES LIEUX CHOISIS, relus depuis l'URL. Le matching se fait toujours
+     sur la ville — c'est elle que le moteur comprend — mais l'en-tête
+     doit dire ce que la personne a demandé. Sans ça, on cherche
+     « Multiplaza » et la page de résultats titre « Panamá » : elle a
+     l'air de ne pas avoir compris. */
+  const lugarDesde = deParams(params, "o");
+  const lugarHacia = deParams(params, "d");
   const fecha = params.get("fecha") ?? localIso();
   const puestos = Number(params.get("puestos") ?? "1");
 
@@ -226,8 +234,17 @@ export function Buscar() {
           </button>
           <div className="min-w-0 flex-1">
             <p className="truncate font-display text-[17px] leading-tight font-bold">
-              {nombreCorto(desde)} → {hacia ? nombreCorto(hacia) : "…"}
+              {lugarDesde?.nombre ?? nombreCorto(desde)} →{" "}
+              {lugarHacia?.nombre ?? (hacia ? nombreCorto(hacia) : "…")}
             </p>
+            {/* LA VILLE EN DESSOUS, quand un lieu précis a été choisi :
+                on ne cache pas d'où part réellement le viaje, on arrête
+                juste de le faire passer pour ce qui a été demandé. */}
+            {(lugarDesde || lugarHacia) && (
+              <p className="truncate text-[12px] leading-tight text-ink-400">
+                {nombreCorto(desde)} → {hacia ? nombreCorto(hacia) : "…"}
+              </p>
+            )}
             <p className="truncate text-[12.5px] text-ink-500">
               {formatDayLabel(fecha)} · {puestos}{" "}
               {puestos === 1 ? "pasajero" : "pasajeros"}

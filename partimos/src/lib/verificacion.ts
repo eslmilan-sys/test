@@ -88,12 +88,19 @@ export async function leerVerificacion(kind: DocKind): Promise<Verificacion> {
   const supabase = getSupabase();
   if (!isSupabaseConfigured || !supabase) return DESCONOCIDO;
   try {
+    /* UNE ATTENTE BORNÉE. Sans ça, une requête qui « pend » — réseau en
+       bord de couverture, base injoignable — ne se termine jamais : le
+       bouton reste sur « Consultando… » indéfiniment et la page ne se
+       stabilise plus. Huit secondes, la même philosophie que le délai du
+       service worker : au-delà, on considère que le réseau ment, et on
+       rend « desconocido », qui est la vérité. */
     const { data, error } = await supabase
       .from("identity_verifications")
       .select("status, updated_at")
       .eq("document_type", DOC_TYPE[kind])
       .order("created_at", { ascending: false })
-      .limit(1);
+      .limit(1)
+      .abortSignal(AbortSignal.timeout(8000));
     if (error) return DESCONOCIDO;
     if (!data || data.length === 0) {
       return { estado: "sin_empezar", actualizado: null, puedeReintentar: true };

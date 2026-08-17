@@ -87,13 +87,33 @@ async function abrir(url, { modo = "app", conSesion = true } = {}) {
     }, SESSION);
   }
   const p = await ctx.newPage();
-  await p.goto(`${BASE}${url}`, { waitUntil: "networkidle" });
+  /* `load`, PAS `networkidle`.
+
+     L'écran de compte interroge la base pour connaître l'état de la
+     vérification. C'est une requête de fond légitime, qui peut mettre
+     plusieurs secondes ou ne jamais aboutir sur un réseau coupé —
+     exactement le cas de ce conteneur, où Supabase est injoignable.
+     `networkidle` attend 500 ms sans trafic : il n'arrivait donc jamais,
+     et la batterie échouait sur un produit parfaitement sain.
+
+     Playwright déconseille `networkidle` pour cette raison précise. On
+     attend le chargement, puis LA CHOSE QU'ON VEUT MESURER — ce qui est
+     de toute façon une meilleure attente qu'un silence réseau. */
+  await p.goto(`${BASE}${url}`, { waitUntil: "load" });
+  await p
+    .locator(".solo-app")
+    .first()
+    .waitFor({ state: "attached", timeout: 20_000 })
+    .catch(() => {});
   /* Après l'hydratation seulement : `PWA.tsx` repose la classe au
      montage et effacerait la nôtre si on la posait trop tôt. */
   if (modo === "app") {
     await p.evaluate(() => document.documentElement.classList.add("app-instalada"));
   }
-  await p.waitForTimeout(500);
+  await p.waitForTimeout(700);
+  if (modo === "app") {
+    await p.evaluate(() => document.documentElement.classList.add("app-instalada"));
+  }
   return { ctx, p };
 }
 

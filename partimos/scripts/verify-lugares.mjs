@@ -167,7 +167,78 @@ console.log(`\nLugares — ${BASE}\n`);
 }
 
 /* ══════════════════════════════════════════════════════════════════
-   3. LE MODE SITE N'EST PAS ABÎMÉ.
+   3. LE PARCOURS COMPLET — c'est LE test de tout ce chantier.
+
+   On choisit « Albrook Mall », et on vérifie deux choses que l'ancien
+   code ratait toutes les deux :
+     · le CHAMP affiche « Albrook Mall », pas « Ciudad de Panamá » ;
+     · l'EN-TÊTE DES RÉSULTATS affiche « Albrook Mall » aussi.
+
+   Le reproche exact était : « ça affiche encore Panamá city et les
+   grandes villes, pas les lieux que j'ai sélectionnés. »
+   ══════════════════════════════════════════════════════════════════ */
+{
+  const { ctx, p } = await abrirApp("/");
+  const campo = p.locator(".solo-app input").first();
+  await campo.click();
+  await campo.fill("albrook");
+  await p.waitForTimeout(800);
+
+  const item = p.locator(".lista-lugares [cmdk-item]").first();
+  if (await item.count()) {
+    await item.click();
+    await p.waitForTimeout(500);
+
+    const valor = await campo.inputValue();
+    ok(
+      "le champ garde le lieu choisi",
+      /albrook/i.test(valor),
+      `le champ dit « ${valor} »`,
+    );
+    ok(
+      "le champ ne le remplace PAS par la ville",
+      !/^ciudad de panam/i.test(valor.trim()),
+      valor,
+    );
+
+    /* Et jusqu'aux résultats. On complète la destination par une ville
+       (déterministe) puis on lance la recherche. */
+    const destino = p.locator(".solo-app input").nth(1);
+    await destino.click();
+    await destino.fill("David");
+    await p.waitForTimeout(800);
+    const itemD = p.locator(".lista-lugares [cmdk-item]").first();
+    if (await itemD.count()) await itemD.click();
+    await p.waitForTimeout(400);
+
+    const boton = p.getByRole("button", { name: /buscar viajes/i }).first();
+    if (await boton.count()) {
+      await boton.click();
+      await p.waitForURL(/\/buscar/, { timeout: 15_000 }).catch(() => {});
+      await p.waitForTimeout(1200);
+
+      const url = p.url();
+      ok(
+        "l'URL transporte le lieu choisi",
+        /oNom=/.test(url),
+        decodeURIComponent(url.split("?")[1] ?? "").slice(0, 70),
+      );
+
+      const cabecera = (await p.locator(".solo-app header").first().innerText().catch(() => "")) ?? "";
+      ok(
+        "l'en-tête des résultats montre le lieu choisi",
+        /albrook/i.test(cabecera),
+        cabecera.replace(/\s+/g, " ").slice(0, 60),
+      );
+    }
+  } else {
+    ok("« albrook » propose un résultat cliquable", false);
+  }
+  await ctx.close();
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   4. LE MODE SITE N'EST PAS ABÎMÉ.
    La règle `:has(.lista-lugares)` retire la navigation ; sur le site,
    l'en-tête n'est pas la barre d'onglets et doit RESTER.
    ══════════════════════════════════════════════════════════════════ */
