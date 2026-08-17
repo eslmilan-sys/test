@@ -4,7 +4,6 @@ import { useState } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { ALL_CITIES, buildRoute } from "@/lib/corridors";
 import { CityCombobox } from "@/components/ui/CityCombobox";
-import { RouteMap } from "@/components/map/RouteMap";
 import { Button } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
 import { formatDayLabel, localIso, SEARCH_HORIZON_DAYS } from "@/lib/trips";
@@ -41,7 +40,6 @@ export function SearchSummary({
 }) {
   const [open, setOpen] = useState(false);
   const [draft, setDraft] = useState(criteria);
-  const [picking, setPicking] = useState<"origin" | "destination">("origin");
   const days = nextDays();
 
   const from = ALL_CITIES.find((c) => c.slug === criteria.from);
@@ -175,27 +173,13 @@ export function SearchSummary({
             </div>
           </div>
 
-          <div className="mt-3 rounded-[20px] border border-ink-200 bg-ink-50/60 p-3">
-            <RouteMap
-              originSlug={draft.from}
-              destinationSlug={draft.to}
-              route={buildRoute(draft.from, draft.to) ?? undefined}
-              picking={picking}
-              onPick={(slug) => {
-                if (picking === "origin") {
-                  setDraft((d) => ({
-                    ...d,
-                    from: slug,
-                    to: d.to === slug ? "" : d.to,
-                  }));
-                  setPicking("destination");
-                } else {
-                  setDraft((d) => ({ ...d, to: slug }));
-                  setPicking("origin");
-                }
-              }}
-            />
-          </div>
+          {/* LA DERNIÈRE CARTE DE L'APPLICATION A ÉTÉ RETIRÉE.
+
+              Elle servait à choisir origine et destination en tapant sur
+              des villes, avec un état invisible « je choisis laquelle ? »
+              qui alternait tout seul. Les deux champs au-dessus font la
+              même chose en le disant. Aucune carte ne subsiste nulle
+              part — vérifié par la batterie des lieux. */}
 
           {sameCity && (
             <p

@@ -40,7 +40,6 @@ type Props = {
   driverName: string;
   priceCents: number;
   seatsLeft: number;
-  stops: string[];
   baseKm: number;
   tollCents: number;
   category: VehicleCategory | number;
@@ -71,7 +70,6 @@ export function BookingPanel({
   citySlug,
   priceCents,
   seatsLeft,
-  stops,
   baseKm,
   tollCents,
   category,
@@ -89,15 +87,11 @@ export function BookingPanel({
   /* L'adresse exacte peut arriver de /ya (?punto=) : elle présélectionne
      « Propongo mi punto » avec le texte déjà écrit — l'utilisateur qui a
      tapé son PH une fois ne le retape jamais. */
-  const [stopIndex, setStopIndex] = useState(
-    initialPoint ? stops.length : 0,
-  );
   const [customPoint, setCustomPoint] = useState(initialPoint);
   /* Le point exact, en coordonnées, dès que le sélecteur les connaît.
      C'est LUI qui commande le prix : le détour n'est plus une supposition
      du passager, c'est une mesure. */
   const [pointCoords, setPointCoords] = useState<Punto | null>(null);
-  const [manualKm, setManualKm] = useState(5);
   const [booked, setBooked] = useState(false);
   /* L'offre du passager : MOINS que l'aporte publié, jamais plus. Offrir
      plus serait enchérir — le prix suivrait la demande, exactement ce que
@@ -114,14 +108,22 @@ export function BookingPanel({
      préférence — dérivée, pas copiée, pour éviter tout setState en effet. */
   const [channelChoice, setChannelChoice] = useState<PayChannel | null>(null);
 
-  const isCustom = stopIndex === stops.length;
+  /* TOUJOURS « proposé » : il n'y a plus de liste de points fabriquée à
+     choisir. Conséquence assumée et conforme à R4 — le conducteur
+     tranche, sauf s'il a déclaré s'arrêter partout sur son chemin et que
+     le point ne le fait pas dévier. */
+  const isCustom = true;
   /* MESURÉ quand on a le point, DEVINÉ sinon — dérivé, jamais recopié
      dans un état par un effet. Zéro est une réponse valable et c'est même
      la meilleure nouvelle du panneau : le point est SUR son chemin, il ne
      coûte rien de plus. */
   const measuredKm =
     pointCoords && route.length > 0 ? detourKm(pointCoords, route) : null;
-  const extraKm = measuredKm ?? manualKm;
+  /* PAS DE MESURE, PAS DE KILOMÈTRES INVENTÉS. Zéro veut dire « on
+     n'ajoute rien au calcul » — le point part quand même au conducteur,
+     qui décide. Fabriquer une valeur ici gonflerait l'aporte sur une
+     estimation que personne n'a faite. */
+  const extraKm = measuredKm ?? 0;
   const quote = quoteDetour(baseKm, tollCents, extraKm, category, seatsOffered);
   const activeOffer = offerOpen && offerCents !== null && offerCents < priceCents;
   const baseCents = activeOffer ? offerCents : priceCents;
@@ -158,7 +160,7 @@ export function BookingPanel({
       feeCents,
       channel: payChannel,
       driverName,
-      point: isCustom ? customPoint || "Punto propuesto" : stops[stopIndex],
+      point: customPoint.trim() || "Punto propuesto",
       status: (needsDriverOk ? "pendiente" : "confirmado") as
         | "pendiente"
         | "confirmado",
@@ -293,35 +295,22 @@ export function BookingPanel({
             </span>
           </p>
         )}
-        <div className="grid gap-1.5">
-          {[...stops, "Propongo mi punto"].map((stop, index) => (
-            <label
-              key={stop}
-              className={`flex cursor-pointer items-center gap-2.5 rounded-[14px] border px-3.5 py-2.5 text-[14.5px] transition-colors ${
-                stopIndex === index
-                  ? "border-ink-900 bg-ink-50 font-semibold"
-                  : "border-ink-200 hover:border-accent"
-              }`}
-            >
-              <input
-                type="radio"
-                name="stop"
-                checked={stopIndex === index}
-                onChange={() => setStopIndex(index)}
-                className="sr-only"
-              />
-              <span
-                aria-hidden
-                className={`size-3.5 shrink-0 rounded-full border-[3px] ${
-                  stopIndex === index
-                    ? "border-ink-900 bg-white"
-                    : "border-ink-200"
-                }`}
-              />
-              {stop}
-            </label>
-          ))}
-        </div>
+        {/* LES TROIS CARTES FIXES ONT ÉTÉ RETIRÉES.
+
+            Elles proposaient « Costa del Este », « Albrook », « Vía
+            Centenario » à TOUT LE MONDE, quel que soit l'endroit où l'on
+            se trouve — c'était une constante par ville, pas la
+            déclaration du conducteur. D'où le reproche : « la personne ne
+            va jamais aller là ».
+
+            Et ce n'était pas seulement inutile, c'était trompeur : ces
+            trois lignes ressemblaient à des points que le conducteur
+            avait choisis (R4), alors qu'elles étaient écrites en dur dans
+            le code, sans une seule coordonnée.
+
+            Il reste donc UN chemin, et il est vrai : tu dis où tu es, on
+            mesure le détour quand on peut, et le conducteur décide — ce
+            qui est sa prérogative. */}
       </fieldset>
 
       {isCustom && (
@@ -342,11 +331,19 @@ export function BookingPanel({
                 : `${driverName} decide si le queda de paso — el recorrido es suyo.`}
             </p>
           </div>
-          {/* Quand le point a des coordonnées, le détour se MESURE : plus
-              de curseur à régler soi-même. Personne ne sait de tête si son
-              PH fait dévier de deux ou de huit kilomètres — et ce chiffre
-              commande le prix. Le curseur reste, mais seulement pour un
-              lieu qu'aucune base ne connaît. */}
+          {/* LE CURSEUR A ÉTÉ RETIRÉ.
+
+              C'était le seul chiffre du produit qu'on demandait à
+              quelqu'un d'INVENTER — et il commandait le prix. Personne
+              ne sait de tête si son PH fait dévier de deux ou de huit
+              kilomètres. Un curseur réglé au hasard, c'est un aporte
+              calculé au hasard, sur une formule qui se veut vérifiable.
+
+              Quand le lieu a des coordonnées, on MESURE (desvio.ts).
+              Quand il n'en a pas, on ne devine plus : on le dit, et
+              c'est le conducteur qui tranche — ce qui est de toute façon
+              sa prérogative (R4, le recorrido est le sien). Mieux vaut
+              « il décidera » que trois décimales fabriquées. */}
           {measuredKm !== null ? (
             <div className="flex items-baseline justify-between gap-3">
               <span className="flex items-center gap-1.5 text-[12.5px] font-semibold text-ink-500">
@@ -357,29 +354,15 @@ export function BookingPanel({
                 {extraKm === 0 ? "Sin desvío" : `+${extraKm.toFixed(1)} km`}
               </b>
             </div>
-          ) : (
-            <>
-              <div className="mb-1 flex items-baseline justify-between">
-                <label
-                  htmlFor="book-km"
-                  className="text-[12.5px] font-semibold text-ink-500"
-                >
-                  Cuánto se desvía
-                </label>
-                <b className="tnum text-[14.5px]">+{extraKm.toFixed(1)} km</b>
-              </div>
-              <input
-                id="book-km"
-                type="range"
-                min={1}
-                max={Math.round(baseKm * 0.22)}
-                step={0.5}
-                value={manualKm}
-                onChange={(e) => setManualKm(Number(e.target.value))}
-                className="h-1.5 w-full cursor-pointer appearance-none rounded-full bg-ink-200 [&::-moz-range-thumb]:size-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-4 [&::-moz-range-thumb]:border-accent [&::-moz-range-thumb]:bg-white [&::-webkit-slider-thumb]:size-5 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-4 [&::-webkit-slider-thumb]:border-accent [&::-webkit-slider-thumb]:bg-white"
-              />
-            </>
-          )}
+          ) : customPoint.trim() ? (
+            <div className="flex items-start gap-1.5 text-[12.5px] leading-snug text-ink-500">
+              <Icon name="pin" className="mt-0.5 size-3.5 shrink-0" />
+              <span>
+                No ubicamos ese punto en el mapa, así que no calculamos el
+                desvío. {driverName} lo revisa y te dice.
+              </span>
+            </div>
+          ) : null}
           <p
             className="mt-2 text-[12.5px] leading-relaxed text-ink-500"
             aria-live="polite"

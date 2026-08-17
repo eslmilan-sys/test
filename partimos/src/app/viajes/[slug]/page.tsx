@@ -5,7 +5,6 @@ import { Container, Eyebrow } from "@/components/site/Section";
 import { RutaCard } from "@/components/home/Rutas";
 import { FaqList, FaqJsonLd } from "@/components/home/Faq";
 import { AvisameForm } from "@/components/AvisameForm";
-import { PickupPicker } from "@/components/map/PickupPicker";
 import { ButtonLink } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
 import { StickyCta } from "@/components/StickyCta";
@@ -20,7 +19,6 @@ import {
 import { formatDuration, formatUsd } from "@/lib/pricing";
 import { getUpcomingTrips } from "@/lib/supabase";
 import { canonical } from "@/lib/site";
-import { corridorMapUrl, MAPBOX_TOKEN } from "@/lib/mapbox";
 import type { Faq } from "@/lib/content";
 
 /**
@@ -334,26 +332,21 @@ export default async function CorridorPage({ params }: Params) {
                       le pays réel, rendu par Mapbox et mis en cache par son
                       CDN — zéro JavaScript embarqué. Le langage est celui du
                       site : bleu = origine, vert = destination. */}
-                  {MAPBOX_TOKEN && (
-                    <img
-                      src={corridorMapUrl(corridor)}
-                      alt={`Mapa de la ruta ${corridor.origin.shortName} → ${corridor.destination.shortName}`}
-                      width={760}
-                      height={440}
-                      loading="lazy"
-                      decoding="async"
-                      className="mb-6 w-full rounded-[20px] border border-ink-200 shadow-card"
-                    />
-                  )}
+                  {/* LE SÉLECTEUR DE POINTS A ÉTÉ RETIRÉ, avec la liste
+                      fabriquée qu'il affichait.
+
+                      C'était une SECONDE implémentation des trois mêmes
+                      points en dur — « Costa del Este », « Albrook »,
+                      « Vía Centenario » — sur une page dont le rôle est
+                      d'amener quelqu'un à s'inscrire. Elle annonçait donc
+                      une expérience qui n'existe plus dans l'app, ce qui
+                      est pire que de ne rien annoncer : la promesse se
+                      découvre fausse à la première réservation. */}
                   <p className="mb-6 max-w-[46ch] text-[15px] leading-relaxed text-ink-500">
-                    Los conductores de esta ruta suelen pasar por aquí. Máximo
-                    cuatro paradas por viaje, y ninguna en una terminal.
+                    Dices dónde estás exactamente y el conductor te dice si le
+                    queda de paso. Máximo cuatro paradas por viaje, y ninguna
+                    en una terminal.
                   </p>
-                  <PickupPicker
-                    stops={corridor.pickupPoints}
-                    baseKm={corridor.distanceKm}
-                    tollCents={corridor.tollCents}
-                  />
 
                   <div className="mt-5 flex items-start gap-3.5 rounded-[20px] border border-ink-200 bg-white px-5 py-4.5">
                     <Icon

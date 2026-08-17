@@ -288,11 +288,6 @@ export function Viaje({ trip, corridor }: { trip: Trip; corridor: Corridor }) {
                     driverName={trip.driver.firstName}
                     priceCents={match.priceCents}
                     seatsLeft={match.seatsFree}
-                    stops={
-                      segment.fromIndex === 0
-                        ? trip.stops
-                        : segment.from.pickupPoints
-                    }
                     citySlug={segment.from.citySlug}
                     baseKm={segment.km}
                     tollCents={segment.tollCents}
