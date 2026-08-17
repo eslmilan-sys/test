@@ -1445,6 +1445,14 @@ html.app-instalada body {
   --color-verde-perfil: #1f4d2e;
   --color-verde-ok: #1a7f45;
   --color-verde-suave: #e6f4ea;
+
+  /* L'AMBRE DE L'ÉTOILE. Il n'existait pas, et c'est pour ça que la note
+     était dessinée en `text-action` — l'orange des boutons. Une étoile
+     de la couleur des actions ressemble à quelque chose qu'on peut
+     appuyer ; à côté d'un vrai bouton orange, elle brouille les deux.
+     Cet ambre est plus chaud et moins saturé : il se lit comme une
+     décoration de la note, pas comme une commande. */
+  --color-ambar-fuerte: #d99000;
 }
 
 /* ---- L'écran de bienvenue ---- */

@@ -4,6 +4,8 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { deParams } from "@/lib/place";
+import { Estrella, BadgeTop } from "@/components/ui/Reputacion";
+import { bonusReputacion, esTopConductor } from "@/lib/conductor";
 import { Icon } from "@/components/ui/Icon";
 import { ALL_CITIES } from "@/lib/corridors";
 import {
@@ -48,11 +50,6 @@ const ORDENES: { id: Orden; label: string }[] = [
   { id: "valoracion", label: "Mejor valoración" },
 ];
 
-function Estrella() {
-  return (
-    <Icon name="star" className="size-[13px] shrink-0 text-action" />
-  );
-}
 
 /** Une carte de résultat. */
 function Tarjeta({ m }: { m: TripMatch }) {
@@ -115,16 +112,23 @@ function Tarjeta({ m }: { m: TripMatch }) {
               {t.driver.firstName} {t.driver.lastInitial}.
             </span>
             <span className="flex items-center gap-1 text-[12px] text-ink-500">
-              <Estrella />
+              <Estrella className="size-[13px] text-ambar-fuerte" />
               <span className="tnum">{t.driver.rating.toFixed(1)}</span>
               <span>({t.driver.ridesCount})</span>
             </span>
           </span>
-          {t.driver.isVerified && (
-            <span className="flex shrink-0 items-center gap-1 rounded-full bg-verde-suave px-2 py-1 text-[11px] font-bold text-verde-ok">
-              <Icon name="shield" className="size-3" />
-              Verificado
-            </span>
+          {/* UN SEUL BADGE À LA FOIS. « Top » implique déjà vérifié — la
+              règle l'exige — donc afficher les deux côte à côte remplit
+              la ligne pour ne rien dire de plus. */}
+          {esTopConductor(t.driver) ? (
+            <BadgeTop conductor={t.driver} />
+          ) : (
+            t.driver.isVerified && (
+              <span className="flex shrink-0 items-center gap-1 rounded-full bg-verde-suave px-2 py-1 text-[11px] font-bold text-verde-ok">
+                <Icon name="shield" className="size-3" />
+                Verificado
+              </span>
+            )
           )}
         </div>
 
@@ -208,7 +212,16 @@ export function Buscar() {
       case "valoracion":
         return copia.sort((a, b) => b.trip.driver.rating - a.trip.driver.rating);
       default:
-        return copia;
+        /* « COINCIDENCIA » MET EN AVANT LES MEILLEURS CONDUCTEURS, sans
+           renverser la pertinence. Le bonus de réputation s'ajoute à
+           l'ordre de départ, il ne le remplace pas : un top conductor à
+           18 h ne doit pas passer devant un viaje ordinaire à 8 h quand
+           on cherche le matin. Voir lib/conductor.ts, où le poids est
+           borné et testé — y compris la règle qui protège les nouveaux
+           d'être enterrés. */
+        return copia.sort(
+          (a, b) => bonusReputacion(b.trip.driver) - bonusReputacion(a.trip.driver),
+        );
     }
   }, [matches, orden, soloVerificados, soloDirectos]);
 

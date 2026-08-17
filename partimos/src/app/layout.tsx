@@ -5,6 +5,7 @@ import { Nav } from "@/components/site/Nav";
 import { PageView } from "@/components/site/PageView";
 import { AuthLanding } from "@/components/site/AuthLanding";
 import { PWA } from "@/components/site/PWA";
+import { SubirAlNavegar } from "@/components/site/SubirAlNavegar";
 import { Footer } from "@/components/site/Footer";
 import { TabBar } from "@/components/site/TabBar";
 import { SessionProvider } from "@/lib/session";
@@ -191,6 +192,7 @@ export default function RootLayout({
           </Suspense>
           {/* L'app installée : service worker, hors-ligne, mises à jour. */}
           <PWA />
+          <SubirAlNavegar />
           {/* Toujours dans le HTML, montrée par CSS seulement une fois
               l'app installée — voir `.solo-app` dans globals.css.
 

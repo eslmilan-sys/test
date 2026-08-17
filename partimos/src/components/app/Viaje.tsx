@@ -5,8 +5,9 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import * as Dialog from "@radix-ui/react-dialog";
 import { Icon } from "@/components/ui/Icon";
+import { Nota, BadgeTop } from "@/components/ui/Reputacion";
+import { esTopConductor } from "@/lib/conductor";
 import { BookingPanel } from "@/components/trip/BookingPanel";
-import { encuadre, linkPath, mapCity, MAP_LINKS } from "@/lib/map";
 import { routePoints } from "@/lib/desvio";
 import { findSegment } from "@/lib/segments";
 import { formatDuration, formatUsd } from "@/lib/pricing";
@@ -59,13 +60,6 @@ export function Viaje({ trip, corridor }: { trip: Trip; corridor: Corridor }) {
     segment.fromIndex,
     segment.toIndex + 1,
   );
-  const caja = encuadre(
-    paradas.map((p) => p.citySlug),
-    { margen: 55, ratioMin: 1.7, ratioMax: 2.4 },
-  );
-  const puntos = paradas
-    .map((p) => mapCity(p.citySlug))
-    .filter((c): c is NonNullable<typeof c> => Boolean(c));
 
   const minutos = Math.round(
     (new Date(match.droppingAt).getTime() -
@@ -76,49 +70,24 @@ export function Viaje({ trip, corridor }: { trip: Trip; corridor: Corridor }) {
 
   return (
     <div className="pb-[104px]">
-      {/* L'EN-TÊTE : le tracé du segment réservé, et rien d'autre. */}
-      <div className="relative bg-verde-perfil">
-        {caja && (
-          <svg
-            viewBox={`${caja.x} ${caja.y} ${caja.w} ${caja.h}`}
-            className="block w-full"
-            aria-hidden
-          >
-            <g fill="none" strokeLinecap="round">
-              {MAP_LINKS.map((l) => (
-                <path
-                  key={l.slug}
-                  d={linkPath(l.from, l.to)}
-                  stroke="#ffffff"
-                  strokeOpacity={0.12}
-                  strokeWidth={4}
-                />
-              ))}
-              <path
-                d={puntos.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`).join(" ")}
-                stroke="#f26419"
-                strokeWidth={9}
-                strokeLinejoin="round"
-              />
-            </g>
-            {puntos.map((p, i) => (
-              <circle
-                key={p.slug}
-                cx={p.x}
-                cy={p.y}
-                r={i === 0 || i === puntos.length - 1 ? 13 : 8}
-                fill={i === 0 ? "#ffffff" : i === puntos.length - 1 ? "#f26419" : "#ffffff"}
-                fillOpacity={i === 0 || i === puntos.length - 1 ? 1 : 0.55}
-              />
-            ))}
-          </svg>
-        )}
+      {/* L'EN-TÊTE — TYPOGRAPHIQUE, PLUS DE FAUSSE CARTE.
 
+          Il portait un tracé du segment : des villes reliées en LIGNE
+          DROITE. Sur un viaje long, ça ressemblait vaguement à une
+          route ; sur Panamá → La Chorrera, deux points côte à côte, ça
+          donnait une tache orange sur fond vert dont personne ne pouvait
+          dire ce qu'elle représentait. Photographiée, signalée.
+
+          Le fond du problème est le même que pour les deux autres
+          cartes retirées : sans tracé routier réel, dessiner un
+          itinéraire c'est l'inventer. Le titre dit déjà d'où à où, et il
+          le dit exactement. */}
+      <div className="relative bg-verde-perfil pt-[env(safe-area-inset-top)]">
         <button
           type="button"
           onClick={() => router.back()}
           aria-label="Volver"
-          className="absolute top-[calc(12px+env(safe-area-inset-top))] left-4 flex size-10 items-center justify-center rounded-full bg-white/90 text-ink-900 backdrop-blur-sm"
+          className="mt-3 ml-4 flex size-10 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-sm transition-colors hover:bg-white/25"
         >
           <Icon name="arrowRight" className="size-5 rotate-180" />
         </button>
@@ -145,10 +114,13 @@ export function Viaje({ trip, corridor }: { trip: Trip; corridor: Corridor }) {
               <p className="font-display text-[17px] font-bold">
                 {trip.driver.firstName} {trip.driver.lastInitial}.
               </p>
-              <p className="flex items-center gap-1 text-[13px] text-ink-500">
-                <Icon name="star" className="size-[13px] text-action" />
-                <span className="tnum">{trip.driver.rating.toFixed(1)}</span>
-                <span>({trip.driver.ridesCount} viajes)</span>
+              <p className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                <Nota
+                  rating={trip.driver.rating}
+                  viajes={trip.driver.ridesCount}
+                  size="md"
+                />
+                <BadgeTop conductor={trip.driver} />
               </p>
             </div>
             {trip.driver.isVerified && (
@@ -160,8 +132,14 @@ export function Viaje({ trip, corridor }: { trip: Trip; corridor: Corridor }) {
           </div>
 
           <ul className="mt-3 grid gap-1.5 border-t border-ink-100 pt-3">
-            {trip.driver.isSuperDriver && (
-              <Linea icon="star">Super conductor — más de 50 viajes</Linea>
+            {/* LE BADGE SE MÉRITE MAINTENANT. Avant, `isSuperDriver`
+                était un booléen écrit à la main dans le jeu de
+                démonstration : personne ne le gagnait, personne ne
+                pouvait le perdre. La règle vit dans lib/conductor.ts. */}
+            {esTopConductor(trip.driver) && (
+              <Linea icon="shield">
+                Top conductor — {trip.driver.ridesCount} viajes, {trip.driver.rating.toFixed(1)} de nota
+              </Linea>
             )}
             <Linea icon="car">
               {trip.vehicle.make} {trip.vehicle.model} {trip.vehicle.year},{" "}
@@ -344,7 +322,7 @@ function Linea({
   icon,
   children,
 }: {
-  icon: "star" | "car" | "users" | "chat";
+  icon: "star" | "car" | "users" | "chat" | "shield";
   children: React.ReactNode;
 }) {
   return (
