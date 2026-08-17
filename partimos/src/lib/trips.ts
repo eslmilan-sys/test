@@ -88,6 +88,17 @@ export type Trip = {
   flexibleStops: boolean;
 };
 
+/* TOUS VÉRIFIÉS, ET CE N'EST PAS UNE FACILITÉ DE DÉMONSTRATION.
+   ─────────────────────────────────────────────────────────────────────
+   On ne peut pas publier un viaje sans cédula ET licencia vérifiées : la
+   porte du conducteur le refuse (voir PublishFlow). Donc tout conducteur
+   qui apparaît dans une recherche EST vérifié, par construction.
+
+   Un des conducteurs de démonstration ne l'était pas, et ça se voyait :
+   certaines cartes portaient « Verificado », d'autres non — ce qui
+   racontait au passager qu'il pouvait tomber sur quelqu'un de non
+   vérifié. C'est faux, et c'est le pire genre de faux : celui qui rend
+   la promesse de la maison moins crédible qu'elle ne l'est. */
 const DRIVERS = [
   {
     firstName: "Ana",
@@ -134,7 +145,7 @@ const DRIVERS = [
     lastInitial: "D",
     rating: 4.7,
     ridesCount: 23,
-    isVerified: false,
+    isVerified: true,
     isSuperDriver: false,
   },
   {
@@ -389,6 +400,22 @@ export function getTrip(id: string): Trip | undefined {
 export const SEARCH_HORIZON_DAYS = 10;
 
 /**
+ * La date demandée tombe-t-elle dans la fenêtre dont les fiches ont été
+ * pré-générées ? Hier compris — un visiteur du Panama en soirée vit
+ * encore « hier » au sens UTC, et son viaje du soir doit rester lisible.
+ */
+export function dentroDelHorizonte(date: string): boolean {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return false;
+  const hoy = new Date(`${localIso()}T12:00:00`);
+  const pedida = new Date(`${date}T12:00:00`);
+  if (Number.isNaN(pedida.getTime())) return false;
+  const dias = Math.round(
+    (pedida.getTime() - hoy.getTime()) / 86_400_000,
+  );
+  return dias >= -1 && dias <= SEARCH_HORIZON_DAYS;
+}
+
+/**
  * Identifiants pré-générés, pour que l'export statique ait des pages.
  *
  * Aucun filtre ici, volontairement. Un trajet complet de bout en bout peut
@@ -500,6 +527,22 @@ export function searchTrips(
   date: string,
   seats = 1,
 ): TripMatch[] {
+  /* ON NE MONTRE QUE CE DONT LA FICHE EXISTE.
+     ─────────────────────────────────────────────────────────────────
+     Trouvé par l'audit du site : une recherche sur une date lointaine
+     (`?fecha=2026-12-24`, une adresse partagée, un signet, un lien
+     d'un moteur) rendait de vrais résultats… qui menaient tous à un
+     404. `demoTripIds` ne pré-génère les fiches que sur l'horizon, et
+     l'export statique n'a aucun moyen d'en fabriquer une à la volée.
+
+     Les sélecteurs de date s'arrêtent déjà à `SEARCH_HORIZON_DAYS` ;
+     ce qui manquait, c'est que le MOTEUR s'y arrête aussi, pour les
+     adresses qui ne passent pas par un sélecteur. Au-delà, la
+     recherche est vide — et vide est la vérité : il n'y a rien de
+     publié ce jour-là. L'écran vide propose déjà de laisser son
+     besoin, ce qui vaut mieux qu'une page morte. */
+  if (!dentroDelHorizonte(date)) return [];
+
   const now = Date.now();
   const matches: TripMatch[] = [];
 

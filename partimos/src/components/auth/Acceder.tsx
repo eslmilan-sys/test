@@ -6,6 +6,7 @@ import { useSession } from "@/lib/session";
 import { getSupabase, isSupabaseConfigured } from "@/lib/supabase";
 import { huella } from "@/lib/clave";
 import { readPastedAuth } from "@/lib/otp-link";
+import { useInstalada } from "@/lib/instalada";
 
 /**
  * ENTRER — DEUX CHEMINS, ET LES DEUX SONT DES BOUTONS.
@@ -76,13 +77,25 @@ export function Acceder({
   const [verClave, setVerClave] = useState(false);
   const [tocado, setTocado] = useState(false);
   const [fallo, setFallo] = useState<string | null>(null);
-  const [ocupado, setOcupado] = useState<"clave" | "enlace" | "pegado" | null>(
-    null,
-  );
+  const [ocupado, setOcupado] = useState<
+    "clave" | "enlace" | "pegado" | "codigo" | null
+  >(null);
   const [vista, setVista] = useState<Vista>("formulario");
   const [pegado, setPegado] = useState("");
+  /* LES SIX CHIFFRES. Ils étaient partis avec l'ancien dialogue du site,
+     et c'est exactement ce qui manquait : « quand j'envoie le code par
+     courriel, ça ouvre le SITE, donc je ne peux pas entrer dans l'app ».
+     C'est vrai et c'est structurel — une app installée sur iPhone a son
+     propre bac à sable ; le lien ouvert par Mail atterrit dans Safari, et
+     la session ouverte là-bas n'y sera jamais visible. Un CODE, lui, se
+     recopie à la main dans l'app, et il n'a besoin d'aucun navigateur. */
+  const [codigo, setCodigo] = useState("");
   const [puedeReenviar, setPuedeReenviar] = useState(true);
   const reenvio = useRef<number>(0);
+  /* Installée, l'app montre le code EN PREMIER — c'est le seul chemin qui
+     marche chez elle (voir lib/instalada.ts). Dans un navigateur, le lien
+     reste le geste le plus court : un tap au lieu de six chiffres. */
+  const instalada = useInstalada();
 
   const correoValido = CORREO.test(correo.trim());
   const puedeEntrar = correoValido && clave.length > 0;
@@ -214,6 +227,30 @@ export function Acceder({
     setVista("enlace");
   }
 
+  /** Les six chiffres du courriel. Le chemin de l'app installée. */
+  async function usarCodigo() {
+    const limpio = codigo.replace(/\D/g, "");
+    if (limpio.length !== 6) {
+      setFallo("El código tiene seis dígitos.");
+      return;
+    }
+    const supabase = getSupabase();
+    if (!supabase) return;
+    setFallo(null);
+    setOcupado("codigo");
+    const { error } = await supabase.auth.verifyOtp({
+      email: correo.trim(),
+      token: limpio,
+      type: "email",
+    });
+    setOcupado(null);
+    if (error) {
+      setFallo("Ese código no es correcto o ya venció. Pide otro.");
+      return;
+    }
+    onListo();
+  }
+
   /** Le lien collé à la main, quand toucher le lien n'a pas ramené ici. */
   async function usarPegado() {
     const leido = readPastedAuth(pegado);
@@ -283,43 +320,104 @@ export function Acceder({
           <h1 className="font-display text-[28px] leading-[1.12] font-extrabold tracking-[-0.035em]">
             Revisa tu correo
           </h1>
-          <p className="mt-2 max-w-[34ch] text-[14px] leading-relaxed text-ink-500">
-            Le mandamos un enlace a{" "}
-            <b className="font-semibold text-ink-900">{correo.trim()}</b>. Ábrelo
-            y quedas dentro — no tienes que volver aquí.
+          <p className="mt-2 max-w-[36ch] text-[14px] leading-relaxed text-ink-500">
+            Le mandamos un correo a{" "}
+            <b className="font-semibold text-ink-900">{correo.trim()}</b>.
+            {instalada
+              ? " Trae un código de seis dígitos: escríbelo aquí y entras."
+              : " Toca el enlace y quedas dentro — no tienes que volver aquí."}
           </p>
 
-          {/* LE RATTRAPAGE. Sur iPhone, Mail ouvre le lien dans SON
-              navigateur, où la session ne sert à rien. Ce champ existe
-              pour ce cas précis, et il arrive tous les jours. */}
-          <label htmlFor="acc-pegar" className="mt-6 block">
-            <span className="mb-1.5 block text-[11.5px] font-bold tracking-[0.09em] text-ink-500 uppercase">
-              ¿Tocarlo no te trajo de vuelta?
-            </span>
+          {/* ── LES SIX CHIFFRES ──────────────────────────────────────
+              POURQUOI ILS EXISTENT, ET POURQUOI ILS PASSENT DEVANT DANS
+              L'APP INSTALLÉE.
+
+              « Quand j'envoie le code par courriel, ça ouvre le site,
+              donc je ne peux pas entrer dans l'app. » C'est exact, et ce
+              n'est pas un réglage à corriger : sur iPhone, une app
+              installée a son propre bac à sable. Mail ouvre le lien dans
+              Safari, la session naît là-bas, et l'app ne la verra
+              jamais.
+
+              Un code, lui, ne dépend d'aucun navigateur : on le recopie
+              où l'on veut entrer. C'est le SEUL chemin par courriel qui
+              marche dans une app installée, donc c'est celui qu'elle
+              montre en premier. */}
+          <div
+            className={`mt-6 rounded-[18px] border-[1.5px] p-4 ${
+              instalada
+                ? "border-sol-300 bg-sol-50"
+                : "border-ink-200 bg-white"
+            }`}
+          >
+            <label
+              htmlFor="acc-codigo"
+              className="mb-1.5 block text-[11.5px] font-bold tracking-[0.09em] text-ink-500 uppercase"
+            >
+              Código de seis dígitos
+            </label>
             <input
-              id="acc-pegar"
-              type="url"
-              inputMode="url"
-              autoComplete="off"
-              autoCapitalize="off"
-              spellCheck={false}
-              value={pegado}
-              onChange={(e) => setPegado(e.target.value)}
-              placeholder="Pega aquí el enlace completo"
-              className={campo()}
+              id="acc-codigo"
+              inputMode="numeric"
+              autoComplete="one-time-code"
+              autoFocus={instalada}
+              value={codigo}
+              onChange={(e) =>
+                setCodigo(e.target.value.replace(/\D/g, "").slice(0, 6))
+              }
+              placeholder="000000"
+              className={`tnum text-center text-[24px] font-bold tracking-[0.34em] ${campo()}`}
             />
-          </label>
+            <button
+              type="button"
+              onClick={() => void usarCodigo()}
+              disabled={codigo.length !== 6 || ocupado !== null}
+              className="cta-naranja mt-3 flex h-[50px] w-full items-center justify-center rounded-full px-6 font-display text-[15.5px] font-bold"
+            >
+              {ocupado === "codigo" ? "Entrando…" : "Entrar con el código"}
+            </button>
+            <p className="mt-2 text-[12px] leading-snug text-ink-500">
+              {instalada
+                ? "El enlace del correo abre el navegador, no la app — por eso aquí se usa el código."
+                : "Si tu correo trae seis dígitos en vez de un enlace, escríbelos aquí."}
+            </p>
+          </div>
+
+          {/* LE LIEN COLLÉ — le rattrapage du navigateur. Sur iPhone, Mail
+              ouvre le lien dans SON navigateur, où la session ne sert à
+              rien. Ce champ existe pour ce cas précis. */}
+          <details className="mt-4" open={!instalada}>
+            <summary className="cursor-pointer text-[13.5px] font-semibold text-sol-700 underline-offset-2 hover:underline">
+              Tengo un enlace, no un código
+            </summary>
+            <label htmlFor="acc-pegar" className="mt-3 block">
+              <span className="mb-1.5 block text-[11.5px] font-bold tracking-[0.09em] text-ink-500 uppercase">
+                ¿Tocarlo no te trajo de vuelta?
+              </span>
+              <input
+                id="acc-pegar"
+                type="url"
+                inputMode="url"
+                autoComplete="off"
+                autoCapitalize="off"
+                spellCheck={false}
+                value={pegado}
+                onChange={(e) => setPegado(e.target.value)}
+                placeholder="Pega aquí el enlace completo"
+                className={campo()}
+              />
+            </label>
+            <button
+              type="button"
+              onClick={() => void usarPegado()}
+              disabled={!pegado.trim() || ocupado !== null}
+              className="mt-3 flex h-[48px] w-full items-center justify-center rounded-full border-[1.5px] border-sol-200 bg-sol-50 px-6 font-display text-[15px] font-bold text-sol-800 transition-colors hover:border-sol-300 hover:bg-sol-100 disabled:opacity-50"
+            >
+              {ocupado === "pegado" ? "Entrando…" : "Entrar con este enlace"}
+            </button>
+          </details>
 
           {fallo && <Aviso>{fallo}</Aviso>}
-
-          <button
-            type="button"
-            onClick={() => void usarPegado()}
-            disabled={!pegado.trim() || ocupado !== null}
-            className="cta-naranja mt-4 flex h-[54px] w-full items-center justify-center rounded-full px-6 font-display text-[16.5px] font-bold"
-          >
-            {ocupado === "pegado" ? "Entrando…" : "Entrar con este enlace"}
-          </button>
 
           <p className="mt-5 text-center text-[13.5px] text-ink-500">
             {puedeReenviar ? "¿No te llegó? " : "Puedes pedir otro en un minuto. "}

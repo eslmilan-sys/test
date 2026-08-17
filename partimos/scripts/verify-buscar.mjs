@@ -143,7 +143,11 @@ console.log(`\nBuscar — ${BASE}\n`);
     ),
   );
   ok("carte — le conducteur et sa note", /\d\.\d/.test(t0));
-  ok("carte — directo ou parada", /Directo|parada/.test(t0));
+  /* « DIRECTO » A ÉTÉ RENOMMÉ, et c'est une correction de fond.
+     Posé au-dessus de « viene desde Panamá », il se lisait comme « le
+     conducteur part d'ici » — l'exact contraire. « Sin paradas en tu
+     tramo » dit la même chose sans promettre un départ qui n'existe pas. */
+  ok("carte — sin paradas ou parada", /Sin paradas|parada/.test(t0));
 
   /* LE TRONÇON EST DANS LE LIEN. Sans lui, la fiche afficherait le prix
      du trajet entier — c'est la faute la plus coûteuse de cet écran. */
@@ -173,23 +177,23 @@ console.log(`\nBuscar — ${BASE}\n`);
 
   /* LES FILTRES retirent vraiment. */
   const directosAntes = (await tarjetas.allTextContents()).filter((t) =>
-    t.includes("Directo"),
+    t.includes("Sin paradas"),
   ).length;
   await app(p).getByRole("button", { name: /Filtros/ }).first().click();
   await p.waitForTimeout(200);
-  await app(p).getByRole("button", { name: "Solo directos" }).click();
+  await app(p).getByRole("button", { name: "Sin paradas intermedias" }).click();
   await p.waitForTimeout(300);
   const nDir = await tarjetas.count();
   const textos = await tarjetas.allTextContents();
-  ok("filtre — « solo directos » ne laisse que des directos",
-    textos.every((t) => t.includes("Directo")),
+  ok("filtre — « sin paradas » ne laisse que ceux-là",
+    textos.every((t) => t.includes("Sin paradas")),
     `${nDir} carte(s)`);
   /* Le filtre et l'étiquette doivent dire la MÊME chose : le nombre de
      cartes qui restent est exactement le nombre de cartes étiquetées
      « Directo » avant filtrage. Deux définitions de « direct » qui
      divergent, c'est un écran qui ment. */
   ok("filtre — le compte suit l'étiquette", nDir === directosAntes, `${nDir} restantes / ${directosAntes} étiquetées`);
-  await app(p).getByRole("button", { name: "Solo directos" }).click();
+  await app(p).getByRole("button", { name: "Sin paradas intermedias" }).click();
   await p.waitForTimeout(250);
   ok("filtre — se retire aussi", (await tarjetas.count()) === n);
   /* « VOUS ÊTES ICI » : l'onglet Buscar doit être allumé sur la page

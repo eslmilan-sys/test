@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { BookingPanel } from "@/components/trip/BookingPanel";
+import { EnRuta } from "@/components/trip/EnRuta";
 import { track } from "@/lib/analytics";
 import type { Corridor } from "@/lib/corridors";
 import { formatDuration, formatUsd } from "@/lib/pricing";
@@ -80,6 +81,14 @@ export function TripDetail({
   return (
     <div className="grid gap-5 min-[900px]:grid-cols-[1.35fr_1fr] min-[900px]:items-start">
       <div className="grid gap-5">
+        {/* MONTER EN COURS DE ROUTE — EN PREMIER, ET C'EST VOULU.
+            C'est l'information qui change la façon dont tout le reste se
+            lit : l'heure du point n'est pas une heure de départ, c'est un
+            passage. Placée en bas de page, elle serait lue après la
+            décision — donc jamais. Elle disparaît d'elle-même quand le
+            passager monte là où le conducteur démarre. */}
+        <EnRuta match={match} />
+
         {/* --- Itinéraire --- */}
         <section className="rounded-[20px] border border-ink-200 bg-white p-5 sm:p-6">
           <p className="mb-1 text-[11.5px] font-bold tracking-[0.14em] text-ink-500 uppercase">

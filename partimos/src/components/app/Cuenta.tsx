@@ -594,7 +594,7 @@ const PIEZAS: Pieza[] = [
   },
   {
     icon: "car",
-    tono: "tostado",
+    tono: "teal",
     titulo: "Licencia de conducir",
     texto:
       "Vigente y a tu nombre. La revisa el mismo proveedor, en el mismo paso.",

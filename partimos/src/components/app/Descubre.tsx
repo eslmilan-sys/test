@@ -68,7 +68,7 @@ const COSAS: {
   },
   {
     icon: "chat",
-    tono: "tostado",
+    tono: "teal",
     titulo: "El chat queda escrito",
     texto:
       "Coordinas la hora y el punto sin dar tu número. Ninguno de los dos puede cambiar un mensaje después de enviarlo.",

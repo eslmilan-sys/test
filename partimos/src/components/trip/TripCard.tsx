@@ -4,6 +4,8 @@ import { Rating } from "@/components/ui/Rating";
 import { formatUsd, formatDuration } from "@/lib/pricing";
 import { getCorridor } from "@/lib/corridors";
 import { formatTime, type TripMatch } from "@/lib/trips";
+import { esTopConductor } from "@/lib/conductor";
+import { EnRuta } from "./EnRuta";
 
 /**
  * Carte de trajet.
@@ -34,15 +36,15 @@ export function TripCard({ match }: { match: TripMatch }) {
 
   const comesFrom = segment.fromIndex > 0;
   const goesOn = segment.toIndex < trip.servedStops.length - 1;
-  const first = trip.servedStops[0];
   const last = trip.servedStops[trip.servedStops.length - 1];
 
-  const context = [
-    comesFrom && `viene desde ${first.name}`,
-    goesOn && `sigue hasta ${last.name}`,
-  ]
-    .filter(Boolean)
-    .join(" y ");
+  /* CE QUI RESTE DANS CETTE LIGNE. L'amont — « viene desde X » — a été
+     retiré d'ici : dire d'où vient le carro sans dire QUAND il passe
+     donnait la moitié de l'information, celle qui inquiète sans aider.
+     `<EnRuta variante="linea">` porte les deux, juste en dessous. Ici il
+     ne reste que l'aval, qui n'a aucune conséquence pour le passager —
+     c'est juste bon à savoir. */
+  const context = goesOn ? `sigue hasta ${last.name}` : "";
 
   return (
     <Link
@@ -95,8 +97,16 @@ export function TripCard({ match }: { match: TripMatch }) {
             </div>
           </div>
 
+          {/* MONTER EN COURS DE ROUTE. Une carte qui affiche « 08:05 »
+              sans dire que le carro roule depuis deux heures promet une
+              ponctualité que personne ne peut tenir. */}
+          {comesFrom && (
+            <div className="mt-2.5">
+              <EnRuta match={match} variante="linea" />
+            </div>
+          )}
           {context && (
-            <p className="mt-2.5 flex items-center gap-1.5 text-[12.5px] text-ink-500">
+            <p className="mt-2 flex items-center gap-1.5 text-[12.5px] text-ink-500">
               <Icon name="arrowRight" className="size-3.5 shrink-0" />
               Este viaje {context}
             </p>
@@ -126,8 +136,13 @@ export function TripCard({ match }: { match: TripMatch }) {
             </span>
 
             <span className="ml-auto flex flex-wrap items-center justify-end gap-1.5">
-              {trip.driver.isSuperDriver && (
-                <Chip tone="brand">Super conductor</Chip>
+              {/* « Super conductor » était `isSuperDriver`, un booléen
+                  écrit à la main dans le jeu de démonstration : personne
+                  ne le gagnait, personne ne pouvait le perdre. La règle
+                  vit maintenant dans lib/conductor.ts et se PERD si la
+                  note redescend. */}
+              {esTopConductor(trip.driver) && (
+                <Chip tone="brand">Top conductor</Chip>
               )}
               {trip.flexibleStops && <Chip>Deja en el camino</Chip>}
               {trip.womenOnly && <Chip>Solo mujeres</Chip>}

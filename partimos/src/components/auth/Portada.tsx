@@ -39,9 +39,17 @@ import { PHOTOS } from "@/lib/photos";
  *  la voiture (ce qu'on partage), le bouclier (avec qui), l'aporte (ce
  *  que ça coûte). Ils ne remplacent pas le titre — ils le préparent. */
 const CAPACIDADES = [
-  { icon: "pin", label: "Viaja a donde quieras" },
-  { icon: "shield", label: "Viaja protegido" },
-  { icon: "cash", label: "Paga mucho menos" },
+  /* TROIS TONS, PAS TROIS FOIS LE MÊME. Les trois gouttes étaient
+     oranges : sous le verre, trois fois la même lumière, donc un seul
+     objet répété. C'est précisément ce que le propriétaire a vu
+     disparaître — « avant il y avait du bleu, du vert et d'autres
+     couleurs derrière le glassmorphisme, ça donnait une identité ».
+     Le vert n'est pas décoratif ici : c'est celui de « vérifié », et il
+     tombe sur le bouclier. Les deux autres se répartissent la rampe et
+     son complément. */
+  { icon: "pin", label: "Viaja a donde quieras", tono: "naranja" },
+  { icon: "shield", label: "Viaja protegido", tono: "green" },
+  { icon: "cash", label: "Paga mucho menos", tono: "teal" },
 ] as const;
 
 export function Portada({
@@ -138,7 +146,7 @@ export function Portada({
                   le coin qui dépasse reste net. C'est ce contraste sur un
                   MÊME objet qui fait « verre » — la transparence seule
                   n'y suffit pas. */}
-              <GlassIcon name={c.icon} tone="naranja" />
+              <GlassIcon name={c.icon} tone={c.tono} />
               <span className="text-center text-[11.5px] leading-tight font-semibold text-ink-600">
                 {c.label}
               </span>

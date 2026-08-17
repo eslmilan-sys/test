@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { Icon } from "@/components/ui/Icon";
 import { abrirVerificacion, type DocKind } from "@/lib/didit";
+import { CarroInline } from "./CarroInline";
 
 /**
  * CE QU'IL FAUT POUR PUBLIER — annoncé AU DÉBUT, pas à la fin.
@@ -26,9 +26,12 @@ import { abrirVerificacion, type DocKind } from "@/lib/didit";
 export type Requisito = {
   que: string;
   porQue: string;
-  /** Le document à vérifier chez Didit, ou une page où finir le geste. */
+  /** Le document à vérifier chez Didit. */
   doc?: DocKind;
-  donde?: string;
+  /** Le carro : il se saisit ICI MÊME, plus jamais sur une autre page.
+   *  Le champ `donde` a disparu avec le lien qu'il portait — voir la note
+   *  sur le geste, juste en dessous. */
+  carro?: true;
 };
 
 export function RequisitosConductor({
@@ -40,6 +43,11 @@ export function RequisitosConductor({
 }) {
   const [abriendo, setAbriendo] = useState<DocKind | null>(null);
   const [error, setError] = useState("");
+  const faltaCarro = faltantes.some((f) => f.carro);
+  /* Ouvert d'office quand le carro est le seul obstacle restant. */
+  const [abrirCarro, setAbrirCarro] = useState(
+    faltaCarro && faltantes.length === 1,
+  );
 
   if (faltantes.length === 0) return null;
 
@@ -104,8 +112,13 @@ export function RequisitosConductor({
                 {f.porQue}
               </span>
             </span>
-            {/* Le geste EST sur la ligne. Un document se vérifie d'ici ;
-                le carro a besoin de son écran, alors on y mène. */}
+            {/* LE GESTE EST SUR LA LIGNE, ET IL Y RESTE.
+                Un document se vérifie d'ici. Le carro, lui, menait à
+                `/cuenta?panel=carro` — un lien vers une autre page, à cet
+                instant précis, est un abandon déguisé : on quitte le
+                formulaire, on remplit un écran de réglages qu'on n'avait
+                pas demandé, et il faut retrouver seul le chemin du
+                retour. Il se déclare donc ICI, sous la ligne. */}
             {f.doc ? (
               <button
                 type="button"
@@ -116,17 +129,32 @@ export function RequisitosConductor({
                 {abriendo === f.doc ? "Abriendo…" : "Verificar"}
               </button>
             ) : (
-              <Link
-                href={f.donde ?? "/cuenta"}
+              <button
+                type="button"
+                onClick={() => setAbrirCarro((v) => !v)}
+                aria-expanded={abrirCarro}
                 className="flex shrink-0 self-center items-center gap-1 rounded-full border-[1.5px] border-ink-200 px-4 py-2 text-[13.5px] font-bold transition-colors hover:border-accent"
               >
-                Agregar
-                <Icon name="arrowRight" className="size-3.5" />
-              </Link>
+                {abrirCarro ? "Cerrar" : "Agregar"}
+                <Icon
+                  name="arrowRight"
+                  className={`size-3.5 transition-transform ${abrirCarro ? "-rotate-90" : ""}`}
+                />
+              </button>
             )}
           </li>
         ))}
       </ul>
+
+      {/* LE FORMULAIRE, DANS LA MÊME PAGE. Il s'ouvre tout seul quand le
+          carro est la SEULE chose qui manque : à ce moment-là il n'y a
+          rien d'autre à faire, et un panneau replié serait une porte de
+          plus à pousser. */}
+      {faltaCarro && abrirCarro && (
+        <div className="mt-2.5 rounded-[14px] bg-white px-4 py-4">
+          <CarroInline compacto />
+        </div>
+      )}
 
       {error && (
         <p role="alert" className="mt-2.5 text-[13px] text-danger">

@@ -107,7 +107,31 @@ const continuar = (p) =>
 async function responderCarro(p) {
   const marca = p.locator('select[aria-label="Marca del carro"]:visible').first();
   if ((await marca.count()) === 0) return;
-  await marca.selectOption("otro");
+
+  /* DEUX FORMULAIRES PEUVENT ÊTRE LÀ, ET C'EST NORMAL.
+     Depuis que le carro se déclare DANS la page (le lien vers Mi cuenta
+     était un abandon déguisé), l'étape montre le formulaire complet
+     quand aucun carro n'est enregistré. Ce formulaire n'a pas d'option
+     « Otro » : il écrit un vrai carro, et écrire un vrai carro exige un
+     compte — que cette batterie n'a pas.
+     Elle emprunte donc le chemin du visiteur sans compte : « mi carro no
+     está en la lista », puis une catégorie. C'est un vrai parcours du
+     produit, pas un contournement de test. */
+  const sinLista = p
+    .locator("button:visible", { hasText: /Mi carro no está en la lista/ })
+    .first();
+  if (await sinLista.count()) {
+    await sinLista.click();
+    await p.waitForTimeout(300);
+  }
+
+  const conOtro = p.locator('select[aria-label="Marca del carro"]:visible').first();
+  if ((await conOtro.count()) === 0) return;
+  const valores = await conOtro
+    .locator("option")
+    .evaluateAll((os) => os.map((o) => o.value).filter(Boolean));
+  if (!valores.includes("otro")) return;
+  await conOtro.selectOption("otro");
   await p.waitForTimeout(250);
 }
 

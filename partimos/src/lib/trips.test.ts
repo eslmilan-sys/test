@@ -14,10 +14,27 @@ import assert from "node:assert/strict";
 import { CORRIDORS, corridorsServing, getCorridor } from "./corridors.ts";
 import { computePriceCap, RATE_PER_KM_CENTS } from "./pricing.ts";
 import { findSegment, seatsTakenOnSegment, segmentCap } from "./segments.ts";
-import { buildTripsFor, matchFor, searchTrips } from "./trips.ts";
+import { buildTripsFor, localIso, matchFor, searchTrips } from "./trips.ts";
 
-/** Une date fixe et lointaine : aucun test ne doit dépendre de l'heure qu'il est. */
-const DATE = "2031-03-14";
+/**
+ * UNE DATE PROCHE, ET C'EST UNE CORRECTION.
+ *
+ * C'était « 2031-03-14 » — fixe et lointaine, pour qu'aucun test ne
+ * dépende de l'heure qu'il est. Bonne intention, mais depuis que
+ * `searchTrips` refuse les dates hors de l'horizon pré-généré (une fiche
+ * qui n'existe pas donne un 404 en export statique, trouvé par l'audit),
+ * une date à cinq ans d'ici rend forcément une liste vide.
+ *
+ * Cinq jours d'ici : assez loin pour qu'aucun viaje ne soit déjà parti à
+ * l'heure où le test tourne, assez près pour être dans l'horizon. Les
+ * assertions restent qualitatives — il y a des résultats, ils sont
+ * partiels, ils sont triés — donc elles ne dépendent pas du jour tiré.
+ */
+const DATE = (() => {
+  const d = new Date();
+  d.setDate(d.getDate() + 5);
+  return localIso(d);
+})();
 
 test("les points de passage sont ordonnés et strictement croissants", () => {
   for (const corridor of CORRIDORS) {
@@ -309,19 +326,25 @@ test("un trajet plein sur son tronçon central reste réservable ailleurs", () =
  * donc sur Panamá (−05:00) et le même instant sort des deux côtés.
  */
 test("les horaires sont ancrés à Panamá, quel que soit le fuseau du runtime", () => {
-  const trip = buildTripsFor("panama-chitre", DATE).find(
-    (t) => t.id === `panama-chitre-${DATE}-0`,
-  )!;
-  // Le viaje 0 part à 23:15 heure de Panamá — soit 04:15 UTC le lendemain.
-  assert.equal(trip.departureAt, `${DATE}T04:15:00.000Z`.replace(DATE, "2031-03-15"));
+  /* L'ancienne version comparait à `2031-03-15T04:15:00.000Z` — une
+     valeur écrite à la main, valable pour la seule date fixe d'alors.
+     Elle vérifiait donc autant le tirage que l'ancrage. Ce qui compte
+     vraiment est plus simple et plus fort : quel que soit le fuseau de
+     la machine qui exécute, un viaje du jour J relu À L'HEURE DU PANAMA
+     doit retomber sur J. Un ancrage sur le fuseau local ferait glisser
+     d'un jour pour la moitié de la planète — et c'est le genre de bug
+     qu'on découvre par un passager qui rate son viaje. */
+  const viajes = buildTripsFor("panama-chitre", DATE);
+  assert.ok(viajes.length > 0);
 
-  for (const trip of buildTripsFor("panama-chitre", DATE)) {
-    const hourUtc = new Date(trip.departureAt).getUTCHours();
-    const hourPanama = (hourUtc + 24 - 5) % 24;
-    assert.ok(
-      Number.isInteger(hourPanama) && hourPanama >= 0 && hourPanama < 24,
-      trip.id,
-    );
+  for (const trip of viajes) {
+    const enPanama = new Date(
+      new Date(trip.departureAt).getTime() - 5 * 3_600_000,
+    )
+      .toISOString()
+      .slice(0, 10);
+    assert.equal(enPanama, DATE, `${trip.id} → ${trip.departureAt}`);
+
     // Les minutes restent celles du tirage : 00, 15, 30 ou 45.
     assert.ok(
       [0, 15, 30, 45].includes(new Date(trip.departureAt).getUTCMinutes()),
@@ -329,3 +352,4 @@ test("les horaires sont ancrés à Panamá, quel que soit le fuseau du runtime",
     );
   }
 });
+

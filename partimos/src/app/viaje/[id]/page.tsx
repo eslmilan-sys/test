@@ -9,6 +9,7 @@ import { TripDetail } from "@/components/trip/TripDetail";
 import { Viaje } from "@/components/app/Viaje";
 import { getCorridor } from "@/lib/corridors";
 import { demoTripIds, getTrip } from "@/lib/trips";
+import { esTopConductor } from "@/lib/conductor";
 
 export const dynamicParams = false;
 
@@ -95,14 +96,17 @@ export default async function TripPage({ params }: Params) {
               </div>
 
               <ul className="mt-4 grid gap-2 border-t border-ink-200 pt-4">
-                {trip.driver.isVerified && (
-                  <Badge icon="id">
-                    Cédula verificada por un proveedor externo
-                  </Badge>
-                )}
-                {trip.driver.isSuperDriver && (
+                {/* Sans condition : personne ne publie sans cédula ET
+                    licencia vérifiées. La ligne énonce la règle de la
+                    maison, elle ne distingue pas ce conducteur-ci. */}
+                <Badge icon="id">
+                  Cédula y licencia verificadas por un proveedor externo — sin
+                  eso no se puede publicar
+                </Badge>
+                {esTopConductor(trip.driver) && (
                   <Badge icon="star">
-                    Super conductor — más de 50 viajes sin incidencias
+                    Top conductor — {trip.driver.ridesCount} viajes,{" "}
+                    {trip.driver.rating.toFixed(1)} de nota
                   </Badge>
                 )}
                 <Badge icon="car">

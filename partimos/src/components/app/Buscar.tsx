@@ -5,8 +5,9 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { deParams } from "@/lib/place";
 import { Estrella, BadgeTop } from "@/components/ui/Reputacion";
-import { bonusReputacion, esTopConductor } from "@/lib/conductor";
+import { bonusReputacion } from "@/lib/conductor";
 import { Icon } from "@/components/ui/Icon";
+import { EnRuta } from "@/components/trip/EnRuta";
 import { ALL_CITIES } from "@/lib/corridors";
 import {
   formatDayLabel,
@@ -62,9 +63,15 @@ function Tarjeta({ m }: { m: TripMatch }) {
     m.segment.fromIndex,
     m.segment.toIndex + 1,
   );
-  /* « Directo » n'est pas cosmétique : c'est l'absence d'arrêt entre la
-     montée et la descente, donc un trajet plus court vécu. */
-  const directo = paradas.length <= 2;
+  /* « SIN PARADAS » ET NON « DIRECTO ».
+     Le mot disait vrai — aucun arrêt entre la montée et la descente,
+     donc un trajet plus court vécu — et il MENTAIT quand même. Posé
+     juste au-dessus de « viene desde Panamá », « Directo » se lit comme
+     « le conducteur part d'ici », c'est-à-dire l'exact contraire. Deux
+     lignes qui se contredisent dans la même carte font douter des deux.
+     « Sin paradas en tu tramo » dit la même chose sans promettre un
+     départ qui n'existe pas. */
+  const sinParadas = paradas.length <= 2;
 
   return (
     <li>
@@ -87,8 +94,8 @@ function Tarjeta({ m }: { m: TripMatch }) {
               {nombreCorto(m.segment.from.citySlug)} → {nombreCorto(m.segment.to.citySlug)}
             </p>
             <p className="mt-0.5 text-[12.5px] text-ink-500">
-              {directo
-                ? "Directo"
+              {sinParadas
+                ? "Sin paradas en tu tramo"
                 : paradas.length === 3
                   ? "1 parada intermedia"
                   : `${paradas.length - 2} paradas intermedias`}
@@ -117,20 +124,22 @@ function Tarjeta({ m }: { m: TripMatch }) {
               <span>({t.driver.ridesCount})</span>
             </span>
           </span>
-          {/* UN SEUL BADGE À LA FOIS. « Top » implique déjà vérifié — la
-              règle l'exige — donc afficher les deux côte à côte remplit
-              la ligne pour ne rien dire de plus. */}
-          {esTopConductor(t.driver) ? (
-            <BadgeTop conductor={t.driver} />
-          ) : (
-            t.driver.isVerified && (
-              <span className="flex shrink-0 items-center gap-1 rounded-full bg-verde-suave px-2 py-1 text-[11px] font-bold text-verde-ok">
-                <Icon name="shield" className="size-3" />
-                Verificado
-              </span>
-            )
-          )}
+          {/* SEUL « TOP » RESTE SUR LA CARTE, parce que lui SE MÉRITE et
+              se perd (voir lib/conductor.ts). « Verificado » ne
+              distinguait personne : tout le monde l'est, sinon on ne
+              publie pas. Il est monté en tête de liste, où une garantie
+              collective a sa place. */}
+          <BadgeTop conductor={t.driver} />
         </div>
+
+        {/* MONTER EN COURS DE ROUTE. Sans cette ligne, l'heure de la
+            carte se lit comme une heure de départ, et quelqu'un attend
+            pour rien au bord de la route. */}
+        {m.segment.fromIndex > 0 && (
+          <div className="mt-3 border-t border-ink-100 pt-3">
+            <EnRuta match={m} variante="linea" />
+          </div>
+        )}
 
         {/* LA TIMELINE des arrêts servis. */}
         <ul className="mt-3 grid gap-1.5 border-t border-ink-100 pt-3">
@@ -189,7 +198,13 @@ export function Buscar() {
   const puestos = Number(params.get("puestos") ?? "1");
 
   const [orden, setOrden] = useState<Orden>("coincidencia");
-  const [soloVerificados, setSoloVerificados] = useState(false);
+  /* LE FILTRE « IDENTIDAD VERIFICADA » A ÉTÉ RETIRÉ, et c'est une
+     correction, pas une simplification. Publier exige déjà cédula et
+     licencia vérifiées : le filtre ne retirait donc jamais une seule
+     carte. Un filtre qui ne filtre rien est pire qu'inutile — il laisse
+     croire que la liste contient des conducteurs non vérifiés, c'est-à-
+     dire exactement le contraire de ce qui est vrai. La garantie est
+     maintenant ÉCRITE une fois, en tête de liste. */
   const [soloDirectos, setSoloDirectos] = useState(false);
   const [filtrosAbiertos, setFiltrosAbiertos] = useState(false);
 
@@ -200,7 +215,6 @@ export function Buscar() {
 
   const visibles = useMemo(() => {
     let v = matches;
-    if (soloVerificados) v = v.filter((m) => m.trip.driver.isVerified);
     if (soloDirectos)
       v = v.filter((m) => m.segment.toIndex - m.segment.fromIndex === 1);
     const copia = [...v];
@@ -223,7 +237,7 @@ export function Buscar() {
           (a, b) => bonusReputacion(b.trip.driver) - bonusReputacion(a.trip.driver),
         );
     }
-  }, [matches, orden, soloVerificados, soloDirectos]);
+  }, [matches, orden, soloDirectos]);
 
   return (
     <div className="mx-auto w-full max-w-[520px]">
@@ -275,18 +289,14 @@ export function Buscar() {
             onClick={() => setFiltrosAbiertos((v) => !v)}
             aria-expanded={filtrosAbiertos}
             className={`flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-[13px] font-semibold transition-colors ${
-              soloVerificados || soloDirectos
+              soloDirectos
                 ? "border-naranja bg-naranja-suave text-naranja"
                 : "border-ink-200 bg-white text-ink-600"
             }`}
           >
             <Icon name="swap" className="size-[15px]" />
             Filtros
-            {(soloVerificados || soloDirectos) && (
-              <span className="tnum">
-                {Number(soloVerificados) + Number(soloDirectos)}
-              </span>
-            )}
+            {soloDirectos && <span className="tnum">1</span>}
           </button>
 
           {/* LE TRI. Le `select` est un vrai `select` — sur téléphone il
@@ -331,18 +341,6 @@ export function Buscar() {
           <div className="mt-2 flex flex-wrap gap-1.5">
             <button
               type="button"
-              onClick={() => setSoloVerificados((v) => !v)}
-              aria-pressed={soloVerificados}
-              className={`rounded-full border px-3 py-1.5 text-[12.5px] font-semibold transition-colors ${
-                soloVerificados
-                  ? "border-naranja bg-naranja text-white"
-                  : "border-ink-200 bg-white text-ink-600"
-              }`}
-            >
-              Identidad verificada
-            </button>
-            <button
-              type="button"
               onClick={() => setSoloDirectos((v) => !v)}
               aria-pressed={soloDirectos}
               className={`rounded-full border px-3 py-1.5 text-[12.5px] font-semibold transition-colors ${
@@ -351,7 +349,7 @@ export function Buscar() {
                   : "border-ink-200 bg-white text-ink-600"
               }`}
             >
-              Solo directos
+              Sin paradas intermedias
             </button>
           </div>
         )}
@@ -368,6 +366,20 @@ export function Buscar() {
             El aporte por puesto sale de la distancia y del carro. No cambia con
             la hora ni con la fecha.
           </p>
+          {/* LA GARANTIE, DITE UNE FOIS ET POUR TOUTE LA LISTE.
+              Elle était une pastille « Verificado » sur chaque carte, ce
+              qui laissait entendre qu'il pouvait y en avoir sans. Il ne
+              peut pas y en avoir sans : publier exige cédula et licencia
+              vérifiées. Une garantie qui vaut pour tout le monde
+              s'annonce en haut ; répétée sur chaque ligne, elle se lit
+              comme une distinction et sème le doute sur les autres. */}
+          {visibles.length > 0 && (
+            <p className="mt-1.5 flex items-start gap-1.5 text-[12.5px] leading-snug font-semibold text-verde-ok">
+              <Icon name="shield" className="mt-px size-3.5 shrink-0" />
+              Todos con cédula y licencia verificadas — sin eso no se puede
+              publicar.
+            </p>
+          )}
         </div>
 
         {visibles.length === 0 ? (

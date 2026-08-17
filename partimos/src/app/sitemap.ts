@@ -23,6 +23,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     },
     { url: canonical("/publicar"), changeFrequency: "weekly", priority: 0.8 },
+    /* LE HUB DES RUTAS. Il relie les douze pages corridor entre elles ;
+       sans lui, chacune ne se rejoint que par l'accueil — et il était
+       déjà lié depuis leur pied de page, vers un 404. */
+    { url: canonical("/viajes"), changeFrequency: "weekly", priority: 0.8 },
     { url: canonical("/seguridad"), changeFrequency: "monthly", priority: 0.6 },
     { url: canonical("/ayuda"), changeFrequency: "monthly", priority: 0.6 },
     { url: canonical("/terminos"), changeFrequency: "yearly", priority: 0.3 },

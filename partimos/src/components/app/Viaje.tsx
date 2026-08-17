@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { deParams } from "@/lib/place";
 import * as Dialog from "@radix-ui/react-dialog";
 import { Icon } from "@/components/ui/Icon";
+import { EnRuta } from "@/components/trip/EnRuta";
 import { Nota, BadgeTop } from "@/components/ui/Reputacion";
 import { esTopConductor } from "@/lib/conductor";
 import { BookingPanel } from "@/components/trip/BookingPanel";
@@ -110,14 +111,28 @@ export function Viaje({ trip, corridor }: { trip: Trip; corridor: Corridor }) {
           <p className="font-display text-[24px] leading-tight font-extrabold tracking-[-0.03em]">
             {segment.from.name} → {segment.to.name}
           </p>
+          {/* « SALE » EST FAUX QUAND ON MONTE EN COURS DE ROUTE.
+              Le conducteur n'est pas parti d'ici : il PASSE. Un seul mot,
+              et il change ce qu'on comprend d'une heure — c'est la même
+              confusion qui fait attendre quelqu'un pour rien au bord de
+              la route. */}
           <p className="mt-1 text-[13.5px] text-white/75">
-            {formatDayLabel(fecha)} · sale {formatTime(match.boardingAt)} ·{" "}
-            {formatDuration(minutos)}
+            {formatDayLabel(fecha)} ·{" "}
+            {match.segment.fromIndex > 0 ? "pasa" : "sale"}{" "}
+            {formatTime(match.boardingAt)} · {formatDuration(minutos)}
           </p>
         </div>
       </div>
 
       <div className="mx-auto w-full max-w-[520px] px-4 pt-4">
+        {/* MONTER EN COURS DE ROUTE — EN PREMIER. C'est ce qui change la
+            lecture de tout le reste : l'heure du point est un passage,
+            pas un départ. Le bloc s'efface tout seul quand le passager
+            monte là où le conducteur démarre. */}
+        <div className="mb-3">
+          <EnRuta match={match} />
+        </div>
+
         {/* QUI MANEJA — avant le prix : on choisit une personne. */}
         <section className="rounded-[18px] border border-ink-200 bg-white p-4">
           <div className="flex items-center gap-3">
@@ -137,12 +152,14 @@ export function Viaje({ trip, corridor }: { trip: Trip; corridor: Corridor }) {
                 <BadgeTop conductor={trip.driver} />
               </p>
             </div>
-            {trip.driver.isVerified && (
-              <span className="flex shrink-0 items-center gap-1 rounded-full bg-verde-suave px-2.5 py-1 text-[11.5px] font-bold text-verde-ok">
-                <Icon name="shield" className="size-3.5" />
-                Verificado
-              </span>
-            )}
+            {/* PAS DE CONDITION. Publier exige cédula et licencia
+                vérifiées : ce conducteur l'est forcément, comme tous les
+                autres. Le montrer « seulement s'il l'est » laissait
+                croire à un tri qui n'existe pas. */}
+            <span className="flex shrink-0 items-center gap-1 rounded-full bg-verde-suave px-2.5 py-1 text-[11.5px] font-bold text-verde-ok">
+              <Icon name="shield" className="size-3.5" />
+              Verificado
+            </span>
           </div>
 
           <ul className="mt-3 grid gap-1.5 border-t border-ink-100 pt-3">

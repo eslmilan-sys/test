@@ -10,6 +10,7 @@ import {
   RequisitosConductor,
   type Requisito,
 } from "@/components/publicar/RequisitosConductor";
+import { CarroInline } from "@/components/publicar/CarroInline";
 import { CityCombobox } from "@/components/ui/CityCombobox";
 import { PlacePicker } from "@/components/ui/PlacePicker";
 import { libre, type PlaceRef } from "@/lib/place";
@@ -348,7 +349,7 @@ export function PublishFlow() {
           que: "Tu carro: marca, modelo y placa",
           porQue:
             "Con eso te reconocen en el punto. No pedimos fotos, y la placa no se muestra en público.",
-          donde: "/cuenta?panel=carro",
+          carro: true as const,
         },
       ].filter(Boolean) as Requisito[]);
   const puedePublicar = faltantes.length === 0;
@@ -1353,6 +1354,34 @@ export function PublishFlow() {
                 puede pedir más; uno ahorrador, menos.
               </p>
 
+              {/* AUCUN CARRO ENREGISTRÉ ? ON LE DEMANDE ICI, PAS AILLEURS.
+                  Le formulaire menait à Mi cuenta, et quitter la
+                  publication à cet instant, c'est ne pas revenir. Une fois
+                  enregistré, il devient LE carro du viaje : son modèle et
+                  son année fixent le taux au km, donc le tope. */}
+              {registeredCars.length === 0 && carMake !== "otro" && (
+                <div className="mb-4 rounded-[18px] border border-ink-200 bg-white p-4">
+                  <CarroInline
+                    compacto
+                    onGuardado={() => {
+                      setUseSavedCar(true);
+                      setCarIndex(0);
+                      setPriceCents(null);
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setCarMake("otro");
+                      setPriceCents(null);
+                    }}
+                    className="mt-3 text-[13.5px] font-semibold text-sol-700 underline-offset-2 hover:underline"
+                  >
+                    Mi carro no está en la lista
+                  </button>
+                </div>
+              )}
+
               {savedCar && useSavedCar ? (
                 <>
                   {registeredCars.length > 1 && (
@@ -1397,7 +1426,7 @@ export function PublishFlow() {
                     </button>
                   </div>
                 </>
-              ) : (
+              ) : registeredCars.length > 0 || carMake === "otro" ? (
                 <>
                   {savedCar && (
                     <button
@@ -1509,7 +1538,7 @@ export function PublishFlow() {
                     </div>
                   )}
                 </>
-              )}
+              ) : null}
             </>
           )}
 

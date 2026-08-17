@@ -45,7 +45,7 @@ const HECHOS: {
   },
   {
     icon: "chat",
-    tono: "tostado",
+    tono: "teal",
     titulo: "Nadie da su número",
     texto:
       "La coordinación pasa por el chat de la reserva. Queda escrita y ninguno de los dos puede cambiar un mensaje después de enviarlo — por eso sirve de prueba.",
