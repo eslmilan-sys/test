@@ -190,7 +190,7 @@ export function Acceder({
           onClick={() => void continuar()}
           disabled={!valido}
           aria-label="Continuar"
-          className="flex size-[58px] items-center justify-center rounded-full bg-naranja text-white transition-colors hover:bg-naranja-hondo disabled:cursor-not-allowed disabled:opacity-35"
+          className="cta-naranja flex size-[58px] items-center justify-center rounded-full text-white disabled:cursor-not-allowed disabled:opacity-35"
         >
           <Icon name="arrowRight" className="size-6" />
         </button>

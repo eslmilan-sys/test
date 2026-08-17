@@ -138,7 +138,7 @@ export function Entrar({
           <button
             type="button"
             onClick={onRegistro}
-            className="flex h-[54px] items-center justify-center rounded-full bg-naranja px-6 font-display text-[16.5px] font-bold text-white transition-colors hover:bg-naranja-hondo"
+            className="cta-naranja flex h-[54px] items-center justify-center rounded-full px-6 font-display text-[16.5px] font-bold text-white transition-colors"
           >
             Crear cuenta
           </button>

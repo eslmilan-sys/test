@@ -39,8 +39,11 @@ const BASE =
  * bouton donne l'impression de n'avoir rien fait.
  */
 const VARIANTS: Record<Variant, string> = {
-  primary:
-    "bg-ink-900 text-white shadow-[0_8px_20px_-8px_rgb(14_42_53/0.5)] hover:bg-ink-800 hover:-translate-y-px active:scale-[0.97]",
+  /* L'ORANGE DE LA MARQUE, comme dans l'app. Il était noir ici : deux
+     boutons principaux de deux couleurs sur le même produit, c'est la
+     première chose qu'on remarque. Le relief vit dans `.cta-naranja`
+     (globals.css), en un seul endroit pour les deux moitiés. */
+  primary: "cta-naranja",
   secondary:
     "bg-white text-ink-900 border-[1.5px] border-ink-200 hover:border-accent hover:text-accent-ink active:scale-[0.97]",
   onDark:

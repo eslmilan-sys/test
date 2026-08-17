@@ -446,7 +446,7 @@ export function Registro({ onCerrar }: { onCerrar: () => void }) {
           onClick={siguiente}
           disabled={!valido[paso] || enviando || correoEnviado}
           aria-label={paso === 5 ? "Crear mi cuenta" : "Siguiente"}
-          className="flex size-[58px] items-center justify-center rounded-full bg-naranja text-white transition-colors hover:bg-naranja-hondo disabled:cursor-not-allowed disabled:opacity-35"
+          className="cta-naranja flex size-[58px] items-center justify-center rounded-full text-white disabled:cursor-not-allowed disabled:opacity-35"
         >
           <Icon name={paso === 5 ? "check" : "arrowRight"} className="size-6" />
         </button>

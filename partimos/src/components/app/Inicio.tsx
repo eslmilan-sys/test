@@ -274,7 +274,7 @@ export function Inicio() {
         type="button"
         onClick={buscar}
         disabled={!hacia}
-        className="entra-app mt-3 flex h-[54px] w-full items-center justify-center gap-2 rounded-[16px] bg-naranja font-display text-[16.5px] font-bold text-white transition-colors hover:bg-naranja-hondo disabled:cursor-not-allowed disabled:opacity-45"
+        className="cta-naranja entra-app mt-3 flex h-[54px] w-full items-center justify-center gap-2 rounded-[16px] font-display text-[16.5px] font-bold text-white disabled:cursor-not-allowed disabled:opacity-45"
         style={{ ["--paso" as string]: 3 }}
       >
         Buscar viajes

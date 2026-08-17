@@ -1494,6 +1494,79 @@ html.app-instalada body {
   --color-ambar-fuerte: #d99000;
 }
 
+/* ═══════════════════════════════════════════════════════════════════════
+   LE BOUTON ORANGE — UNE SEULE DÉFINITION POUR LES DEUX MOITIÉS.
+
+   Le site et l'app ne se ressemblaient pas, et voici pourquoi : le
+   bouton principal du SITE était `bg-ink-900`, c'est-à-dire presque
+   noir, quand celui de l'APP est orange. Deux boutons principaux de deux
+   couleurs différentes sur le même produit — c'est la première chose
+   qu'on remarque, et c'est ce qui a été remarqué.
+
+   L'orange gagne : c'est la couleur de la marque, elle a du punch, et
+   c'est déjà celle que porte l'app. Le noir devient l'action secondaire.
+
+   Le relief vient de trois couches, pas d'une ombre grise posée dessus :
+
+     · un DÉGRADÉ très court du haut vers le bas — deux tons d'orange
+       seulement, assez pour que la surface ne soit pas plate, pas assez
+       pour qu'on voie un dégradé ;
+     · une ombre PORTÉE COLORÉE, dans l'orange lui-même et pas en gris :
+       une ombre grise sous un objet saturé le salit, une ombre teintée
+       le fait flotter ;
+     · un liseré clair en haut, à l'intérieur, qui simule la lumière qui
+       tombe. C'est ce détail qui fait « bouton physique ».
+
+   Au survol il monte d'un pixel et son ombre s'écarte ; à l'appui il
+   s'enfonce et l'ombre se resserre. Les deux mouvements sont ceux d'un
+   objet réel qu'on presse.
+   ═══════════════════════════════════════════════════════════════════════ */
+.cta-naranja {
+  background-image: linear-gradient(
+    180deg,
+    var(--color-naranja-vivo, #f4692a) 0%,
+    var(--color-naranja, #e2540c) 62%,
+    var(--color-naranja-hondo, #c2470a) 100%
+  );
+  color: #fff;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.28),
+    0 1px 2px rgb(120 40 6 / 0.28),
+    0 10px 22px -10px rgb(206 74 12 / 0.62);
+  transition:
+    transform 140ms cubic-bezier(0.2, 0.9, 0.2, 1),
+    box-shadow 140ms cubic-bezier(0.2, 0.9, 0.2, 1),
+    filter 140ms ease;
+}
+.cta-naranja:hover:not(:disabled) {
+  transform: translateY(-1px);
+  filter: saturate(1.06);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.32),
+    0 2px 4px rgb(120 40 6 / 0.26),
+    0 16px 30px -12px rgb(206 74 12 / 0.7);
+}
+.cta-naranja:active:not(:disabled) {
+  transform: translateY(0.5px) scale(0.988);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.2),
+    0 1px 2px rgb(120 40 6 / 0.3),
+    0 6px 14px -8px rgb(206 74 12 / 0.55);
+}
+.cta-naranja:disabled {
+  box-shadow: none;
+  filter: grayscale(0.35);
+}
+/* Le mouvement se coupe pour qui le demande — la couleur, elle, reste. */
+@media (prefers-reduced-motion: reduce) {
+  .cta-naranja,
+  .cta-naranja:hover:not(:disabled),
+  .cta-naranja:active:not(:disabled) {
+    transform: none;
+    transition: none;
+  }
+}
+
 /* ---- L'écran de bienvenue ---- */
 @media (prefers-reduced-motion: no-preference) {
   @keyframes bienvenidaFondo {

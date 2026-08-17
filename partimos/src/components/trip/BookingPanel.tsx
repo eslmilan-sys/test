@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { PlacePicker } from "@/components/ui/PlacePicker";
@@ -19,6 +19,7 @@ import { CashMark, TarjetaMark, YappyBubbles } from "@/components/ui/PayMark";
 import { quoteDetour } from "@/lib/detour";
 import { detourKm, type Punto } from "@/lib/desvio";
 import { proponerPuntos, type Propuesta } from "@/lib/recogida";
+import type { PlaceRef } from "@/lib/place";
 import { lugaresCerca } from "@/lib/geosearch";
 import { bookingDisclaimer } from "@/lib/content";
 import { TRIPS_ARE_DEMO } from "@/lib/config";
@@ -64,6 +65,13 @@ type Props = {
    *  qu'on mesure le détour d'un point proposé — pas par rapport à la
    *  ville. Vide, on retombe sur le curseur manuel. */
   route?: Punto[];
+  /** LE LIEU CHOISI À LA RECHERCHE. La personne a déjà dit d'où elle
+   *  part ; le lui redemander pour pouvoir enfin lui proposer des points
+   *  était absurde, et c'est ce qui faisait qu'aucune recommandation
+   *  n'apparaissait jamais. */
+  lugarBuscado?: PlaceRef | null;
+  /** Le point de départ DÉCLARÉ par le conducteur. */
+  puntoConductor?: { nombre: string; punto: Punto } | null;
 };
 
 export function BookingPanel({
@@ -83,6 +91,8 @@ export function BookingPanel({
   toSlug,
   boardingAt,
   route = [],
+  lugarBuscado = null,
+  puntoConductor = null,
 }: Props) {
   const { session, isDemo, updateSession } = useSession();
   const [seats, setSeats] = useState(1);
@@ -140,16 +150,33 @@ export function BookingPanel({
      synchrone dans l'effet déclenche des rendus en cascade (le
      compilateur React le refuse, à raison). Sans point, il n'y a rien à
      proposer — ça se lit, ça ne s'écrit pas. */
-  const cercanos = pointCoords ? sugeridos : [];
+  /* LA POSITION DE DÉPART pour les recommandations : celle qu'on vient
+     de saisir, sinon celle de la recherche. C'est ce repli qui fait
+     apparaître les propositions DÈS l'ouverture de l'écran, au lieu
+     d'attendre qu'on retape ce qu'on a déjà dit. */
+  const latBuscada = lugarBuscado?.lat ?? null;
+  const lngBuscada = lugarBuscado?.lng ?? null;
+  /* MÉMOÏSÉ : un objet recréé à chaque rendu relancerait la requête de
+     lieux proches en boucle. Ce sont les deux nombres qui comptent, pas
+     l'identité de l'objet. */
+  const origenPropuestas = useMemo(
+    () =>
+      pointCoords ??
+      (latBuscada !== null && lngBuscada !== null
+        ? { lat: latBuscada, lng: lngBuscada }
+        : null),
+    [pointCoords, latBuscada, lngBuscada],
+  );
+  const cercanos = origenPropuestas ? sugeridos : [];
   useEffect(() => {
-    if (!pointCoords || route.length === 0) return;
+    if (!origenPropuestas || route.length === 0) return;
     const ctrl = new AbortController();
     let vivo = true;
-    void lugaresCerca(pointCoords, ctrl.signal).then((lugares) => {
+    void lugaresCerca(origenPropuestas, ctrl.signal).then((lugares) => {
       if (!vivo) return;
       setSugeridos(
         proponerPuntos(
-          pointCoords,
+          origenPropuestas,
           route,
           lugares
             .filter((l) => l.lat !== null && l.lng !== null)
@@ -162,7 +189,7 @@ export function BookingPanel({
       vivo = false;
       ctrl.abort();
     };
-  }, [pointCoords, route]);
+  }, [origenPropuestas, route]);
 
   const measuredKm =
     pointCoords && route.length > 0 ? detourKm(pointCoords, route) : null;
@@ -372,6 +399,42 @@ export function BookingPanel({
               onCoords={setPointCoords}
               placeholder="Ej. Multiplaza, Vía Israel, frente al parque…"
             />
+            {/* « JE VAIS AU POINT DU CONDUCTEUR » — l'option qui manquait,
+                et elle est la plus honnête de toutes : c'est là qu'il
+                part DÉJÀ. Zéro détour, zéro négociation, zéro kilomètre
+                ajouté au calcul. Elle passe donc en premier, avant les
+                lieux proches : quand elle convient, plus rien d'autre
+                n'a besoin d'être décidé. */}
+            {puntoConductor && (
+              <button
+                type="button"
+                onClick={() => {
+                  setCustomPoint(puntoConductor.nombre);
+                  setPointCoords(puntoConductor.punto);
+                }}
+                className={`mt-2.5 flex w-full items-center gap-2.5 rounded-[12px] border px-3.5 py-2.5 text-left transition-colors ${
+                  customPoint === puntoConductor.nombre
+                    ? "border-ink-900 bg-ink-900 text-white"
+                    : "border-ink-200 bg-white hover:border-accent"
+                }`}
+              >
+                <Icon name="pin" className="size-4 shrink-0" />
+                <span className="min-w-0 flex-1">
+                  <span className="block text-[14px] font-semibold">
+                    Voy al punto de {driverName}
+                  </span>
+                  <span
+                    className={`block text-[12.5px] ${
+                      customPoint === puntoConductor.nombre
+                        ? "text-white/70"
+                        : "text-ink-500"
+                    }`}
+                  >
+                    {puntoConductor.nombre} · sin desvío
+                  </span>
+                </span>
+              </button>
+            )}
             {cercanos.length > 0 && (
               <div className="mt-2.5">
                 <p className="mb-1.5 text-[11.5px] font-bold tracking-[0.09em] text-ink-500 uppercase">

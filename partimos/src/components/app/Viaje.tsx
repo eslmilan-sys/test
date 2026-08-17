@@ -3,12 +3,14 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { deParams } from "@/lib/place";
 import * as Dialog from "@radix-ui/react-dialog";
 import { Icon } from "@/components/ui/Icon";
 import { Nota, BadgeTop } from "@/components/ui/Reputacion";
 import { esTopConductor } from "@/lib/conductor";
 import { BookingPanel } from "@/components/trip/BookingPanel";
 import { routePoints } from "@/lib/desvio";
+import { ALL_CITIES } from "@/lib/corridors";
 import { findSegment } from "@/lib/segments";
 import { formatDuration, formatUsd } from "@/lib/pricing";
 import {
@@ -66,6 +68,18 @@ export function Viaje({ trip, corridor }: { trip: Trip; corridor: Corridor }) {
       new Date(match.boardingAt).getTime()) /
       60_000,
   );
+  /* LE POINT DE DÉPART DÉCLARÉ par le conducteur, avec ses coordonnées.
+     `Waypoint` ne porte qu'un slug ; le catalogue des villes porte le
+     point. C'est la seule option dont on sait avec certitude qu'elle ne
+     fait dévier de rien : c'est là que le conducteur part déjà. */
+  const ciudadSalida = ALL_CITIES.find((c) => c.slug === segment.from.citySlug);
+  const puntoConductor = ciudadSalida
+    ? {
+        nombre: segment.from.name,
+        punto: { lat: ciudadSalida.lat, lng: ciudadSalida.lng },
+      }
+    : null;
+
   const fecha = trip.departureAt.slice(0, 10);
 
   return (
@@ -249,7 +263,7 @@ export function Viaje({ trip, corridor }: { trip: Trip; corridor: Corridor }) {
               <button
                 type="button"
                 disabled={match.seatsFree < 1}
-                className="ml-auto flex h-[50px] flex-1 items-center justify-center gap-2 rounded-[16px] bg-naranja font-display text-[15.5px] font-bold text-white transition-colors hover:bg-naranja-hondo disabled:opacity-45"
+                className="cta-naranja ml-auto flex h-[50px] flex-1 items-center justify-center gap-2 rounded-[16px] font-display text-[15.5px] font-bold text-white disabled:opacity-45"
               >
                 {trip.instantBooking ? "Reservar" : "Pedir el puesto"}
                 <Icon name="arrowRight" className="size-[17px]" />
@@ -282,6 +296,15 @@ export function Viaje({ trip, corridor }: { trip: Trip; corridor: Corridor }) {
                     key={`${trip.id}-${segment.fromIndex}-${segment.toIndex}`}
                     tripId={trip.id}
                     initialPoint={params.get("punto") ?? ""}
+                    /* LE LIEU CHOISI À LA RECHERCHE arrive enfin jusqu'ici.
+                       Sans lui, le panneau démarrait sans position, donc
+                       sans recommandations — d'où « je n'ai aucune
+                       proposition de lieu ». La personne avait pourtant
+                       DÉJÀ dit d'où elle part, deux écrans plus tôt. */
+                    lugarBuscado={deParams(params, "o")}
+                    /* Le point de départ DÉCLARÉ par le conducteur : il
+                       devient une option à part entière (zéro détour). */
+                    puntoConductor={puntoConductor}
                     fromSlug={segment.from.citySlug}
                     toSlug={segment.to.citySlug}
                     boardingAt={match.boardingAt}

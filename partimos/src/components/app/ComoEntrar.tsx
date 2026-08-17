@@ -98,7 +98,7 @@ export function ComoEntrar({
           <button
             type="button"
             onClick={onCorreo}
-            className="flex h-[56px] items-center justify-center gap-3 rounded-full bg-naranja px-6 font-display text-[16px] font-bold text-white transition-colors hover:bg-naranja-hondo"
+            className="cta-naranja flex h-[56px] items-center justify-center gap-3 rounded-full px-6 font-display text-[16px] font-bold text-white transition-colors"
           >
             <Icon name="mail" className="size-5" />
             Continuar con mi correo

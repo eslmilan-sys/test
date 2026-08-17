@@ -759,7 +759,7 @@ function Verificacion() {
             type="button"
             onClick={() => void verificar()}
             disabled={abriendo}
-            className="mt-3 flex h-[54px] w-full items-center justify-center gap-2.5 rounded-[16px] bg-naranja font-display text-[16px] font-bold text-white transition-colors hover:bg-naranja-hondo disabled:opacity-50"
+            className="cta-naranja mt-3 flex h-[54px] w-full items-center justify-center gap-2.5 rounded-[16px] font-display text-[16px] font-bold text-white disabled:opacity-50"
           >
             <Icon name="id" className="size-5" />
             {abriendo ? "Abriendo…" : "Verificar mi cédula ahora"}
