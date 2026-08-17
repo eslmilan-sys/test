@@ -3,12 +3,12 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ALL_CITIES, buildRoute } from "@/lib/corridors";
+import { irArriba } from "@/lib/navegar";
+import { ALL_CITIES,  } from "@/lib/corridors";
 import { useSession } from "@/lib/session";
 import { Button } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
 import { CityCombobox } from "@/components/ui/CityCombobox";
-import { RouteMap } from "@/components/map/RouteMap";
 import { localIso, SEARCH_HORIZON_DAYS } from "@/lib/trips";
 import { saveLastSearch, useHydrated, useLastSearch } from "@/lib/lastsearch";
 
@@ -67,23 +67,7 @@ export function SearchCard() {
   const hydrated = useHydrated();
   const [dateChoice, setDateChoice] = useState<string | null>(null);
   const date = dateChoice ?? days[0].value;
-  const [showMap, setShowMap] = useState(false);
-  // Sur la carte, le premier clic renseigne l'origine, le suivant la
-  // destination. Alterner évite un sélecteur « je choisis quoi » de plus.
-  const [picking, setPicking] = useState<"origin" | "destination">("origin");
-
   const sameCity = from === to;
-
-  function pickOnMap(slug: string) {
-    if (picking === "origin") {
-      setFromChoice(slug);
-      if (slug === to) setToChoice("");
-      setPicking("destination");
-    } else {
-      setToChoice(slug);
-      setPicking("origin");
-    }
-  }
 
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
@@ -91,6 +75,7 @@ export function SearchCard() {
     saveLastSearch({ from, to, seats, date });
 
     if (mode === "ofrecer") {
+      irArriba();
       router.push(`/publicar/nuevo?desde=${from}&hacia=${to}`);
       return;
     }
@@ -99,6 +84,7 @@ export function SearchCard() {
        routier (buildRoute), et la page de résultats sait dire « rien
        pour cette date » avec l'alerte. L'ancien barrage « esa ruta no
        está abierta » datait des corridors fermés — supprimé. */
+    irArriba();
     router.push(
       `/buscar?desde=${from}&hacia=${to}&fecha=${date}&puestos=${seats}`,
     );
@@ -157,35 +143,13 @@ export function SearchCard() {
         </div>
       </div>
 
-      <div className="flex items-center justify-between gap-3 px-5 pb-2">
-        <div
-          role="group"
-          aria-label="Cómo escoger las ciudades"
-          className="flex gap-1"
-        >
-          {(
-            [
-              [false, "Escribir", "search"],
-              [true, "Mapa", "pin"],
-            ] as const
-          ).map(([value, label, icon]) => (
-            <button
-              key={label}
-              type="button"
-              aria-pressed={showMap === value}
-              onClick={() => setShowMap(value)}
-              className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[13.5px] font-semibold transition-colors ${
-                showMap === value
-                  ? "bg-ink-900 text-white"
-                  : "text-ink-500 hover:bg-ink-50"
-              }`}
-            >
-              <Icon name={icon} className="size-3.5" />
-              {label}
-            </button>
-          ))}
-        </div>
-      </div>
+      {/* LE SEGMENTÉ « Escribir / Mapa » A DISPARU AVEC LA CARTE.
+
+          Il n'existait que pour choisir entre deux façons de remplir les
+          mêmes deux champs. La carte partie, il ne restait qu'un bouton
+          qui ne fait rien — et un segmenté à une seule option est un
+          bouton qui ment sur son rôle. Écrire est le seul chemin, donc
+          il n'a plus besoin d'être annoncé. */}
 
       <form onSubmit={handleSubmit} noValidate>
         <CityCombobox
@@ -255,21 +219,6 @@ export function SearchCard() {
         </div>
         )}
 
-        {/* La carte n'est pas un extra caché derrière un lien : c'est l'autre
-            façon de renseigner les deux mêmes champs. Elle mérite donc une
-            place égale, et elle montre d'un coup d'œil ce que couvre la
-            plateforme — ce que sept lignes de liste ne diront jamais. */}
-        {showMap && (
-          <div className="mt-2 rounded-[20px] border border-ink-200 bg-ink-50/70 p-3">
-            <RouteMap
-              originSlug={from}
-              destinationSlug={to}
-              route={buildRoute(from, to) ?? undefined}
-              picking={picking}
-              onPick={pickOnMap}
-            />
-          </div>
-        )}
 
         {sameCity && (
           <p

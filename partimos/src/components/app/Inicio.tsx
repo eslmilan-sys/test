@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { irArriba } from "@/lib/navegar";
 import { Icon } from "@/components/ui/Icon";
 import { GlassIcon, type GlassTone } from "@/components/ui/GlassIcon";
 import { LogoMark } from "@/components/site/Logo";
@@ -89,6 +90,7 @@ export function Inicio() {
       ...aParams(desdeLugar, "o"),
       ...aParams(haciaLugar, "d"),
     });
+    irArriba();
     router.push(`/buscar?${params}`);
   }
 

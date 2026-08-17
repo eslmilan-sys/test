@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { irArriba } from "@/lib/navegar";
 import { saveLastSearch } from "@/lib/lastsearch";
 import { track } from "@/lib/analytics";
 import Link from "next/link";
@@ -164,6 +165,7 @@ export function SearchResults() {
       fecha: next.date,
       puestos: String(next.seats),
     });
+    irArriba();
     router.push(`/buscar?${q}`);
   }
 
