@@ -14,7 +14,6 @@ import {
   type TripMatch,
 } from "@/lib/trips";
 import { formatUsd } from "@/lib/pricing";
-import { Mapa } from "./Mapa";
 
 /**
  * BUSCAR — les résultats, d'après la maquette du propriétaire.
@@ -189,8 +188,6 @@ export function Buscar() {
   const [soloVerificados, setSoloVerificados] = useState(false);
   const [soloDirectos, setSoloDirectos] = useState(false);
   const [filtrosAbiertos, setFiltrosAbiertos] = useState(false);
-  const [vista, setVista] = useState<"lista" | "mapa">("lista");
-  const [activo, setActivo] = useState(0);
 
   const matches = useMemo(
     () => (hacia ? searchTrips(desde, hacia, fecha, puestos) : []),
@@ -304,29 +301,17 @@ export function Buscar() {
             </select>
           </label>
 
-          {/* LISTA / MAPA. Deux réponses à deux questions : la liste dit
-              QUAND on part, la carte dit PAR OÙ on passe. Un segmenté,
-              pas deux onglets de page : on ne change pas d'écran, on
-              change de lecture des mêmes résultats. */}
-          <div
-            role="group"
-            aria-label="Cómo ver los resultados"
-            className="ml-auto flex shrink-0 items-center rounded-full border border-ink-200 bg-white p-0.5"
-          >
-            {(["lista", "mapa"] as const).map((v) => (
-              <button
-                key={v}
-                type="button"
-                onClick={() => setVista(v)}
-                aria-pressed={vista === v}
-                className={`rounded-full px-3 py-1 text-[13px] font-semibold capitalize transition-colors ${
-                  vista === v ? "bg-naranja text-white" : "text-ink-500"
-                }`}
-              >
-                {v}
-              </button>
-            ))}
-          </div>
+          {/* LA VUE CARTE A ÉTÉ RETIRÉE, sur demande explicite et répétée
+              du propriétaire (« la mapo franchement tu peux l'enlever »,
+              puis « delete opcion search in map, everywhere »).
+
+              Elle promettait plus qu'elle ne tenait : sans tracé réel
+              des routes, elle montrait des points reliés en ligne
+              droite — donc « par où on passe » était une invention. Une
+              carte qui ment sur l'itinéraire est pire qu'une liste
+              honnête, surtout sur un produit où le passager décide de
+              monter dans la voiture d'un inconnu à partir de ce qu'il
+              voit à l'écran. */}
         </div>
 
         {filtrosAbiertos && (
@@ -389,16 +374,6 @@ export function Buscar() {
               Ver otras fechas
             </Link>
           </div>
-        ) : vista === "mapa" ? (
-          /* L'index du viaje mis en avant est BORNÉ ici, pas rangé
-             corrigé dans l'état : un filtre qui raccourcit la liste ne
-             doit pas pouvoir laisser un index qui pointe dans le vide. */
-          <Mapa
-            matches={visibles}
-            activo={Math.min(activo, visibles.length - 1)}
-            onActivo={setActivo}
-            desde={desde}
-          />
         ) : (
           <ul className="grid gap-2.5">
             {visibles.map((m) => (

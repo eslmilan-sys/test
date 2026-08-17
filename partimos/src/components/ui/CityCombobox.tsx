@@ -132,6 +132,25 @@ export function CityCombobox({
      parce que c'est le corridor qui y mène. Débouncé, annulable,
      silencieux sans jeton. */
   const [remote, setRemote] = useState<PlaceRef[]>([]);
+
+  /* LA MÉMOIRE DU LIEU CHOISI, DANS LE COMPOSANT LUI-MÊME.
+     ─────────────────────────────────────────────────────────────────
+     Corriger ça dans l'écran d'accueil ne corrigeait qu'UN écran sur
+     six : le site, /ya, la publication et le résumé de recherche
+     gardaient chacun leur état, et aucun ne rangeait le lieu. Résultat,
+     le bug « je tape une adresse exacte et ça affiche la grande ville »
+     survivait partout ailleurs — signalé, à juste titre.
+
+     Un composant qui perd l'information qu'on vient de lui donner est
+     fautif, quel que soit son appelant. Il la garde donc lui-même. Les
+     écrans qui veulent la piloter passent `lugar` et gagnent ; les
+     autres n'ont rien à faire. */
+  const [elegido, setElegido] = useState<PlaceRef | null>(null);
+  /* Si l'écran change la ville de l'extérieur (échange origine/
+     destination, retour, valeur par défaut), le lieu mémorisé ne
+     correspond plus : on l'oublie plutôt que d'afficher « Multiplaza »
+     au-dessus de « David ». */
+  const mostrado = lugar ?? (elegido && elegido.citySlug === value ? elegido : null);
   const [resolving, setResolving] = useState<string | null>(null);
   /* Jamais un clic qui ne fait rien : quand un lieu ne peut pas devenir
      une ville (échec de résolution, ou même ville que l'autre champ),
@@ -199,7 +218,9 @@ export function CityCombobox({
     onPlace?.(r.nombre, city.slug);
     /* L'OBJET ENTIER, avec les coordonnées enfin résolues : c'est lui
        qui sera réaffiché dans le champ et transporté dans l'URL. */
-    onPlaceRef?.({ ...r, citySlug: city.slug, lat: coords.lat, lng: coords.lng });
+    const escogido = { ...r, citySlug: city.slug, lat: coords.lat, lng: coords.lng };
+    setElegido(escogido);
+    onPlaceRef?.(escogido);
     setOpen(false);
   };
 
@@ -251,7 +272,7 @@ export function CityCombobox({
                `lugar?.nombre` d'abord ; la ville seulement quand aucun
                lieu précis n'a été choisi — c'est-à-dire quand la ville
                EST le choix, le seul cas où l'afficher est honnête. */
-            value={open ? query : (lugar?.nombre ?? selected?.name ?? "")}
+            value={open ? query : (mostrado?.nombre ?? selected?.name ?? "")}
             placeholder={placeholder}
             /* ROUVRIR AU CLIC, pas seulement au focus. Après avoir choisi une
                ville, le champ GARDE le focus : le retoucher n'émettait donc
@@ -291,6 +312,7 @@ export function CityCombobox({
                   onChange(results[0].slug);
                   onPlace?.("", results[0].slug);
                   onPlaceRef?.(null);
+                  setElegido(null);
                   setOpen(false);
                 } else if (placeResults[0]) {
                   onChange(placeResults[0].citySlug);
@@ -307,9 +329,9 @@ export function CityCombobox({
           {/* LA VILLE SOUS LE LIEU. Elle reste lisible — on veut savoir
               d'où part le viaje — mais en secondaire, parce qu'elle est
               un complément d'adresse et pas l'intention. */}
-          {!open && lugar && lugar.contexto && (
+          {!open && mostrado && mostrado.contexto && (
             <span className="mt-0.5 block truncate text-[12px] leading-tight text-ink-400">
-              {lugar.contexto}
+              {mostrado.contexto}
             </span>
           )}
         </div>
@@ -343,6 +365,7 @@ export function CityCombobox({
                   onChange(city.slug);
                   onPlace?.("", city.slug);
                   onPlaceRef?.(null);
+                  setElegido(null);
                   setOpen(false);
                 }}
                 className="flex cursor-pointer items-baseline justify-between gap-3 rounded-[10px] px-3 py-2.5 text-[15px] data-[selected=true]:bg-ink-50"
@@ -369,15 +392,17 @@ export function CityCombobox({
                        « Albrook Mall » : sans cette ligne, le lieu le
                        plus sûr de tous était justement celui qui se
                        faisait remplacer par sa ville. */
-                    onPlaceRef?.({
+                    const delCatalogo = {
                       nombre: place.name,
                       kind: adivinarKind(place.name),
                       citySlug: place.citySlug,
                       contexto: contextoDe(place.citySlug),
                       lat: placeCity.lat,
                       lng: placeCity.lng,
-                      fuente: "catalogo",
-                    });
+                      fuente: "catalogo" as const,
+                    };
+                    setElegido(delCatalogo);
+                    onPlaceRef?.(delCatalogo);
                     setOpen(false);
                   }}
                   className="flex cursor-pointer items-baseline justify-between gap-3 rounded-[10px] px-3 py-2.5 text-[15px] data-[selected=true]:bg-ink-50"
