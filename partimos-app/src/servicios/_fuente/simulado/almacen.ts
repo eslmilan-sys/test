@@ -13,6 +13,8 @@ import { corredores } from './geografia';
 const CHITRE = corredores.find((c) => c.slug === 'panama-chitre')!;
 
 export const VIAJE_CHITRE_ID = '55555555-5555-4555-8555-555555555555';
+/** El mismo viaje con el booleano de maletas apagado, para ver `7a` en su otra cara. */
+export const VIAJE_SIN_MALETAS_ID = '55555555-5555-4555-8555-555555555556';
 
 /**
  * El viaje del almacén sale hoy: así las cuentas atrás de `11a` — «expira en
@@ -85,6 +87,13 @@ export const viajes: ViajeFila[] = [
     accepts_luggage: true,
   },
 ];
+
+viajes.push({
+  ...viajes[0],
+  id: VIAJE_SIN_MALETAS_ID,
+  seats_offered: 2,
+  accepts_luggage: false,
+});
 
 export const paradas: TripStop[] = [
   {

@@ -11,11 +11,11 @@ import { color, espacio, radio, texto } from '@/ui/tokens';
 const HECHAS = [
   { id: '5c', titulo: 'Publicar', ruta: '/(conductor)/publicar' as const },
   { id: '11a', titulo: 'Solicitudes de puesto', ruta: '/(conductor)/solicitudes' as const },
+  { id: '7a', titulo: 'Reserva', ruta: '/(pasajero)/reservar' as const },
+  { id: '7b', titulo: 'Pago del aporte', ruta: '/(pasajero)/pagar' as const },
 ];
 
 const PENDIENTES = [
-  '7a  Reservar',
-  '7b  Pagar',
   '1f / 1g  Códigos de abordaje',
   '1i  Llegada y liberación',
 ];

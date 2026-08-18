@@ -20,6 +20,47 @@ export const HORAS_PARA_RESPONDER = 4;
 /** Dónde te recoge: una parada de la ruta, o una dirección que escribes tú. */
 export type Punto = { paradaId: string } | { direccionPropia: string };
 
+/** Lo que `7a` necesita antes de que el pasajero toque nada. */
+export type ReservaPreparada = {
+  viajeId: string;
+  conductor: string;
+  destino: string;
+  salida: string;
+  /** La primera parada de la ruta, de donde arranca el carro. */
+  origen: { etiqueta: string; hora: string };
+  aporteCentavos: number;
+  /** El booleano del conductor. El formulario entero depende de él. */
+  aceptaMaletas: boolean;
+  /** Lo que el punto del pasajero le añade al conductor. */
+  minutosDeDesvio: number;
+};
+
+export async function prepararReserva(viajeId: string): Promise<ReservaPreparada> {
+  const viaje = fuente.viajes.find((v) => v.id === viajeId);
+  if (!viaje) throw new Error(`No existe el viaje ${viajeId}`);
+
+  const conductor = fuente.perfiles.find((p) => p.id === viaje.driver_id);
+  const origen = fuente.paradas
+    .filter((p) => p.trip_id === viajeId)
+    .sort((a, b) => a.sequence - b.sequence)[0];
+
+  return demora({
+    viajeId,
+    conductor: conductor?.first_name ?? 'El conductor',
+    destino: (viaje.destination_label ?? '').split(' · ')[0],
+    salida: viaje.departure_at,
+    origen: {
+      etiqueta: origen?.custom_label ?? viaje.origin_label ?? '',
+      hora: origen?.scheduled_at ?? viaje.departure_at,
+    },
+    aporteCentavos: viaje.price_cents,
+    aceptaMaletas: viaje.accepts_luggage,
+    // Sin mapas de verdad el desvío es una estimación fija; ver «lo que es
+    // ingeniería» en el traspaso.
+    minutosDeDesvio: 4,
+  });
+}
+
 /**
  * Pide un puesto. No se cobra: queda pendiente hasta que el conductor acepte.
  */

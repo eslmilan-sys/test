@@ -4,8 +4,8 @@
  * Interruptor (48 × 30, pulgar de 24, recorrido de 18).
  */
 
-import type { ReactNode } from 'react';
-import { Pressable, StyleSheet, Text, View, type ViewStyle } from 'react-native';
+import { type ReactNode, useState } from 'react';
+import { Pressable, StyleSheet, Text, TextInput, View, type ViewStyle } from 'react-native';
 
 import { familia, color, radio, texto } from './tokens';
 
@@ -165,6 +165,43 @@ export function Boton({
   );
 }
 
+/* ----------------------------------------------------------------- Campo */
+
+type CampoProps = {
+  valor: string;
+  alEscribir: (v: string) => void;
+  marcador?: string;
+  /** La línea que explica qué pasa con lo que escribes. */
+  ayuda?: string;
+  etiquetaAccesible: string;
+};
+
+export function Campo({ valor, alEscribir, marcador, ayuda, etiquetaAccesible }: CampoProps) {
+  const [enfocado, setEnfocado] = useState(false);
+  return (
+    <View>
+      <View
+        style={[
+          estilos.campo,
+          enfocado && { borderColor: color.rojo500 },
+        ]}
+      >
+        <TextInput
+          accessibilityLabel={etiquetaAccesible}
+          value={valor}
+          onChangeText={alEscribir}
+          placeholder={marcador}
+          placeholderTextColor={color.ink400}
+          onFocus={() => setEnfocado(true)}
+          onBlur={() => setEnfocado(false)}
+          style={estilos.campoTexto}
+        />
+      </View>
+      {ayuda ? <Text style={estilos.campoAyuda}>{ayuda}</Text> : null}
+    </View>
+  );
+}
+
 /* ---------------------------------------------------------------- Avatar */
 
 /** Un tono por persona, estable por el nombre, para que no cambie de pantalla en pantalla. */
@@ -309,4 +346,25 @@ const estilos = StyleSheet.create({
     alignSelf: 'flex-start',
   },
   insigniaPunto: { width: 6, height: 6, borderRadius: radio.pastilla, opacity: 0.85 },
+
+  campo: {
+    height: 52,
+    paddingHorizontal: 16,
+    justifyContent: 'center',
+    backgroundColor: color.blanco,
+    borderRadius: radio.control,
+    borderWidth: 1,
+    borderColor: color.bordePorDefecto,
+  },
+  campoTexto: {
+    fontSize: 16,
+    fontWeight: '500',
+    letterSpacing: -0.16,
+    color: color.ink900,
+    fontFamily: familia,
+    // en web el input trae su propio contorno al enfocarse
+    outlineStyle: 'none',
+  } as never,
+  campoAyuda: { marginTop: 6, fontSize: 12.5, color: color.ink400, fontFamily: familia },
 });
+
