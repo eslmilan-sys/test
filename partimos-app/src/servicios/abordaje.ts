@@ -147,6 +147,57 @@ export async function verificarCodigo(
   } as const);
 }
 
+/* ------------------------------------------------------------------ *
+ * Llegada — pantalla `1i`
+ * ------------------------------------------------------------------ */
+
+export type Llegada = {
+  reservaId: string;
+  /** El segundo código: el que cierra el viaje. */
+  digitos: string[];
+  ciudad: string;
+  lugar: string;
+  llegadaHora: string;
+  conductor: string;
+  /** Dónde le llega la plata al conductor. */
+  destinoDelDinero: string;
+  aporteCentavos: number;
+  /** Lo que Partimos se queda del aporte: nada. */
+  comisionCentavos: number;
+  totalCentavos: number;
+  liberado: boolean;
+};
+
+export async function resumenDeLlegada(reservaId: string): Promise<Llegada> {
+  const reserva = fuente.reservas.find((r) => r.id === reservaId);
+  if (!reserva) throw new Error(`No existe la reserva ${reservaId}`);
+
+  const viaje = fuente.viajes.find((v) => v.id === reserva.trip_id)!;
+  const conductor = fuente.perfiles.find((p) => p.id === viaje.driver_id);
+  const paradas = fuente.paradas
+    .filter((p) => p.trip_id === viaje.id)
+    .sort((a, b) => a.sequence - b.sequence);
+  const ultima = paradas[paradas.length - 1];
+  const etiqueta = ultima?.custom_label ?? viaje.destination_label ?? '';
+  const [ciudad, lugar] = etiqueta.split(' · ');
+
+  return demora({
+    reservaId,
+    digitos: reserva.arrival_code.split(''),
+    ciudad: ciudad ?? etiqueta,
+    lugar: lugar ?? '',
+    llegadaHora: ultima?.scheduled_at ?? viaje.arrival_estimate_at ?? viaje.departure_at,
+    conductor: conductor?.first_name ?? 'El conductor',
+    destinoDelDinero:
+      reserva.payment_channel === 'external' ? 'la mano, en efectivo' : 'su Yappy',
+    aporteCentavos: reserva.unit_price_cents * reserva.seats,
+    // El conductor recibe el aporte entero: la tarifa se cobró aparte.
+    comisionCentavos: 0,
+    totalCentavos: reserva.unit_price_cents * reserva.seats,
+    liberado: reserva.released_at != null,
+  });
+}
+
 /** Nadie apareció. Sin marca de abordaje, el aporte no se libera. */
 export async function marcarNoShow(reservaId: string): Promise<ReservaFila> {
   return demora(

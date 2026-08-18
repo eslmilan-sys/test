@@ -86,6 +86,39 @@ export function CampoRojo({
   );
 }
 
+/**
+ * `--grad-sunrise`: azul frío en una esquina, rosa cálido en la contraria y luz
+ * de arena en medio. El blanco del centro es lo que impide que vire a morado.
+ */
+export function Amanecer({ ancho = 346, alto = 260 }: { ancho?: number; alto?: number }) {
+  return (
+    <Svg width={ancho} height={alto} style={StyleSheet.absoluteFill}>
+      <Defs>
+        <LinearGradient id="amanecer-base" x1="0.2" y1="0" x2="0.8" y2="1">
+          <Stop offset="0" stopColor="#F2F8FC" />
+          <Stop offset="1" stopColor="#FFF8F2" />
+        </LinearGradient>
+        <RadialGradient id="amanecer-azul" cx="0.5" cy="0.5" r="0.5">
+          <Stop offset="0" stopColor="#8CBEDD" stopOpacity="1" />
+          <Stop offset="0.62" stopColor="#8CBEDD" stopOpacity="0" />
+        </RadialGradient>
+        <RadialGradient id="amanecer-rosa" cx="0.5" cy="0.5" r="0.5">
+          <Stop offset="0" stopColor="#F2A0AC" stopOpacity="1" />
+          <Stop offset="0.66" stopColor="#F2A0AC" stopOpacity="0" />
+        </RadialGradient>
+        <RadialGradient id="amanecer-arena" cx="0.5" cy="0.5" r="0.5">
+          <Stop offset="0" stopColor="#FFDCC0" stopOpacity="1" />
+          <Stop offset="0.72" stopColor="#FFDCC0" stopOpacity="0" />
+        </RadialGradient>
+      </Defs>
+      <Rect x="0" y="0" width={ancho} height={alto} fill="url(#amanecer-base)" />
+      <Ellipse cx={0.14 * ancho} cy={0.1 * alto} rx={0.58 * ancho} ry={0.66 * alto} fill="url(#amanecer-azul)" />
+      <Ellipse cx={0.86 * ancho} cy={0.86 * alto} rx={0.62 * ancho} ry={0.7 * alto} fill="url(#amanecer-rosa)" />
+      <Ellipse cx={0.52 * ancho} cy={0.52 * alto} rx={0.74 * ancho} ry={0.62 * alto} fill="url(#amanecer-arena)" />
+    </Svg>
+  );
+}
+
 const estilos = StyleSheet.create({
   motivo: { position: 'absolute', right: -18, bottom: -10, opacity: 0.2 },
 });

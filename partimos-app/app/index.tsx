@@ -15,11 +15,11 @@ const HECHAS = [
   { id: '7b', titulo: 'Pago del aporte', ruta: '/(pasajero)/pagar' as const },
   { id: '1f', titulo: 'Código de abordaje · pasajero', ruta: '/(pasajero)/codigo' as const },
   { id: '1g', titulo: 'Código de abordaje · conductor', ruta: '/(conductor)/abordaje' as const },
+  { id: '1i', titulo: 'Llegada y liberación', ruta: '/(pasajero)/llegada' as const },
 ];
 
-const PENDIENTES = [
-  '1i  Llegada y liberación',
-];
+/** Lo siguiente, ya fuera del bloque de riesgo: el descubrimiento del pasajero. */
+const PENDIENTES = ['3a  Inicio', '1b / 3b  Resultados', '5a  Detalle del viaje'];
 
 export default function Indice() {
   return (

@@ -17,6 +17,12 @@ Pantallas hechas, por orden de riesgo:
 | Id | Pantalla | Ruta |
 | --- | --- | --- |
 | `5c` | Publicar | `/(conductor)/publicar` |
+| `11a` | Solicitudes de puesto | `/(conductor)/solicitudes` |
+| `7a` | Reserva | `/(pasajero)/reservar` |
+| `7b` | Pago del aporte | `/(pasajero)/pagar` |
+| `1f` | Código de abordaje · pasajero | `/(pasajero)/codigo` |
+| `1g` | Código de abordaje · conductor | `/(conductor)/abordaje` |
+| `1i` | Llegada y liberación | `/(pasajero)/llegada` |
 
 ## Cómo está montada
 
@@ -69,9 +75,15 @@ la salida, el conductor se queda 1 $ por el puesto que ya no vende.
 ## Lo que la base todavía no tiene
 
 Está en `src/tipos/index.ts`, bajo «pendiente de migración», con nombre propio
-para que la migración sea mecánica: el booleano de maletas en `trips`, el tope
-en `corridors`, y en `bookings` el código de abordaje, la marca de abordaje, la
-caducidad de la solicitud, los minutos de desvío, la liberación del aporte y los
-contadores de equipaje. Falta además el estado «rechazada» en `booking_status`.
+para que la migración sea mecánica:
+
+- `trips.accepts_luggage` — el booleano de maletas de `5c`.
+- `corridors.max_price_cents` — el tope por ruta.
+- `bookings`: `boarding_code` y `arrival_code` (son dos códigos distintos: uno
+  abre el viaje en `1f`/`1g` y otro lo cierra en `1i`), `boarded_at`,
+  `released_at`, `expires_at` para las 4 h de `11a`, `detour_minutes`, y
+  `mochilas` / `maletas`.
+- `booking_status` necesita «rechazada»: hoy no hay estado para que el conductor
+  diga que no sin cancelar una reserva confirmada.
 
 No se ha tocado la base de producción.

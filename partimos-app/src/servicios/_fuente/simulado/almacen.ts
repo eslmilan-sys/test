@@ -198,6 +198,7 @@ const reservaBase = (extra: Partial<ReservaFila>): ReservaFila => ({
   payment_channel: 'yappy_app',
   // pendiente de migración
   boarding_code: '0000',
+  arrival_code: '0000',
   boarded_at: null,
   expires_at: AHORA,
   detour_minutes: null,
@@ -222,6 +223,7 @@ export const reservas: ReservaFila[] = [
     mochilas: 1,
     maletas: 1,
     boarding_code: '5521',
+    arrival_code: '9084',
   }),
   reservaBase({
     id: '77777777-7777-4777-8777-777777777701',
@@ -231,6 +233,7 @@ export const reservas: ReservaFila[] = [
     mochilas: 1,
     maletas: 1,
     boarding_code: '4917',
+    arrival_code: '2610',
     expires_at: enMinutos(220), // 3 h 40
     created_at: haceMinutos(20),
   }),
@@ -242,6 +245,7 @@ export const reservas: ReservaFila[] = [
     mochilas: 1,
     maletas: 0,
     boarding_code: '2384',
+    arrival_code: '7431',
     expires_at: enMinutos(50), // menos de 1 h: pastilla roja sólida
     created_at: haceMinutos(190),
   }),
@@ -257,6 +261,7 @@ reservas.push(
     confirmed_at: haceMinutos(2880),
     proposed_point: 'Albrook · bahía 4',
     boarding_code: '3179',
+    arrival_code: '8052',
     maletas: 1,
   }),
   reservaBase({
@@ -267,6 +272,7 @@ reservas.push(
     confirmed_at: haceMinutos(2900),
     proposed_point: 'Albrook · bahía 4',
     boarding_code: '6042',
+    arrival_code: '1596',
     boarded_at: haceMinutos(3),
   }),
   reservaBase({
@@ -277,6 +283,7 @@ reservas.push(
     confirmed_at: haceMinutos(3000),
     proposed_point: 'Vía Brasil',
     boarding_code: '8465',
+    arrival_code: '4728',
     boarded_at: haceMinutos(1),
     payment_channel: 'external',
     service_fee_cents: 0,

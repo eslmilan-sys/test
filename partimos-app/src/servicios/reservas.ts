@@ -105,7 +105,8 @@ export async function pedirPuesto(
     offer_price_cents: null,
     offer_accepted: null,
     payment_channel: canal,
-    boarding_code: nuevoCodigoDeAbordaje(),
+    boarding_code: nuevoCodigo(),
+    arrival_code: nuevoCodigo(),
     boarded_at: null,
     expires_at: new Date(ahora.getTime() + HORAS_PARA_RESPONDER * 3600_000).toISOString(),
     detour_minutes: null,
@@ -133,8 +134,8 @@ export async function marcarNoShow(reservaId: string): Promise<ReservaFila> {
 
 /* ------------------------------------------------------------------ */
 
-/** Cuatro dígitos. En producción lo emite el servidor y se verifica ahí. */
-function nuevoCodigoDeAbordaje(): string {
+/** Cuatro dígitos. En producción los emite el servidor y se verifican ahí. */
+function nuevoCodigo(): string {
   return String(Math.floor(1000 + Math.random() * 9000));
 }
 

@@ -59,6 +59,8 @@ export type CorridorPendiente = {
 export type BookingPendiente = {
   /** El código de 4 dígitos de `1f` / `1g`. */
   boarding_code: string;
+  /** El segundo código, el de `1i`: cierra el viaje y suelta el aporte. */
+  arrival_code: string;
   /** La marca que prueba que el viaje pasó. Sin ella no se libera el aporte. */
   boarded_at: string | null;
   /** Las 4 h que tiene el conductor para responder (`11a`). */
