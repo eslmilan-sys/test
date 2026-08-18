@@ -8,10 +8,12 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { color, espacio, radio, texto } from '@/ui/tokens';
 
-const HECHAS = [{ id: '5c', titulo: 'Publicar', ruta: '/(conductor)/publicar' as const }];
+const HECHAS = [
+  { id: '5c', titulo: 'Publicar', ruta: '/(conductor)/publicar' as const },
+  { id: '11a', titulo: 'Solicitudes de puesto', ruta: '/(conductor)/solicitudes' as const },
+];
 
 const PENDIENTES = [
-  '11a  Aceptar solicitud',
   '7a  Reservar',
   '7b  Pagar',
   '1f / 1g  Códigos de abordaje',

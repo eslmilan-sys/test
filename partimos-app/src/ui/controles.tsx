@@ -98,17 +98,49 @@ export function Pastilla({ children, fondo = color.azul100, tinta = color.azul70
 
 /* ----------------------------------------------------------------- Botón */
 
+/**
+ * `rojo` es la acción de seguir adelante. `azul` es la acción dentro de una
+ * hoja, porque rojo sobre rojo no se lee. `contorno` no es destructivo por sí
+ * mismo: es la salida secundaria, con borde y sin relleno.
+ */
+type Tono = 'rojo' | 'azul' | 'contorno';
+type Tamano = 'md' | 'lg';
+
 type BotonProps = {
   children: ReactNode;
   alPulsar?: () => void;
-  /** azul dentro de una hoja, rojo sobre arena. El rojo sobre rojo no se lee. */
-  tono?: 'azul' | 'rojo';
+  tono?: Tono;
+  tamano?: Tamano;
   desactivado?: boolean;
+  /** Ocupa el ancho disponible. */
+  ancho?: boolean;
 };
 
-export function Boton({ children, alPulsar, tono = 'rojo', desactivado = false }: BotonProps) {
-  const fondo = tono === 'azul' ? color.azul500 : color.rojo500;
-  const fondoPulsado = tono === 'azul' ? color.azul600 : color.rojo600;
+const TAMANOS: Record<Tamano, { height: number; paddingHorizontal: number; fontSize: number }> = {
+  md: { height: 52, paddingHorizontal: 26, fontSize: 16 },
+  lg: { height: 58, paddingHorizontal: 32, fontSize: 17 },
+};
+
+export function Boton({
+  children,
+  alPulsar,
+  tono = 'rojo',
+  tamano = 'lg',
+  desactivado = false,
+  ancho = false,
+}: BotonProps) {
+  const medida = TAMANOS[tamano];
+  const paleta = {
+    rojo: { fondo: color.rojo500, pulsado: color.rojo600, tinta: color.blanco, borde: 'transparent' },
+    azul: { fondo: color.azul500, pulsado: color.azul600, tinta: color.blanco, borde: 'transparent' },
+    contorno: {
+      fondo: 'transparent',
+      pulsado: color.sand200,
+      tinta: color.ink900,
+      borde: color.ink900,
+    },
+  }[tono];
+
   return (
     <Pressable
       accessibilityRole="button"
@@ -116,11 +148,92 @@ export function Boton({ children, alPulsar, tono = 'rojo', desactivado = false }
       onPress={alPulsar}
       style={({ pressed }) => [
         estilos.boton,
-        { backgroundColor: pressed ? fondoPulsado : fondo, opacity: desactivado ? 0.5 : 1 },
+        {
+          height: medida.height,
+          paddingHorizontal: medida.paddingHorizontal,
+          backgroundColor: pressed ? paleta.pulsado : paleta.fondo,
+          borderColor: paleta.borde,
+          opacity: desactivado ? 0.5 : 1,
+        },
+        ancho && { flex: 1 },
       ]}
     >
-      <Text style={estilos.botonTexto}>{children}</Text>
+      <Text style={[estilos.botonTexto, { fontSize: medida.fontSize, color: paleta.tinta }]}>
+        {children}
+      </Text>
     </Pressable>
+  );
+}
+
+/* ---------------------------------------------------------------- Avatar */
+
+/** Un tono por persona, estable por el nombre, para que no cambie de pantalla en pantalla. */
+const TONOS_AVATAR = {
+  azul: { fondo: color.azul100, tinta: color.azul700 },
+  rojo: { fondo: color.rojo100, tinta: color.rojo700 },
+  arena: { fondo: color.arena100, tinta: '#A06F33' },
+  arena2: { fondo: color.sand200, tinta: color.ink700 },
+} as const;
+
+function tonoDe(nombre: string): keyof typeof TONOS_AVATAR {
+  const claves = ['azul', 'arena', 'arena2'] as const;
+  let n = 0;
+  for (let i = 0; i < nombre.length; i++) n = (n + nombre.charCodeAt(i)) % 997;
+  return claves[n % claves.length];
+}
+
+export function Avatar({
+  nombre,
+  tono,
+  tamano = 44,
+}: {
+  nombre: string;
+  tono?: keyof typeof TONOS_AVATAR;
+  tamano?: number;
+}) {
+  const paleta = TONOS_AVATAR[tono ?? tonoDe(nombre)];
+  const iniciales = nombre
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0])
+    .join('')
+    .toUpperCase();
+
+  return (
+    <View
+      style={[
+        estilos.avatar,
+        { width: tamano, height: tamano, backgroundColor: paleta.fondo },
+      ]}
+    >
+      <Text style={{ fontSize: tamano * 0.4, fontWeight: '600', letterSpacing: -0.4, color: paleta.tinta, fontFamily: familia }}>
+        {iniciales}
+      </Text>
+    </View>
+  );
+}
+
+/* -------------------------------------------------------------- Insignia */
+
+export function Insignia({
+  children,
+  fondo = color.sand200,
+  tinta = color.ink700,
+  punto = false,
+}: {
+  children: ReactNode;
+  fondo?: string;
+  tinta?: string;
+  punto?: boolean;
+}) {
+  return (
+    <View style={[estilos.insignia, { backgroundColor: fondo }]}>
+      {punto ? <View style={[estilos.insigniaPunto, { backgroundColor: tinta }]} /> : null}
+      <Text style={{ fontSize: 11, fontWeight: '500', letterSpacing: -0.06, color: tinta, fontFamily: familia }}>
+        {children}
+      </Text>
+    </View>
   );
 }
 
@@ -171,11 +284,29 @@ const estilos = StyleSheet.create({
   pastilla: { borderRadius: radio.pastilla, paddingHorizontal: 8, paddingVertical: 3 },
 
   boton: {
-    height: 58,
     borderRadius: radio.pastilla,
+    borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 32,
+    flexDirection: 'row',
   },
-  botonTexto: { fontSize: 17, fontWeight: '600', letterSpacing: -0.17, color: color.blanco, fontFamily: familia },
+  botonTexto: { fontWeight: '600', letterSpacing: -0.17, fontFamily: familia },
+
+  avatar: {
+    borderRadius: radio.cuadrado,
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+  },
+
+  insignia: {
+    height: 22,
+    paddingHorizontal: 8,
+    borderRadius: radio.pastilla,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    alignSelf: 'flex-start',
+  },
+  insigniaPunto: { width: 6, height: 6, borderRadius: radio.pastilla, opacity: 0.85 },
 });

@@ -48,3 +48,20 @@ export function diaLargo(d: Date | string): string {
 export function mas(d: Date | string, minutos: number): Date {
   return new Date(new Date(d).getTime() + minutos * 60_000);
 }
+
+const diaISO = new Intl.DateTimeFormat('en-CA', {
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+  timeZone: ZONA,
+});
+
+/** Mismo día en Panamá, no en la zona del teléfono. */
+export function esHoy(d: Date | string, ahora: Date = new Date()): boolean {
+  return diaISO.format(new Date(d)) === diaISO.format(ahora);
+}
+
+/** «Hoy 14:50» cuando sale hoy; si no, «sábado 14 14:50». */
+export function cuando(d: Date | string): string {
+  return `${esHoy(d) ? 'Hoy' : diaCorto(d)} ${hora(d)}`;
+}

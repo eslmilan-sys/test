@@ -7,17 +7,42 @@
 
 import type { Booking, Payment, ReservaFila, TripStop, ViajeFila } from '@/tipos';
 
-import { ANDRES_ID, ELANTRA_ID, MATEO_ID, ROSA_ID } from './personas';
+import { ANDRES_ID, DANIELA_ID, ELANTRA_ID, MATEO_ID, ROSA_ID } from './personas';
 import { corredores } from './geografia';
 
 const CHITRE = corredores.find((c) => c.slug === 'panama-chitre')!;
 
 export const VIAJE_CHITRE_ID = '55555555-5555-4555-8555-555555555555';
-const AHORA = '2026-11-14T14:00:00-05:00';
 
 /**
- * El viaje del recorrido del diseño: Albrook → Chitré, sábado 14 a las 14:50.
- * Los `snap_*` son la foto del cálculo en el momento de publicar, como en la base.
+ * El viaje del almacén sale hoy: así las cuentas atrás de `11a` — «expira en
+ * 3 h 40» — significan algo al abrir la app, en vez de contar meses.
+ * `5c` no lee de aquí: allí el conductor está componiendo un viaje nuevo.
+ */
+const arranque = new Date();
+const enMinutos = (m: number) => new Date(arranque.getTime() + m * 60_000).toISOString();
+const haceMinutos = (m: number) => enMinutos(-m);
+
+/** Hoy a las 14:50 en Panamá; si ya pasó, mañana a la misma hora. */
+function proximaSalida(): Date {
+  const hoy = new Date(arranque);
+  hoy.setUTCHours(19, 50, 0, 0); // 14:50 en UTC−5
+  if (hoy.getTime() - arranque.getTime() < 60 * 60_000) {
+    hoy.setUTCDate(hoy.getUTCDate() + 1);
+  }
+  return hoy;
+}
+
+const AHORA = arranque.toISOString();
+const salida = proximaSalida();
+const SALIDA = salida.toISOString();
+const desdeLaSalida = (m: number) => new Date(salida.getTime() + m * 60_000).toISOString();
+const LLEGADA = desdeLaSalida(210);
+
+/**
+ * El viaje del recorrido del diseño: Albrook → Chitré, publicado y con gente
+ * pidiendo puesto. Los `snap_*` son la foto del cálculo en el momento de
+ * publicar, igual que en la base.
  */
 export const viajes: ViajeFila[] = [
   {
@@ -25,8 +50,8 @@ export const viajes: ViajeFila[] = [
     driver_id: ANDRES_ID,
     vehicle_id: ELANTRA_ID,
     corridor_id: CHITRE.id,
-    departure_at: '2026-11-14T14:50:00-05:00',
-    arrival_estimate_at: '2026-11-14T18:20:00-05:00',
+    departure_at: SALIDA,
+    arrival_estimate_at: LLEGADA,
     seats_offered: 3,
     price_cents: 600,
     gender_preference: 'any',
@@ -69,7 +94,7 @@ export const paradas: TripStop[] = [
     custom_label: 'Albrook · Terminal',
     kind: 'origin',
     sequence: 0,
-    scheduled_at: '2026-11-14T14:50:00-05:00',
+    scheduled_at: SALIDA,
     created_at: AHORA,
   },
   {
@@ -79,7 +104,7 @@ export const paradas: TripStop[] = [
     custom_label: 'La Chorrera',
     kind: 'waypoint',
     sequence: 1,
-    scheduled_at: '2026-11-14T15:35:00-05:00',
+    scheduled_at: desdeLaSalida(45),
     created_at: AHORA,
   },
   {
@@ -89,7 +114,7 @@ export const paradas: TripStop[] = [
     custom_label: 'Penonomé',
     kind: 'waypoint',
     sequence: 2,
-    scheduled_at: '2026-11-14T16:40:00-05:00',
+    scheduled_at: desdeLaSalida(110),
     created_at: AHORA,
   },
   {
@@ -99,7 +124,7 @@ export const paradas: TripStop[] = [
     custom_label: 'Chitré · Parque Unión',
     kind: 'destination',
     sequence: 3,
-    scheduled_at: '2026-11-14T18:20:00-05:00',
+    scheduled_at: LLEGADA,
     created_at: AHORA,
   },
 ];
@@ -138,8 +163,22 @@ const reservaBase = (extra: Partial<ReservaFila>): ReservaFila => ({
   ...extra,
 });
 
-/** Las dos solicitudes que `11a` tiene en pantalla. */
+/**
+ * Todas las reservas del viaje, como estarían en la tabla: la de Daniela ya
+ * pagada, y las dos que `11a` tiene pendientes de respuesta.
+ */
 export const reservas: ReservaFila[] = [
+  reservaBase({
+    id: '77777777-7777-4777-8777-777777777700',
+    passenger_id: DANIELA_ID,
+    status: 'confirmed',
+    confirmed_at: haceMinutos(180),
+    proposed_point: 'Costa del Este',
+    detour_minutes: 3,
+    mochilas: 1,
+    maletas: 1,
+    boarding_code: '5521',
+  }),
   reservaBase({
     id: '77777777-7777-4777-8777-777777777701',
     passenger_id: MATEO_ID,
@@ -148,8 +187,8 @@ export const reservas: ReservaFila[] = [
     mochilas: 1,
     maletas: 1,
     boarding_code: '4917',
-    expires_at: '2026-11-14T17:40:00-05:00',
-    created_at: '2026-11-14T13:40:00-05:00',
+    expires_at: enMinutos(220), // 3 h 40
+    created_at: haceMinutos(20),
   }),
   reservaBase({
     id: '77777777-7777-4777-8777-777777777702',
@@ -159,20 +198,8 @@ export const reservas: ReservaFila[] = [
     mochilas: 1,
     maletas: 0,
     boarding_code: '2384',
-    expires_at: '2026-11-14T15:10:00-05:00',
-    created_at: '2026-11-14T11:10:00-05:00',
-  }),
-];
-
-/** Un puesto ya pagado, para que el contador de `11a` empiece en 1 de 3. */
-export const reservasConfirmadas: ReservaFila[] = [
-  reservaBase({
-    id: '77777777-7777-4777-8777-777777777700',
-    passenger_id: '99999999-9999-4999-8999-999999999999',
-    status: 'confirmed',
-    confirmed_at: '2026-11-14T12:00:00-05:00',
-    proposed_point: 'Albrook · Terminal',
-    boarding_code: '5521',
+    expires_at: enMinutos(50), // menos de 1 h: pastilla roja sólida
+    created_at: haceMinutos(190),
   }),
 ];
 

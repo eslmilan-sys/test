@@ -41,6 +41,12 @@ export function resumenDeEquipaje({ mochilas, maletas }: Equipaje): string {
   return maletas === 1 ? 'Mochila y una maleta' : `Mochila y ${maletas} maletas`;
 }
 
+/** La versión corta, para una fila estrecha: «1 maleta» o «solo mochila». */
+export function resumenCorto({ maletas }: Equipaje): string {
+  if (maletas === 0) return 'solo mochila';
+  return maletas === 1 ? '1 maleta' : `${maletas} maletas`;
+}
+
 /** Si el conductor deja de aceptar maletas y alguien ya reservó con una, hay que avisar en rojo (`14d`). */
 export function hayConflictoDeEquipaje(aceptaMaletas: boolean, maletasReservadas: number): boolean {
   return !aceptaMaletas && maletasReservadas > 0;

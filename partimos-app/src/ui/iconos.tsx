@@ -56,6 +56,44 @@ export function Cerrar({ tamano = 12, tinta = color.ink600 }: Props) {
   );
 }
 
+export function Pin({ tamano = 15, tinta = color.azul500 }: Props) {
+  return (
+    <Svg viewBox="0 0 24 24" width={tamano} height={tamano} fill="none">
+      <Path
+        d="M12 21s7-5.5 7-11a7 7 0 1 0-14 0c0 5.5 7 11 7 11Z"
+        stroke={tinta}
+        strokeWidth={1.8}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <Circle cx={12} cy={10} r={2.4} stroke={tinta} strokeWidth={1.8} />
+    </Svg>
+  );
+}
+
+export function Maleta({ tamano = 15, tinta = color.ink600 }: Props) {
+  return (
+    <Svg viewBox="0 0 24 24" width={tamano} height={tamano} fill="none">
+      <Rect x={3} y={7} width={18} height={13} rx={2.5} stroke={tinta} strokeWidth={1.7} />
+      <Path d="M9 7V4.8h6V7" stroke={tinta} strokeWidth={1.7} strokeLinecap="round" />
+    </Svg>
+  );
+}
+
+export function Visto({ tamano = 14, tinta = '#fff' }: Props) {
+  return (
+    <Svg viewBox="0 0 24 24" width={tamano} height={tamano} fill="none">
+      <Path
+        d="M5 12.5l4.5 4.5L19 7.5"
+        stroke={tinta}
+        strokeWidth={2.4}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </Svg>
+  );
+}
+
 /** Cobertura y batería de la barra de estado del diseño. */
 export function Cobertura() {
   return (

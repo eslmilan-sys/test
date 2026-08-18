@@ -10,6 +10,7 @@ import type { Profile, Vehicle, VehicleCategory } from '@/tipos';
 export const ANDRES_ID = '11111111-1111-4111-8111-111111111111';
 export const MATEO_ID = '22222222-2222-4222-8222-222222222222';
 export const ROSA_ID = '33333333-3333-4333-8333-333333333333';
+export const DANIELA_ID = '99999999-9999-4999-8999-999999999999';
 export const ELANTRA_ID = '44444444-4444-4444-8444-444444444444';
 
 /** Filas reales de `vehicle_categories`. El `rate_per_km_cents` de la base es
@@ -65,6 +66,27 @@ export const perfiles: Profile[] = [
     accepts_cash: true,
   },
   {
+    id: DANIELA_ID,
+    first_name: 'Daniela',
+    last_initial: 'L.',
+    phone: '+507 6000 0003',
+    photo_url: null,
+    home_city_id: '6a6a7413-08f3-4902-9378-62847a9856bd',
+    gender: 'mujer',
+    bio: null,
+    is_id_verified: true,
+    is_phone_verified: true,
+    is_suspended: false,
+    suspended_reason: null,
+    locale: 'es-PA',
+    created_at: '2026-04-02T09:00:00+00:00',
+    updated_at: '2026-11-10T09:00:00+00:00',
+    linkedin_connected_at: null,
+    preferred_pay_channel: 'yappy_app',
+    accepts_yappy_direct: true,
+    accepts_cash: false,
+  },
+  {
     id: ROSA_ID,
     first_name: 'Rosa',
     last_initial: 'I.',
@@ -106,6 +128,17 @@ export const vehiculos: Vehicle[] = [
     photo_path: null,
   },
 ];
+
+/**
+ * Reputación por persona. En producción sale de la vista `driver_ratings` y su
+ * equivalente para pasajeros (`reviews` agrupadas por `subject_id`).
+ */
+export const reputacion: Record<string, { viajes: number; calificacion: number | null }> = {
+  [ANDRES_ID]: { viajes: 34, calificacion: 4.9 },
+  [MATEO_ID]: { viajes: 12, calificacion: 4.8 },
+  [ROSA_ID]: { viajes: 0, calificacion: null },
+  [DANIELA_ID]: { viajes: 6, calificacion: 5.0 },
+};
 
 /** La placa completa, que la columna `plate_last3` todavía no puede guardar. */
 export const placasCompletas: Record<string, string> = {
