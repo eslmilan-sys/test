@@ -21,6 +21,29 @@ import { fuente } from './_fuente';
 const demora = <T,>(valor: T, ms = 120): Promise<T> =>
   new Promise((resolve) => setTimeout(() => resolve(valor), ms));
 
+const diaPanama = new Intl.DateTimeFormat('en-CA', {
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+  timeZone: 'America/Panama',
+});
+
+/** El día de un viaje es el de Panamá, no el del teléfono ni el UTC. */
+export function diaEnPanama(cuando: string | Date): string {
+  return diaPanama.format(new Date(cuando));
+}
+
+/**
+ * Una fila de `available_trips` más lo que la vista todavía no expone: el
+ * booleano de maletas y las etiquetas de origen y destino, que sí están en
+ * `trips`.
+ */
+export type ViajeEnResultados = AvailableTrip & {
+  accepts_luggage: boolean;
+  origin_label: string | null;
+  destination_label: string | null;
+};
+
 export type Filtros = {
   aceptaMaletas?: boolean;
   soloMujeres?: boolean;
@@ -35,19 +58,45 @@ export async function buscarViajes(
   destino: string,
   fecha: string,
   filtros: Filtros = {},
-): Promise<(AvailableTrip & { accepts_luggage: boolean })[]> {
+): Promise<ViajeEnResultados[]> {
   const corredor = corredorDe(origen, destino);
   if (!corredor) return demora([]);
 
   const encontrados = fuente.viajes
     .filter((v) => v.corridor_id === corredor.id)
     .filter((v) => v.status === 'published')
-    .filter((v) => v.departure_at.slice(0, 10) === fecha)
+    .filter((v) => diaEnPanama(v.departure_at) === fecha)
     .filter((v) => (filtros.aceptaMaletas ? v.accepts_luggage : true))
     .filter((v) => (filtros.soloMujeres ? v.gender_preference === 'women_only' : true))
-    .map(comoResultado);
+    .map(comoResultado)
+    // un viaje lleno no es un resultado
+    .filter((v) => (v.seats_available ?? 0) > 0);
 
   return demora(encontrados);
+}
+
+/**
+ * El primer día, desde hoy, con salidas publicadas en esa ruta. Es lo que la
+ * pantalla de resultados enseña cuando nadie ha elegido fecha todavía: más
+ * útil que un «hoy» vacío.
+ */
+export async function proximoDiaConViajes(
+  origen: string,
+  destino: string,
+  desde = new Date(),
+): Promise<string> {
+  const corredor = corredorDe(origen, destino);
+  const hoy = diaEnPanama(desde);
+  if (!corredor) return demora(hoy, 0);
+
+  const dias = fuente.viajes
+    .filter((v) => v.corridor_id === corredor.id && v.status === 'published')
+    .filter((v) => v.seats_offered > contarVendidos(v.id))
+    .map((v) => diaEnPanama(v.departure_at))
+    .filter((d) => d >= hoy)
+    .sort();
+
+  return demora(dias[0] ?? hoy, 0);
 }
 
 export async function obtenerViaje(viajeId: string): Promise<ViajeFila | null> {
@@ -56,6 +105,76 @@ export async function obtenerViaje(viajeId: string): Promise<ViajeFila | null> {
 
 export async function paradasDelViaje(viajeId: string): Promise<TripStop[]> {
   return demora(fuente.paradas.filter((p) => p.trip_id === viajeId).sort((a, b) => a.sequence - b.sequence));
+}
+
+/* ------------------------------------------------------------------ *
+ * Inicio — pantalla `3a`
+ * ------------------------------------------------------------------ */
+
+export type RutaPopular = {
+  slug: string;
+  origen: string;
+  destino: string;
+  /** El aporte más barato publicado hoy en esa ruta. */
+  desdeCentavos: number;
+  foto: string;
+};
+
+/** `corridors.is_priority` marca las rutas que el producto empuja. */
+export async function rutasPopulares(limite = 2): Promise<RutaPopular[]> {
+  const rutas = fuente.corredores
+    .filter((c) => c.is_priority && c.is_active)
+    .slice(0, limite)
+    .map((c) => {
+      const destino = fuente.ciudades.find((x) => x.id === c.destination_city_id);
+      const publicados = fuente.viajes
+        .filter((v) => v.corridor_id === c.id && v.status === 'published')
+        .map((v) => v.price_cents);
+      return {
+        slug: c.slug,
+        origen: 'Panamá',
+        destino: destino?.name ?? '',
+        desdeCentavos: publicados.length
+          ? Math.min(...publicados)
+          : aporteDeReferencia(c),
+        foto: destino?.slug ?? '',
+      };
+    });
+  return demora(rutas);
+}
+
+export type GanchoDeConductor = {
+  /** Lo que el conductor recupera llevando el carro lleno en esa ruta. */
+  recuperasCentavos: number;
+  puestos: number;
+  destino: string;
+};
+
+/** La tarjeta que invita a publicar, en `3a`. La cifra es de un viaje, no del mes. */
+export async function ganchoDeConductor(corredorSlug = 'panama-chitre'): Promise<GanchoDeConductor> {
+  const corredor = fuente.corredores.find((c) => c.slug === corredorSlug)!;
+  const destino = fuente.ciudades.find((x) => x.id === corredor.destination_city_id);
+  const puestos = 3;
+  const costo = costoDelViaje({
+    distanciaKm: Number(corredor.distance_km),
+    peajeCentavos: Number(corredor.toll_cents),
+    consumoL100km: CONSUMO_L_100KM.standard,
+  });
+  const aporte = aporteCalculado(costo, puestos, topeDeRuta(costo));
+  return demora({
+    recuperasCentavos: loQueRecuperas(aporte, puestos),
+    puestos,
+    destino: destino?.name ?? '',
+  });
+}
+
+function aporteDeReferencia(c: Corridor): number {
+  const costo = costoDelViaje({
+    distanciaKm: Number(c.distance_km),
+    peajeCentavos: Number(c.toll_cents),
+    consumoL100km: CONSUMO_L_100KM.standard,
+  });
+  return aporteCalculado(costo, 3, topeDeRuta(costo));
 }
 
 /* ------------------------------------------------------------------ *
@@ -213,6 +332,12 @@ export function repartoDelCosto(costoCentavos: number, aporteCentavos: number, p
 
 /* ------------------------------------------------------------------ */
 
+function contarVendidos(viajeId: string): number {
+  return fuente.reservas.filter(
+    (r) => r.trip_id === viajeId && (r.status === 'confirmed' || r.status === 'completed'),
+  ).length;
+}
+
 function corredorDe(origen: string, destino: string): Corridor | undefined {
   const ciudad = (slug: string) => fuente.ciudades.find((c) => c.slug === slug)?.id;
   const o = ciudad(origen);
@@ -225,7 +350,7 @@ function consumoDe(carro: Vehicle): number {
   return CONSUMO_L_100KM[carro.category_code as CategoriaVehiculo] ?? CONSUMO_L_100KM.standard;
 }
 
-function comoResultado(v: ViajeFila): AvailableTrip & { accepts_luggage: boolean } {
+function comoResultado(v: ViajeFila): ViajeEnResultados {
   const carro = fuente.vehiculos.find((c) => c.id === v.vehicle_id);
   const conductor = fuente.perfiles.find((p) => p.id === v.driver_id);
   const corredor = fuente.corredores.find((c) => c.id === v.corridor_id);
@@ -258,6 +383,8 @@ function comoResultado(v: ViajeFila): AvailableTrip & { accepts_luggage: boolean
     rate_per_km_cents: carro?.rate_per_km_cents ?? null,
     photo_path: carro?.photo_path ?? null,
     accepts_luggage: v.accepts_luggage,
+    origin_label: v.origin_label,
+    destination_label: v.destination_label,
   };
 }
 

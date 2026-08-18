@@ -9,18 +9,30 @@
 import { Platform, StyleSheet, Text, View } from 'react-native';
 
 import { Bateria, Cobertura } from './iconos';
-import { familia, espacio } from './tokens';
+import { familia, color, espacio } from './tokens';
 
-export function BarraDeEstado({ hora = '9:41' }: { hora?: string }) {
+/**
+ * `claro` sobre el campo rojo o un mapa oscuro; `oscuro` sobre el mapa de día,
+ * donde el blanco no se lee.
+ */
+export function BarraDeEstado({
+  hora = '9:41',
+  tono = 'claro',
+}: {
+  hora?: string;
+  tono?: 'claro' | 'oscuro';
+}) {
   // En el móvil manda la barra del sistema; solo la dibujamos en web.
   if (Platform.OS !== 'web') return <View style={{ height: 0 }} />;
 
+  const tinta = tono === 'claro' ? '#fff' : color.ink900;
+
   return (
     <View style={estilos.barra}>
-      <Text style={estilos.hora}>{hora}</Text>
+      <Text style={[estilos.hora, { color: tinta }]}>{hora}</Text>
       <View style={estilos.iconos}>
-        <Cobertura />
-        <Bateria />
+        <Cobertura tinta={tinta} />
+        <Bateria tinta={tinta} />
       </View>
     </View>
   );
@@ -34,6 +46,6 @@ const estilos = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-  hora: { fontSize: 14, fontWeight: '600', letterSpacing: -0.14, color: '#fff', fontFamily: familia },
+  hora: { fontSize: 14, fontWeight: '600', letterSpacing: -0.14, fontFamily: familia },
   iconos: { flexDirection: 'row', gap: 5, alignItems: 'center' },
 });

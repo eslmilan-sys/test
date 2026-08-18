@@ -11,12 +11,22 @@ import { StyleSheet, View } from 'react-native';
 import Svg, { Defs, Ellipse, LinearGradient, RadialGradient, Rect, Stop } from 'react-native-svg';
 
 import Hibisco from '../../assets/motivos/pa-hibisco.svg';
-import Mapa from '../../assets/motivos/pa-mapa.svg';
+import MapaPa from '../../assets/motivos/pa-mapa.svg';
 import Palmera from '../../assets/motivos/pa-palmera.svg';
+import Skyline from '../../assets/motivos/pa-skyline.svg';
 import { campoRojo } from './tokens';
 
-/** Los motivos que se recortan contra el borde del campo. Nunca sobre texto. */
-const MOTIVOS = { palmera: Palmera, hibisco: Hibisco, mapa: Mapa } as const;
+/**
+ * Los motivos que se recortan contra el borde del campo, en tinta oscura al
+ * 20–26 %. Nunca sobre texto: cada uno trae su sitio.
+ */
+const MOTIVOS = {
+  palmera: { svg: Palmera, ancho: 170, alto: 170, sitio: { right: -18, bottom: -10 }, opacidad: 0.2 },
+  hibisco: { svg: Hibisco, ancho: 158, alto: 158, sitio: { right: -36, top: -28 }, opacidad: 0.2 },
+  mapa: { svg: MapaPa, ancho: 180, alto: 180, sitio: { right: -20, bottom: -16 }, opacidad: 0.2 },
+  // la ciudad va al pie, de lado a lado, como una línea de horizonte
+  skyline: { svg: Skyline, ancho: 390, alto: 196, sitio: { left: 0, right: 0, bottom: 0 }, opacidad: 0.26 },
+} as const;
 
 type Props = {
   /** 326 en una pantalla de inicio, 186–214 en una secundaria. */
@@ -33,7 +43,7 @@ export function CampoRojo({
   motivo,
   children,
 }: Props) {
-  const Motivo = motivo ? MOTIVOS[motivo] : null;
+  const m = motivo ? MOTIVOS[motivo] : null;
   return (
     <View style={[StyleSheet.absoluteFill, { height: altura, overflow: 'hidden' }]}>
       <Svg width={ancho} height={altura} style={StyleSheet.absoluteFill}>
@@ -75,9 +85,9 @@ export function CampoRojo({
         />
       </Svg>
 
-      {Motivo ? (
-        <View style={estilos.motivo} pointerEvents="none">
-          <Motivo width={170} height={170} color="#1C0A10" />
+      {m ? (
+        <View style={[{ position: 'absolute', opacity: m.opacidad }, m.sitio]} pointerEvents="none">
+          <m.svg width={m.ancho} height={m.alto} color="#1C0A10" />
         </View>
       ) : null}
 
@@ -119,6 +129,4 @@ export function Amanecer({ ancho = 346, alto = 260 }: { ancho?: number; alto?: n
   );
 }
 
-const estilos = StyleSheet.create({
-  motivo: { position: 'absolute', right: -18, bottom: -10, opacity: 0.2 },
-});
+

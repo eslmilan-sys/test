@@ -27,20 +27,27 @@ const arranque = new Date();
 const enMinutos = (m: number) => new Date(arranque.getTime() + m * 60_000).toISOString();
 const haceMinutos = (m: number) => enMinutos(-m);
 
-/** Hoy a las 14:50 en Panamá; si ya pasó, mañana a la misma hora. */
-function proximaSalida(): Date {
-  const hoy = new Date(arranque);
-  hoy.setUTCHours(19, 50, 0, 0); // 14:50 en UTC−5
-  if (hoy.getTime() - arranque.getTime() < 60 * 60_000) {
-    hoy.setUTCDate(hoy.getUTCDate() + 1);
-  }
-  return hoy;
+/**
+ * Todas las salidas cuelgan del mismo día de Panamá, para que el filtro «hoy»
+ * de los resultados las vea juntas. Si la primera hora del día ya pasó, el día
+ * entero se corre a mañana — nunca se parte por la medianoche.
+ */
+const PRIMERA_HORA_PA = 6.5; // 06:30
+
+function aLaHoraDePanama(horas: number, diasDespues = 0): Date {
+  const d = new Date(arranque);
+  d.setUTCHours(Math.floor(horas) + 5, Math.round((horas % 1) * 60), 0, 0); // Panamá es UTC−5
+  d.setUTCDate(d.getUTCDate() + diasDespues);
+  return d;
 }
 
+const corrido = aLaHoraDePanama(PRIMERA_HORA_PA).getTime() - arranque.getTime() < 30 * 60_000 ? 1 : 0;
+const enPanama = (horas: number) => aLaHoraDePanama(horas, corrido).toISOString();
+
 const AHORA = arranque.toISOString();
-const salida = proximaSalida();
-const SALIDA = salida.toISOString();
-const desdeLaSalida = (m: number) => new Date(salida.getTime() + m * 60_000).toISOString();
+const SALIDA = enPanama(14 + 50 / 60);
+const desdeLaSalida = (m: number) =>
+  new Date(new Date(SALIDA).getTime() + m * 60_000).toISOString();
 const LLEGADA = desdeLaSalida(210);
 
 /**
@@ -172,6 +179,56 @@ paradas.push(
     created_at: AHORA,
   },
 );
+
+/**
+ * Más salidas del día en la misma ruta, para que los resultados tengan algo que
+ * enseñar: horas distintas, aportes distintos y el booleano de maletas en sus
+ * dos posiciones.
+ */
+const otrasSalidas: { enMinutos: number; precio: number; puestos: number; maletas: boolean; origen: string }[] = [
+  { enMinutos: 75, precio: 600, puestos: 3, maletas: true, origen: 'Albrook · Terminal' },
+  { enMinutos: 160, precio: 700, puestos: 1, maletas: false, origen: 'Vía España' },
+  { enMinutos: 245, precio: 500, puestos: 4, maletas: true, origen: 'Costa del Este' },
+];
+
+otrasSalidas.forEach((s, i) => {
+  const id = `55555555-5555-4555-8555-5555555556${String(i).padStart(2, '0')}`;
+  const sale = enMinutos(s.enMinutos);
+  viajes.push({
+    ...viajes[0],
+    id,
+    departure_at: sale,
+    arrival_estimate_at: new Date(new Date(sale).getTime() + (200 + i * 10) * 60_000).toISOString(),
+    seats_offered: s.puestos,
+    price_cents: s.precio,
+    accepts_luggage: s.maletas,
+    origin_label: s.origen,
+    gender_preference: i === 2 ? 'women_only' : 'any',
+    accepts_cash: i !== 1,
+  });
+  paradas.push(
+    {
+      id: `66666666-6666-4666-8666-6666666668${String(i).padStart(2, '0')}`,
+      trip_id: id,
+      pickup_point_id: null,
+      custom_label: s.origen,
+      kind: 'origin',
+      sequence: 0,
+      scheduled_at: sale,
+      created_at: AHORA,
+    },
+    {
+      id: `66666666-6666-4666-8666-6666666669${String(i).padStart(2, '0')}`,
+      trip_id: id,
+      pickup_point_id: null,
+      custom_label: 'Chitré · Parque Unión',
+      kind: 'destination',
+      sequence: 1,
+      scheduled_at: new Date(new Date(sale).getTime() + (200 + i * 10) * 60_000).toISOString(),
+      created_at: AHORA,
+    },
+  );
+});
 
 const reservaBase = (extra: Partial<ReservaFila>): ReservaFila => ({
   id: '',

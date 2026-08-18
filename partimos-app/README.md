@@ -12,10 +12,13 @@ npx expo start          # escanea el QR con Expo Go
 npx expo start --web    # o en el navegador, en localhost:8081
 ```
 
-Pantallas hechas, por orden de riesgo:
+Pantallas hechas:
 
 | Id | Pantalla | Ruta |
 | --- | --- | --- |
+| `3a` | Inicio | `/(pasajero)` |
+| `1b` / `3b` | Resultados | `/(pasajero)/resultados` |
+| `5a` | Detalle del viaje | `/(pasajero)/viaje` |
 | `5c` | Publicar | `/(conductor)/publicar` |
 | `11a` | Solicitudes de puesto | `/(conductor)/solicitudes` |
 | `7a` | Reserva | `/(pasajero)/reservar` |

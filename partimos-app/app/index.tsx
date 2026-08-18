@@ -9,6 +9,9 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { color, espacio, radio, texto } from '@/ui/tokens';
 
 const HECHAS = [
+  { id: '3a', titulo: 'Inicio', ruta: '/(pasajero)' as const },
+  { id: '1b', titulo: 'Resultados', ruta: '/(pasajero)/resultados' as const },
+  { id: '5a', titulo: 'Detalle del viaje', ruta: '/(pasajero)/viaje' as const },
   { id: '5c', titulo: 'Publicar', ruta: '/(conductor)/publicar' as const },
   { id: '11a', titulo: 'Solicitudes de puesto', ruta: '/(conductor)/solicitudes' as const },
   { id: '7a', titulo: 'Reserva', ruta: '/(pasajero)/reservar' as const },
@@ -19,7 +22,7 @@ const HECHAS = [
 ];
 
 /** Lo siguiente, ya fuera del bloque de riesgo: el descubrimiento del pasajero. */
-const PENDIENTES = ['3a  Inicio', '1b / 3b  Resultados', '5a  Detalle del viaje'];
+const PENDIENTES = ['1c  La puerta', '4b–4d  Registro', '6b  Perfil público'];
 
 export default function Indice() {
   return (
