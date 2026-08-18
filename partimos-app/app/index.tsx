@@ -13,10 +13,11 @@ const HECHAS = [
   { id: '11a', titulo: 'Solicitudes de puesto', ruta: '/(conductor)/solicitudes' as const },
   { id: '7a', titulo: 'Reserva', ruta: '/(pasajero)/reservar' as const },
   { id: '7b', titulo: 'Pago del aporte', ruta: '/(pasajero)/pagar' as const },
+  { id: '1f', titulo: 'Código de abordaje · pasajero', ruta: '/(pasajero)/codigo' as const },
+  { id: '1g', titulo: 'Código de abordaje · conductor', ruta: '/(conductor)/abordaje' as const },
 ];
 
 const PENDIENTES = [
-  '1f / 1g  Códigos de abordaje',
   '1i  Llegada y liberación',
 ];
 

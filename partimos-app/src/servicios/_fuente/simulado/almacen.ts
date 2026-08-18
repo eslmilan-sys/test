@@ -7,7 +7,7 @@
 
 import type { Booking, Payment, ReservaFila, TripStop, ViajeFila } from '@/tipos';
 
-import { ANDRES_ID, DANIELA_ID, ELANTRA_ID, MATEO_ID, ROSA_ID } from './personas';
+import { ANDRES_ID, DANIELA_ID, ELANTRA_ID, JOSE_ID, LUCIA_ID, MARIA_ID, MATEO_ID, ROSA_ID } from './personas';
 import { corredores } from './geografia';
 
 const CHITRE = corredores.find((c) => c.slug === 'panama-chitre')!;
@@ -15,6 +15,8 @@ const CHITRE = corredores.find((c) => c.slug === 'panama-chitre')!;
 export const VIAJE_CHITRE_ID = '55555555-5555-4555-8555-555555555555';
 /** El mismo viaje con el booleano de maletas apagado, para ver `7a` en su otra cara. */
 export const VIAJE_SIN_MALETAS_ID = '55555555-5555-4555-8555-555555555556';
+/** El de esta mañana, a punto de salir: es el que se aborda en `1f` / `1g`. */
+export const VIAJE_ABORDANDO_ID = '55555555-5555-4555-8555-555555555557';
 
 /**
  * El viaje del almacén sale hoy: así las cuentas atrás de `11a` — «expira en
@@ -95,6 +97,7 @@ viajes.push({
   accepts_luggage: false,
 });
 
+
 export const paradas: TripStop[] = [
   {
     id: '66666666-6666-4666-8666-666666666601',
@@ -137,6 +140,38 @@ export const paradas: TripStop[] = [
     created_at: AHORA,
   },
 ];
+
+viajes.push({
+  ...viajes[0],
+  id: VIAJE_ABORDANDO_ID,
+  departure_at: enMinutos(12),
+  arrival_estimate_at: enMinutos(12 + 210),
+  seats_offered: 3,
+  origin_label: 'Albrook · bahía 4',
+});
+
+paradas.push(
+  {
+    id: '66666666-6666-4666-8666-666666666701',
+    trip_id: VIAJE_ABORDANDO_ID,
+    pickup_point_id: null,
+    custom_label: 'Albrook · bahía 4',
+    kind: 'origin',
+    sequence: 0,
+    scheduled_at: enMinutos(12),
+    created_at: AHORA,
+  },
+  {
+    id: '66666666-6666-4666-8666-666666666702',
+    trip_id: VIAJE_ABORDANDO_ID,
+    pickup_point_id: null,
+    custom_label: 'Chitré · Parque Unión',
+    kind: 'destination',
+    sequence: 1,
+    scheduled_at: enMinutos(12 + 210),
+    created_at: AHORA,
+  },
+);
 
 const reservaBase = (extra: Partial<ReservaFila>): ReservaFila => ({
   id: '',
@@ -211,6 +246,43 @@ export const reservas: ReservaFila[] = [
     created_at: haceMinutos(190),
   }),
 ];
+
+/** Los tres puestos vendidos del viaje que está abordando: dos ya subieron. */
+reservas.push(
+  reservaBase({
+    id: '77777777-7777-4777-8777-777777777710',
+    trip_id: VIAJE_ABORDANDO_ID,
+    passenger_id: MARIA_ID,
+    status: 'confirmed',
+    confirmed_at: haceMinutos(2880),
+    proposed_point: 'Albrook · bahía 4',
+    boarding_code: '3179',
+    maletas: 1,
+  }),
+  reservaBase({
+    id: '77777777-7777-4777-8777-777777777711',
+    trip_id: VIAJE_ABORDANDO_ID,
+    passenger_id: JOSE_ID,
+    status: 'confirmed',
+    confirmed_at: haceMinutos(2900),
+    proposed_point: 'Albrook · bahía 4',
+    boarding_code: '6042',
+    boarded_at: haceMinutos(3),
+  }),
+  reservaBase({
+    id: '77777777-7777-4777-8777-777777777712',
+    trip_id: VIAJE_ABORDANDO_ID,
+    passenger_id: LUCIA_ID,
+    status: 'confirmed',
+    confirmed_at: haceMinutos(3000),
+    proposed_point: 'Vía Brasil',
+    boarding_code: '8465',
+    boarded_at: haceMinutos(1),
+    payment_channel: 'external',
+    service_fee_cents: 0,
+    total_cents: 600,
+  }),
+);
 
 export const pagos: Payment[] = [];
 
