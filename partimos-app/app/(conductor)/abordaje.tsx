@@ -290,7 +290,7 @@ const estilos = StyleSheet.create({
     ...tabular,
   },
   cursor: { width: 2, height: 30, backgroundColor: color.rojo500 },
-  error: { marginTop: 12, fontSize: 12.5, lineHeight: 18, color: color.rojo700, fontFamily: familia },
+  error: { marginTop: 12, fontSize: 12.5, lineHeight: 18.125, color: color.rojo700, fontFamily: familia },
 
   teclado: { gap: 9, marginTop: 18 },
   filaTeclas: { flexDirection: 'row', gap: 9 },

@@ -81,17 +81,48 @@ export function Interruptor({ activo, alCambiar, etiqueta, descripcion }: Interr
 
 /* --------------------------------------------------------------- Pastilla */
 
+/** La pastilla tiene dos tamaños en el traspaso, y la diferencia se nota. */
+const MEDIDAS_PASTILLA = {
+  s: { fontSize: 10.5, lineHeight: 15.225, paddingVertical: 3, paddingHorizontal: 8 },
+  m: { fontSize: 11.5, lineHeight: 16.675, paddingVertical: 4, paddingHorizontal: 9 },
+} as const;
+
 type PastillaProps = {
   children: ReactNode;
   fondo?: string;
   tinta?: string;
+  tamano?: keyof typeof MEDIDAS_PASTILLA;
   estilo?: ViewStyle;
 };
 
-export function Pastilla({ children, fondo = color.azul100, tinta = color.azul700, estilo }: PastillaProps) {
+export function Pastilla({
+  children,
+  fondo = color.azul100,
+  tinta = color.azul700,
+  tamano = 's',
+  estilo,
+}: PastillaProps) {
+  const medida = MEDIDAS_PASTILLA[tamano];
   return (
-    <View style={[estilos.pastilla, { backgroundColor: fondo }, estilo]}>
-      <Text style={[texto.pastilla, { color: tinta }]}>{children}</Text>
+    <View
+      style={[
+        estilos.pastilla,
+        {
+          backgroundColor: fondo,
+          paddingVertical: medida.paddingVertical,
+          paddingHorizontal: medida.paddingHorizontal,
+        },
+        estilo,
+      ]}
+    >
+      <Text
+        style={[
+          texto.pastilla,
+          { fontSize: medida.fontSize, lineHeight: medida.lineHeight, color: tinta },
+        ]}
+      >
+        {children}
+      </Text>
     </View>
   );
 }
@@ -329,7 +360,7 @@ const estilos = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  stepperGlifo: { fontSize: 19, lineHeight: 22, fontWeight: '500', color: color.ink900, fontFamily: familia },
+  stepperGlifo: { fontSize: 19, lineHeight: 19, fontWeight: '500', color: color.ink900, fontFamily: familia },
   stepperValor: {
     minWidth: 34,
     textAlign: 'center',
@@ -355,7 +386,7 @@ const estilos = StyleSheet.create({
     elevation: 1,
   },
 
-  pastilla: { borderRadius: radio.pastilla, paddingHorizontal: 8, paddingVertical: 3 },
+  pastilla: { borderRadius: radio.pastilla },
 
   boton: {
     borderRadius: radio.pastilla,

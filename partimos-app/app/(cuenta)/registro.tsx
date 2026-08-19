@@ -420,7 +420,7 @@ const estilos = StyleSheet.create({
   } as never,
   ayuda: { fontSize: 13.5, lineHeight: 20, color: color.ink600, marginTop: 16, fontFamily: familia },
   ayudaCorta: { flex: 1, fontSize: 13.5, lineHeight: 19.57, color: color.ink600, fontFamily: familia, ...tabular },
-  legal: { fontSize: 12.5, lineHeight: 18, color: color.ink500, marginTop: 12, textAlign: 'center', fontFamily: familia },
+  legal: { fontSize: 12.5, lineHeight: 18.125, color: color.ink500, marginTop: 12, textAlign: 'center', fontFamily: familia },
 
   casillas: { flexDirection: 'row', gap: 10 },
   casilla: {
@@ -442,7 +442,7 @@ const estilos = StyleSheet.create({
   },
   cursor: { width: 2, height: 30, backgroundColor: color.rojo500 },
   entradaInvisible: { position: 'absolute', opacity: 0, height: 1, width: 1 },
-  error: { marginTop: 12, fontSize: 12.5, lineHeight: 18, color: color.rojo700, fontFamily: familia },
+  error: { marginTop: 12, fontSize: 12.5, lineHeight: 18.125, color: color.rojo700, fontFamily: familia },
 
   filaReenvio: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 16 },
   enlace: { fontSize: 13.5, lineHeight: 19.57, fontWeight: '600', color: color.azul700, fontFamily: familia },

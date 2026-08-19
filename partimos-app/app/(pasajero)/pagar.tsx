@@ -177,7 +177,7 @@ const estilos = StyleSheet.create({
   },
   titular: {
     fontSize: 33,
-    lineHeight: 35,
+    lineHeight: 34.65,
     letterSpacing: -1.32,
     fontWeight: '400',
     color: '#fff',
@@ -262,11 +262,11 @@ const estilos = StyleSheet.create({
     fontSize: 34,
     fontWeight: '700',
     letterSpacing: -1.53,
-    lineHeight: 34,
+    lineHeight: 30.6,
     color: color.ink900,
     fontFamily: familia,
   },
-  explicacion: { fontSize: 12.5, lineHeight: 18, color: color.ink600, marginTop: 14, fontFamily: familia },
+  explicacion: { fontSize: 12.5, lineHeight: 18.125, color: color.ink600, marginTop: 14, fontFamily: familia },
 
   pie: {
     paddingHorizontal: espacio.gutter,
@@ -279,7 +279,7 @@ const estilos = StyleSheet.create({
   notaPie: {
     textAlign: 'center',
     fontSize: 12.5,
-    lineHeight: 18,
+    lineHeight: 18.125,
     color: color.ink500,
     marginTop: 10,
     fontFamily: familia,

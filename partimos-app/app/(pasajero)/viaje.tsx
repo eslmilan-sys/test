@@ -277,7 +277,7 @@ const estilos = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: color.bordeSutil,
   },
-  promesa: { flex: 1, fontSize: 13, lineHeight: 18, color: color.ink700, fontFamily: familia },
+  promesa: { flex: 1, fontSize: 13, lineHeight: 18.85, color: color.ink700, fontFamily: familia },
 
   barraVidrio: {
     position: 'absolute',

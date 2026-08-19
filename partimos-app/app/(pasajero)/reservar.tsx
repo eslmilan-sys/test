@@ -109,6 +109,7 @@ export default function Reservar() {
               <Epigrafe>Equipaje</Epigrafe>
             </View>
             <Pastilla
+              tamano="m"
               fondo={datos.aceptaMaletas ? color.azul100 : color.sand200}
               tinta={datos.aceptaMaletas ? color.azul700 : color.ink700}
             >
@@ -223,7 +224,7 @@ const estilos = StyleSheet.create({
   },
   titular: {
     fontSize: 33,
-    lineHeight: 35,
+    lineHeight: 34.65,
     letterSpacing: -1.32,
     fontWeight: '400',
     color: '#fff',
@@ -317,7 +318,7 @@ const estilos = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: color.bordeSutil,
   },
-  notaTexto: { flex: 1, fontSize: 12.5, lineHeight: 18, color: color.ink600, fontFamily: familia },
+  notaTexto: { flex: 1, fontSize: 12.5, lineHeight: 18.125, color: color.ink600, fontFamily: familia },
 
   pie: {
     paddingHorizontal: espacio.gutter,
@@ -332,11 +333,11 @@ const estilos = StyleSheet.create({
     fontSize: 32,
     fontWeight: '700',
     letterSpacing: -1.44,
-    lineHeight: 32,
+    lineHeight: 28.8,
     color: color.ink900,
     fontFamily: familia,
     ...tabular,
   },
-  precioSimbolo: { fontSize: 17, fontWeight: '500' },
+  precioSimbolo: { fontSize: 17, lineHeight: 15.3, fontWeight: '500' },
   notaPie: { textAlign: 'center', fontSize: 12.5, lineHeight: 18.12, color: color.ink500, marginTop: 10, fontFamily: familia },
 });

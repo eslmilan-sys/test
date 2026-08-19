@@ -259,7 +259,8 @@ function FilaDeCatalogo({
           <Text style={estilos.valor}>{valor}</Text>
         </View>
       </View>
-      {contador ? <Text style={estilos.contador}>{contador}</Text> : null}
+      {/* El año no lleva cuenta, pero sigue ocupando su hueco en la fila. */}
+      <Text style={estilos.contador}>{contador ?? ''}</Text>
       <Bajar />
     </Pressable>
   );

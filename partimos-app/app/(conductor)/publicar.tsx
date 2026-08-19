@@ -371,7 +371,7 @@ const estilos = StyleSheet.create({
     borderTopColor: color.bordeSutil,
   },
   textoPuestos: { flex: 1, ...texto.fila, color: color.ink900 },
-  cuenta: { fontSize: 12.5, lineHeight: 18, color: color.ink700, marginTop: 10, fontFamily: familia },
+  cuenta: { fontSize: 12.5, lineHeight: 18.125, color: color.ink700, marginTop: 10, fontFamily: familia },
 
   tarjetaInterruptores: {
     marginHorizontal: 22,
@@ -398,5 +398,5 @@ const estilos = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: color.bordeSutil,
   },
-  notaPie: { textAlign: 'center', fontSize: 12.5, lineHeight: 18, color: color.ink500, marginTop: 10, fontFamily: familia },
+  notaPie: { textAlign: 'center', fontSize: 12.5, lineHeight: 18.125, color: color.ink500, marginTop: 10, fontFamily: familia },
 });
