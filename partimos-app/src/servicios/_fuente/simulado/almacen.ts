@@ -9,6 +9,7 @@ import type { Booking, Message, Payment, ReservaFila, TripStop, ViajeFila } from
 
 import { ANDRES_ID, DANIELA_ID, ELANTRA_ID, JOSE_ID, LUCIA_ID, MARIA_ID, MATEO_ID, ROSA_ID } from './personas';
 import { corredores } from './geografia';
+import { AHORA, LLEGADA, SALIDA, desdeLaSalida, enMinutos, enPanama, haceMinutos } from './reloj';
 
 const CHITRE = corredores.find((c) => c.slug === 'panama-chitre')!;
 
@@ -17,38 +18,6 @@ export const VIAJE_CHITRE_ID = '55555555-5555-4555-8555-555555555555';
 export const VIAJE_SIN_MALETAS_ID = '55555555-5555-4555-8555-555555555556';
 /** El de esta mañana, a punto de salir: es el que se aborda en `1f` / `1g`. */
 export const VIAJE_ABORDANDO_ID = '55555555-5555-4555-8555-555555555557';
-
-/**
- * El viaje del almacén sale hoy: así las cuentas atrás de `11a` — «expira en
- * 3 h 40» — significan algo al abrir la app, en vez de contar meses.
- * `5c` no lee de aquí: allí el conductor está componiendo un viaje nuevo.
- */
-const arranque = new Date();
-const enMinutos = (m: number) => new Date(arranque.getTime() + m * 60_000).toISOString();
-const haceMinutos = (m: number) => enMinutos(-m);
-
-/**
- * Todas las salidas cuelgan del mismo día de Panamá, para que el filtro «hoy»
- * de los resultados las vea juntas. Si la primera hora del día ya pasó, el día
- * entero se corre a mañana — nunca se parte por la medianoche.
- */
-const PRIMERA_HORA_PA = 6.5; // 06:30
-
-function aLaHoraDePanama(horas: number, diasDespues = 0): Date {
-  const d = new Date(arranque);
-  d.setUTCHours(Math.floor(horas) + 5, Math.round((horas % 1) * 60), 0, 0); // Panamá es UTC−5
-  d.setUTCDate(d.getUTCDate() + diasDespues);
-  return d;
-}
-
-const corrido = aLaHoraDePanama(PRIMERA_HORA_PA).getTime() - arranque.getTime() < 30 * 60_000 ? 1 : 0;
-const enPanama = (horas: number) => aLaHoraDePanama(horas, corrido).toISOString();
-
-const AHORA = arranque.toISOString();
-const SALIDA = enPanama(14 + 50 / 60);
-const desdeLaSalida = (m: number) =>
-  new Date(new Date(SALIDA).getTime() + m * 60_000).toISOString();
-const LLEGADA = desdeLaSalida(210);
 
 /**
  * El viaje del recorrido del diseño: Albrook → Chitré, publicado y con gente
