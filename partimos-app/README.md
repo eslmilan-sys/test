@@ -41,6 +41,26 @@ Expo Go tiene que ser la versión del SDK 57, que es la que usa el proyecto.
 Y sin teléfono, `npx expo start --web` abre lo mismo en `localhost:8081`; el
 índice de las 58 pantallas está en la raíz.
 
+## Publicada, sin instalar nada
+
+`/app` en la raíz del repositorio es la app exportada como sitio estático: las 58
+pantallas prerenderizadas, sin servidor. Publicada con GitHub Pages se abre desde
+el teléfono con un enlace, sin Expo Go y sin clonar nada:
+
+    https://eslmilan-sys.github.io/test/app/
+
+Para rehacerla después de tocar una pantalla:
+
+```bash
+npm run export:web
+```
+
+El subcamino `/test/app` entra por `PARTIMOS_BASE_URL` en `app.config.js` y solo
+al exportar, para que `npx expo start` siga sirviendo desde la raíz. Si algún día
+la app cambia de carpeta o de dominio, ese es el único sitio que se toca.
+
+Es una carpeta nueva: no toca `partimos/`, que sigue siendo el sitio de siempre.
+
 Las 58 pantallas del traspaso, hechas:
 
 **A · Pasajero: buscar y entrar**
