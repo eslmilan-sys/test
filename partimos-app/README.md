@@ -9,12 +9,20 @@ El QR no lo imprime este repositorio: lo imprime `npx expo start` en la máquina
 que sirve la app, y el teléfono lo escanea para conectarse a ella. Así que el QR
 tiene que nacer en tu computadora, en tu misma red wifi que el teléfono.
 
+La app vive en la rama `claude/partimos-app-design-9hzmqb`, no en `main`, así
+que la carpeta `partimos-app/` no existe hasta después del `checkout`. Por eso se
+clona la rama directamente, y las órdenes van encadenadas con `&&` para que un
+fallo pare la fila en vez de dejar corriendo las demás en la carpeta equivocada:
+
 ```bash
-git clone https://github.com/eslmilan-sys/test.git
-cd test/partimos-app
-git checkout claude/partimos-app-design-9hzmqb
-npm install
-npx expo start
+git clone --branch claude/partimos-app-design-9hzmqb https://github.com/eslmilan-sys/test.git
+cd test/partimos-app && npm install && npx expo start
+```
+
+Si ya tenías el repositorio clonado, no lo vuelvas a clonar:
+
+```bash
+cd ~/test && git checkout claude/partimos-app-design-9hzmqb && cd partimos-app && npm install && npx expo start
 ```
 
 En la terminal aparece el QR y debajo una dirección `exp://192.168.x.x:8081`.
