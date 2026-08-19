@@ -155,7 +155,7 @@ paradas.push(
  * dos posiciones.
  */
 const otrasSalidas: { enMinutos: number; precio: number; puestos: number; maletas: boolean; origen: string }[] = [
-  { enMinutos: 75, precio: 600, puestos: 3, maletas: true, origen: 'Albrook · Terminal' },
+  { enMinutos: 50, precio: 600, puestos: 3, maletas: true, origen: 'Albrook · Terminal' },
   { enMinutos: 160, precio: 700, puestos: 1, maletas: false, origen: 'Vía España' },
   { enMinutos: 245, precio: 500, puestos: 4, maletas: true, origen: 'Costa del Este' },
 ];

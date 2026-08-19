@@ -106,8 +106,6 @@ export default function Estado() {
           </View>
 
           <View>
-            {/* La línea que cose los cuatro puntos, por detrás de ellos. */}
-            <View style={estilos.linea} />
             {datos.pasos.map((paso, i) => (
               <View key={paso.titulo} style={estilos.paso}>
                 <View style={[estilos.punto, PUNTO[paso.estado]]}>
@@ -126,6 +124,9 @@ export default function Estado() {
                 </View>
               </View>
             ))}
+            {/* La línea que cose los cuatro puntos va la última: en el traspaso
+                está posicionada, así que se pinta por encima y los cruza. */}
+            <View style={estilos.linea} />
           </View>
         </View>
 
