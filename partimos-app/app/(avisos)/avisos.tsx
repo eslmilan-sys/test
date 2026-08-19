@@ -273,13 +273,14 @@ const estilos = StyleSheet.create({
     padding: 20,
   },
   /**
-   * El epígrafe de 11 px y «Marcar leído» de 12 px se alinean por la línea base,
-   * que aquí son dos píxeles justos de desnivel.
+   * El epígrafe de 11 px y «Marcar leído» de 12 px comparten línea base: un
+   * píxel de desnivel. Va a mano porque `alignItems: 'baseline'` mide desde la
+   * caja de línea, no desde la letra, y deja el epígrafe un píxel más abajo.
    */
   filaSeccionSaber: { flexDirection: 'row', alignItems: 'flex-start', gap: 9, marginBottom: 4 },
   epigrafeAzul: {
     flex: 1,
-    marginTop: 2,
+    marginTop: 1,
     fontSize: 11,
     lineHeight: 15.95,
     fontWeight: '600',
