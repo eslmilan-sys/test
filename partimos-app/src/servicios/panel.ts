@@ -63,8 +63,10 @@ function comoPublicado(v: ViajeFila): ViajePublicado {
   return {
     id: v.id,
     cuando: v.departure_at,
-    origen: (v.origin_label ?? '').split(' · ')[0],
-    destino: (v.destination_label ?? '').split(' · ')[0],
+    // La etiqueta entera, con el sitio: en el panel del conductor «Albrook»
+    // a secas no dice de qué terminal sale su propio viaje.
+    origen: v.origin_label ?? '',
+    destino: v.destination_label ?? '',
     horaSalida: v.departure_at,
     horaLlegada: v.arrival_estimate_at ?? v.departure_at,
     puestosVendidos: vendidos,
@@ -189,7 +191,10 @@ export async function prepararEdicion(viajeId: string): Promise<Edicion> {
         clave: 'mujeres',
         etiqueta: 'Solo mujeres',
         valor: viaje.gender_preference === 'women_only' ? 'Sí' : 'No',
-        cerrado: hayPagados,
+        // El traspaso lo deja abierto aunque alguien haya pagado. Encenderlo
+        // con un hombre a bordo es un problema de verdad, pero la decisión es
+        // del diseño y se respeta: queda anotado, no cambiado a escondidas.
+        cerrado: false,
       },
     ],
     seAvisa: hayPagados,
