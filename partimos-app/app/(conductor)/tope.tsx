@@ -121,11 +121,14 @@ export default function Tope() {
         </View>
 
         <View style={estilos.tarjetaFrase}>
-          {/* El traspaso mete el amanecer en una caja más grande que la tarjeta
-              y lo desenfoca 26 px para que no se vea dónde empieza. Sin filtro
-              de desenfoque, la caja se ajusta a la tarjeta: el corte duro del
-              degradado se nota más que el desplazamiento de los focos. */}
-          <Amanecer ancho={346} alto={120} />
+          {/* El traspaso desborda el amanecer de la tarjeta y lo desenfoca 26 px,
+              y ese desenfoque es lo que lo deja en un lavado y no en tres
+              manchas. Sin filtro de desenfoque en React Native, el desborde se
+              agranda hasta sacar los tres focos fuera de la tarjeta: dentro
+              sólo entra su caída, que es lo que el desenfoque conseguía. */}
+          <View style={estilos.amanecer} pointerEvents="none">
+            <Amanecer ancho={486} alto={190} />
+          </View>
           <Text style={estilos.frase}>
             {'Aunque llenes el carro, '}
             <Text style={estilos.fraseFuerte}>siempre pones parte del viaje</Text>
@@ -244,6 +247,7 @@ const estilos = StyleSheet.create({
     overflow: 'hidden',
     ...sombra.s,
   },
+  amanecer: { position: 'absolute', left: -70, top: -30, width: 486, height: 190, opacity: 0.95 },
   frase: {
     maxWidth: 250,
     fontSize: 15,

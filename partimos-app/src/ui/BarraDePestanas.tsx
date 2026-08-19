@@ -19,50 +19,50 @@ type Props = {
 };
 
 export function BarraDePestanas({ pestanas, valor, alCambiar, fab }: Props) {
-  const medio = Math.ceil(pestanas.length / 2) - 1;
+  // El FAB es un hermano más de la barra, no un añadido pegado a una pestaña:
+  // si va dentro de otra caja, el reparto `space-between` cuenta cuatro cosas
+  // en vez de cinco y las pestañas del medio se separan de más.
+  const medio = Math.ceil(pestanas.length / 2);
+
+  const pestana = (p: Pestana) => {
+    const activo = p.valor === valor;
+    return (
+      <Pressable
+        key={p.valor}
+        accessibilityRole="tab"
+        accessibilityState={{ selected: activo }}
+        accessibilityLabel={p.etiqueta}
+        onPress={() => alCambiar?.(p.valor)}
+        style={estilos.pestana}
+      >
+        <View style={estilos.icono}>{p.icono(activo)}</View>
+        <Text
+          style={[
+            estilos.etiqueta,
+            { fontWeight: activo ? '600' : '500', color: activo ? color.rojo600 : color.ink700 },
+          ]}
+        >
+          {p.etiqueta}
+        </Text>
+      </Pressable>
+    );
+  };
 
   return (
     <View style={estilos.barra}>
-      {pestanas.map((p, i) => {
-        const activo = p.valor === valor;
-        const boton = (
-          <Pressable
-            key={p.valor}
-            accessibilityRole="tab"
-            accessibilityState={{ selected: activo }}
-            accessibilityLabel={p.etiqueta}
-            onPress={() => alCambiar?.(p.valor)}
-            style={estilos.pestana}
-          >
-            <View style={estilos.icono}>{p.icono(activo)}</View>
-            <Text
-              style={[
-                estilos.etiqueta,
-                { fontWeight: activo ? '600' : '500', color: activo ? color.rojo600 : color.ink700 },
-              ]}
-            >
-              {p.etiqueta}
-            </Text>
-          </Pressable>
-        );
-
-        if (fab && i === medio) {
-          return (
-            <View key={p.valor} style={estilos.conFab}>
-              {boton}
-              <Pressable
-                accessibilityRole="button"
-                accessibilityLabel={fab.etiqueta}
-                onPress={fab.alPulsar}
-                style={estilos.fab}
-              >
-                {fab.icono}
-              </Pressable>
-            </View>
-          );
-        }
-        return boton;
-      })}
+      {pestanas.slice(0, medio).map(pestana)}
+      {fab ? (
+        <Pressable
+          key="fab"
+          accessibilityRole="button"
+          accessibilityLabel={fab.etiqueta}
+          onPress={fab.alPulsar}
+          style={estilos.fab}
+        >
+          {fab.icono}
+        </Pressable>
+      ) : null}
+      {pestanas.slice(medio).map(pestana)}
     </View>
   );
 }
@@ -84,7 +84,6 @@ const estilos = StyleSheet.create({
     shadowOffset: { width: 0, height: 10 },
     elevation: 6,
   },
-  conFab: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   pestana: { alignItems: 'center', gap: 4, paddingHorizontal: 12, minWidth: 52 },
   icono: { width: 22, height: 22, alignItems: 'center', justifyContent: 'center' },
   etiqueta: { fontSize: 10.5, lineHeight: 15.22, letterSpacing: -0.05, fontFamily: familia },

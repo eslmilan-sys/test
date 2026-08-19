@@ -33,6 +33,10 @@ const FOTOS: Record<string, number> = {
   'las-tablas': require('../../assets/venao.webp'),
 };
 
+/** Los puestos se escriben con letra: en una frase, «tres» se lee y «3» se cuenta. */
+const LETRAS = ['cero', 'un', 'dos', 'tres', 'cuatro', 'cinco', 'seis'];
+const enLetra = (n: number) => LETRAS[n] ?? String(n);
+
 export default function Inicio() {
   const router = useRouter();
   const [rutas, setRutas] = useState<RutaPopular[]>([]);
@@ -147,7 +151,7 @@ export default function Inicio() {
                   <Text style={estilos.fraseGancho}>
                     {'Lo que '}
                     <Text style={estilos.fraseGanchoFuerte}>recuperas</Text>
-                    {` llevando ${gancho.puestos} puestos a ${gancho.destino}`}
+                    {` llevando ${enLetra(gancho.puestos)} puestos a ${gancho.destino}`}
                   </Text>
                 </View>
                 <Pressable
@@ -201,7 +205,7 @@ const estilos = StyleSheet.create({
   saludoFuerte: { fontWeight: '600' },
   titular: {
     fontSize: 36,
-    lineHeight: 37,
+    lineHeight: 36.72,
     letterSpacing: -1.62,
     fontWeight: '400',
     color: '#fff',
@@ -317,7 +321,7 @@ const estilos = StyleSheet.create({
   },
   fraseGancho: {
     fontSize: 15,
-    lineHeight: 20,
+    lineHeight: 20.25,
     marginTop: 8,
     maxWidth: 190,
     color: color.ink900,
