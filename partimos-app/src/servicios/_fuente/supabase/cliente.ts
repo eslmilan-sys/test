@@ -33,5 +33,16 @@ export const supabase = createClient<Database>(URL, LLAVE, {
     persistSession: true,
     // El enlace mágico vuelve con la sesión en la URL; solo en web hay URL.
     detectSessionInUrl: Platform.OS === 'web',
+    // `implicit` y no `pkce`, que es el valor por defecto de la librería.
+    //
+    // Con pkce el enlace vuelve con un código que hay que canjear contra el
+    // servidor, y el que empezó la sesión tiene que ser el mismo que la
+    // termina —el verificador vive en el navegador que pidió el correo—. Un
+    // sitio sin servidor abierto desde el correo, muchas veces en otro
+    // navegador, no cumple eso. Con implicit la sesión vuelve entera en el
+    // fragmento de la URL y entra sin canje.
+    //
+    // Es lo que ya usa el sitio de `partimos/`, que funciona. No lo cambiamos.
+    flowType: 'implicit',
   },
 });
