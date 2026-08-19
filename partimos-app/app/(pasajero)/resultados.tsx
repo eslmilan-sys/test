@@ -215,8 +215,8 @@ const estilos = StyleSheet.create({
   },
   titular: {
     fontSize: 31,
-    lineHeight: 33,
-    letterSpacing: -1.4,
+    lineHeight: 32.86,
+    letterSpacing: -1.395,
     fontWeight: '400',
     color: '#fff',
     marginTop: 14,

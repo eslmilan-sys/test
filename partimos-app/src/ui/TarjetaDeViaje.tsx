@@ -115,12 +115,14 @@ const estilos = StyleSheet.create({
     fontSize: 26,
     fontWeight: '700',
     letterSpacing: -1.04,
-    lineHeight: 25,
+    lineHeight: 24.7,
     color: color.ink900,
     fontFamily: familia,
     ...tabular,
   },
-  precioSimbolo: { fontSize: 15, fontWeight: '500' },
+  // El símbolo tiene su propia caja de línea, más apretada que la de la cifra:
+  // así se apoya en la misma base en vez de estirar la fila.
+  precioSimbolo: { fontSize: 15, lineHeight: 14.25, fontWeight: '500' },
 
   recorrido: { gap: 8, marginTop: 11 },
   parada: { flexDirection: 'row', alignItems: 'center', gap: 11 },
