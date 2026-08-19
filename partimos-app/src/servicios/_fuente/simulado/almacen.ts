@@ -199,6 +199,53 @@ otrasSalidas.forEach((s, i) => {
   );
 });
 
+/**
+ * Una salida a otro destino, para que `1a` y los resultados no enseñen la
+ * misma ciudad dos veces. Santiago está más lejos, así que el aporte sube: es
+ * el mismo cálculo, no un número puesto a mano.
+ */
+const SANTIAGO = corredores.find((c) => c.slug === 'panama-santiago')!;
+
+viajes.push({
+  ...viajes[0],
+  id: '55555555-5555-4555-8555-555555555580',
+  corridor_id: SANTIAGO.id,
+  departure_at: enMinutos(38),
+  arrival_estimate_at: enMinutos(38 + (SANTIAGO.typical_duration_min ?? 240)),
+  seats_offered: 2,
+  price_cents: 1200,
+  snap_distance_km: Number(SANTIAGO.distance_km),
+  snap_toll_cents: Number(SANTIAGO.toll_cents),
+  snap_max_price_cents: 1300,
+  destination_label: 'Santiago · Terminal',
+  destination_lat: 8.1015,
+  destination_lng: -80.9803,
+  accepts_luggage: true,
+});
+
+paradas.push(
+  {
+    id: '66666666-6666-4666-8666-666666666801',
+    trip_id: '55555555-5555-4555-8555-555555555580',
+    pickup_point_id: null,
+    custom_label: 'Albrook · Terminal',
+    kind: 'origin',
+    sequence: 0,
+    scheduled_at: enMinutos(38),
+    created_at: AHORA,
+  },
+  {
+    id: '66666666-6666-4666-8666-666666666802',
+    trip_id: '55555555-5555-4555-8555-555555555580',
+    pickup_point_id: null,
+    custom_label: 'Santiago · Terminal',
+    kind: 'destination',
+    sequence: 1,
+    scheduled_at: enMinutos(38 + (SANTIAGO.typical_duration_min ?? 240)),
+    created_at: AHORA,
+  },
+);
+
 const reservaBase = (extra: Partial<ReservaFila>): ReservaFila => ({
   id: '',
   trip_id: VIAJE_CHITRE_ID,

@@ -143,6 +143,51 @@ export async function rutasPopulares(limite = 2): Promise<RutaPopular[]> {
   return demora(rutas);
 }
 
+/* ------------------------------------------------------------------ *
+ * Bienvenida — pantalla `1a`
+ * ------------------------------------------------------------------ */
+
+export type SalidaCercana = {
+  viajeId: string;
+  hora: string;
+  destino: string;
+  aporteCentavos: number;
+  /** El slug de la ciudad, que es como se encuentra su fotografía. */
+  foto: string;
+};
+
+/**
+ * Las salidas que enseña `1a` **sin pedir cuenta**. Es la promesa entera del
+ * recorrido del pasajero en una pantalla: hay gente saliendo ahora, y para
+ * verlo no hace falta registrarse.
+ */
+export async function proximasSalidas(limite = 3, ventanaMin = 60): Promise<SalidaCercana[]> {
+  const ahora = Date.now();
+  const hasta = ahora + ventanaMin * 60_000;
+  const salidas = fuente.viajes
+    // La pantalla promete «salen en la próxima hora»: la ventana la cumple.
+    .filter((v) => v.status === 'published')
+    .filter((v) => {
+      const t = new Date(v.departure_at).getTime();
+      return t >= ahora && t <= hasta;
+    })
+    .filter((v) => v.seats_offered > contarVendidos(v.id))
+    .sort((a, b) => a.departure_at.localeCompare(b.departure_at))
+    .slice(0, limite)
+    .map((v) => {
+      const destino = (v.destination_label ?? '').split(' · ')[0];
+      const ciudad = fuente.ciudades.find((c) => c.name === destino);
+      return {
+        viajeId: v.id,
+        hora: v.departure_at,
+        destino,
+        aporteCentavos: v.price_cents,
+        foto: ciudad?.slug ?? '',
+      };
+    });
+  return demora(salidas);
+}
+
 export type GanchoDeConductor = {
   /** Lo que el conductor recupera llevando el carro lleno en esa ruta. */
   recuperasCentavos: number;

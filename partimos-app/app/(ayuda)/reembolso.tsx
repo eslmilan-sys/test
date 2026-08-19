@@ -12,7 +12,7 @@
  */
 
 import { useEffect, useState } from 'react';
-import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import Svg, { Path, Rect } from 'react-native-svg';
@@ -114,7 +114,7 @@ export default function Reembolso() {
         </Text>
       </View>
 
-      <View style={estilos.medio}>
+      <ScrollView style={estilos.medio} showsVerticalScrollIndicator={false}>
         <View style={estilos.hoja}>
           <View style={{ marginBottom: 14 }}>
             <Epigrafe>¿Qué pasó?</Epigrafe>
@@ -187,7 +187,7 @@ export default function Reembolso() {
             </Pressable>
           </View>
         </View>
-      </View>
+      </ScrollView>
 
       <View style={estilos.pie}>
         <Boton tono="azul" alPulsar={pedir} desactivado={pidiendo}>
@@ -253,8 +253,9 @@ const estilos = StyleSheet.create({
   },
   titularFuerte: { fontWeight: '600' },
 
-  // Lo de en medio no rueda: cabe entero y el pie va fijo debajo.
-  medio: { flex: 1, minHeight: 0, overflow: 'hidden' },
+  // Con el motivo del traspaso cabe justo; con la regla de «cancelé yo», que es
+  // dos líneas más larga, no. Rueda lo de en medio y el pie se queda fijo.
+  medio: { flex: 1, minHeight: 0 },
 
   hoja: {
     marginTop: 22,
@@ -317,6 +318,9 @@ const estilos = StyleSheet.create({
     color: color.ink700,
     marginTop: 8,
     fontFamily: familia,
+    // En web todo Text sale con `white-space: pre-wrap`, y eso mete el espacio
+    // del salto de línea dentro de la caja: cuatro píxeles de más al medir.
+    ...(Platform.OS === 'web' ? ({ whiteSpace: 'normal' } as object) : null),
   },
 
   filaImporte: {
