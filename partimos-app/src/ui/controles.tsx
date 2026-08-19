@@ -100,12 +100,13 @@ export function Pastilla({ children, fondo = color.azul100, tinta = color.azul70
 
 /**
  * `rojo` es la acción de seguir adelante. `azul` es la acción dentro de una
- * hoja, porque rojo sobre rojo no se lee. `contorno` no es destructivo por sí
- * mismo: es la salida secundaria, con borde y sin relleno. `texto` es la
- * salida más callada de todas: sin relleno y sin borde, para lo que se va sin
- * hacer nada.
+ * hoja, porque rojo sobre rojo no se lee. `blanco` es esa misma acción cuando
+ * se sienta encima del campo rojo. `contorno` no es destructivo por sí mismo:
+ * es la salida secundaria, con borde y sin relleno. `texto` es la salida más
+ * callada de todas: sin relleno y sin borde, para lo que se va sin hacer
+ * nada.
  */
-type Tono = 'rojo' | 'azul' | 'contorno' | 'texto';
+type Tono = 'rojo' | 'azul' | 'contorno' | 'texto' | 'blanco';
 type Tamano = 'md' | 'lg';
 
 type BotonProps = {
@@ -145,6 +146,14 @@ export function Boton({
       fondo: 'transparent',
       pulsado: color.sand200,
       tinta: color.ink600,
+      borde: 'transparent',
+    },
+    // Sobre el campo rojo la acción no puede ser roja: ahí el blanco es lo que
+    // se toca para seguir adelante.
+    blanco: {
+      fondo: color.blanco,
+      pulsado: color.sand200,
+      tinta: color.ink900,
       borde: 'transparent',
     },
   }[tono];

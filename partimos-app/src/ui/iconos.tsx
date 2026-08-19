@@ -210,6 +210,29 @@ export function Marca({ tamano = 26, tinta = '#fff' }: Props) {
   );
 }
 
+/**
+ * La marca en sus dos colores, dentro de su cuadrado blanco. Es la única vez
+ * que el rojo y el azul se tocan, y funciona porque son cuatro cuadrados
+ * separados por el blanco de detrás: la geometría de la bandera.
+ */
+export function MarcaColor({ tamano = 44 }: { tamano?: number }) {
+  const hueco = 2;
+  const relleno = 7;
+  const c = (tamano - relleno * 2 - hueco) / 2;
+  const cuadro = (x: number, y: number, tinta: string) => (
+    <Rect x={x} y={y} width={c} height={c} rx={2} fill={tinta} />
+  );
+  return (
+    <Svg width={tamano} height={tamano} viewBox={`0 0 ${tamano} ${tamano}`}>
+      <Rect x={0} y={0} width={tamano} height={tamano} rx={10} fill="#fff" />
+      {cuadro(relleno, relleno, color.rojo500)}
+      {cuadro(relleno + c + hueco, relleno, color.azul500)}
+      {cuadro(relleno, relleno + c + hueco, color.azul500)}
+      {cuadro(relleno + c + hueco, relleno + c + hueco, color.rojo500)}
+    </Svg>
+  );
+}
+
 export function Avion({ tamano = 20, tinta = '#fff' }: Props) {
   return (
     <Svg viewBox="0 0 24 24" width={tamano} height={tamano} fill="none">

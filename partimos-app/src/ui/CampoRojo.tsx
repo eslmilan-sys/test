@@ -14,6 +14,7 @@ import Hibisco from '../../assets/motivos/pa-hibisco.svg';
 import MapaPa from '../../assets/motivos/pa-mapa.svg';
 import Palmera from '../../assets/motivos/pa-palmera.svg';
 import Skyline from '../../assets/motivos/pa-skyline.svg';
+import SkylineTornillo from '../../assets/motivos/pa-skyline-tornillo.svg';
 import { campoRojo } from './tokens';
 
 /**
@@ -26,6 +27,13 @@ const MOTIVOS = {
   mapa: { svg: MapaPa, ancho: 180, alto: 180, sitio: { right: -20, bottom: -16 }, opacidad: 0.2 },
   // la ciudad va al pie, de lado a lado, como una línea de horizonte
   skyline: { svg: Skyline, ancho: 390, alto: 196, sitio: { left: 0, right: 0, bottom: 0 }, opacidad: 0.26 },
+  /**
+   * La silueta con la torre Tornillo, la que trajo el cliente. En `4a` no es
+   * marca de agua sino la línea de horizonte de la pantalla entera: va al pie,
+   * a plena opacidad, con sus tres capas de profundidad ya dentro del propio
+   * archivo.
+   */
+  tornillo: { svg: SkylineTornillo, ancho: 390, alto: 120, sitio: { left: 0, right: 0, bottom: 0 }, opacidad: 1 },
 } as const;
 
 type Props = {
