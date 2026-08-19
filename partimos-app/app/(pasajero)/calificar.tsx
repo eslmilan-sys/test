@@ -6,6 +6,11 @@
  *
  * Los atajos se guardan en las notas por eje que ya tiene `reviews`
  * (`puntualidad`, `manejo`, `trato`, `carro`, `encuentro`).
+ *
+ * Aquí nos apartamos del traspaso a propósito: el diseño pinta «Ahora no» de
+ * rojo sólido y «Enviar calificación» de azul, y eso deja el botón más fuerte
+ * de la pantalla en la salida. Rojo es lo que se toca para seguir adelante,
+ * así que enviar es rojo y la salida va en texto pleno.
  */
 
 import { useEffect, useState } from 'react';
@@ -132,7 +137,6 @@ export default function Calificar() {
 
       <View style={estilos.pie}>
         <Boton
-          tono="azul"
           alPulsar={async () => {
             await calificar(RESERVA, estrellas, elegidos, comentario);
             router.replace('/(pasajero)');
@@ -140,7 +144,7 @@ export default function Calificar() {
         >
           Enviar calificación
         </Boton>
-        <Boton tamano="md" alPulsar={() => router.replace('/(pasajero)')}>
+        <Boton tono="texto" tamano="md" alPulsar={() => router.replace('/(pasajero)')}>
           Ahora no
         </Boton>
       </View>

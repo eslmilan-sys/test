@@ -101,9 +101,11 @@ export function Pastilla({ children, fondo = color.azul100, tinta = color.azul70
 /**
  * `rojo` es la acción de seguir adelante. `azul` es la acción dentro de una
  * hoja, porque rojo sobre rojo no se lee. `contorno` no es destructivo por sí
- * mismo: es la salida secundaria, con borde y sin relleno.
+ * mismo: es la salida secundaria, con borde y sin relleno. `texto` es la
+ * salida más callada de todas: sin relleno y sin borde, para lo que se va sin
+ * hacer nada.
  */
-type Tono = 'rojo' | 'azul' | 'contorno';
+type Tono = 'rojo' | 'azul' | 'contorno' | 'texto';
 type Tamano = 'md' | 'lg';
 
 type BotonProps = {
@@ -139,6 +141,12 @@ export function Boton({
       tinta: color.ink900,
       borde: color.ink900,
     },
+    texto: {
+      fondo: 'transparent',
+      pulsado: color.sand200,
+      tinta: color.ink600,
+      borde: 'transparent',
+    },
   }[tono];
 
   return (
@@ -161,7 +169,13 @@ export function Boton({
       <Text
         style={[
           estilos.botonTexto,
-          { fontSize: medida.fontSize, lineHeight: interlinea(medida.fontSize), color: paleta.tinta },
+          {
+            fontSize: medida.fontSize,
+            lineHeight: interlinea(medida.fontSize),
+            // `-.01em` del traspaso: depende del tamaño, no es un número fijo.
+            letterSpacing: -medida.fontSize / 100,
+            color: paleta.tinta,
+          },
         ]}
       >
         {children}
@@ -332,7 +346,7 @@ const estilos = StyleSheet.create({
     justifyContent: 'center',
     flexDirection: 'row',
   },
-  botonTexto: { fontWeight: '600', letterSpacing: -0.17, fontFamily: familia },
+  botonTexto: { fontWeight: '600', fontFamily: familia },
 
   avatar: {
     borderRadius: radio.cuadrado,
