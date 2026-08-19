@@ -3,14 +3,35 @@
 Recreación del traspaso de diseño (`design_handoff_partimos_app/`) en Expo.
 Un solo código para el navegador y para el teléfono con Expo Go.
 
-## Correrla
+## Correrla en el teléfono
+
+El QR no lo imprime este repositorio: lo imprime `npx expo start` en la máquina
+que sirve la app, y el teléfono lo escanea para conectarse a ella. Así que el QR
+tiene que nacer en tu computadora, en tu misma red wifi que el teléfono.
 
 ```bash
-cd partimos-app
+git clone https://github.com/eslmilan-sys/test.git
+cd test/partimos-app
+git checkout claude/partimos-app-design-9hzmqb
 npm install
-npx expo start          # escanea el QR con Expo Go
-npx expo start --web    # o en el navegador, en localhost:8081
+npx expo start
 ```
+
+En la terminal aparece el QR y debajo una dirección `exp://192.168.x.x:8081`.
+Instala **Expo Go** (App Store o Play Store), ábrela y escanea:
+
+- **Android** — se escanea desde la propia Expo Go, con «Scan QR code».
+- **iPhone** — se escanea con la cámara del sistema, no desde Expo Go.
+
+Si el teléfono no encuentra la computadora, es la wifi: tienen que estar en la
+misma red y sin aislamiento de clientes. La salida es `npx expo start --tunnel`,
+que pasa por internet en vez de por la red local y funciona desde cualquier
+parte.
+
+Expo Go tiene que ser la versión del SDK 57, que es la que usa el proyecto.
+
+Y sin teléfono, `npx expo start --web` abre lo mismo en `localhost:8081`; el
+índice de las 58 pantallas está en la raíz.
 
 Las 58 pantallas del traspaso, hechas:
 
