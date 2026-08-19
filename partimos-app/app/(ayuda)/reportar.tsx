@@ -166,9 +166,12 @@ export default function Reportar() {
             })}
           </View>
 
+          {/* El párrafo va anidado como en el traspaso: la caja de fuera lleva
+              el estilo y ocupa la columna, la de dentro se ciñe a las líneas
+              que ocupa el texto. */}
           <View style={estilos.consecuencia}>
             <Text style={estilos.consecuenciaTexto}>
-              Lo revisamos hoy mismo y puede quedar suspendido mientras miramos.
+              <Text>Lo revisamos hoy mismo y puede quedar suspendido mientras miramos.</Text>
             </Text>
           </View>
         </View>
