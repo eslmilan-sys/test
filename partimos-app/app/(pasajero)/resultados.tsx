@@ -7,16 +7,23 @@
  */
 
 import { useCallback, useEffect, useState } from 'react';
-import { Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Modal, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { useRouter } from 'expo-router';
 
 import { etiquetaDeMaletero } from '@/dominio/equipaje';
 import { NOMBRE_DEL_CANAL } from '@/dominio/tarifas';
-import { type Filtros, buscarViajes, diaEnPanama, proximoDiaConViajes } from '@/servicios/viajes';
+import {
+  COMO_SE_ORDENA,
+  type Filtros,
+  type Orden,
+  buscarViajes,
+  diaEnPanama,
+  proximoDiaConViajes,
+} from '@/servicios/viajes';
 import { BarraDeEstado } from '@/ui/BarraDeEstado';
 import { CampoRojo } from '@/ui/CampoRojo';
-import { Epigrafe } from '@/ui/controles';
+import { Boton, Epigrafe } from '@/ui/controles';
 import { tabular } from '@/ui/dinero';
 import { hora } from '@/ui/fechas';
 import { Atras, Cerrar, Filtros as IconoFiltros } from '@/ui/iconos';
@@ -28,6 +35,7 @@ import { familia, color, espacio, radio } from '@/ui/tokens';
 export default function Resultados() {
   const router = useRouter();
   const [filtros, setFiltros] = useState<Filtros>({});
+  const [hojaAbierta, setHojaAbierta] = useState(false);
   const [viajes, setViajes] = useState<ViajeEnTarjeta[]>([]);
   const [dia, setDia] = useState<string | null>(null);
 
@@ -83,9 +91,15 @@ export default function Resultados() {
           >
             <Atras />
           </Pressable>
-          <View style={estilos.circulo}>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Filtros"
+            onPress={() => setHojaAbierta(true)}
+            style={estilos.circulo}
+          >
             <IconoFiltros />
-          </View>
+            {cuantosFiltros(filtros) > 0 ? <View style={estilos.punto} /> : null}
+          </Pressable>
         </View>
 
         <Text style={estilos.titular}>
@@ -109,6 +123,7 @@ export default function Resultados() {
           etiqueta="Solo mujeres"
           alPulsar={() => alternar('soloMujeres')}
         />
+        <Chip activo={!!filtros.yappy} etiqueta="Yappy" alPulsar={() => alternar('yappy')} />
       </View>
 
       <ScrollView
@@ -118,7 +133,7 @@ export default function Resultados() {
       >
         <View style={estilos.filaSeccion}>
           <Epigrafe>{`Salidas de ${cuandoTexto(dia).toLowerCase()}`}</Epigrafe>
-          <Text style={estilos.orden}>más temprano primero</Text>
+          <Text style={estilos.orden}>{COMO_SE_ORDENA[filtros.orden ?? 'temprano']}</Text>
         </View>
 
         {viajes.length === 0 ? (
@@ -138,6 +153,13 @@ export default function Resultados() {
           </View>
         )}
       </ScrollView>
+    <HojaDeFiltros
+        abierta={hojaAbierta}
+        filtros={filtros}
+        alCambiar={setFiltros}
+        alCerrar={() => setHojaAbierta(false)}
+        cuantos={viajes.length}
+      />
     </View>
   );
 }
@@ -173,6 +195,83 @@ function Chip({
         </View>
       ) : null}
     </Pressable>
+  );
+}
+
+/** Cuántos filtros están puestos: es lo que enciende el punto del icono. */
+function cuantosFiltros(f: Filtros): number {
+  return [f.aceptaMaletas, f.soloMujeres, f.yappy].filter(Boolean).length;
+}
+
+/**
+ * La hoja de filtros. Lo mismo que las pastillas de arriba y dos cosas que no
+ * caben ahí: el orden, y el botón de quitarlos todos.
+ *
+ * Se cierra tocando fuera, como todas las hojas del traspaso.
+ */
+function HojaDeFiltros({
+  abierta,
+  filtros,
+  alCambiar,
+  alCerrar,
+  cuantos,
+}: {
+  abierta: boolean;
+  filtros: Filtros;
+  alCambiar: (f: Filtros) => void;
+  alCerrar: () => void;
+  cuantos: number;
+}) {
+  const alternar = (clave: 'aceptaMaletas' | 'soloMujeres' | 'yappy') =>
+    alCambiar({ ...filtros, [clave]: filtros[clave] ? undefined : true });
+
+  return (
+    <Modal visible={abierta} transparent animationType="slide" onRequestClose={alCerrar}>
+      <Pressable accessibilityLabel="Cerrar" style={estilos.velo} onPress={alCerrar} />
+      <View style={estilos.hoja}>
+        <View style={estilos.asa} />
+        <Text style={estilos.hojaTitulo}>Filtros</Text>
+
+        <View style={estilos.hojaGrupo}>
+          <Chip
+            activo={!!filtros.aceptaMaletas}
+            etiqueta="Acepta maletas"
+            alPulsar={() => alternar('aceptaMaletas')}
+          />
+          <Chip
+            activo={!!filtros.soloMujeres}
+            etiqueta="Solo mujeres"
+            alPulsar={() => alternar('soloMujeres')}
+          />
+          <Chip activo={!!filtros.yappy} etiqueta="Yappy" alPulsar={() => alternar('yappy')} />
+        </View>
+
+        <Text style={estilos.hojaEpigrafe}>Ordenar por</Text>
+        <View style={estilos.hojaGrupo}>
+          {(['temprano', 'barato'] as Orden[]).map((o) => (
+            <Chip
+              key={o}
+              activo={(filtros.orden ?? 'temprano') === o}
+              etiqueta={o === 'temprano' ? 'Más temprano' : 'Aporte más bajo'}
+              alPulsar={() => alCambiar({ ...filtros, orden: o })}
+            />
+          ))}
+        </View>
+
+        <View style={estilos.hojaPie}>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Quitar los filtros"
+            onPress={() => alCambiar({})}
+          >
+            <Text style={estilos.quitar}>Quitar los filtros</Text>
+          </Pressable>
+          <Boton alPulsar={alCerrar}>
+            {cuantos === 1 ? 'Ver 1 viaje' : `Ver ${cuantos} viajes`}
+          </Boton>
+        </View>
+      </View>
+    </Modal>
   );
 }
 
@@ -232,6 +331,69 @@ const estilos = StyleSheet.create({
   },
 
   filtros: { flexDirection: 'row', gap: 8, paddingHorizontal: espacio.gutter },
+
+  /** El punto que dice que hay filtros puestos sin tener que abrir la hoja. */
+  punto: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    width: 7,
+    height: 7,
+    borderRadius: 4,
+    backgroundColor: color.rojo500,
+  },
+
+  velo: { flex: 1, backgroundColor: 'rgba(18,9,12,.42)' },
+  hoja: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: color.blanco,
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    paddingHorizontal: espacio.hoja,
+    paddingTop: 12,
+    paddingBottom: 34,
+    gap: 14,
+    maxWidth: 390,
+    alignSelf: 'center',
+    width: '100%',
+  },
+  asa: {
+    width: 40,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: color.bordePorDefecto,
+    alignSelf: 'center',
+  },
+  hojaTitulo: {
+    fontFamily: familia,
+    fontSize: 22,
+    lineHeight: 31.9,
+    fontWeight: '600',
+    letterSpacing: -0.22,
+    color: color.ink900,
+  },
+  hojaEpigrafe: {
+    fontFamily: familia,
+    fontSize: 12,
+    lineHeight: 17.4,
+    fontWeight: '600',
+    letterSpacing: 0.1 * 12,
+    textTransform: 'uppercase',
+    color: color.ink600,
+  },
+  hojaGrupo: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  hojaPie: { gap: 12, marginTop: 4 },
+  quitar: {
+    fontFamily: familia,
+    fontSize: 14,
+    lineHeight: 20.3,
+    fontWeight: '600',
+    color: color.ink600,
+    textAlign: 'center',
+  },
   chip: {
     height: 34,
     paddingHorizontal: 13,

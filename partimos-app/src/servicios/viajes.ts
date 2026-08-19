@@ -49,6 +49,18 @@ export type ViajeEnResultados = AvailableTrip & {
 export type Filtros = {
   aceptaMaletas?: boolean;
   soloMujeres?: boolean;
+  /** Quien paga con Yappy no quiere ver viajes que solo aceptan efectivo. */
+  yappy?: boolean;
+  /** El orden de `1b`: «más temprano primero» o el aporte más bajo. */
+  orden?: Orden;
+};
+
+export type Orden = 'temprano' | 'barato';
+
+/** Lo que la pantalla escribe debajo del titular. */
+export const COMO_SE_ORDENA: Record<Orden, string> = {
+  temprano: 'más temprano primero',
+  barato: 'el aporte más bajo primero',
 };
 
 /**
@@ -70,9 +82,15 @@ export async function buscarViajes(
     .filter((v) => diaEnPanama(v.departure_at) === fecha)
     .filter((v) => (filtros.aceptaMaletas ? v.accepts_luggage : true))
     .filter((v) => (filtros.soloMujeres ? v.gender_preference === 'women_only' : true))
+    .filter((v) => (filtros.yappy ? v.accepts_yappy_direct : true))
     .map(comoResultado)
     // un viaje lleno no es un resultado
-    .filter((v) => (v.seats_available ?? 0) > 0);
+    .filter((v) => (v.seats_available ?? 0) > 0)
+    .sort((a, b) => {
+      const hora = (a.departure_at ?? '').localeCompare(b.departure_at ?? '');
+      if (filtros.orden !== 'barato') return hora;
+      return (a.price_cents ?? 0) - (b.price_cents ?? 0) || hora;
+    });
 
   return demora(encontrados);
 }
