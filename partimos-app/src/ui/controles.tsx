@@ -317,7 +317,17 @@ export function Avatar({
         { width: tamano, height: tamano, backgroundColor: paleta.fondo },
       ]}
     >
-      <Text style={{ fontSize: tamano * 0.4, fontWeight: '600', letterSpacing: -0.4, color: paleta.tinta, fontFamily: familia }}>
+      <Text
+        style={{
+          fontSize: tamano * 0.4,
+          lineHeight: interlinea(tamano * 0.4),
+          fontWeight: '600',
+          // `-.02em`, como el resto del traspaso: depende del tamaño.
+          letterSpacing: tamano * 0.4 * -0.02,
+          color: paleta.tinta,
+          fontFamily: familia,
+        }}
+      >
         {iniciales}
       </Text>
     </View>
