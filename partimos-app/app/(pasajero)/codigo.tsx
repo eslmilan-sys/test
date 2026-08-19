@@ -181,7 +181,7 @@ const estilos = StyleSheet.create({
 
   explicacion: {
     fontSize: 14,
-    lineHeight: 20,
+    lineHeight: 20.3,
     color: color.campoTexto,
     marginTop: 18,
     fontFamily: familia,
@@ -250,5 +250,5 @@ const estilos = StyleSheet.create({
     paddingVertical: 16,
     paddingHorizontal: 18,
   },
-  avisoTexto: { fontSize: 13.5, lineHeight: 20, color: color.ink700, fontFamily: familia },
+  avisoTexto: { fontSize: 13.5, lineHeight: 20.3, color: color.ink700, fontFamily: familia },
 });

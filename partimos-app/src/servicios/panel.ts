@@ -91,6 +91,8 @@ export type PuestoMio = {
   canal: string;
   codigo: string;
   punto: string;
+  /** Los kilómetros del corredor, que `1h` enseña junto al tiempo que falta. */
+  distanciaKm: number;
   /** Sólo el de hoy manda en la pantalla. */
   esDeHoy: boolean;
 };
@@ -133,6 +135,7 @@ function comoPuesto(r: (typeof fuente.reservas)[number]): PuestoMio | null {
     canal: r.payment_channel,
     codigo: r.boarding_code,
     punto: r.proposed_point ?? (viaje.origin_label ?? '').split(' · ')[0],
+    distanciaKm: viaje.snap_distance_km ?? 0,
     esDeHoy: enPanama.format(new Date(viaje.departure_at)) === enPanama.format(new Date()),
   };
 }

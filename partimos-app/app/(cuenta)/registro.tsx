@@ -75,15 +75,19 @@ export default function Registro() {
       <BarraDeEstado />
 
       <View style={estilos.cabecera}>
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="Atrás"
-          onPress={() => (paso === 1 ? router.back() : setPaso((p) => (p - 1) as Paso))}
-          style={estilos.circulo}
-        >
-          <Atras />
-        </Pressable>
-        <Text style={estilos.epigrafeCampo}>{`Paso ${paso} de 3`}</Text>
+        {/* El paso va a la derecha del botón de atrás, en la misma fila: es
+            una marca de sitio, no un título. */}
+        <View style={estilos.filaSuperior}>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Atrás"
+            onPress={() => (paso === 1 ? router.back() : setPaso((p) => (p - 1) as Paso))}
+            style={estilos.circulo}
+          >
+            <Atras />
+          </Pressable>
+          <Text style={estilos.epigrafeCampo}>{`Paso ${paso} de 3`}</Text>
+        </View>
         <Text style={estilos.titular}>
           {paso === 1 ? 'Tu ' : paso === 2 ? 'Escribe el ' : '¿Cómo te '}
           <Text style={estilos.titularFuerte}>
@@ -357,8 +361,8 @@ const estilos = StyleSheet.create({
     backgroundColor: color.campoControl,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 14,
   },
+  filaSuperior: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   epigrafeCampo: {
     fontSize: 11, lineHeight: 15.95,
     fontWeight: '600',
@@ -369,7 +373,7 @@ const estilos = StyleSheet.create({
   },
   titular: {
     fontSize: 30,
-    lineHeight: 32,
+    lineHeight: 31.8,
     letterSpacing: -1.35,
     fontWeight: '400',
     color: '#fff',

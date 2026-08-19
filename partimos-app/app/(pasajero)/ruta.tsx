@@ -61,7 +61,7 @@ export default function EnRuta() {
             <Text style={estilos.epigrafeVidrio}>Llegas</Text>
             <Text style={estilos.horaLlegada}>{hora(llegada)}</Text>
             <View style={estilos.raya} />
-            <Text style={estilos.faltaTexto}>{restante(llegada)}</Text>
+            <Text style={estilos.faltaTexto}>{`${restante(llegada)} · ${puesto.distanciaKm} km`}</Text>
           </View>
         </Vidrio>
       </View>
@@ -185,6 +185,7 @@ const estilos = StyleSheet.create({
     position: 'absolute',
     left: 0,
     right: 0,
+    top: 499.3,
     bottom: 0,
     backgroundColor: color.blanco,
     borderTopLeftRadius: 28,

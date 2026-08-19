@@ -125,8 +125,8 @@ const estilos = StyleSheet.create({
   },
   titular: {
     fontSize: 31,
-    lineHeight: 33,
-    letterSpacing: -1.4,
+    lineHeight: 32.86,
+    letterSpacing: -1.395,
     fontWeight: '400',
     color: '#fff',
     marginTop: 12,
@@ -165,7 +165,7 @@ const estilos = StyleSheet.create({
   },
   explicacion: {
     fontSize: 13.5,
-    lineHeight: 20,
+    lineHeight: 19.575,
     color: color.ink600,
     marginTop: 14,
     fontFamily: familia,
@@ -188,7 +188,7 @@ const estilos = StyleSheet.create({
     fontSize: 46,
     fontWeight: '700',
     letterSpacing: -2.3,
-    lineHeight: 46,
+    lineHeight: 41.4,
     color: color.ink900,
     fontFamily: familia,
     ...tabular,
