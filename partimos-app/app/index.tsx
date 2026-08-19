@@ -21,10 +21,13 @@ const HECHAS = [
   { id: '1f', titulo: 'Código de abordaje · pasajero', ruta: '/(pasajero)/codigo' as const },
   { id: '1g', titulo: 'Código de abordaje · conductor', ruta: '/(conductor)/abordaje' as const },
   { id: '1i', titulo: 'Llegada y liberación', ruta: '/(pasajero)/llegada' as const },
+  { id: '6b', titulo: 'Perfil público', ruta: '/(pasajero)/perfil' as const },
+  { id: '6c', titulo: 'Chat del viaje', ruta: '/(pasajero)/chat' as const },
+  { id: '1j', titulo: 'Calificar', ruta: '/(pasajero)/calificar' as const },
 ];
 
-/** Lo siguiente, ya fuera del bloque de riesgo: el descubrimiento del pasajero. */
-const PENDIENTES = ['6b  Perfil público', '6c  Chat del viaje', '1j  Calificar'];
+/** Lo siguiente: el resto del descubrimiento del pasajero y el tablero D. */
+const PENDIENTES = ['1a  Bienvenida', '3c  Filtros', '1d  Publicar desde el mapa', '9a  Mis viajes'];
 
 export default function Indice() {
   return (

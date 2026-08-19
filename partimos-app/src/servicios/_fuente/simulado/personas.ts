@@ -5,7 +5,7 @@
  * piden puesto en `11a`.
  */
 
-import type { Profile, Vehicle, VehicleCategory } from '@/tipos';
+import type { Profile, Review, Vehicle, VehicleCategory } from '@/tipos';
 
 export const ANDRES_ID = '11111111-1111-4111-8111-111111111111';
 export const MATEO_ID = '22222222-2222-4222-8222-222222222222';
@@ -14,6 +14,8 @@ export const DANIELA_ID = '99999999-9999-4999-8999-999999999999';
 export const MARIA_ID = 'aaaaaaa1-0000-4000-8000-000000000001';
 export const JOSE_ID = 'aaaaaaa1-0000-4000-8000-000000000002';
 export const LUCIA_ID = 'aaaaaaa1-0000-4000-8000-000000000003';
+export const VIELKA_ID = 'aaaaaaa1-0000-4000-8000-000000000004';
+export const JAVIER_ID = 'aaaaaaa1-0000-4000-8000-000000000005';
 export const ELANTRA_ID = '44444444-4444-4444-8444-444444444444';
 
 /** Filas reales de `vehicle_categories`. El `rate_per_km_cents` de la base es
@@ -173,6 +175,48 @@ export const perfiles: Profile[] = [
     accepts_yappy_direct: true,
     accepts_cash: false,
   },
+  {
+    id: VIELKA_ID,
+    first_name: 'Vielka',
+    last_initial: 'C.',
+    phone: '+507 6000 0007',
+    photo_url: null,
+    home_city_id: '6a6a7413-08f3-4902-9378-62847a9856bd',
+    gender: 'mujer',
+    bio: null,
+    is_id_verified: true,
+    is_phone_verified: true,
+    is_suspended: false,
+    suspended_reason: null,
+    locale: 'es-PA',
+    created_at: '2026-04-20T09:00:00+00:00',
+    updated_at: '2026-08-01T09:00:00+00:00',
+    linkedin_connected_at: null,
+    preferred_pay_channel: 'yappy_app',
+    accepts_yappy_direct: true,
+    accepts_cash: true,
+  },
+  {
+    id: JAVIER_ID,
+    first_name: 'Javier',
+    last_initial: 'S.',
+    phone: '+507 6000 0008',
+    photo_url: null,
+    home_city_id: '6a6a7413-08f3-4902-9378-62847a9856bd',
+    gender: 'hombre',
+    bio: null,
+    is_id_verified: true,
+    is_phone_verified: true,
+    is_suspended: false,
+    suspended_reason: null,
+    locale: 'es-PA',
+    created_at: '2026-04-20T09:00:00+00:00',
+    updated_at: '2026-08-01T09:00:00+00:00',
+    linkedin_connected_at: null,
+    preferred_pay_channel: 'yappy_app',
+    accepts_yappy_direct: true,
+    accepts_cash: true,
+  },
 ];
 
 export const vehiculos: Vehicle[] = [
@@ -208,6 +252,73 @@ export const reputacion: Record<string, { viajes: number; calificacion: number |
   [JOSE_ID]: { viajes: 3, calificacion: 4.7 },
   [LUCIA_ID]: { viajes: 9, calificacion: 5.0 },
 };
+
+/**
+ * Reseñas, forma exacta de `reviews`. Los atajos de `1j` no son una columna
+ * nueva: se guardan en las notas por eje que la tabla ya tiene
+ * (`puntualidad`, `manejo`, `trato`, `carro`, `encuentro`).
+ *
+ * El nombre de quien escribe no vive aquí: se une por `author_id`, como en
+ * producción se une con `public_profiles`.
+ */
+export const resenas: Review[] = [
+  {
+    id: 'bbbbbbb1-0000-4000-8000-000000000001',
+    booking_id: '77777777-7777-4777-8777-7777777776a1',
+    author_id: VIELKA_ID,
+    subject_id: ANDRES_ID,
+    rating: 5,
+    comment: 'Puntual y maneja tranquilo. Avisó cuando iba llegando.',
+    puntualidad: 5,
+    manejo: 5,
+    trato: 5,
+    carro: null,
+    encuentro: null,
+    created_at: '2026-07-12T22:10:00+00:00',
+  },
+  {
+    id: 'bbbbbbb1-0000-4000-8000-000000000002',
+    booking_id: '77777777-7777-4777-8777-7777777776a2',
+    author_id: JAVIER_ID,
+    subject_id: ANDRES_ID,
+    rating: 5,
+    comment: 'El punto de recogida era exacto. Repetiría.',
+    puntualidad: null,
+    manejo: null,
+    trato: null,
+    carro: null,
+    encuentro: 5,
+    created_at: '2026-06-28T23:40:00+00:00',
+  },
+  {
+    id: 'bbbbbbb1-0000-4000-8000-000000000003',
+    booking_id: '77777777-7777-4777-8777-7777777776a3',
+    author_id: ROSA_ID,
+    subject_id: ANDRES_ID,
+    rating: 5,
+    comment: 'Todo claro desde el chat.',
+    puntualidad: null,
+    manejo: null,
+    trato: 5,
+    carro: null,
+    encuentro: null,
+    created_at: '2026-06-01T21:05:00+00:00',
+  },
+  {
+    id: 'bbbbbbb1-0000-4000-8000-000000000004',
+    booking_id: '77777777-7777-4777-8777-7777777776a4',
+    author_id: ANDRES_ID,
+    subject_id: MATEO_ID,
+    rating: 5,
+    comment: 'Llegó antes que yo al punto.',
+    puntualidad: 5,
+    manejo: null,
+    trato: null,
+    carro: null,
+    encuentro: 5,
+    created_at: '2026-07-20T20:00:00+00:00',
+  },
+];
 
 /** La placa completa, que la columna `plate_last3` todavía no puede guardar. */
 export const placasCompletas: Record<string, string> = {

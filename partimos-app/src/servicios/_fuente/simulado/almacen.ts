@@ -5,7 +5,7 @@
  * servicios y reciben filas; de dónde salen no es asunto suyo.
  */
 
-import type { Booking, Payment, ReservaFila, TripStop, ViajeFila } from '@/tipos';
+import type { Booking, Message, Payment, ReservaFila, TripStop, ViajeFila } from '@/tipos';
 
 import { ANDRES_ID, DANIELA_ID, ELANTRA_ID, JOSE_ID, LUCIA_ID, MARIA_ID, MATEO_ID, ROSA_ID } from './personas';
 import { corredores } from './geografia';
@@ -347,6 +347,37 @@ reservas.push(
     total_cents: 600,
   }),
 );
+
+/**
+ * El hilo de la reserva de Daniela, donde se acuerda el punto por escrito.
+ * `messages` es inmutable en la base: un trigger prohíbe editarlos.
+ */
+export const mensajes: Message[] = [
+  {
+    id: 1,
+    booking_id: '77777777-7777-4777-8777-777777777700',
+    sender_id: ANDRES_ID,
+    body: 'Buenas Daniela, salgo puntual del Parque Unión a las 6.',
+    read_at: haceMinutos(600),
+    created_at: haceMinutos(660),
+  },
+  {
+    id: 2,
+    booking_id: '77777777-7777-4777-8777-777777777700',
+    sender_id: DANIELA_ID,
+    body: 'Perfecto. ¿Puedo subir una maleta mediana?',
+    read_at: haceMinutos(600),
+    created_at: haceMinutos(658),
+  },
+  {
+    id: 3,
+    booking_id: '77777777-7777-4777-8777-777777777700',
+    sender_id: ANDRES_ID,
+    body: 'Sí, va en el baúl. Te espero frente a la iglesia.',
+    read_at: null,
+    created_at: haceMinutos(655),
+  },
+];
 
 export const pagos: Payment[] = [];
 

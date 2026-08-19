@@ -210,6 +210,34 @@ export function Marca({ tamano = 26, tinta = '#fff' }: Props) {
   );
 }
 
+export function Avion({ tamano = 20, tinta = '#fff' }: Props) {
+  return (
+    <Svg viewBox="0 0 24 24" width={tamano} height={tamano} fill="none">
+      <Path
+        d="M4 12l16-8-6 8 6 8z"
+        stroke={tinta}
+        strokeWidth={1.8}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </Svg>
+  );
+}
+
+/** La estrella grande de `1j`, que se rellena o se queda en contorno. */
+export function EstrellaGrande({ tamano = 44, llena = true }: { tamano?: number; llena?: boolean }) {
+  const d = 'M12 2.6l2.9 6 6.6.8-4.8 4.5 1.2 6.5L12 17.2l-5.9 3.2 1.2-6.5L2.5 9.4l6.6-.8z';
+  return (
+    <Svg viewBox="0 0 24 24" width={tamano} height={tamano} fill="none">
+      {llena ? (
+        <Path d={d} fill={color.oro500} />
+      ) : (
+        <Path d={d} stroke={color.ink200} strokeWidth={1.7} />
+      )}
+    </Svg>
+  );
+}
+
 /** Cobertura y batería de la barra de estado del diseño. */
 export function Cobertura({ tinta = '#fff' }: Props) {
   return (

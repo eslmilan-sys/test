@@ -28,6 +28,9 @@ Pantallas hechas:
 | `1f` | Código de abordaje · pasajero | `/(pasajero)/codigo` |
 | `1g` | Código de abordaje · conductor | `/(conductor)/abordaje` |
 | `1i` | Llegada y liberación | `/(pasajero)/llegada` |
+| `6b` | Perfil público | `/(pasajero)/perfil` |
+| `6c` | Chat del viaje | `/(pasajero)/chat` |
+| `1j` | Calificar | `/(pasajero)/calificar` |
 
 ## Cómo está montada
 
