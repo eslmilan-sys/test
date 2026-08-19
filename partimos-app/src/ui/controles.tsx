@@ -17,10 +17,19 @@ type StepperProps = {
   min?: number;
   max?: number;
   /** Se lee con lector de pantalla: «Puestos libres, 3». */
+  /** Lo que va detrás de la cifra: «$» cuando el contador cuenta dinero. */
+  sufijo?: string;
   etiquetaAccesible: string;
 };
 
-export function Stepper({ valor, alCambiar, min = 0, max = 9, etiquetaAccesible }: StepperProps) {
+export function Stepper({
+  valor,
+  alCambiar,
+  min = 0,
+  max = 9,
+  sufijo,
+  etiquetaAccesible,
+}: StepperProps) {
   const boton = (paso: number, apagado: boolean, glifo: string, nombre: string) => (
     <Pressable
       disabled={apagado}
@@ -44,7 +53,12 @@ export function Stepper({ valor, alCambiar, min = 0, max = 9, etiquetaAccesible 
       accessibilityValue={{ min, max, now: valor }}
     >
       {boton(-1, valor <= min, '−', 'Uno menos')}
-      <Text style={estilos.stepperValor}>{valor}</Text>
+      <Text style={estilos.stepperValor}>
+        {valor}
+        {/* El símbolo va más pequeño y en tinta suave: la cifra es lo que se
+            mueve, el símbolo sólo dice de qué. */}
+        {sufijo ? <Text style={estilos.stepperSufijo}>{` ${sufijo}`}</Text> : null}
+      </Text>
       {boton(1, valor >= max, '+', 'Uno más')}
     </View>
   );
@@ -361,6 +375,7 @@ const estilos = StyleSheet.create({
     justifyContent: 'center',
   },
   stepperGlifo: { fontSize: 19, lineHeight: 19, fontWeight: '500', color: color.ink900, fontFamily: familia },
+  stepperSufijo: { fontSize: 13, lineHeight: 18.85, fontWeight: '600', color: color.ink600 },
   stepperValor: {
     minWidth: 34,
     textAlign: 'center',
@@ -372,7 +387,7 @@ const estilos = StyleSheet.create({
 
   interruptorFila: { flexDirection: 'row', gap: 16, minHeight: 30 },
   interruptorEtiqueta: { fontSize: 15, lineHeight: 21.75, fontWeight: '500', color: color.ink900, fontFamily: familia },
-  interruptorDescripcion: { fontSize: 13, lineHeight: 18, color: color.ink600, marginTop: 2, fontFamily: familia },
+  interruptorDescripcion: { fontSize: 13, lineHeight: 18.2, color: color.ink600, marginTop: 2, fontFamily: familia },
   pista: { width: 48, height: 30, borderRadius: radio.pastilla, padding: 3, justifyContent: 'center' },
   pulgar: {
     width: 24,
