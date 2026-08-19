@@ -1,12 +1,12 @@
 /**
  * `4e` `14e` Entrar — para quien ya tiene cuenta.
  *
- * **El celular es la llave.** No hay contraseña que recordar ni que perder: se
- * pide el número y llega un código, igual que al registrarse. Por eso esta
- * pantalla y el primer paso de `4b` se parecen tanto — es a propósito.
+ * **Correo y contraseña**, no el celular que dibuja el traspaso: no hay
+ * proveedor de SMS contratado y las cuentas que existen son de correo. El
+ * motivo entero está en `servicios/cuenta.ts`.
  *
- * Google y Apple van debajo de una línea, no arriba: en Panamá el número es lo
- * que todo el mundo tiene, y lo demás es un atajo para quien lo prefiera.
+ * Google y Apple van debajo de una línea, no arriba: el correo es lo que todo
+ * el mundo tiene, y lo demás es un atajo para quien lo prefiera.
  */
 
 import { useState } from 'react';
@@ -14,8 +14,9 @@ import { Platform, Pressable, StyleSheet, Text, TextInput, View } from 'react-na
 
 import { useRouter } from 'expo-router';
 
-import { PREFIJO_PA, formatearTelefono, pedirCodigo, telefonoCompleto } from '@/servicios/cuenta';
+import { QUE_PASO, contrasenaValida, correoValido, entrar as entrarConCuenta } from '@/servicios/cuenta';
 import { BarraDeEstado } from '@/ui/BarraDeEstado';
+import { Campo } from '@/ui/Campo';
 import { CampoRojo } from '@/ui/CampoRojo';
 import { Boton } from '@/ui/controles';
 import { tabular } from '@/ui/dinero';
@@ -24,15 +25,21 @@ import { TRACK_MICRO, familia, color, espacio, interlinea, radio } from '@/ui/to
 
 export default function Entrar() {
   const router = useRouter();
-  const [telefono, setTelefono] = useState('');
-  const [enfocado, setEnfocado] = useState(false);
+  const [correo, setCorreo] = useState('');
+  const [clave, setClave] = useState('');
+  const [quePaso, setQuePaso] = useState<string | null>(null);
+  const [entrando, setEntrando] = useState(false);
 
-  const listo = telefonoCompleto(telefono);
+  const listo = correoValido(correo) && contrasenaValida(clave);
 
   const enviar = async () => {
-    if (!listo) return;
-    await pedirCodigo(telefono);
-    router.push({ pathname: '/(cuenta)/registro', params: { telefono, paso: '2' } });
+    if (!listo || entrando) return;
+    setEntrando(true);
+    setQuePaso(null);
+    const r = await entrarConCuenta(correo, clave);
+    setEntrando(false);
+    if (r.ok) router.replace('/(pasajero)');
+    else setQuePaso(QUE_PASO[r.motivo]);
   };
 
   return (
@@ -56,37 +63,38 @@ export default function Entrar() {
         <Text style={estilos.titular}>
           {'Hola otra vez,'}
           {'\n'}
-          <Text style={estilos.titularFuerte}>¿tu celular?</Text>
+          <Text style={estilos.titularFuerte}>¿tu correo?</Text>
         </Text>
       </View>
 
       <View style={estilos.cuerpo}>
         <View style={estilos.hoja}>
-          <View style={estilos.filaTelefono}>
-            <View style={estilos.prefijo}>
-              <Text style={estilos.prefijoTexto}>{PREFIJO_PA}</Text>
-              <Chevron />
-            </View>
-            <View style={[estilos.campoTelefono, enfocado && { borderColor: color.ink900 }]}>
-              <TextInput
-                accessibilityLabel="Tu celular"
-                value={formatearTelefono(telefono)}
-                onChangeText={(t) => setTelefono(t.replace(/\D/g, '').slice(0, 8))}
-                onFocus={() => setEnfocado(true)}
-                onBlur={() => setEnfocado(false)}
-                onSubmitEditing={enviar}
-                keyboardType="number-pad"
-                placeholder="6612 4831"
-                placeholderTextColor={color.ink400}
-                style={estilos.entradaTelefono}
-              />
-            </View>
+          <View style={{ gap: 14 }}>
+            <Campo
+              etiqueta="Correo"
+              valor={correo}
+              alEscribir={setCorreo}
+              marcador="tu@correo.com"
+              correo
+              mal={!!quePaso}
+            />
+            <Campo
+              etiqueta="Contraseña"
+              valor={clave}
+              alEscribir={setClave}
+              marcador="Al menos 6 caracteres"
+              secreto
+              mal={!!quePaso}
+              alTerminar={enviar}
+            />
           </View>
+
+          {quePaso ? <Text style={estilos.quePaso}>{quePaso}</Text> : null}
 
           <View style={{ marginTop: 16 }}>
             {/* Dentro de la hoja blanca la acción es azul: rojo sobre rojo no se lee. */}
-            <Boton tono="azul" desactivado={!listo} alPulsar={enviar}>
-              Enviarme el código
+            <Boton tono="azul" desactivado={!listo || entrando} alPulsar={enviar}>
+              {entrando ? 'Entrando…' : 'Entrar'}
             </Boton>
           </View>
         </View>
@@ -107,22 +115,14 @@ export default function Entrar() {
             </Pressable>
           </View>
 
-          <Text style={estilos.cambiaste}>
-            {'¿Cambiaste de número? '}
-            <Text style={estilos.escribenos}>Escríbenos</Text>
-          </Text>
+          <Pressable accessibilityRole="button" onPress={() => router.push('/(cuenta)/registro')}>
+            <Text style={estilos.cambiaste}>
+              {'¿Todavía no tienes cuenta? '}
+              <Text style={estilos.escribenos}>Regístrate</Text>
+            </Text>
+          </Pressable>
         </View>
       </View>
-    </View>
-  );
-}
-
-/** La flecha del selector de prefijo. */
-function Chevron() {
-  return (
-    <View style={estilos.chevron}>
-      <View style={estilos.chevronRama} />
-      <View style={[estilos.chevronRama, { transform: [{ rotate: '-45deg' }], marginLeft: -3.5 }]} />
     </View>
   );
 }
@@ -135,6 +135,14 @@ const estilos = StyleSheet.create({
     width: '100%',
     alignSelf: 'center',
     ...(Platform.OS === 'web' ? { height: 844, maxHeight: 844 } : null),
+  },
+
+  quePaso: {
+    fontFamily: familia,
+    fontSize: 13,
+    lineHeight: interlinea(13),
+    color: color.rojo500,
+    marginTop: 12,
   },
 
   cabecera: { paddingHorizontal: espacio.gutter },

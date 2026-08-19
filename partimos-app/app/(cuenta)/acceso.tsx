@@ -17,8 +17,9 @@ import { Platform, Pressable, StyleSheet, Text, TextInput, View } from 'react-na
 
 import { useRouter } from 'expo-router';
 
-import { PREFIJO_PA, formatearTelefono, pedirCodigo, telefonoCompleto } from '@/servicios/cuenta';
+import { QUE_PASO, contrasenaValida, correoValido, entrar } from '@/servicios/cuenta';
 import { BarraDeEstado } from '@/ui/BarraDeEstado';
+import { Campo } from '@/ui/Campo';
 import { CampoRojo } from '@/ui/CampoRojo';
 import { Boton, Epigrafe } from '@/ui/controles';
 import { tabular } from '@/ui/dinero';
@@ -27,15 +28,19 @@ import { familia, color, espacio, interlinea, radio } from '@/ui/tokens';
 
 export default function Acceso() {
   const router = useRouter();
-  const [telefono, setTelefono] = useState('');
+  const [correo, setCorreo] = useState('');
+  const [clave, setClave] = useState('');
+  const [quePaso, setQuePaso] = useState<string | null>(null);
   const [enfocado, setEnfocado] = useState(false);
 
-  const listo = telefonoCompleto(telefono);
+  const listo = correoValido(correo) && contrasenaValida(clave);
 
   const enviar = async () => {
     if (!listo) return;
-    await pedirCodigo(telefono);
-    router.push({ pathname: '/(cuenta)/registro', params: { telefono, paso: '2' } });
+    setQuePaso(null);
+    const r = await entrar(correo, clave);
+    if (r.ok) router.replace('/(pasajero)');
+    else setQuePaso(QUE_PASO[r.motivo]);
   };
 
   return (
@@ -51,40 +56,42 @@ export default function Acceso() {
           <Text style={estilos.titularFuerte}>vez</Text>
         </Text>
 
-        <Text style={estilos.entrada}>Tu número es tu cuenta. Te mandamos un código y entras.</Text>
+        <Text style={estilos.entrada}>Tu correo es tu cuenta. Escribe la contraseña y entras.</Text>
       </View>
 
       <View style={estilos.cuerpo}>
         <View style={estilos.hoja}>
-          <Epigrafe>Tu celular</Epigrafe>
+          <Epigrafe>Tu correo</Epigrafe>
 
-          <View style={estilos.filaTelefono}>
-            <View style={estilos.prefijo}>
-              <Text style={estilos.prefijoTexto}>{PREFIJO_PA}</Text>
-            </View>
-            <View style={[estilos.campoTelefono, enfocado && { borderColor: color.ink900 }]}>
-              <TextInput
-                accessibilityLabel="Tu celular"
-                value={formatearTelefono(telefono)}
-                onChangeText={(t) => setTelefono(t.replace(/\D/g, '').slice(0, 8))}
-                onFocus={() => setEnfocado(true)}
-                onBlur={() => setEnfocado(false)}
-                onSubmitEditing={enviar}
-                keyboardType="number-pad"
-                placeholder="6612 4831"
-                placeholderTextColor={color.ink400}
-                style={estilos.entradaTelefono}
-              />
-            </View>
+          <View style={{ gap: 14 }}>
+            <Campo
+              etiqueta="Correo"
+              valor={correo}
+              alEscribir={setCorreo}
+              marcador="tu@correo.com"
+              correo
+              mal={!!quePaso}
+            />
+            <Campo
+              etiqueta="Contraseña"
+              valor={clave}
+              alEscribir={setClave}
+              marcador="Al menos 6 caracteres"
+              secreto
+              mal={!!quePaso}
+              alTerminar={enviar}
+            />
           </View>
+
+          {quePaso ? <Text style={estilos.malo}>{quePaso}</Text> : null}
 
           <View style={{ marginTop: 16 }}>
             <Boton desactivado={!listo} alPulsar={enviar}>
-              Enviar el código
+              Entrar
             </Boton>
           </View>
 
-          <Text style={estilos.ayuda}>El mismo número con el que te registraste.</Text>
+          <Text style={estilos.ayuda}>El mismo correo con el que te registraste.</Text>
         </View>
 
         <Pressable
@@ -121,6 +128,13 @@ function Flecha() {
 }
 
 const estilos = StyleSheet.create({
+  malo: {
+    fontFamily: familia,
+    fontSize: 13,
+    lineHeight: 18.85,
+    color: color.rojo500,
+    marginTop: 12,
+  },
   pantalla: {
     flex: 1,
     backgroundColor: color.sand100,

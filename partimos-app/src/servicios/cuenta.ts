@@ -1,59 +1,29 @@
 /**
- * La cuenta — pantallas `1c` (la puerta), `4b`–`4d` (registro) y `4e` (entrar).
+ * La cuenta — pantallas `1c` (la puerta), `4b`–`4d` (registro), `4e` y `14e`.
  *
- * El teléfono es la llave: no hay contraseña. La cuenta se pide una sola vez y
- * en el momento en que ya sabes qué ganas con ella — al pedir puesto, nunca al
- * abrir la app.
+ * **Divergencia con el traspaso, decidida.** El diseño dibuja un celular
+ * panameño y un código de cuatro cifras por SMS. No hay proveedor de SMS
+ * contratado, no hay una sola cuenta de teléfono en la base —las que hay son
+ * las cuatro de correo— y mandar mensajes cuesta por mensaje. Así que la
+ * cuenta es **correo y contraseña**, que es por donde ya se entra hoy.
+ *
+ * Lo que el traspaso decidía de verdad no cambia: la cuenta se pide al pedir
+ * puesto y no al abrir la app, y en público solo se ve el nombre y la inicial
+ * del apellido. Cambia el sobre, no la regla.
  */
 
 import type { Profile } from '@/tipos';
 
-import { fuente } from './_fuente';
+import { supabase } from './_fuente/supabase/cliente';
 
-const demora = <T,>(valor: T, ms = 120): Promise<T> =>
-  new Promise((resolve) => setTimeout(() => resolve(valor), ms));
+/** El mínimo que acepta Supabase. Pedir más no lo hace más seguro, lo hace más molesto. */
+export const LARGO_MINIMO = 6;
 
-export const PREFIJO_PA = '+507';
+/** Un correo con pinta de correo. La verdad la dice el envío, no esta expresión. */
+export const correoValido = (correo: string): boolean =>
+  /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(correo.trim());
 
-/** Segundos hasta poder pedir otro SMS. */
-export const ESPERA_PARA_REENVIAR = 30;
-
-/** Los celulares panameños son de 8 dígitos. */
-export function telefonoCompleto(digitos: string): boolean {
-  return digitos.replace(/\D/g, '').length === 8;
-}
-
-/** «6612 4831» — en dos bloques, como se dicta en voz alta. */
-export function formatearTelefono(digitos: string): string {
-  const limpio = digitos.replace(/\D/g, '').slice(0, 8);
-  return limpio.length > 4 ? `${limpio.slice(0, 4)} ${limpio.slice(4)}` : limpio;
-}
-
-/**
- * Manda el código por SMS. En producción lo emite el proveedor; aquí devolvemos
- * el que hay que teclear para que se pueda probar el recorrido entero.
- */
-export async function pedirCodigo(telefono: string): Promise<{ enviado: true; pista: string }> {
-  if (!telefonoCompleto(telefono)) throw new Error('Ese celular no tiene ocho dígitos');
-  return demora({ enviado: true, pista: CODIGO_SIMULADO });
-}
-
-export type ResultadoDeEntrada =
-  | { ok: true; nuevo: boolean; perfil: Profile | null }
-  | { ok: false; motivo: 'codigo-no-coincide' };
-
-/** El código de 4 dígitos del SMS. Sin contraseña que recordar. */
-export async function verificarCodigoSms(
-  telefono: string,
-  codigo: string,
-): Promise<ResultadoDeEntrada> {
-  if (codigo !== CODIGO_SIMULADO) {
-    return demora({ ok: false, motivo: 'codigo-no-coincide' } as const);
-  }
-  const limpio = telefono.replace(/\D/g, '');
-  const existente = fuente.perfiles.find((p) => (p.phone ?? '').replace(/\D/g, '').endsWith(limpio));
-  return demora({ ok: true, nuevo: !existente, perfil: existente ?? null } as const);
-}
+export const contrasenaValida = (clave: string): boolean => clave.length >= LARGO_MINIMO;
 
 /**
  * En público solo se ve el nombre y la inicial del apellido. La regla vive
@@ -64,44 +34,115 @@ export function inicialDelApellido(apellido: string): string | null {
   return limpio ? `${limpio[0].toUpperCase()}.` : null;
 }
 
-export async function crearCuenta(
-  telefono: string,
+export type Fallo =
+  | 'correo-invalido'
+  | 'contrasena-corta'
+  | 'ya-existe'
+  | 'no-coincide'
+  | 'sin-confirmar'
+  | 'demasiados-intentos'
+  | 'no-se-pudo';
+
+export type Entrada =
+  | { ok: true; dentro: boolean }
+  | { ok: false; motivo: Fallo };
+
+/**
+ * Crea la cuenta.
+ *
+ * `dentro: false` no es un fallo: es que el proyecto pide confirmar el correo
+ * antes de dejar entrar, y entonces hay un mensaje esperando en la bandeja. La
+ * pantalla necesita distinguirlo para decir qué pasa en vez de quedarse quieta.
+ */
+export async function registrarse(
+  correo: string,
+  clave: string,
   nombre: string,
   apellido: string,
-): Promise<Profile> {
-  const ahora = new Date().toISOString();
-  const perfil: Profile = {
-    id: nuevoId(),
-    first_name: nombre.trim(),
-    last_initial: inicialDelApellido(apellido),
-    phone: `${PREFIJO_PA} ${formatearTelefono(telefono)}`,
-    photo_url: null,
-    home_city_id: null,
-    gender: null,
-    bio: null,
-    is_id_verified: false,
-    is_phone_verified: true,
-    is_suspended: false,
-    suspended_reason: null,
-    locale: 'es-PA',
-    created_at: ahora,
-    updated_at: ahora,
-    linkedin_connected_at: null,
-    preferred_pay_channel: 'yappy_app',
-    accepts_yappy_direct: true,
-    accepts_cash: true,
-  };
-  fuente.perfiles.push(perfil);
-  return demora(perfil);
+): Promise<Entrada> {
+  if (!correoValido(correo)) return { ok: false, motivo: 'correo-invalido' };
+  if (!contrasenaValida(clave)) return { ok: false, motivo: 'contrasena-corta' };
+
+  const { data, error } = await supabase.auth.signUp({
+    email: correo.trim(),
+    password: clave,
+    options: {
+      // El disparador `handle_new_user` lee esto para escribir el perfil, así
+      // que el nombre del paso 3 llega a `profiles` sin un segundo viaje.
+      data: { first_name: nombre.trim(), last_name: apellido.trim() },
+    },
+  });
+
+  if (error) return { ok: false, motivo: comoSeLlama(error) };
+  return { ok: true, dentro: !!data.session };
 }
 
-/* ------------------------------------------------------------------ */
+/** Entra. Sin sesión no hay nada que enseñar, así que el fallo importa. */
+export async function entrar(correo: string, clave: string): Promise<Entrada> {
+  if (!correoValido(correo)) return { ok: false, motivo: 'correo-invalido' };
 
-/** Mientras no haya proveedor de SMS. En producción no existe esta constante. */
-const CODIGO_SIMULADO = '4917';
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email: correo.trim(),
+    password: clave,
+  });
 
-let contador = 0;
-function nuevoId(): string {
-  contador += 1;
-  return `cccccccc-cccc-4ccc-8ccc-${String(contador).padStart(12, '0')}`;
+  if (error) return { ok: false, motivo: comoSeLlama(error) };
+  return { ok: true, dentro: !!data.session };
 }
+
+/** El correo para volver a poner contraseña, cuando se olvidó. */
+export async function olvideLaContrasena(correo: string): Promise<boolean> {
+  if (!correoValido(correo)) return false;
+  const { error } = await supabase.auth.resetPasswordForEmail(correo.trim());
+  return !error;
+}
+
+export async function salir(): Promise<void> {
+  await supabase.auth.signOut();
+}
+
+/** Quién está dentro ahora mismo, o `null`. */
+export async function quienEs(): Promise<Profile | null> {
+  const { data } = await supabase.auth.getSession();
+  const id = data.session?.user.id;
+  if (!id) return null;
+  const { data: perfil } = await supabase.from('profiles').select('*').eq('id', id).maybeSingle();
+  return perfil ?? null;
+}
+
+/** El identificador de quien está dentro, que es lo que casi todo necesita. */
+export async function miId(): Promise<string | null> {
+  const { data } = await supabase.auth.getSession();
+  return data.session?.user.id ?? null;
+}
+
+/** Avisa cada vez que se entra o se sale. Devuelve cómo dejar de escuchar. */
+export function alCambiarLaSesion(hacer: (dentro: boolean) => void): () => void {
+  const { data } = supabase.auth.onAuthStateChange((_evento, sesion) => hacer(!!sesion));
+  return () => data.subscription.unsubscribe();
+}
+
+/**
+ * Los errores de Supabase vienen en inglés y con código. Traducirlos aquí, y no
+ * en cada pantalla, es lo que hace que todas digan lo mismo ante lo mismo.
+ */
+function comoSeLlama(error: { code?: string; status?: number; message: string }): Fallo {
+  const codigo = error.code ?? '';
+  if (codigo === 'user_already_exists' || /already registered/i.test(error.message)) return 'ya-existe';
+  if (codigo === 'invalid_credentials' || error.status === 400) return 'no-coincide';
+  if (codigo === 'email_not_confirmed') return 'sin-confirmar';
+  if (codigo === 'weak_password') return 'contrasena-corta';
+  if (error.status === 429) return 'demasiados-intentos';
+  return 'no-se-pudo';
+}
+
+/** Lo que la pantalla enseña cuando algo no salió. */
+export const QUE_PASO: Record<Fallo, string> = {
+  'correo-invalido': 'Ese correo no parece un correo.',
+  'contrasena-corta': `La contraseña necesita ${LARGO_MINIMO} caracteres o más.`,
+  'ya-existe': 'Ya hay una cuenta con ese correo. Entra en vez de registrarte.',
+  'no-coincide': 'El correo o la contraseña no coinciden.',
+  'sin-confirmar': 'Falta confirmar el correo. Mira tu bandeja.',
+  'demasiados-intentos': 'Demasiados intentos seguidos. Espera un momento.',
+  'no-se-pudo': 'No se pudo. Revisa la conexión y vuelve a intentar.',
+};

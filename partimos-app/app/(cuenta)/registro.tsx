@@ -1,5 +1,5 @@
 /**
- * `4b` `4c` `4d` Registro — celular, código y nombre.
+ * `4b` `4c` `4d` Registro — correo, contraseña y nombre.
  *
  * Los tres pasos del traspaso, en una sola ruta con el paso en el parámetro,
  * porque el número escrito en el primero es lo que el segundo verifica.
@@ -15,16 +15,14 @@ import { Platform, Pressable, StyleSheet, Text, TextInput, View } from 'react-na
 import { useLocalSearchParams, useRouter } from 'expo-router';
 
 import {
-  ESPERA_PARA_REENVIAR,
-  PREFIJO_PA,
-  crearCuenta,
-  formatearTelefono,
+  QUE_PASO,
+  contrasenaValida,
+  correoValido,
   inicialDelApellido,
-  pedirCodigo,
-  telefonoCompleto,
-  verificarCodigoSms,
+  registrarse,
 } from '@/servicios/cuenta';
 import { BarraDeEstado } from '@/ui/BarraDeEstado';
+import { Campo } from '@/ui/Campo';
 import { CampoRojo } from '@/ui/CampoRojo';
 import { Boton } from '@/ui/controles';
 import { tabular } from '@/ui/dinero';
@@ -35,38 +33,47 @@ type Paso = 1 | 2 | 3;
 
 export default function Registro() {
   const router = useRouter();
-  const params = useLocalSearchParams<{ telefono?: string; paso?: string; viaje?: string }>();
+  const params = useLocalSearchParams<{ correo?: string; paso?: string; viaje?: string }>();
 
   const [paso, setPaso] = useState<Paso>((Number(params.paso) as Paso) || 1);
-  const [telefono, setTelefono] = useState(params.telefono ?? '');
-  const [codigo, setCodigo] = useState('');
+  const [correo, setCorreo] = useState(params.correo ?? '');
+  const [clave, setClave] = useState('');
   const [nombre, setNombre] = useState('');
   const [apellido, setApellido] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const [restante, setRestante] = useState(ESPERA_PARA_REENVIAR);
+  const [creando, setCreando] = useState(false);
 
-  // La cuenta atrás del reenvío solo corre mientras se está en el paso 2.
-  useEffect(() => {
-    if (paso !== 2) return;
-    setRestante(ESPERA_PARA_REENVIAR);
-    const t = setInterval(() => setRestante((s) => (s > 0 ? s - 1 : 0)), 1000);
-    return () => clearInterval(t);
-  }, [paso]);
-
-  const irAlCodigo = async () => {
-    await pedirCodigo(telefono);
+  /**
+   * La cuenta se crea en el último paso, no en el primero: hasta que no hay
+   * nombre no hay nada que guardar, y así nadie deja a medias una cuenta que
+   * ya existe.
+   */
+  const crear = async () => {
+    if (creando) return;
+    setCreando(true);
     setError(null);
-    setPaso(2);
-  };
+    const r = await registrarse(correo, clave, nombre, apellido);
+    setCreando(false);
 
-  const comprobar = async (valor: string) => {
-    const resultado = await verificarCodigoSms(telefono, valor);
-    if (resultado.ok) {
-      setError(null);
-      setPaso(3);
-    } else {
-      setError('Ese código no es. Míralo otra vez o pide uno nuevo.');
+    if (!r.ok) {
+      setError(QUE_PASO[r.motivo]);
+      // Un correo ya registrado o mal escrito se arregla en el primer paso.
+      if (r.motivo === 'ya-existe' || r.motivo === 'correo-invalido') setPaso(1);
+      return;
     }
+
+    // Sin sesión hay un correo de confirmación esperando: decirlo, y no dejar
+    // a alguien mirando una pantalla que no avanza.
+    if (!r.dentro) {
+      setError('Cuenta creada. Confirma el correo que acabamos de enviarte y entra.');
+      return;
+    }
+
+    router.replace(
+      params.viaje
+        ? { pathname: '/(pasajero)/reservar', params: { viaje: params.viaje } }
+        : '/(pasajero)',
+    );
   };
 
   return (
@@ -89,9 +96,9 @@ export default function Registro() {
           <Text style={estilos.epigrafeCampo}>{`Paso ${paso} de 3`}</Text>
         </View>
         <Text style={estilos.titular}>
-          {paso === 1 ? 'Tu ' : paso === 2 ? 'Escribe el ' : '¿Cómo te '}
+          {paso === 1 ? 'Tu ' : paso === 2 ? 'Elige una ' : '¿Cómo te '}
           <Text style={estilos.titularFuerte}>
-            {paso === 1 ? 'celular' : paso === 2 ? 'código' : 'llamas?'}
+            {paso === 1 ? 'correo' : paso === 2 ? 'contraseña' : 'llamas?'}
           </Text>
         </Text>
       </View>
@@ -99,27 +106,18 @@ export default function Registro() {
       <View style={estilos.cuerpo}>
         <View style={estilos.hoja}>
           {paso === 1 ? (
-            <PasoCelular
-              telefono={telefono}
-              alEscribir={setTelefono}
-              alSeguir={irAlCodigo}
+            <PasoCorreo
+              correo={correo}
+              alEscribir={(v) => { setCorreo(v); setError(null); }}
+              error={error}
+              alSeguir={() => correoValido(correo) && setPaso(2)}
             />
           ) : paso === 2 ? (
-            <PasoCodigo
-              codigo={codigo}
-              alEscribir={(v) => {
-                setCodigo(v);
-                setError(null);
-                if (v.length === 4) comprobar(v);
-              }}
-              telefono={telefono}
+            <PasoContrasena
+              clave={clave}
+              alEscribir={(v) => { setClave(v); setError(null); }}
               error={error}
-              restante={restante}
-              alCambiarNumero={() => setPaso(1)}
-              alReenviar={async () => {
-                await pedirCodigo(telefono);
-                setRestante(ESPERA_PARA_REENVIAR);
-              }}
+              alSeguir={() => contrasenaValida(clave) && setPaso(3)}
             />
           ) : (
             <PasoNombre
@@ -127,14 +125,9 @@ export default function Registro() {
               apellido={apellido}
               alEscribirNombre={setNombre}
               alEscribirApellido={setApellido}
-              alCrear={async () => {
-                await crearCuenta(telefono, nombre, apellido);
-                router.replace(
-                  params.viaje
-                    ? { pathname: '/(pasajero)/reservar', params: { viaje: params.viaje } }
-                    : '/(pasajero)',
-                );
-              }}
+              error={error}
+              creando={creando}
+              alCrear={crear}
             />
           )}
         </View>
@@ -153,124 +146,68 @@ export default function Registro() {
 
 /* ------------------------------------------------------------ pasos */
 
-function PasoCelular({
-  telefono,
+function PasoCorreo({
+  correo,
   alEscribir,
+  error,
   alSeguir,
 }: {
-  telefono: string;
+  correo: string;
   alEscribir: (v: string) => void;
+  error: string | null;
   alSeguir: () => void;
 }) {
   return (
     <>
-      <View style={estilos.filaTelefono}>
-        <View style={estilos.prefijo}>
-          <Text style={estilos.prefijoTexto}>{PREFIJO_PA}</Text>
-        </View>
-        <View style={estilos.campo}>
-          <TextInput
-            accessibilityLabel="Tu número de celular"
-            value={formatearTelefono(telefono)}
-            onChangeText={(v) => alEscribir(v.replace(/\D/g, '').slice(0, 8))}
-            placeholder="6000 0000"
-            placeholderTextColor={color.ink400}
-            keyboardType="phone-pad"
-            style={estilos.entradaGrande}
-          />
-        </View>
-      </View>
-      <Text style={estilos.ayuda}>
-        Te mandamos un código por SMS. No hay contraseña que recordar.
-      </Text>
+      <Campo
+        etiqueta="Correo"
+        valor={correo}
+        alEscribir={alEscribir}
+        marcador="tu@correo.com"
+        correo
+        mal={!!error}
+        alTerminar={alSeguir}
+      />
+      {error ? <Text style={estilos.malo}>{error}</Text> : null}
+      <Text style={estilos.ayuda}>Aquí te llega la confirmación y nada más.</Text>
       <View style={{ marginTop: 18 }}>
-        <Boton tono="azul" desactivado={!telefonoCompleto(telefono)} alPulsar={alSeguir}>
-          Enviarme el código
+        <Boton tono="azul" desactivado={!correoValido(correo)} alPulsar={alSeguir}>
+          Seguir
         </Boton>
       </View>
     </>
   );
 }
 
-function PasoCodigo({
-  codigo,
+function PasoContrasena({
+  clave,
   alEscribir,
-  telefono,
   error,
-  restante,
-  alCambiarNumero,
-  alReenviar,
+  alSeguir,
 }: {
-  codigo: string;
+  clave: string;
   alEscribir: (v: string) => void;
-  telefono: string;
   error: string | null;
-  restante: number;
-  alCambiarNumero: () => void;
-  alReenviar: () => void;
+  alSeguir: () => void;
 }) {
-  const entrada = useRef<TextInput>(null);
-
   return (
     <>
-      <Pressable accessibilityRole="button" accessibilityLabel="Escribe el código" onPress={() => entrada.current?.focus()}>
-        <View style={estilos.casillas}>
-          {[0, 1, 2, 3].map((i) => {
-            const valor = codigo[i];
-            const activa = i === codigo.length;
-            return (
-              <View
-                key={i}
-                style={[
-                  estilos.casilla,
-                  valor != null
-                    ? { backgroundColor: color.sand200, borderColor: 'transparent' }
-                    : activa
-                      ? { borderColor: color.rojo500, borderWidth: 2 }
-                      : { borderColor: color.bordePorDefecto },
-                ]}
-              >
-                {valor != null ? (
-                  <Text style={estilos.casillaTexto}>{valor}</Text>
-                ) : activa ? (
-                  <View style={estilos.cursor} />
-                ) : null}
-              </View>
-            );
-          })}
-        </View>
-      </Pressable>
-
-      {/* El campo real, invisible: el teclado que sale es el del teléfono. */}
-      <TextInput
-        ref={entrada}
-        accessibilityLabel="Código de cuatro dígitos"
-        value={codigo}
-        onChangeText={(v) => alEscribir(v.replace(/\D/g, '').slice(0, 4))}
-        keyboardType="number-pad"
-        maxLength={4}
-        autoFocus
-        style={estilos.entradaInvisible}
+      <Campo
+        etiqueta="Contraseña"
+        valor={clave}
+        alEscribir={alEscribir}
+        marcador="Al menos 6 caracteres"
+        secreto
+        mal={!!error}
+        alTerminar={alSeguir}
       />
-
-      {error ? <Text style={estilos.error}>{error}</Text> : null}
-
-      <View style={estilos.filaReenvio}>
-        <Text style={estilos.ayudaCorta}>
-          {`Se lo mandamos al ${formatearTelefono(telefono)}`}
-        </Text>
-        <Pressable accessibilityRole="button" onPress={alCambiarNumero}>
-          <Text style={estilos.enlace}>Cambiar</Text>
-        </Pressable>
+      {error ? <Text style={estilos.malo}>{error}</Text> : null}
+      <Text style={estilos.ayuda}>Seis caracteres o más. No hace falta que sea rara.</Text>
+      <View style={{ marginTop: 18 }}>
+        <Boton tono="azul" desactivado={!contrasenaValida(clave)} alPulsar={alSeguir}>
+          Seguir
+        </Boton>
       </View>
-
-      <Pressable accessibilityRole="button" disabled={restante > 0} onPress={alReenviar}>
-        <Text style={[estilos.reenviar, restante === 0 && { color: color.azul700 }]}>
-          {restante > 0
-            ? `Reenviar en 0:${String(restante).padStart(2, '0')}`
-            : 'Reenviar el código'}
-        </Text>
-      </Pressable>
     </>
   );
 }
@@ -280,12 +217,16 @@ function PasoNombre({
   apellido,
   alEscribirNombre,
   alEscribirApellido,
+  error,
+  creando,
   alCrear,
 }: {
   nombre: string;
   apellido: string;
   alEscribirNombre: (v: string) => void;
   alEscribirApellido: (v: string) => void;
+  error: string | null;
+  creando: boolean;
   alCrear: () => void;
 }) {
   const inicial = inicialDelApellido(apellido);
@@ -320,8 +261,14 @@ function PasoNombre({
           : 'En público solo se ve tu nombre y la inicial del apellido — nunca el apellido completo.'}
       </Text>
 
+      {error ? <Text style={estilos.malo}>{error}</Text> : null}
+
       <View style={{ marginTop: 18 }}>
-        <Boton tono="azul" desactivado={!nombre.trim() || !apellido.trim()} alPulsar={alCrear}>
+        <Boton
+          tono="azul"
+          desactivado={!nombre.trim() || !apellido.trim() || creando}
+          alPulsar={alCrear}
+        >
           Crear mi cuenta
         </Boton>
       </View>
@@ -351,6 +298,14 @@ const estilos = StyleSheet.create({
     width: '100%',
     alignSelf: 'center',
     ...(Platform.OS === 'web' ? { height: 844, maxHeight: 844 } : null),
+  },
+
+  malo: {
+    fontFamily: familia,
+    fontSize: 13,
+    lineHeight: 18.85,
+    color: color.rojo500,
+    marginTop: 10,
   },
 
   cabecera: { paddingHorizontal: espacio.gutter },

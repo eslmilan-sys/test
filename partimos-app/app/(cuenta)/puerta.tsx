@@ -2,7 +2,7 @@
  * `1c` La Puerta — la única pantalla de cuenta del recorrido del pasajero.
  *
  * Solo se llega aquí pulsando «Pedir puesto», y el viaje se queda detrás,
- * atenuado pero visible: ya sabes qué ganas antes de dar el celular. Es la
+ * atenuado pero visible: ya sabes qué ganas antes de dar el correo. Es la
  * diferencia con el conductor, que tiene la cédula en el paso 03.
  */
 
@@ -11,8 +11,9 @@ import { Platform, Pressable, StyleSheet, Text, TextInput, View } from 'react-na
 
 import { useLocalSearchParams, useRouter } from 'expo-router';
 
-import { PREFIJO_PA, formatearTelefono, telefonoCompleto } from '@/servicios/cuenta';
+import { correoValido } from '@/servicios/cuenta';
 import { BarraDeEstado } from '@/ui/BarraDeEstado';
+import { Campo } from '@/ui/Campo';
 import { CampoRojo } from '@/ui/CampoRojo';
 import { Boton, Epigrafe } from '@/ui/controles';
 import { tabular } from '@/ui/dinero';
@@ -22,9 +23,9 @@ import { TRACK_MICRO, familia, color, espacio, radio } from '@/ui/tokens';
 export default function Puerta() {
   const router = useRouter();
   const { viaje } = useLocalSearchParams<{ viaje?: string }>();
-  const [telefono, setTelefono] = useState('');
+  const [correo, setCorreo] = useState('');
 
-  const listo = telefonoCompleto(telefono);
+  const listo = correoValido(correo);
 
   return (
     <View style={estilos.pantalla}>
@@ -74,41 +75,31 @@ export default function Puerta() {
             <Text style={estilos.tituloFuerte}>tu cuenta</Text>
           </Text>
           <Text style={estilos.explicacion}>
-            Te pedimos el celular una vez. Con eso te avisamos cuando Andrés acepte y te guardamos
+            Te pedimos el correo una vez. Con eso te avisamos cuando Andrés acepte y te guardamos
             el código de abordaje.
           </Text>
         </View>
 
-        <View style={estilos.filaTelefono}>
-          <View style={estilos.prefijo}>
-            <Text style={estilos.prefijoTexto}>{PREFIJO_PA}</Text>
-          </View>
-          <View style={[estilos.campoTelefono, listo && { borderColor: color.ink900 }]}>
-            <TextInput
-              accessibilityLabel="Tu número de celular"
-              value={formatearTelefono(telefono)}
-              onChangeText={(v) => setTelefono(v.replace(/\D/g, '').slice(0, 8))}
-              placeholder="6000 0000"
-              placeholderTextColor={color.ink400}
-              keyboardType="phone-pad"
-              autoFocus={Platform.OS !== 'web'}
-              style={estilos.entradaTelefono}
-            />
-          </View>
-        </View>
+        <Campo
+          etiqueta="Correo"
+          valor={correo}
+          alEscribir={setCorreo}
+          marcador="tu@correo.com"
+          correo
+        />
 
         <View style={{ gap: 10 }}>
           <Boton
             desactivado={!listo}
             alPulsar={() =>
-              router.push({ pathname: '/(cuenta)/registro', params: { telefono, viaje, paso: '2' } })
+              router.push({ pathname: '/(cuenta)/registro', params: { correo, viaje, paso: '2' } })
             }
           >
             Pedir el puesto
           </Boton>
           <View style={estilos.filaPromesa}>
             <Escudo tamano={15} tinta={color.ink500} />
-            <Text style={estilos.promesa}>Sin contraseña. Te llega un código por SMS.</Text>
+            <Text style={estilos.promesa}>Una vez, y ya. Nada de anuncios ni llamadas.</Text>
           </View>
         </View>
 
