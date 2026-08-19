@@ -339,6 +339,9 @@ export function Insignia({
 }) {
   return (
     <View style={[estilos.insignia, { backgroundColor: fondo }]}>
+      {/* El punto va dentro del hueco que la etiqueta le reserva a su
+          izquierda, no como hermano: así la caja del texto es la de la
+          insignia entera, como en el traspaso. */}
       {punto ? <View style={[estilos.insigniaPunto, { backgroundColor: tinta }]} /> : null}
       <Text
         style={{
@@ -348,6 +351,7 @@ export function Insignia({
           letterSpacing: -0.055,
           color: tinta,
           fontFamily: familia,
+          ...(punto ? { paddingLeft: 12 } : null),
         }}
       >
         {children}
@@ -425,10 +429,16 @@ const estilos = StyleSheet.create({
     borderRadius: radio.pastilla,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
     alignSelf: 'flex-start',
   },
-  insigniaPunto: { width: 6, height: 6, borderRadius: radio.pastilla, opacity: 0.85 },
+  insigniaPunto: {
+    position: 'absolute',
+    left: 8,
+    width: 6,
+    height: 6,
+    borderRadius: radio.pastilla,
+    opacity: 0.85,
+  },
 
   campo: {
     height: 52,
