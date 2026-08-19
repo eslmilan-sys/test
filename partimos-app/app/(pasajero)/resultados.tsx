@@ -224,7 +224,7 @@ const estilos = StyleSheet.create({
   },
   titularFuerte: { fontWeight: '600' },
   subtitulo: {
-    fontSize: 14,
+    fontSize: 14, lineHeight: 20.3,
     color: color.campoTexto,
     marginTop: 10,
     fontFamily: familia,
@@ -241,7 +241,7 @@ const estilos = StyleSheet.create({
     alignItems: 'center',
     gap: 7,
   },
-  chipTexto: { fontSize: 13, fontWeight: '500', fontFamily: familia },
+  chipTexto: { fontSize: 13, lineHeight: 18.85, fontWeight: '500', fontFamily: familia },
   chipQuitar: {
     width: 21,
     height: 21,
@@ -258,7 +258,7 @@ const estilos = StyleSheet.create({
     alignItems: 'baseline',
     marginBottom: 10,
   },
-  orden: { fontSize: 12.5, color: color.ink500, fontFamily: familia },
+  orden: { fontSize: 12.5, lineHeight: 18.12, color: color.ink500, fontFamily: familia },
 
   vacio: {
     backgroundColor: color.blanco,
@@ -269,6 +269,6 @@ const estilos = StyleSheet.create({
     padding: 20,
     gap: 4,
   },
-  vacioTitulo: { fontSize: 15, fontWeight: '500', color: color.ink900, fontFamily: familia },
+  vacioTitulo: { fontSize: 15, lineHeight: 21.75, fontWeight: '500', color: color.ink900, fontFamily: familia },
   vacioTexto: { fontSize: 13.5, lineHeight: 20, color: color.ink600, fontFamily: familia },
 });

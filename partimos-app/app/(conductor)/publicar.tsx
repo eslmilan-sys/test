@@ -18,7 +18,7 @@ import {
   repartoDelCosto,
 } from '@/servicios/viajes';
 import { BarraDeEstado } from '@/ui/BarraDeEstado';
-import { CampoRojo } from '@/ui/CampoRojo';
+import { Brillo, CampoRojo } from '@/ui/CampoRojo';
 import { Boton, Epigrafe, Interruptor, Pastilla, Stepper } from '@/ui/controles';
 import { formatearDinero, formatearDineroRedondo, tabular } from '@/ui/dinero';
 import { diaCorto, hora, mas } from '@/ui/fechas';
@@ -152,6 +152,7 @@ export default function Publicar() {
 
         {/* El aporte, con el degradado que cierra la tarjeta */}
         <View style={estilos.tarjetaAporte}>
+          <Brillo />
           <View style={estilos.filaAporte}>
             <View style={{ flex: 1, minWidth: 0 }}>
               <Epigrafe>Aporte por puesto</Epigrafe>
@@ -295,7 +296,7 @@ const estilos = StyleSheet.create({
   },
   textoCarro: { flex: 1, ...texto.fila, color: color.ink900 },
   carroApagado: { fontWeight: '400', color: color.ink500, fontFamily: familia },
-  cambiar: { fontSize: 12.5, fontWeight: '600', color: color.azul700, fontFamily: familia },
+  cambiar: { fontSize: 12.5, lineHeight: 18.12, fontWeight: '600', color: color.azul700, fontFamily: familia },
 
   recorrido: { marginTop: 10, position: 'relative' },
   lineaRecorrido: {
@@ -324,9 +325,9 @@ const estilos = StyleSheet.create({
     borderWidth: 2,
     borderColor: color.ink200,
   },
-  paradaNombre: { flex: 1, fontSize: 14, fontWeight: '500', letterSpacing: -0.21, color: color.ink900, fontFamily: familia },
-  paradaIntermedia: { flex: 1, fontSize: 14, letterSpacing: -0.21, color: color.ink900, fontFamily: familia },
-  paradaHora: { fontSize: 12.5, color: color.ink400, ...tabular, fontFamily: familia },
+  paradaNombre: { flex: 1, fontSize: 14, lineHeight: 20.3, fontWeight: '500', letterSpacing: -0.21, color: color.ink900, fontFamily: familia },
+  paradaIntermedia: { flex: 1, fontSize: 14, lineHeight: 20.3, letterSpacing: -0.21, color: color.ink900, fontFamily: familia },
+  paradaHora: { fontSize: 12.5, lineHeight: 18.12, color: color.ink400, ...tabular, fontFamily: familia },
   quitar: {
     width: 22,
     height: 22,
@@ -345,7 +346,7 @@ const estilos = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: color.bordeSutil,
   },
-  anadirTexto: { fontSize: 13.5, fontWeight: '600', color: color.azul700, fontFamily: familia },
+  anadirTexto: { fontSize: 13.5, lineHeight: 19.57, fontWeight: '600', color: color.azul700, fontFamily: familia },
 
   tarjetaAporte: {
     marginHorizontal: 22,

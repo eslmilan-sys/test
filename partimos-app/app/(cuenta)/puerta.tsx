@@ -17,7 +17,7 @@ import { CampoRojo } from '@/ui/CampoRojo';
 import { Boton, Epigrafe } from '@/ui/controles';
 import { tabular } from '@/ui/dinero';
 import { Escudo } from '@/ui/iconos';
-import { familia, color, espacio, radio } from '@/ui/tokens';
+import { TRACK_MICRO, familia, color, espacio, radio } from '@/ui/tokens';
 
 export default function Puerta() {
   const router = useRouter();
@@ -137,9 +137,9 @@ const estilos = StyleSheet.create({
 
   cabecera: { paddingHorizontal: espacio.gutter },
   epigrafeCampo: {
-    fontSize: 11,
+    fontSize: 11, lineHeight: 15.95,
     fontWeight: '600',
-    letterSpacing: 0.66,
+    letterSpacing: 11 * TRACK_MICRO,
     textTransform: 'uppercase',
     color: color.campoTexto,
     fontFamily: familia,
@@ -180,9 +180,9 @@ const estilos = StyleSheet.create({
     borderColor: color.ink200,
     marginTop: 5,
   },
-  paradaNombre: { fontSize: 16, letterSpacing: -0.29, color: color.ink900, fontFamily: familia },
-  paradaDetalle: { fontSize: 13, color: color.ink500, fontFamily: familia },
-  paradaHora: { fontSize: 13.5, color: color.ink600, fontFamily: familia, ...tabular },
+  paradaNombre: { fontSize: 16, lineHeight: 23.2, letterSpacing: -0.29, color: color.ink900, fontFamily: familia },
+  paradaDetalle: { fontSize: 13, lineHeight: 18.85, color: color.ink500, fontFamily: familia },
+  paradaHora: { fontSize: 13.5, lineHeight: 19.57, color: color.ink600, fontFamily: familia, ...tabular },
 
   velo: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(38,35,43,.48)' },
 
@@ -227,7 +227,7 @@ const estilos = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  prefijoTexto: { fontSize: 16, fontWeight: '500', color: color.ink700, fontFamily: familia },
+  prefijoTexto: { fontSize: 16, lineHeight: 23.2, fontWeight: '500', color: color.ink700, fontFamily: familia },
   campoTelefono: {
     flex: 1,
     height: 56,
@@ -238,7 +238,7 @@ const estilos = StyleSheet.create({
     paddingHorizontal: 16,
   },
   entradaTelefono: {
-    fontSize: 17,
+    fontSize: 17, lineHeight: 24.65,
     fontWeight: '500',
     letterSpacing: -0.17,
     color: color.ink900,
@@ -248,7 +248,7 @@ const estilos = StyleSheet.create({
   } as never,
 
   filaPromesa: { flexDirection: 'row', alignItems: 'center', gap: 10, justifyContent: 'center' },
-  promesa: { fontSize: 12.5, color: color.ink500, fontFamily: familia },
+  promesa: { fontSize: 12.5, lineHeight: 18.12, color: color.ink500, fontFamily: familia },
 
   otrasEntradas: {
     borderTopWidth: 1,
@@ -265,5 +265,5 @@ const estilos = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  botonQuietoTexto: { fontSize: 14, fontWeight: '600', color: color.ink900, fontFamily: familia },
+  botonQuietoTexto: { fontSize: 14, lineHeight: 20.3, fontWeight: '600', color: color.ink900, fontFamily: familia },
 });

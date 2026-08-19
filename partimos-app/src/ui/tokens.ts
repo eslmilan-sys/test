@@ -101,10 +101,24 @@ export const espacio = {
  * tabulares de la misma fuente.
  */
 export const familia = Platform.select({
+  // En web, la misma pila del traspaso: Inter Tight se carga en app/+html.tsx.
   web: '"Helvetica Neue", Helvetica, "Inter Tight", Arial, sans-serif',
+  // En Apple la grotesca del diseño existe de verdad.
   ios: 'Helvetica Neue',
+  // En Android hace falta registrar Inter Tight por peso, que pide una
+  // compilación propia: en Expo Go se ve con la grotesca del sistema.
   default: undefined,
 });
+
+/**
+ * La altura de línea del cuerpo, `--lh-body`. En el navegador el texto la
+ * hereda; React Native no hereda nada, así que va explícita en cada estilo.
+ * Sin ella cada fila queda ~4 px más corta y la pantalla entera se comprime.
+ */
+export const INTERLINEA = 1.45;
+
+/** Redondeada al cuarto de píxel, como la calcula el navegador. */
+export const interlinea = (tamano: number) => Math.round(tamano * INTERLINEA * 100) / 100;
 
 const conFuente = { fontFamily: familia };
 
@@ -133,23 +147,25 @@ export const sombra = {
   },
 } as const;
 
-/** El micro-tracking de los epígrafes. */
-export const trackMicro = 0.06 * 11;
+/** `--track-micro` es 0.1em. En un epígrafe de 11px son 1,1px. */
+export const TRACK_MICRO = 0.1;
+export const trackMicro = (tamano: number) => tamano * TRACK_MICRO;
 
 export const texto = {
-  titular: { fontSize: 31, lineHeight: 33, letterSpacing: -1.24, fontWeight: '400' as const, ...conFuente },
+  titular: { fontSize: 31, lineHeight: 32.55, letterSpacing: -1.24, fontWeight: '400' as const, ...conFuente },
   titularFuerte: { fontWeight: '600' as const },
-  titularSecundario: { fontSize: 27, lineHeight: 30, letterSpacing: -1.13, fontWeight: '400' as const, ...conFuente },
-  tituloTarjeta: { fontSize: 15.5, letterSpacing: -0.28, fontWeight: '500' as const, ...conFuente },
-  cuerpo: { fontSize: 14, lineHeight: 20, fontWeight: '400' as const, ...conFuente },
-  fila: { fontSize: 14.5, letterSpacing: -0.22, fontWeight: '500' as const, ...conFuente },
+  titularSecundario: { fontSize: 27, lineHeight: 28.35, letterSpacing: -1.13, fontWeight: '400' as const, ...conFuente },
+  tituloTarjeta: { fontSize: 15.5, lineHeight: interlinea(15.5), letterSpacing: -0.28, fontWeight: '500' as const, ...conFuente },
+  cuerpo: { fontSize: 14, lineHeight: interlinea(14), fontWeight: '400' as const, ...conFuente },
+  fila: { fontSize: 14.5, lineHeight: interlinea(14.5), letterSpacing: -0.22, fontWeight: '500' as const, ...conFuente },
   epigrafe: {
     fontSize: 11,
     fontWeight: '600' as const,
-    letterSpacing: 0.66,
+    letterSpacing: 11 * TRACK_MICRO,
+    lineHeight: interlinea(11),
     textTransform: 'uppercase' as const,
     ...conFuente,
   },
-  precio: { fontSize: 31, fontWeight: '700' as const, letterSpacing: -1.4, ...conFuente },
-  pastilla: { fontSize: 10.5, fontWeight: '600' as const, ...conFuente },
+  precio: { fontSize: 31, lineHeight: 27.9, fontWeight: '700' as const, letterSpacing: -1.4, ...conFuente },
+  pastilla: { fontSize: 10.5, lineHeight: interlinea(10.5), fontWeight: '600' as const, ...conFuente },
 } as const;

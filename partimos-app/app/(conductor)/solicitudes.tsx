@@ -263,10 +263,10 @@ const estilos = StyleSheet.create({
     elevation: 2,
   },
   filaPersona: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  nombre: { fontSize: 16, fontWeight: '500', letterSpacing: -0.32, color: color.ink900, fontFamily: familia },
-  reputacion: { fontSize: 12.5, color: color.ink600, marginTop: 1, fontFamily: familia, ...tabular },
+  nombre: { fontSize: 16, lineHeight: 23.2, fontWeight: '500', letterSpacing: -0.32, color: color.ink900, fontFamily: familia },
+  reputacion: { fontSize: 12.5, lineHeight: 18.12, color: color.ink600, marginTop: 1, fontFamily: familia, ...tabular },
   pastillaExpira: { paddingHorizontal: 9, paddingVertical: 4, borderRadius: radio.pastilla },
-  pastillaExpiraTexto: { fontSize: 11, fontWeight: '600', fontFamily: familia },
+  pastillaExpiraTexto: { fontSize: 11, lineHeight: 15.95, fontWeight: '600', fontFamily: familia },
 
   filaPunto: {
     flexDirection: 'row',
@@ -277,12 +277,12 @@ const estilos = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: color.bordeSutil,
   },
-  punto: { flex: 1, fontSize: 13.5, fontWeight: '500', letterSpacing: -0.2, color: color.ink900, fontFamily: familia },
-  desvio: { fontSize: 13.5, color: color.ink500, fontFamily: familia, ...tabular },
+  punto: { flex: 1, fontSize: 13.5, lineHeight: 19.57, fontWeight: '500', letterSpacing: -0.2, color: color.ink900, fontFamily: familia },
+  desvio: { fontSize: 13.5, lineHeight: 19.57, color: color.ink500, fontFamily: familia, ...tabular },
 
   filaEquipaje: { flexDirection: 'row', alignItems: 'center', gap: 9, marginTop: 10 },
-  equipaje: { flex: 1, fontSize: 13.5, color: color.ink700, fontFamily: familia },
-  aporte: { fontSize: 19, fontWeight: '700', letterSpacing: -0.67, color: color.ink900, fontFamily: familia, ...tabular },
+  equipaje: { flex: 1, fontSize: 13.5, lineHeight: 19.57, color: color.ink700, fontFamily: familia },
+  aporte: { fontSize: 19, lineHeight: 27.55, fontWeight: '700', letterSpacing: -0.67, color: color.ink900, fontFamily: familia, ...tabular },
 
   acciones: { flexDirection: 'row', gap: 9, marginTop: 15 },
 
@@ -304,8 +304,8 @@ const estilos = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  reciboTexto: { flex: 1, fontSize: 13.5, fontWeight: '500', letterSpacing: -0.2, color: color.ink900, fontFamily: familia },
-  escribir: { fontSize: 12.5, fontWeight: '600', color: color.azul700, fontFamily: familia },
+  reciboTexto: { flex: 1, fontSize: 13.5, lineHeight: 19.57, fontWeight: '500', letterSpacing: -0.2, color: color.ink900, fontFamily: familia },
+  escribir: { fontSize: 12.5, lineHeight: 18.12, fontWeight: '600', color: color.azul700, fontFamily: familia },
 
   vacio: {
     marginHorizontal: 22,
@@ -331,6 +331,6 @@ const estilos = StyleSheet.create({
     alignItems: 'center',
     gap: 12,
   },
-  nombreConfirmado: { fontSize: 14.5, fontWeight: '500', letterSpacing: -0.22, color: color.ink900, fontFamily: familia },
-  detalleConfirmado: { fontSize: 12.5, color: color.ink500, marginTop: 1, fontFamily: familia },
+  nombreConfirmado: { fontSize: 14.5, lineHeight: 21.02, fontWeight: '500', letterSpacing: -0.22, color: color.ink900, fontFamily: familia },
+  detalleConfirmado: { fontSize: 12.5, lineHeight: 18.12, color: color.ink500, marginTop: 1, fontFamily: familia },
 });

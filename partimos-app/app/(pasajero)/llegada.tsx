@@ -15,7 +15,7 @@ import { Amanecer, CampoRojo } from '@/ui/CampoRojo';
 import { Boton, Epigrafe, Pastilla } from '@/ui/controles';
 import { formatearDineroRedondo, tabular } from '@/ui/dinero';
 import { hora } from '@/ui/fechas';
-import { familia, color, espacio, radio } from '@/ui/tokens';
+import { TRACK_MICRO, familia, color, espacio, radio } from '@/ui/tokens';
 
 const RESERVA = '77777777-7777-4777-8777-777777777710';
 
@@ -116,9 +116,9 @@ const estilos = StyleSheet.create({
 
   cabecera: { paddingHorizontal: espacio.gutter },
   epigrafeCampo: {
-    fontSize: 11,
+    fontSize: 11, lineHeight: 15.95,
     fontWeight: '600',
-    letterSpacing: 0.66,
+    letterSpacing: 11 * TRACK_MICRO,
     textTransform: 'uppercase',
     color: color.campoTexto,
     fontFamily: familia,
@@ -156,7 +156,7 @@ const estilos = StyleSheet.create({
     justifyContent: 'center',
   },
   digitoTexto: {
-    fontSize: 30,
+    fontSize: 30, lineHeight: 43.5,
     fontWeight: '600',
     letterSpacing: -0.9,
     color: color.ink900,
@@ -218,17 +218,17 @@ const estilos = StyleSheet.create({
     paddingBottom: 11,
   },
   filaConLinea: { borderBottomWidth: 1, borderBottomColor: color.bordeSutil },
-  cuentaEtiqueta: { fontSize: 14.5, color: color.ink700, fontFamily: familia },
-  cuentaMonto: { fontSize: 14.5, fontWeight: '500', color: color.ink900, fontFamily: familia, ...tabular },
+  cuentaEtiqueta: { fontSize: 14.5, lineHeight: 21.02, color: color.ink700, fontFamily: familia },
+  cuentaMonto: { fontSize: 14.5, lineHeight: 21.02, fontWeight: '500', color: color.ink900, fontFamily: familia, ...tabular },
   filaTotal: {
     flexDirection: 'row',
     alignItems: 'baseline',
     justifyContent: 'space-between',
     paddingTop: 13,
   },
-  totalEtiqueta: { fontSize: 15, fontWeight: '600', color: color.ink900, fontFamily: familia },
+  totalEtiqueta: { fontSize: 15, lineHeight: 21.75, fontWeight: '600', color: color.ink900, fontFamily: familia },
   totalMonto: {
-    fontSize: 17,
+    fontSize: 17, lineHeight: 24.65,
     fontWeight: '700',
     letterSpacing: -0.51,
     color: color.ink900,

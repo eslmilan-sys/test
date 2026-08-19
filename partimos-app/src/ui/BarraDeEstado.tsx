@@ -46,6 +46,6 @@ const estilos = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-  hora: { fontSize: 14, fontWeight: '600', letterSpacing: -0.14, fontFamily: familia },
+  hora: { fontSize: 14, lineHeight: 20.3, fontWeight: '600', letterSpacing: -0.14, fontFamily: familia },
   iconos: { flexDirection: 'row', gap: 5, alignItems: 'center' },
 });

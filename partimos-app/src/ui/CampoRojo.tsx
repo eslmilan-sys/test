@@ -135,3 +135,30 @@ export function Amanecer({ ancho = 346, alto = 260 }: { ancho?: number; alto?: n
 }
 
 
+
+/**
+ * El brillo cálido que cierra la tarjeta del aporte en `5c` y `7b`:
+ * `radial-gradient(120% 96% at 46% 122%, rojo .30, oro .24 al 40 %, nada al 74 %)`.
+ * Sube desde debajo del borde, así que la tarjeta necesita recortar.
+ */
+export function Brillo({ ancho = 346, alto = 190 }: { ancho?: number; alto?: number }) {
+  const id = useId().replace(/:/g, '');
+  return (
+    <Svg width={ancho} height={alto} style={StyleSheet.absoluteFill}>
+      <Defs>
+        <RadialGradient id={`brillo-${id}`} cx="0.5" cy="0.5" r="0.5">
+          <Stop offset="0" stopColor="#D21034" stopOpacity="0.30" />
+          <Stop offset="0.4" stopColor="#E0A83C" stopOpacity="0.24" />
+          <Stop offset="0.74" stopColor="#FFFFFF" stopOpacity="0" />
+        </RadialGradient>
+      </Defs>
+      <Ellipse
+        cx={0.46 * ancho}
+        cy={1.22 * alto}
+        rx={1.2 * ancho}
+        ry={0.96 * alto}
+        fill={`url(#brillo-${id})`}
+      />
+    </Svg>
+  );
+}

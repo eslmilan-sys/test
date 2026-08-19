@@ -7,7 +7,7 @@
 import { type ReactNode, useState } from 'react';
 import { Pressable, StyleSheet, Text, TextInput, View, type ViewStyle } from 'react-native';
 
-import { familia, color, radio, texto } from './tokens';
+import { familia, color, interlinea, radio, texto } from './tokens';
 
 /* ---------------------------------------------------------------- Stepper */
 
@@ -158,7 +158,12 @@ export function Boton({
         ancho && { flex: 1 },
       ]}
     >
-      <Text style={[estilos.botonTexto, { fontSize: medida.fontSize, color: paleta.tinta }]}>
+      <Text
+        style={[
+          estilos.botonTexto,
+          { fontSize: medida.fontSize, lineHeight: interlinea(medida.fontSize), color: paleta.tinta },
+        ]}
+      >
         {children}
       </Text>
     </Pressable>
@@ -296,14 +301,14 @@ const estilos = StyleSheet.create({
   stepperValor: {
     minWidth: 34,
     textAlign: 'center',
-    fontSize: 19,
+    fontSize: 19, lineHeight: 27.55,
     fontWeight: '600',
     letterSpacing: -0.38,
     color: color.ink900,
     fontVariant: ['tabular-nums'], fontFamily: familia },
 
   interruptorFila: { flexDirection: 'row', gap: 16, minHeight: 30 },
-  interruptorEtiqueta: { fontSize: 15, fontWeight: '500', color: color.ink900, fontFamily: familia },
+  interruptorEtiqueta: { fontSize: 15, lineHeight: 21.75, fontWeight: '500', color: color.ink900, fontFamily: familia },
   interruptorDescripcion: { fontSize: 13, lineHeight: 18, color: color.ink600, marginTop: 2, fontFamily: familia },
   pista: { width: 48, height: 30, borderRadius: radio.pastilla, padding: 3, justifyContent: 'center' },
   pulgar: {
@@ -357,7 +362,7 @@ const estilos = StyleSheet.create({
     borderColor: color.bordePorDefecto,
   },
   campoTexto: {
-    fontSize: 16,
+    fontSize: 16, lineHeight: 23.2,
     fontWeight: '500',
     letterSpacing: -0.16,
     color: color.ink900,
@@ -365,6 +370,6 @@ const estilos = StyleSheet.create({
     // en web el input trae su propio contorno al enfocarse
     outlineStyle: 'none',
   } as never,
-  campoAyuda: { marginTop: 6, fontSize: 12.5, color: color.ink400, fontFamily: familia },
+  campoAyuda: { marginTop: 6, fontSize: 12.5, lineHeight: 18.12, color: color.ink400, fontFamily: familia },
 });
 

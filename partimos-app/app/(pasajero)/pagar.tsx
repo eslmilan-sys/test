@@ -17,12 +17,12 @@ import type { CanalDePago } from '@/dominio/tarifas';
 import { type MetodoDePago, desglosar, metodosDePago } from '@/servicios/pagos';
 import { type ReservaPreparada, prepararReserva } from '@/servicios/reservas';
 import { BarraDeEstado } from '@/ui/BarraDeEstado';
-import { CampoRojo } from '@/ui/CampoRojo';
+import { Brillo, CampoRojo } from '@/ui/CampoRojo';
 import { Boton, Epigrafe } from '@/ui/controles';
 import { Dinero, tabular } from '@/ui/dinero';
 import { hora } from '@/ui/fechas';
 import { Atras } from '@/ui/iconos';
-import { familia, color, espacio, radio } from '@/ui/tokens';
+import { TRACK_MICRO, familia, color, espacio, radio } from '@/ui/tokens';
 
 const VIAJE = '55555555-5555-4555-8555-555555555555';
 
@@ -116,6 +116,7 @@ export default function Pagar() {
         </View>
 
         <View style={estilos.tarjetaCuenta}>
+          <Brillo alto={210} />
           <View style={estilos.filaCuenta}>
             <Text style={estilos.cuentaEtiqueta}>{`Aporte a ${datos.conductor}`}</Text>
             <Dinero centavos={desglose.aporteCentavos} style={estilos.cuentaMonto} />
@@ -166,9 +167,9 @@ const estilos = StyleSheet.create({
     justifyContent: 'center',
   },
   epigrafeCampo: {
-    fontSize: 11,
+    fontSize: 11, lineHeight: 15.95,
     fontWeight: '600',
-    letterSpacing: 0.66,
+    letterSpacing: 11 * TRACK_MICRO,
     textTransform: 'uppercase',
     color: color.campoTexto,
     flex: 1,
@@ -217,17 +218,17 @@ const estilos = StyleSheet.create({
   },
   puntoElegido: { width: 10, height: 10, borderRadius: radio.pastilla, backgroundColor: color.azul500 },
   metodoNombre: {
-    fontSize: 15.5,
+    fontSize: 15.5, lineHeight: 22.47,
     fontWeight: '500',
     letterSpacing: -0.28,
     color: color.ink900,
     fontFamily: familia,
   },
-  metodoDetalle: { fontSize: 12.5, color: color.ink600, marginTop: 2, fontFamily: familia, ...tabular },
+  metodoDetalle: { fontSize: 12.5, lineHeight: 18.12, color: color.ink600, marginTop: 2, fontFamily: familia, ...tabular },
   distintivo: {
-    fontSize: 10.5,
+    fontSize: 10.5, lineHeight: 15.22,
     fontWeight: '600',
-    letterSpacing: 0.63,
+    letterSpacing: 10.5 * TRACK_MICRO,
     textTransform: 'uppercase',
     color: color.azul700,
     fontFamily: familia,
@@ -240,17 +241,18 @@ const estilos = StyleSheet.create({
     borderWidth: 1,
     borderColor: color.bordeSutil,
     padding: 20,
+    overflow: 'hidden',
     backgroundColor: color.blanco,
   },
   filaCuenta: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 },
-  cuentaEtiqueta: { fontSize: 14.5, color: color.ink700, fontFamily: familia },
-  cuentaMonto: { fontSize: 14.5, fontWeight: '500', color: color.ink700, fontFamily: familia },
+  cuentaEtiqueta: { fontSize: 14.5, lineHeight: 21.02, color: color.ink700, fontFamily: familia },
+  cuentaMonto: { fontSize: 14.5, lineHeight: 21.02, fontWeight: '500', color: color.ink700, fontFamily: familia },
   separador: { height: 1, backgroundColor: color.bordeSutil, marginVertical: 15 },
   filaTotal: { flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between', gap: 12 },
   totalEtiqueta: {
-    fontSize: 11,
+    fontSize: 11, lineHeight: 15.95,
     fontWeight: '600',
-    letterSpacing: 0.66,
+    letterSpacing: 11 * TRACK_MICRO,
     textTransform: 'uppercase',
     color: color.ink500,
     paddingBottom: 5,

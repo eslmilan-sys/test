@@ -15,7 +15,7 @@ import { Avatar, Boton } from '@/ui/controles';
 import { formatearDineroRedondo, tabular } from '@/ui/dinero';
 import { hora } from '@/ui/fechas';
 import { Atras } from '@/ui/iconos';
-import { familia, color, espacio, radio } from '@/ui/tokens';
+import { TRACK_MICRO, familia, color, espacio, radio } from '@/ui/tokens';
 
 const RESERVA = '77777777-7777-4777-8777-777777777710';
 
@@ -143,7 +143,7 @@ const estilos = StyleSheet.create({
     backgroundColor: color.campoControl,
   },
   pastillaSalidaTexto: {
-    fontSize: 12.5,
+    fontSize: 12.5, lineHeight: 18.12,
     fontWeight: '600',
     color: '#fff',
     fontFamily: familia,
@@ -152,9 +152,9 @@ const estilos = StyleSheet.create({
   puntoBlanco: { width: 6, height: 6, borderRadius: radio.pastilla, backgroundColor: '#fff' },
 
   epigrafe: {
-    fontSize: 11,
+    fontSize: 11, lineHeight: 15.95,
     fontWeight: '600',
-    letterSpacing: 0.66,
+    letterSpacing: 11 * TRACK_MICRO,
     textTransform: 'uppercase',
     color: color.campoTexto,
     marginTop: 26,
@@ -171,7 +171,7 @@ const estilos = StyleSheet.create({
     justifyContent: 'center',
   },
   digitoTexto: {
-    fontSize: 52,
+    fontSize: 52, lineHeight: 75.4,
     fontWeight: '600',
     letterSpacing: -2.08,
     color: '#fff',
@@ -201,13 +201,13 @@ const estilos = StyleSheet.create({
   },
   filaConductor: { flexDirection: 'row', alignItems: 'center', gap: 13 },
   nombreConductor: {
-    fontSize: 16.5,
+    fontSize: 16.5, lineHeight: 23.93,
     fontWeight: '500',
     letterSpacing: -0.33,
     color: color.ink900,
     fontFamily: familia,
   },
-  carro: { fontSize: 13.5, color: color.ink600, marginTop: 2, fontFamily: familia },
+  carro: { fontSize: 13.5, lineHeight: 19.57, color: color.ink600, marginTop: 2, fontFamily: familia },
   separador: { height: 1, backgroundColor: color.bordeSutil, marginVertical: 18 },
 
   recorrido: { position: 'relative' },
@@ -236,9 +236,9 @@ const estilos = StyleSheet.create({
     borderColor: color.ink200,
     marginTop: 4,
   },
-  paradaNombre: { fontSize: 16, letterSpacing: -0.29, color: color.ink900, fontFamily: familia },
-  paradaDetalle: { fontSize: 13, color: color.ink500, fontFamily: familia },
-  paradaHora: { fontSize: 13.5, color: color.ink600, fontFamily: familia, ...tabular },
+  paradaNombre: { fontSize: 16, lineHeight: 23.2, letterSpacing: -0.29, color: color.ink900, fontFamily: familia },
+  paradaDetalle: { fontSize: 13, lineHeight: 18.85, color: color.ink500, fontFamily: familia },
+  paradaHora: { fontSize: 13.5, lineHeight: 19.57, color: color.ink600, fontFamily: familia, ...tabular },
 
   avisoPago: {
     marginHorizontal: 22,

@@ -87,7 +87,7 @@ const estilos = StyleSheet.create({
   conFab: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   pestana: { alignItems: 'center', gap: 4, paddingHorizontal: 12, minWidth: 52 },
   icono: { width: 22, height: 22, alignItems: 'center', justifyContent: 'center' },
-  etiqueta: { fontSize: 10.5, letterSpacing: -0.05, fontFamily: familia },
+  etiqueta: { fontSize: 10.5, lineHeight: 15.22, letterSpacing: -0.05, fontFamily: familia },
   fab: {
     width: 46,
     height: 46,

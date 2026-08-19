@@ -16,7 +16,7 @@ import { Avatar, Boton, Epigrafe } from '@/ui/controles';
 import { tabular } from '@/ui/dinero';
 import { hora } from '@/ui/fechas';
 import { Visto } from '@/ui/iconos';
-import { familia, color, espacio, radio } from '@/ui/tokens';
+import { TRACK_MICRO, familia, color, espacio, radio } from '@/ui/tokens';
 
 const VIAJE = '55555555-5555-4555-8555-555555555557';
 const FILAS = [
@@ -234,9 +234,9 @@ const estilos = StyleSheet.create({
 
   cabecera: { paddingHorizontal: espacio.gutter },
   epigrafeCampo: {
-    fontSize: 11,
+    fontSize: 11, lineHeight: 15.95,
     fontWeight: '600',
-    letterSpacing: 0.66,
+    letterSpacing: 11 * TRACK_MICRO,
     textTransform: 'uppercase',
     color: color.campoTexto,
     fontFamily: familia,
@@ -270,7 +270,7 @@ const estilos = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: 16,
   },
-  contador: { fontSize: 12.5, color: color.ink500, fontFamily: familia },
+  contador: { fontSize: 12.5, lineHeight: 18.12, color: color.ink500, fontFamily: familia },
   todosDentro: { fontSize: 13.5, lineHeight: 20, color: color.ink600, fontFamily: familia },
 
   casillas: { flexDirection: 'row', gap: 10 },
@@ -282,7 +282,7 @@ const estilos = StyleSheet.create({
     justifyContent: 'center',
   },
   casillaTexto: {
-    fontSize: 34,
+    fontSize: 34, lineHeight: 49.3,
     fontWeight: '600',
     letterSpacing: -1.02,
     color: color.ink900,
@@ -307,13 +307,13 @@ const estilos = StyleSheet.create({
     borderColor: color.bordeSutil,
   },
   teclaTexto: {
-    fontSize: 23,
+    fontSize: 23, lineHeight: 33.35,
     fontWeight: '500',
     color: color.ink900,
     fontFamily: familia,
     ...tabular,
   },
-  teclaBorrar: { fontSize: 22, color: color.ink600, fontFamily: familia },
+  teclaBorrar: { fontSize: 22, lineHeight: 31.9, color: color.ink600, fontFamily: familia },
 
   lista: {
     marginTop: 12,
@@ -324,10 +324,10 @@ const estilos = StyleSheet.create({
     padding: 18,
   },
   filaPasajero: { flexDirection: 'row', alignItems: 'center', gap: 11 },
-  nombrePasajero: { flex: 1, fontSize: 15, fontWeight: '500', color: color.ink900, fontFamily: familia },
-  puestos: { fontSize: 13, color: color.ink500, fontFamily: familia },
+  nombrePasajero: { flex: 1, fontSize: 15, lineHeight: 21.75, fontWeight: '500', color: color.ink900, fontFamily: familia },
+  puestos: { fontSize: 13, lineHeight: 18.85, color: color.ink500, fontFamily: familia },
   abordo: { flexDirection: 'row', alignItems: 'center', gap: 5 },
-  abordoTexto: { fontSize: 13, fontWeight: '500', color: color.verde500, fontFamily: familia },
+  abordoTexto: { fontSize: 13, lineHeight: 18.85, fontWeight: '500', color: color.verde500, fontFamily: familia },
 
   pie: {
     paddingHorizontal: 22,
@@ -338,5 +338,5 @@ const estilos = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: color.bordeSutil,
   },
-  noShow: { textAlign: 'center', fontSize: 12.5, color: color.ink500, fontFamily: familia },
+  noShow: { textAlign: 'center', fontSize: 12.5, lineHeight: 18.12, color: color.ink500, fontFamily: familia },
 });

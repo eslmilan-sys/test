@@ -208,7 +208,7 @@ const estilos = StyleSheet.create({
   hojaContenido: { paddingHorizontal: espacio.gutter, paddingTop: 20, paddingBottom: 170 },
 
   filaEncabezado: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16 },
-  cuando: { fontSize: 25, letterSpacing: -1, marginTop: 7, fontWeight: '400', color: color.ink900, fontFamily: familia },
+  cuando: { fontSize: 25, lineHeight: 36.25, letterSpacing: -1, marginTop: 7, fontWeight: '400', color: color.ink900, fontFamily: familia },
   cuandoFuerte: { fontWeight: '600' },
   precio: {
     fontSize: 30,
@@ -219,7 +219,7 @@ const estilos = StyleSheet.create({
     fontFamily: familia,
     ...tabular,
   },
-  porPuesto: { fontSize: 12.5, color: color.ink600, marginTop: 5, fontFamily: familia },
+  porPuesto: { fontSize: 12.5, lineHeight: 18.12, color: color.ink600, marginTop: 5, fontFamily: familia },
 
   tarjeta: {
     backgroundColor: color.blanco,
@@ -258,16 +258,16 @@ const estilos = StyleSheet.create({
     borderWidth: 2,
     borderColor: color.ink200,
   },
-  paradaNombre: { flex: 1, fontSize: 15, fontWeight: '500', letterSpacing: -0.27, color: color.ink900, fontFamily: familia },
-  paradaHora: { fontSize: 13, color: color.ink400, fontFamily: familia, ...tabular },
+  paradaNombre: { flex: 1, fontSize: 15, lineHeight: 21.75, fontWeight: '500', letterSpacing: -0.27, color: color.ink900, fontFamily: familia },
+  paradaHora: { fontSize: 13, lineHeight: 18.85, color: color.ink400, fontFamily: familia, ...tabular },
 
   filaConductor: { flexDirection: 'row', alignItems: 'center', gap: 13 },
-  nombre: { fontSize: 16.5, fontWeight: '500', letterSpacing: -0.33, color: color.ink900, fontFamily: familia },
+  nombre: { fontSize: 16.5, lineHeight: 23.93, fontWeight: '500', letterSpacing: -0.33, color: color.ink900, fontFamily: familia },
   filaCalificacion: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 2 },
-  calificacion: { fontSize: 13, color: color.ink600, fontFamily: familia, ...tabular },
+  calificacion: { fontSize: 13, lineHeight: 18.85, color: color.ink600, fontFamily: familia, ...tabular },
   separador: { height: 1, backgroundColor: color.bordeSutil, marginVertical: 16 },
   filaCarro: { flexDirection: 'row', alignItems: 'center', gap: 11 },
-  textoCarro: { flex: 1, fontSize: 14.5, fontWeight: '500', letterSpacing: -0.22, color: color.ink900, fontFamily: familia },
+  textoCarro: { flex: 1, fontSize: 14.5, lineHeight: 21.02, fontWeight: '500', letterSpacing: -0.22, color: color.ink900, fontFamily: familia },
   filaPromesa: {
     flexDirection: 'row',
     alignItems: 'center',

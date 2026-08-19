@@ -109,7 +109,7 @@ const estilos = StyleSheet.create({
     padding: 15,
   },
   filaSuperior: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16 },
-  cuando: { fontSize: 13, color: color.ink600, fontFamily: familia, ...tabular },
+  cuando: { fontSize: 13, lineHeight: 18.85, color: color.ink600, fontFamily: familia, ...tabular },
   filaPrecio: { flexDirection: 'row', alignItems: 'flex-start', gap: 6 },
   precio: {
     fontSize: 26,
@@ -133,16 +133,16 @@ const estilos = StyleSheet.create({
     borderWidth: 1.5,
     borderColor: color.bordePorDefecto,
   },
-  paradaTexto: { fontSize: 15.5, fontWeight: '500', letterSpacing: -0.28, color: color.ink900, fontFamily: familia },
-  llegada: { marginLeft: 'auto', fontSize: 13, color: color.ink400, fontFamily: familia, ...tabular },
+  paradaTexto: { fontSize: 15.5, lineHeight: 22.47, fontWeight: '500', letterSpacing: -0.28, color: color.ink900, fontFamily: familia },
+  llegada: { marginLeft: 'auto', fontSize: 13, lineHeight: 18.85, color: color.ink400, fontFamily: familia, ...tabular },
 
   filaEquipaje: { flexDirection: 'row', alignItems: 'center', gap: 7, marginTop: 9 },
-  equipaje: { fontSize: 12.5, color: color.ink600, fontFamily: familia },
+  equipaje: { fontSize: 12.5, lineHeight: 18.12, color: color.ink600, fontFamily: familia },
 
   separador: { height: 1, backgroundColor: color.bordeSutil, marginTop: 13, marginBottom: 12 },
 
   filaConductor: { flexDirection: 'row', alignItems: 'center', gap: 11 },
-  nombre: { fontSize: 14.5, fontWeight: '500', letterSpacing: -0.22, color: color.ink900, fontFamily: familia },
+  nombre: { fontSize: 14.5, lineHeight: 21.02, fontWeight: '500', letterSpacing: -0.22, color: color.ink900, fontFamily: familia },
   filaCalificacion: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 1 },
-  calificacion: { fontSize: 13, color: color.ink600, fontFamily: familia, ...tabular },
+  calificacion: { fontSize: 13, lineHeight: 18.85, color: color.ink600, fontFamily: familia, ...tabular },
 });

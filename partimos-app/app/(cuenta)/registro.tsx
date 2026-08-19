@@ -29,7 +29,7 @@ import { CampoRojo } from '@/ui/CampoRojo';
 import { Boton } from '@/ui/controles';
 import { tabular } from '@/ui/dinero';
 import { Atras } from '@/ui/iconos';
-import { familia, color, espacio, radio } from '@/ui/tokens';
+import { TRACK_MICRO, familia, color, espacio, radio } from '@/ui/tokens';
 
 type Paso = 1 | 2 | 3;
 
@@ -360,9 +360,9 @@ const estilos = StyleSheet.create({
     marginBottom: 14,
   },
   epigrafeCampo: {
-    fontSize: 11,
+    fontSize: 11, lineHeight: 15.95,
     fontWeight: '600',
-    letterSpacing: 0.66,
+    letterSpacing: 11 * TRACK_MICRO,
     textTransform: 'uppercase',
     color: color.campoTexto,
     fontFamily: familia,
@@ -400,7 +400,7 @@ const estilos = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  prefijoTexto: { fontSize: 16, fontWeight: '500', color: color.ink700, fontFamily: familia },
+  prefijoTexto: { fontSize: 16, lineHeight: 23.2, fontWeight: '500', color: color.ink700, fontFamily: familia },
   campo: {
     flex: 1,
     height: 58,
@@ -411,7 +411,7 @@ const estilos = StyleSheet.create({
     paddingHorizontal: 16,
   },
   entradaGrande: {
-    fontSize: 18,
+    fontSize: 18, lineHeight: 26.1,
     fontWeight: '500',
     color: color.ink900,
     fontFamily: familia,
@@ -419,7 +419,7 @@ const estilos = StyleSheet.create({
     outlineStyle: 'none',
   } as never,
   ayuda: { fontSize: 13.5, lineHeight: 20, color: color.ink600, marginTop: 16, fontFamily: familia },
-  ayudaCorta: { flex: 1, fontSize: 13.5, color: color.ink600, fontFamily: familia, ...tabular },
+  ayudaCorta: { flex: 1, fontSize: 13.5, lineHeight: 19.57, color: color.ink600, fontFamily: familia, ...tabular },
   legal: { fontSize: 12.5, lineHeight: 18, color: color.ink500, marginTop: 12, textAlign: 'center', fontFamily: familia },
 
   casillas: { flexDirection: 'row', gap: 10 },
@@ -433,7 +433,7 @@ const estilos = StyleSheet.create({
     justifyContent: 'center',
   },
   casillaTexto: {
-    fontSize: 34,
+    fontSize: 34, lineHeight: 49.3,
     fontWeight: '600',
     letterSpacing: -1.02,
     color: color.ink900,
@@ -445,14 +445,14 @@ const estilos = StyleSheet.create({
   error: { marginTop: 12, fontSize: 12.5, lineHeight: 18, color: color.rojo700, fontFamily: familia },
 
   filaReenvio: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 16 },
-  enlace: { fontSize: 13.5, fontWeight: '600', color: color.azul700, fontFamily: familia },
-  reenviar: { fontSize: 13.5, color: color.ink500, marginTop: 10, fontFamily: familia, ...tabular },
+  enlace: { fontSize: 13.5, lineHeight: 19.57, fontWeight: '600', color: color.azul700, fontFamily: familia },
+  reenviar: { fontSize: 13.5, lineHeight: 19.57, color: color.ink500, marginTop: 10, fontFamily: familia, ...tabular },
 
   loQueSigue: { marginTop: 16, gap: 10 },
   loQueSigueTitulo: {
-    fontSize: 11,
+    fontSize: 11, lineHeight: 15.95,
     fontWeight: '600',
-    letterSpacing: 0.66,
+    letterSpacing: 11 * TRACK_MICRO,
     textTransform: 'uppercase',
     color: color.azul500,
     fontFamily: familia,
@@ -466,6 +466,6 @@ const estilos = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  numeroPasoTexto: { fontSize: 12, fontWeight: '600', color: color.azul700, fontFamily: familia },
+  numeroPasoTexto: { fontSize: 12, lineHeight: 17.4, fontWeight: '600', color: color.azul700, fontFamily: familia },
   textoPaso: { flex: 1, fontSize: 13.5, lineHeight: 19, color: color.ink700, fontFamily: familia },
 });

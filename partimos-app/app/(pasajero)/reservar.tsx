@@ -21,7 +21,7 @@ import { Boton, Campo, Epigrafe, Pastilla, Stepper } from '@/ui/controles';
 import { tabular } from '@/ui/dinero';
 import { diaCorto, hora } from '@/ui/fechas';
 import { Atras, Maleta } from '@/ui/iconos';
-import { familia, color, espacio, radio } from '@/ui/tokens';
+import { TRACK_MICRO, familia, color, espacio, radio } from '@/ui/tokens';
 
 const VIAJE = '55555555-5555-4555-8555-555555555555';
 /** Mientras no exista sesión. La cuenta se pide en `1c`, al pulsar Pedir puesto. */
@@ -213,9 +213,9 @@ const estilos = StyleSheet.create({
     justifyContent: 'center',
   },
   epigrafeCampo: {
-    fontSize: 11,
+    fontSize: 11, lineHeight: 15.95,
     fontWeight: '600',
-    letterSpacing: 0.66,
+    letterSpacing: 11 * TRACK_MICRO,
     textTransform: 'uppercase',
     color: color.campoTexto,
     flex: 1,
@@ -273,13 +273,13 @@ const estilos = StyleSheet.create({
   },
   paradaNombre: {
     flex: 1,
-    fontSize: 15.5,
+    fontSize: 15.5, lineHeight: 22.47,
     fontWeight: '500',
     letterSpacing: -0.28,
     color: color.ink900,
     fontFamily: familia,
   },
-  paradaHora: { fontSize: 13, color: color.ink400, fontFamily: familia, ...tabular },
+  paradaHora: { fontSize: 13, lineHeight: 18.85, color: color.ink400, fontFamily: familia, ...tabular },
 
   tarjetaEquipaje: {
     marginHorizontal: 22,
@@ -301,7 +301,7 @@ const estilos = StyleSheet.create({
   },
   etiquetaStepper: {
     flex: 1,
-    fontSize: 14.5,
+    fontSize: 14.5, lineHeight: 21.02,
     fontWeight: '500',
     letterSpacing: -0.22,
     color: color.ink900,
@@ -338,5 +338,5 @@ const estilos = StyleSheet.create({
     ...tabular,
   },
   precioSimbolo: { fontSize: 17, fontWeight: '500' },
-  notaPie: { textAlign: 'center', fontSize: 12.5, color: color.ink500, marginTop: 10, fontFamily: familia },
+  notaPie: { textAlign: 'center', fontSize: 12.5, lineHeight: 18.12, color: color.ink500, marginTop: 10, fontFamily: familia },
 });

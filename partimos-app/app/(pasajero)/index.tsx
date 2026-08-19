@@ -24,7 +24,7 @@ import { Amanecer, CampoRojo } from '@/ui/CampoRojo';
 import { Boton, Epigrafe } from '@/ui/controles';
 import { formatearDineroRedondo, tabular } from '@/ui/dinero';
 import { Carro, Chat, Lupa, Marca, Mas, Persona } from '@/ui/iconos';
-import { familia, color, espacio, radio } from '@/ui/tokens';
+import { TRACK_MICRO, familia, color, espacio, radio } from '@/ui/tokens';
 
 const FOTOS: Record<string, number> = {
   chitre: require('../../assets/chitre.jpeg'),
@@ -197,7 +197,7 @@ const estilos = StyleSheet.create({
 
   cabecera: { paddingHorizontal: espacio.gutter, paddingTop: 8 },
   filaSaludo: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 16 },
-  saludo: { fontSize: 15.5, fontWeight: '500', letterSpacing: -0.19, color: '#fff', fontFamily: familia },
+  saludo: { fontSize: 15.5, lineHeight: 22.47, fontWeight: '500', letterSpacing: -0.19, color: '#fff', fontFamily: familia },
   saludoFuerte: { fontWeight: '600' },
   titular: {
     fontSize: 36,
@@ -234,14 +234,14 @@ const estilos = StyleSheet.create({
     borderColor: color.ink200,
   },
   etiquetaLugar: {
-    fontSize: 11,
+    fontSize: 11, lineHeight: 15.95,
     fontWeight: '600',
-    letterSpacing: 0.66,
+    letterSpacing: 11 * TRACK_MICRO,
     textTransform: 'uppercase',
     color: color.ink400,
     fontFamily: familia,
   },
-  valorLugar: { fontSize: 16.5, letterSpacing: -0.33, color: color.ink900, marginTop: 2, fontFamily: familia },
+  valorLugar: { fontSize: 16.5, lineHeight: 23.93, letterSpacing: -0.33, color: color.ink900, marginTop: 2, fontFamily: familia },
 
   filaCajas: { flexDirection: 'row', gap: 10, marginTop: 12 },
   caja: {
@@ -253,14 +253,14 @@ const estilos = StyleSheet.create({
     paddingHorizontal: 13,
   },
   etiquetaCaja: {
-    fontSize: 10.5,
+    fontSize: 10.5, lineHeight: 15.22,
     fontWeight: '600',
-    letterSpacing: 0.63,
+    letterSpacing: 10.5 * TRACK_MICRO,
     textTransform: 'uppercase',
     color: color.ink400,
     fontFamily: familia,
   },
-  valorCaja: { fontSize: 15, fontWeight: '500', color: color.ink900, marginTop: 2, fontFamily: familia },
+  valorCaja: { fontSize: 15, lineHeight: 21.75, fontWeight: '500', color: color.ink900, marginTop: 2, fontFamily: familia },
 
   seccionRutas: { paddingHorizontal: espacio.gutter, paddingTop: 18 },
   filaSeccion: {
@@ -269,7 +269,7 @@ const estilos = StyleSheet.create({
     alignItems: 'baseline',
     marginBottom: 2,
   },
-  verTodas: { fontSize: 13, fontWeight: '500', color: color.rojo600, fontFamily: familia },
+  verTodas: { fontSize: 13, lineHeight: 18.85, fontWeight: '500', color: color.rojo600, fontFamily: familia },
   filaRuta: { flexDirection: 'row', alignItems: 'center', gap: 13, paddingVertical: 11 },
   filaRutaConLinea: { borderTopWidth: 1, borderTopColor: color.bordeSutil },
   miniatura: {
@@ -280,11 +280,11 @@ const estilos = StyleSheet.create({
     backgroundColor: color.sand200,
   },
   foto: { width: '100%', height: '100%' },
-  nombreRuta: { flex: 1, fontSize: 16.5, letterSpacing: -0.36, color: color.ink900, fontFamily: familia },
+  nombreRuta: { flex: 1, fontSize: 16.5, lineHeight: 23.93, letterSpacing: -0.36, color: color.ink900, fontFamily: familia },
   nombreRutaFuerte: { fontWeight: '600' },
-  desde: { fontSize: 12.5, color: color.ink500, fontFamily: familia },
+  desde: { fontSize: 12.5, lineHeight: 18.12, color: color.ink500, fontFamily: familia },
   precioRuta: {
-    fontSize: 16,
+    fontSize: 16, lineHeight: 23.2,
     fontWeight: '700',
     letterSpacing: -0.56,
     color: color.ink900,
@@ -333,7 +333,7 @@ const estilos = StyleSheet.create({
     justifyContent: 'center',
   },
   botonPublicarTexto: {
-    fontSize: 14,
+    fontSize: 14, lineHeight: 20.3,
     fontWeight: '600',
     letterSpacing: -0.14,
     color: color.ink900,
