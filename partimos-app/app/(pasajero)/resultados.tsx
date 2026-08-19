@@ -50,7 +50,7 @@ export default function Resultados() {
             equipaje: etiquetaDeMaletero(v.accepts_luggage),
             conductor: {
               nombre: `${v.first_name ?? ''} ${v.last_initial ?? ''}`.trim(),
-              calificacion: 4.9,
+              calificacion: v.driver_rating ?? 0,
               carro: `${v.model ?? ''} ${v.color ?? ''}`.trim(),
             },
             canal: NOMBRE_DEL_CANAL.yappy_app,

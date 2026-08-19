@@ -42,6 +42,8 @@ export type ViajeEnResultados = AvailableTrip & {
   accepts_luggage: boolean;
   origin_label: string | null;
   destination_label: string | null;
+  /** De la vista `driver_ratings`. Nula si todavía no lo ha calificado nadie. */
+  driver_rating: number | null;
 };
 
 export type Filtros = {
@@ -478,6 +480,7 @@ function comoResultado(v: ViajeFila): ViajeEnResultados {
     accepts_luggage: v.accepts_luggage,
     origin_label: v.origin_label,
     destination_label: v.destination_label,
+    driver_rating: fuente.reputacion[v.driver_id]?.calificacion ?? null,
   };
 }
 

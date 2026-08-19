@@ -206,7 +206,9 @@ function Detallada({ viaje, alPulsar }: { viaje: ViajeEnResultados; alPulsar: ()
           <Text style={estilos.nombre}>{nombre}</Text>
           <View style={estilos.filaNota}>
             <Estrella tamano={11} />
-            <Text style={estilos.nota}>{`5.0 · ${categoria(viaje.category_code)}`}</Text>
+            <Text style={estilos.nota}>
+              {`${(viaje.driver_rating ?? 0).toFixed(1)} · ${categoria(viaje.category_code)}`}
+            </Text>
           </View>
         </View>
         {soloMujeres ? (

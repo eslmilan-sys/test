@@ -18,7 +18,16 @@
  */
 
 import { useEffect, useState } from 'react';
-import { Linking, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import {
+  Linking,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  type TextStyle,
+  View,
+} from 'react-native';
 
 import { useRouter } from 'expo-router';
 import Svg, { Path } from 'react-native-svg';
@@ -36,12 +45,20 @@ import { CampoRojo } from '@/ui/CampoRojo';
 import { Boton } from '@/ui/controles';
 import { diaCorto } from '@/ui/fechas';
 import { Atras } from '@/ui/iconos';
-import { TRACK_MICRO, color, espacio, familia, interlinea, radio, sombra, texto } from '@/ui/tokens';
+import { color, espacio, familia, interlinea, radio, sombra, texto } from '@/ui/tokens';
 
 // Mientras no haya sesión: la pasajera del recorrido del diseño y el puesto que
 // tiene en el Albrook → Chitré. De ese puesto sale a quién se reporta.
 const PASAJERA = '99999999-9999-4999-8999-999999999999';
 const RESERVA = '77777777-7777-4777-8777-777777777700';
+
+/**
+ * React Native Web deja `white-space: pre-wrap` en todo `Text`, y eso conserva
+ * el espacio que queda al final de la línea partida: el párrafo mide 4 px más
+ * de lo que ocupa. El traspaso corta como corta el navegador.
+ */
+const CORTE_DEL_NAVEGADOR =
+  Platform.OS === 'web' ? ({ whiteSpace: 'normal' } as unknown as TextStyle) : null;
 
 /** El auricular del bloque de emergencia; `@/ui/iconos` no tiene teléfono. */
 function Telefono({ tamano = 20, tinta = color.blanco }: { tamano?: number; tinta?: string }) {
@@ -166,12 +183,13 @@ export default function Reportar() {
             })}
           </View>
 
-          {/* El párrafo va anidado como en el traspaso: la caja de fuera lleva
-              el estilo y ocupa la columna, la de dentro se ciñe a las líneas
-              que ocupa el texto. */}
+          {/* El párrafo va en su propia caja dentro de la línea, como en el
+              traspaso: ocupa lo que mide, no toda la columna. */}
           <View style={estilos.consecuencia}>
             <Text style={estilos.consecuenciaTexto}>
-              <Text>Lo revisamos hoy mismo y puede quedar suspendido mientras miramos.</Text>
+              <Text style={CORTE_DEL_NAVEGADOR}>
+                Lo revisamos hoy mismo y puede quedar suspendido mientras miramos.
+              </Text>
             </Text>
           </View>
         </View>
@@ -368,9 +386,11 @@ const estilos = StyleSheet.create({
     height: 24,
     borderRadius: radio.pastilla,
     backgroundColor: color.blanco,
-    ...sombra.s,
+    shadowColor: '#26232B',
+    shadowOpacity: 0.06,
     shadowRadius: 2,
     shadowOffset: { width: 0, height: 1 },
+    elevation: 1,
   },
 
   pie: {
