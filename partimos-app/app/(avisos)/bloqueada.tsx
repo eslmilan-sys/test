@@ -24,6 +24,7 @@ import { CampoRojo } from '@/ui/CampoRojo';
 import { tabular } from '@/ui/dinero';
 import { diaLargo, hora } from '@/ui/fechas';
 import { Marca } from '@/ui/iconos';
+import { useReloj } from '@/ui/reloj';
 import { TRACK_MICRO, familia, color, espacio, interlinea, radio } from '@/ui/tokens';
 import { Vidrio } from '@/ui/Vidrio';
 
@@ -36,16 +37,12 @@ const CUANTOS_CABEN = 2;
 export default function Bloqueada() {
   const router = useRouter();
   const [pila, setPila] = useState<Aviso[]>([]);
-  const [ahora, setAhora] = useState(() => new Date());
+
+  // El reloj de la pantalla bloqueada es el del teléfono: se mueve solo.
+  const ahora = useReloj(20_000);
 
   useEffect(() => {
     cargar().then(setPila);
-  }, []);
-
-  // El reloj de la pantalla bloqueada es el del teléfono: se mueve solo.
-  useEffect(() => {
-    const t = setInterval(() => setAhora(new Date()), 20_000);
-    return () => clearInterval(t);
   }, []);
 
   const refrescar = () => cargar().then(setPila);

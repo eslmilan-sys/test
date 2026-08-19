@@ -14,7 +14,7 @@ import { BarraDeEstado } from '@/ui/BarraDeEstado';
 import { CampoRojo } from '@/ui/CampoRojo';
 import { Avatar, Boton, Epigrafe } from '@/ui/controles';
 import { tabular } from '@/ui/dinero';
-import { hora } from '@/ui/fechas';
+import { hora, mas } from '@/ui/fechas';
 import { Visto } from '@/ui/iconos';
 import { TRACK_MICRO, familia, color, espacio, radio } from '@/ui/tokens';
 
@@ -69,7 +69,7 @@ export default function Abordaje() {
     <View style={estilos.pantalla}>
       <CampoRojo altura={196} />
 
-      <BarraDeEstado hora={hora(new Date())} />
+      <BarraDeEstado hora={hora(mas(datos.salida, -1))} />
 
       <View style={estilos.cabecera}>
         <Text style={estilos.epigrafeCampo}>

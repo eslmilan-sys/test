@@ -13,7 +13,7 @@ import { BarraDeEstado } from '@/ui/BarraDeEstado';
 import { CampoRojo } from '@/ui/CampoRojo';
 import { Avatar, Boton } from '@/ui/controles';
 import { formatearDineroRedondo, tabular } from '@/ui/dinero';
-import { hora } from '@/ui/fechas';
+import { hora, mas } from '@/ui/fechas';
 import { Atras } from '@/ui/iconos';
 import { TRACK_MICRO, familia, color, espacio, radio } from '@/ui/tokens';
 
@@ -32,7 +32,7 @@ export default function Codigo() {
     <View style={estilos.pantalla}>
       <CampoRojo altura={400} />
 
-      <BarraDeEstado hora={hora(new Date())} />
+      <BarraDeEstado hora={hora(mas(datos.salida, -12))} />
 
       <ScrollView
         style={{ flex: 1 }}

@@ -21,6 +21,7 @@ import { CampoRojo } from '@/ui/CampoRojo';
 import { Boton, Epigrafe } from '@/ui/controles';
 import { formatearDineroRedondo, tabular } from '@/ui/dinero';
 import { diaLargo, hora } from '@/ui/fechas';
+import { useReloj } from '@/ui/reloj';
 import { Marca } from '@/ui/iconos';
 import { TRACK_MICRO, familia, color, espacio, interlinea, radio } from '@/ui/tokens';
 
@@ -37,6 +38,7 @@ const FOTOS: Record<string, number> = {
 export default function Bienvenida() {
   const router = useRouter();
   const [salidas, setSalidas] = useState<SalidaCercana[]>([]);
+  const hoy = useReloj();
 
   useEffect(() => {
     proximasSalidas(3).then(setSalidas);
@@ -55,7 +57,7 @@ export default function Bienvenida() {
         <View style={estilos.cabecera}>
           <View style={estilos.filaMarca}>
             {/* Panamá es el único mercado del producto: va como copia, no como dato. */}
-            <Text style={estilos.epigrafeCampo}>{`Panamá · ${diaLargo(new Date())}`}</Text>
+            <Text style={estilos.epigrafeCampo}>{`Panamá · ${diaLargo(hoy)}`}</Text>
             <Marca tamano={26} />
           </View>
 
