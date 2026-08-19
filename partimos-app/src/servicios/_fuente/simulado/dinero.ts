@@ -148,14 +148,14 @@ function entrada(id: number, centavos: number, descripcion: string, cuando: stri
 }
 
 /** El Yappy donde caen los envíos. La base guarda el método, no el número. */
-export const yappyDelConductor = { [ANDRES_ID]: '7788', [DANIELA_ID]: '6699' } as const;
+export const yappyDelConductor: Record<string, string> = { [ANDRES_ID]: '7788', [DANIELA_ID]: '6699' };
 
-export function guardarCancelacion(c: Cancellation): Cancellation {
+export async function guardarCancelacion(c: Cancellation): Promise<Cancellation> {
   cancelaciones.unshift(c);
   return c;
 }
 
-export function guardarReembolso(r: Refund): Refund {
+export async function guardarReembolso(r: Refund): Promise<Refund> {
   reembolsos.unshift(r);
   return r;
 }

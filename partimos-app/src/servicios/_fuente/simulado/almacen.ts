@@ -454,22 +454,25 @@ export const mensajes: Message[] = [
 export const pagos: Payment[] = [];
 
 /** Altas en memoria. Se pierde al recargar, y está bien: es un simulado. */
-export function guardarViaje(viaje: ViajeFila): ViajeFila {
+export async function guardarViaje(viaje: ViajeFila): Promise<ViajeFila> {
   viajes.unshift(viaje);
   return viaje;
 }
 
-export function guardarReserva(reserva: ReservaFila): ReservaFila {
+export async function guardarReserva(reserva: ReservaFila): Promise<ReservaFila> {
   reservas.unshift(reserva);
   return reserva;
 }
 
-export function guardarPago(pago: Payment): Payment {
+export async function guardarPago(pago: Payment): Promise<Payment> {
   pagos.unshift(pago);
   return pago;
 }
 
-export function actualizarReserva(id: string, cambios: Partial<Booking> & Partial<ReservaFila>): ReservaFila {
+export async function actualizarReserva(
+  id: string,
+  cambios: Partial<ReservaFila>,
+): Promise<ReservaFila> {
   const i = reservas.findIndex((r) => r.id === id);
   if (i < 0) throw new Error(`No existe la reserva ${id}`);
   reservas[i] = { ...reservas[i], ...cambios, updated_at: new Date().toISOString() };

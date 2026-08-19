@@ -137,7 +137,7 @@ export async function verificarCodigo(
   if (!reserva) return demora({ ok: false, motivo: 'no-coincide' } as const);
   if (reserva.boarded_at) return demora({ ok: false, motivo: 'ya-abordo' } as const);
 
-  fuente.actualizarReserva(reserva.id, { boarded_at: new Date().toISOString() });
+  await fuente.actualizarReserva(reserva.id, { boarded_at: new Date().toISOString() });
   const p = fuente.perfiles.find((x) => x.id === reserva.passenger_id);
 
   return demora({
@@ -201,7 +201,7 @@ export async function resumenDeLlegada(reservaId: string): Promise<Llegada> {
 /** Nadie apareció. Sin marca de abordaje, el aporte no se libera. */
 export async function marcarNoShow(reservaId: string): Promise<ReservaFila> {
   return demora(
-    fuente.actualizarReserva(reservaId, {
+    await fuente.actualizarReserva(reservaId, {
       status: 'no_show_passenger',
       cancelled_at: new Date().toISOString(),
     }),

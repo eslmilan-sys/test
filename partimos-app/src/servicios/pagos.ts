@@ -104,7 +104,7 @@ export async function elegirMetodo(reservaId: string, canal: CanalDePago): Promi
   const reserva = fuente.reservas.find((r) => r.id === reservaId);
   if (!reserva) throw new Error(`No existe la reserva ${reservaId}`);
   const aporte = reserva.unit_price_cents * reserva.seats;
-  fuente.actualizarReserva(reservaId, {
+  await fuente.actualizarReserva(reservaId, {
     payment_channel: canal,
     service_fee_cents: tarifaDeServicio(aporte, canal),
     total_cents: totalQuePagaElPasajero(aporte, canal),
@@ -118,7 +118,7 @@ export async function liberarAporte(reservaId: string): Promise<Payment | null> 
   if (!pago) return demora(null);
   pago.status = 'captured';
   pago.captured_at = new Date().toISOString();
-  fuente.actualizarReserva(reservaId, { released_at: pago.captured_at });
+  await fuente.actualizarReserva(reservaId, { released_at: pago.captured_at });
   return demora(pago);
 }
 

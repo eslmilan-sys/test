@@ -115,7 +115,7 @@ export async function pedirPuesto(
     maletas: equipaje.maletas,
   };
 
-  return demora(fuente.guardarReserva(reserva));
+  return demora(await fuente.guardarReserva(reserva));
 }
 
 export async function reservasDelViaje(viajeId: string): Promise<ReservaFila[]> {
@@ -124,12 +124,12 @@ export async function reservasDelViaje(viajeId: string): Promise<ReservaFila[]> 
 
 /** El conductor marca a alguien al subir. Esta marca es lo que prueba que el viaje pasó. */
 export async function marcarAbordaje(reservaId: string): Promise<ReservaFila> {
-  return demora(fuente.actualizarReserva(reservaId, { boarded_at: new Date().toISOString() }));
+  return demora(await fuente.actualizarReserva(reservaId, { boarded_at: new Date().toISOString() }));
 }
 
 /** Nadie apareció. Sin marca de abordaje no se libera el aporte. */
 export async function marcarNoShow(reservaId: string): Promise<ReservaFila> {
-  return demora(fuente.actualizarReserva(reservaId, { status: 'no_show_passenger' }));
+  return demora(await fuente.actualizarReserva(reservaId, { status: 'no_show_passenger' }));
 }
 
 /* ------------------------------------------------------------------ */

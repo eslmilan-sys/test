@@ -94,14 +94,14 @@ export const avisos: AvisoPendiente[] = [
   },
 ];
 
-export function marcarAvisoLeido(id: string): AvisoPendiente | null {
+export async function marcarAvisoLeido(id: string): Promise<AvisoPendiente | null> {
   const i = avisos.findIndex((a) => a.id === id);
   if (i < 0) return null;
   avisos[i] = { ...avisos[i], read_at: new Date().toISOString() };
   return avisos[i];
 }
 
-export function marcarTodosLeidos(perfilId: string): number {
+export async function marcarTodosLeidos(perfilId: string): Promise<number> {
   const ahora = new Date().toISOString();
   let n = 0;
   avisos.forEach((a, i) => {

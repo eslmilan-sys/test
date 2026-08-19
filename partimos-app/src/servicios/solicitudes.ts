@@ -105,7 +105,7 @@ export async function aceptarSolicitud(
   }
 
   const ahora = new Date().toISOString();
-  const confirmada = fuente.actualizarReserva(id, {
+  const confirmada = await fuente.actualizarReserva(id, {
     status: 'confirmed',
     confirmed_at: ahora,
     proposal_accepted: reserva.proposed_point ? true : null,
@@ -125,7 +125,7 @@ export async function aceptarSolicitud(
     captured_at: null,
     created_at: ahora,
   };
-  fuente.guardarPago(pago);
+  await fuente.guardarPago(pago);
 
   return demora({ reserva: confirmada, pago, puestosLibres: puestosLibresDe(reserva.trip_id) });
 }
@@ -133,7 +133,7 @@ export async function aceptarSolicitud(
 /** Rechazar no pide motivo. */
 export async function rechazarSolicitud(id: string): Promise<ReservaFila> {
   return demora(
-    fuente.actualizarReserva(id, {
+    await fuente.actualizarReserva(id, {
       status: 'cancelled_driver',
       cancelled_at: new Date().toISOString(),
       cancellation_reason: 'rechazada_por_el_conductor',

@@ -83,12 +83,15 @@ export const rutinas: RutinaFila[] = [
   },
 ];
 
-export function guardarIncidencia(i: Incident): Incident {
+export async function guardarIncidencia(i: Incident): Promise<Incident> {
   incidencias.unshift(i);
   return i;
 }
 
-export function cambiarAvisoDeRutina(id: string, avisar: boolean): RutinaFila | null {
+export async function cambiarAvisoDeRutina(
+  id: string,
+  avisar: boolean,
+): Promise<RutinaFila | null> {
   const i = rutinas.findIndex((r) => r.id === id);
   if (i < 0) return null;
   rutinas[i] = { ...rutinas[i], avisar, updated_at: new Date().toISOString() };

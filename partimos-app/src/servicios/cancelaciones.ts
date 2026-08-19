@@ -147,9 +147,9 @@ export async function cancelar(
     created_at: new Date().toISOString(),
   };
 
-  fuente.guardarCancelacion(cancelacion);
-  fuente.guardarReembolso(reembolso);
-  fuente.actualizarReserva(reservaId, {
+  await fuente.guardarCancelacion(cancelacion);
+  await fuente.guardarReembolso(reembolso);
+  await fuente.actualizarReserva(reservaId, {
     status: eleccion.parte === 'driver' ? 'cancelled_driver' : 'cancelled_passenger',
     cancelled_at: cancelacion.created_at,
   });

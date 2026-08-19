@@ -63,12 +63,12 @@ export async function bandeja(perfilId: string): Promise<Bandeja> {
 
 /** Tocar un aviso lo marca leído, y el contador va detrás. */
 export async function marcarLeido(avisoId: string): Promise<Aviso | null> {
-  const fila = fuente.marcarAvisoLeido(avisoId);
+  const fila = await fuente.marcarAvisoLeido(avisoId);
   return demora(fila ? comoAviso(fila) : null);
 }
 
 export async function marcarTodo(perfilId: string): Promise<number> {
-  return demora(fuente.marcarTodosLeidos(perfilId));
+  return demora(await fuente.marcarTodosLeidos(perfilId));
 }
 
 /** Lo que enseña la pantalla bloqueada de `12a`: el aviso más nuevo sin leer. */

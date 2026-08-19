@@ -411,7 +411,7 @@ export async function publicarViaje(borrador: BorradorDePublicacion): Promise<Vi
     accepts_luggage: borrador.aceptaMaletas,
   };
 
-  return demora(fuente.guardarViaje(viaje));
+  return demora(await fuente.guardarViaje(viaje));
 }
 
 /** El reparto que `5c` enseña bajo la cifra y `5d` desglosa. */

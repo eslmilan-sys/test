@@ -152,6 +152,6 @@ export async function reportar(
     created_at: new Date().toISOString(),
   };
 
-  fuente.guardarIncidencia(incidencia);
+  await fuente.guardarIncidencia(incidencia);
   return demora(incidencia);
 }

@@ -34,7 +34,7 @@ export async function rutasGuardadas(perfilId: string): Promise<RutaGuardada[]> 
 
 /** El interruptor de una ruta. Apaga el aviso; la ruta sigue guardada. */
 export async function cambiarAviso(rutaId: string, avisar: boolean): Promise<RutaGuardada | null> {
-  const fila = fuente.cambiarAvisoDeRutina(rutaId, avisar);
+  const fila = await fuente.cambiarAvisoDeRutina(rutaId, avisar);
   return demora(fila ? comoRuta(fila) : null);
 }
 
