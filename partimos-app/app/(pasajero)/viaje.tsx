@@ -152,7 +152,8 @@ export default function DetalleDelViaje() {
           <Pastilla estilo={{ marginTop: 3 }}>1 puesto</Pastilla>
         </View>
         <Boton
-          alPulsar={() => router.push({ pathname: '/(pasajero)/reservar', params: { viaje: viajeId } })}
+          // la puerta: pedir puesto es lo único que pide cuenta
+          alPulsar={() => router.push({ pathname: '/(cuenta)/puerta', params: { viaje: viajeId } })}
         >
           Pedir mi puesto
         </Boton>
