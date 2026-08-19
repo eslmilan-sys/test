@@ -37,6 +37,10 @@ const pesos = [
   ['Bold', 700],
 ] as const;
 
+// Cuando la app se publica bajo un subcamino (GitHub Pages, por ejemplo), una
+// ruta absoluta manda las fuentes a la raíz del dominio y no las encuentra.
+const base = (process.env.EXPO_BASE_URL ?? '').replace(/\/$/, '');
+
 const estilos = `
 ${pesos
   .map(
@@ -45,7 +49,7 @@ ${pesos
   font-style: normal;
   font-weight: ${peso};
   font-display: swap;
-  src: url("/fuentes/InterTight-${archivo}.ttf") format("truetype");
+  src: url("${base}/fuentes/InterTight-${archivo}.ttf") format("truetype");
 }`,
   )
   .join('\n')}
