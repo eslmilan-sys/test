@@ -80,15 +80,19 @@ test('las tarifas sobre un aporte de 6 $', () => {
   assert.equal(totalQuePagaElPasajero(600, 'yappy_app'), 630);
 });
 
-test('cancelo yo con tiempo: vuelve el aporte, la tarifa no', () => {
+// El traspaso es explícito: a más de 2 h vuelve **entero, tarifa incluida**,
+// 6,30 $ sobre un viaje de 6 $ con Yappy. No retenemos nada por algo que
+// todavía no nos ha costado nada.
+test('cancelo yo con tiempo: vuelve todo, tarifa incluida', () => {
   const r = calcularReembolso({
     motivo: 'yo',
     aporteCentavos: 600,
     tarifaCentavos: 30,
     horasAntesDeLaSalida: 19,
   });
-  assert.equal(r.montoCentavos, 600);
-  assert.equal(r.retenidoCentavos, 30);
+  assert.equal(r.montoCentavos, 630);
+  assert.equal(r.retenidoCentavos, 0);
+  assert.equal(r.paraElConductorCentavos, 0);
 });
 
 test('cancelo yo a última hora: el conductor se queda 1 $', () => {

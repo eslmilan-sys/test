@@ -7,10 +7,11 @@
  * cosas por las que de verdad vamos a escribirle, en el orden en que ocurren.
  * Ninguna es una ventaja: son avisos que sin ellos le cuestan el viaje.
  *
- * La línea de la lista de espera y el vidrio del diálogo del sistema van
- * juntos a propósito: primero prometemos qué NO mandamos, y sólo después
- * enseñamos el cartel del sistema, apagado al 70 %, para que el «Permitir» ya
- * esté decidido cuando aparezca de verdad.
+ * El orden de abajo también es deliberado: primero prometemos qué NO mandamos,
+ * y sólo después enseñamos el cartel del sistema, apagado al 70 % y sin
+ * responder al dedo, para que el «Permitir» ya esté decidido cuando aparezca
+ * de verdad. Ese cartel es un ensayo, no un control: si se hace pulsable, la
+ * pantalla miente.
  *
  * El nombre del conductor sale del viaje que se está a punto de reservar. Es
  * el único dato de negocio de la pantalla; lo demás es copia de interfaz.

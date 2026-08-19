@@ -53,7 +53,7 @@ export default function DetalleDelViaje() {
     <View style={estilos.pantalla}>
       <Mapa alto={300} />
 
-      <BarraDeEstado hora={hora(new Date())} tono="oscuro" />
+      <BarraDeEstado tono="oscuro" />
 
       <View style={estilos.chrome}>
         <View style={estilos.vidrioBoton}>
@@ -214,12 +214,20 @@ const estilos = StyleSheet.create({
     fontSize: 30,
     fontWeight: '700',
     letterSpacing: -1.35,
-    lineHeight: 30,
+    lineHeight: 27,
+    textAlign: 'right',
     color: color.ink900,
     fontFamily: familia,
     ...tabular,
   },
-  porPuesto: { fontSize: 12.5, lineHeight: 18.12, color: color.ink600, marginTop: 5, fontFamily: familia },
+  porPuesto: {
+    fontSize: 12.5,
+    lineHeight: 18.125,
+    textAlign: 'right',
+    color: color.ink600,
+    marginTop: 5,
+    fontFamily: familia,
+  },
 
   tarjeta: {
     backgroundColor: color.blanco,

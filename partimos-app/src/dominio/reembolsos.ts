@@ -50,15 +50,18 @@ export function calcularReembolso({
   switch (motivo) {
     case 'yo': {
       const aTiempo = horasAntesDeLaSalida >= HORAS_PARA_CANCELAR_ENTERO;
-      const retencion = aTiempo ? 0 : RETENCION_TARDIA_CENTAVOS;
+      // A tiempo vuelve **todo, tarifa incluida**: no retenemos nada por algo
+      // que todavía no nos ha costado nada. Tarde vuelve el aporte menos 1 $,
+      // que se queda el conductor por el puesto que ya no vende, y la tarifa
+      // tampoco vuelve porque el cobro ya se hizo.
       return {
         titulo: 'Completo si faltan más de 2 h',
         texto: aTiempo
           ? `Faltan ${textoDeHoras(horasAntesDeLaSalida)}, así que vuelve entero. A menos de 2 h se devuelve menos 1 $, que se queda el conductor.`
           : `Faltan menos de 2 h, así que se devuelve menos 1 $, que se queda el conductor por el puesto que ya no vende.`,
-        montoCentavos: aporteCentavos - retencion,
-        retenidoCentavos: tarifaCentavos + retencion,
-        paraElConductorCentavos: retencion,
+        montoCentavos: aTiempo ? todo : aporteCentavos - RETENCION_TARDIA_CENTAVOS,
+        retenidoCentavos: aTiempo ? 0 : tarifaCentavos + RETENCION_TARDIA_CENTAVOS,
+        paraElConductorCentavos: aTiempo ? 0 : RETENCION_TARDIA_CENTAVOS,
         plazo: '3 a 5 días hábiles',
       };
     }
