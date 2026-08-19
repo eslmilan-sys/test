@@ -136,7 +136,9 @@ export default function Ayuda() {
                   onPress={() => router.push(cosa.ruta as Href)}
                   style={({ pressed }) => [estilos.fila, pressed && estilos.filaPulsada]}
                 >
-                  <Text style={estilos.filaTitulo}>{cosa.titulo}</Text>
+                  <View style={estilos.filaTituloCaja}>
+                    <Text style={estilos.filaTitulo}>{cosa.titulo}</Text>
+                  </View>
                   <View style={[estilos.pastilla, urgente && estilos.pastillaUrgente]}>
                     <Text
                       style={[estilos.pastillaTexto, urgente && estilos.pastillaTextoUrgente]}
@@ -261,8 +263,12 @@ const estilos = StyleSheet.create({
     borderTopColor: color.bordeSutil,
   },
   filaPulsada: { opacity: 0.6 },
+  /* El título ocupa el hueco que queda hasta la pastilla, pero la caja de
+     texto se ciñe a la palabra: el traspaso mete el título en un span en
+     línea, y si el texto se estira el galón deja de leerse como final de
+     fila. */
+  filaTituloCaja: { flex: 1, alignItems: 'flex-start' },
   filaTitulo: {
-    flex: 1,
     fontSize: 14.5,
     lineHeight: interlinea(14.5),
     fontWeight: '500',

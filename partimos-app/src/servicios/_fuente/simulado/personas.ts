@@ -16,6 +16,9 @@ export const JOSE_ID = 'aaaaaaa1-0000-4000-8000-000000000002';
 export const LUCIA_ID = 'aaaaaaa1-0000-4000-8000-000000000003';
 export const VIELKA_ID = 'aaaaaaa1-0000-4000-8000-000000000004';
 export const JAVIER_ID = 'aaaaaaa1-0000-4000-8000-000000000005';
+/** Conductora del fin de semana a la playa, con SUV y viajes solo para mujeres. */
+export const CARLA_ID = 'aaaaaaa1-0000-4000-8000-000000000006';
+export const TUCSON_ID = '44444444-4444-4444-8444-444444444445';
 export const ELANTRA_ID = '44444444-4444-4444-8444-444444444444';
 
 /** Filas reales de `vehicle_categories`. El `rate_per_km_cents` de la base es
@@ -217,6 +220,27 @@ export const perfiles: Profile[] = [
     accepts_yappy_direct: true,
     accepts_cash: true,
   },
+  {
+    id: CARLA_ID,
+    first_name: 'Carla',
+    last_initial: 'V.',
+    phone: '+507 6000 0009',
+    photo_url: null,
+    home_city_id: '6a6a7413-08f3-4902-9378-62847a9856bd',
+    gender: 'mujer',
+    bio: 'Voy a la playa casi todos los fines de semana.',
+    is_id_verified: true,
+    is_phone_verified: true,
+    is_suspended: false,
+    suspended_reason: null,
+    locale: 'es-PA',
+    created_at: '2026-02-10T09:00:00+00:00',
+    updated_at: '2026-08-01T09:00:00+00:00',
+    linkedin_connected_at: null,
+    preferred_pay_channel: 'yappy_app',
+    accepts_yappy_direct: true,
+    accepts_cash: true,
+  },
 ];
 
 export const vehiculos: Vehicle[] = [
@@ -237,6 +261,22 @@ export const vehiculos: Vehicle[] = [
     rate_per_km_cents: null,
     photo_path: null,
   },
+  {
+    id: TUCSON_ID,
+    owner_id: CARLA_ID,
+    category_code: 'suv',
+    make: 'Hyundai',
+    model: 'Tucson',
+    color: 'blanco',
+    year: 2022,
+    seats_total: 5,
+    plate_last3: '907',
+    is_active: true,
+    created_at: '2026-02-10T09:30:00+00:00',
+    consumption_l_100km: 11.0,
+    rate_per_km_cents: null,
+    photo_path: null,
+  },
 ];
 
 /**
@@ -251,6 +291,7 @@ export const reputacion: Record<string, { viajes: number; calificacion: number |
   [MARIA_ID]: { viajes: 21, calificacion: 4.9 },
   [JOSE_ID]: { viajes: 3, calificacion: 4.7 },
   [LUCIA_ID]: { viajes: 9, calificacion: 5.0 },
+  [CARLA_ID]: { viajes: 41, calificacion: 5.0 },
 };
 
 /**
@@ -323,4 +364,5 @@ export const resenas: Review[] = [
 /** La placa completa, que la columna `plate_last3` todavía no puede guardar. */
 export const placasCompletas: Record<string, string> = {
   [ELANTRA_ID]: 'AB-1234',
+  [TUCSON_ID]: 'CV-0907',
 };

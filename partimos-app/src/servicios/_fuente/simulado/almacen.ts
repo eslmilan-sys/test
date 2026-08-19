@@ -7,7 +7,7 @@
 
 import type { Booking, Message, Payment, ReservaFila, TripStop, ViajeFila } from '@/tipos';
 
-import { ANDRES_ID, DANIELA_ID, ELANTRA_ID, JOSE_ID, LUCIA_ID, MARIA_ID, MATEO_ID, ROSA_ID } from './personas';
+import { ANDRES_ID, CARLA_ID, DANIELA_ID, ELANTRA_ID, JOSE_ID, LUCIA_ID, MARIA_ID, MATEO_ID, ROSA_ID, TUCSON_ID } from './personas';
 import { corredores } from './geografia';
 import { AHORA, LLEGADA, SALIDA, desdeLaSalida, enMinutos, enPanama, haceMinutos } from './reloj';
 
@@ -245,6 +245,62 @@ paradas.push(
     created_at: AHORA,
   },
 );
+
+/**
+ * El fin de semana a la playa, que es lo que enseña `3c`: la ruta con su
+ * fotografía detrás. Carla lleva SUV y publica viajes solo para mujeres.
+ */
+const CORONADO = corredores.find((c) => c.slug === 'panama-coronado')!;
+
+const playa = (i: number, hora: number, precio: number, origen: string, destino: string, soloMujeres: boolean) => {
+  const id = `55555555-5555-4555-8555-5555555559${String(i).padStart(2, '0')}`;
+  const sale = enPanama(hora, 1);
+  const llega = new Date(new Date(sale).getTime() + (CORONADO.typical_duration_min ?? 100) * 60_000).toISOString();
+  viajes.push({
+    ...viajes[0],
+    id,
+    driver_id: CARLA_ID,
+    vehicle_id: TUCSON_ID,
+    corridor_id: CORONADO.id,
+    departure_at: sale,
+    arrival_estimate_at: llega,
+    seats_offered: i === 0 ? 2 : 3,
+    price_cents: precio,
+    gender_preference: soloMujeres ? 'women_only' : 'any',
+    snap_distance_km: Number(CORONADO.distance_km),
+    snap_toll_cents: Number(CORONADO.toll_cents),
+    snap_max_price_cents: 600,
+    origin_label: origen,
+    destination_label: destino,
+    accepts_luggage: true,
+  });
+  paradas.push(
+    {
+      id: `66666666-6666-4666-8666-66666666690${i}`,
+      trip_id: id,
+      pickup_point_id: null,
+      custom_label: origen,
+      kind: 'origin',
+      sequence: 0,
+      scheduled_at: sale,
+      created_at: AHORA,
+    },
+    {
+      id: `66666666-6666-4666-8666-66666666691${i}`,
+      trip_id: id,
+      pickup_point_id: null,
+      custom_label: destino,
+      kind: 'destination',
+      sequence: 1,
+      scheduled_at: llega,
+      created_at: AHORA,
+    },
+  );
+};
+
+playa(0, 7.5, 600, 'Costa del Este', 'Playa Blanca · entrada', true);
+playa(1, 9, 500, 'Albrook · Terminal', 'Playa Blanca · entrada', false);
+playa(2, 14, 500, 'Vía Centenario', 'Río Hato · cruce', false);
 
 const reservaBase = (extra: Partial<ReservaFila>): ReservaFila => ({
   id: '',

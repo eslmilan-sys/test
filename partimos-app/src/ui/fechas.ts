@@ -39,6 +39,21 @@ export function diaCorto(d: Date | string): string {
   return diaYNumero.format(new Date(d)).replace(',', '');
 }
 
+const diaAbreviado = new Intl.DateTimeFormat('es-PA', {
+  weekday: 'short',
+  timeZone: ZONA,
+});
+
+/**
+ * «Sáb» — el día en tres letras, con mayúscula, para las filas donde no cabe
+ * el nombre entero. `Intl` lo devuelve con punto en algunas versiones; se
+ * quita, porque en una fila de resultados el punto es ruido.
+ */
+export function diaAbrev(d: Date | string): string {
+  const corto = diaAbreviado.format(new Date(d)).replace('.', '');
+  return corto.charAt(0).toUpperCase() + corto.slice(1);
+}
+
 /** «sábado 14 de noviembre» */
 export function diaLargo(d: Date | string): string {
   return fechaLarga.format(new Date(d)).replace(',', '');

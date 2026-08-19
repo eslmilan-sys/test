@@ -27,7 +27,7 @@ import { Epigrafe } from '@/ui/controles';
 import { formatearDinero, tabular } from '@/ui/dinero';
 import { ZONA, hora } from '@/ui/fechas';
 import { Atras, Visto } from '@/ui/iconos';
-import { familia, color, espacio, interlinea, radio, sombra } from '@/ui/tokens';
+import { familia, color, espacio, radio, sombra } from '@/ui/tokens';
 
 /** El reembolso de la cancelación de Andrés. Mientras no haya sesión. */
 const REEMBOLSO = 'ff000000-0000-4000-8000-000000000001';

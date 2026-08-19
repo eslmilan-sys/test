@@ -295,7 +295,16 @@ export function Insignia({
   return (
     <View style={[estilos.insignia, { backgroundColor: fondo }]}>
       {punto ? <View style={[estilos.insigniaPunto, { backgroundColor: tinta }]} /> : null}
-      <Text style={{ fontSize: 11, fontWeight: '500', letterSpacing: -0.06, color: tinta, fontFamily: familia }}>
+      <Text
+        style={{
+          fontSize: 11,
+          lineHeight: interlinea(11),
+          fontWeight: '500',
+          letterSpacing: -0.055,
+          color: tinta,
+          fontFamily: familia,
+        }}
+      >
         {children}
       </Text>
     </View>

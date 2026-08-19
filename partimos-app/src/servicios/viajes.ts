@@ -188,6 +188,54 @@ export async function proximasSalidas(limite = 3, ventanaMin = 60): Promise<Sali
   return demora(salidas);
 }
 
+/* ------------------------------------------------------------------ *
+ * Una ruta con su fotografía — pantalla `3c`
+ * ------------------------------------------------------------------ */
+
+export type ResumenDeRuta = {
+  slug: string;
+  origen: string;
+  destino: string;
+  /** El slug de la ciudad, que es como se encuentra su fotografía. */
+  foto: string;
+  distanciaKm: number;
+  duracionMin: number;
+  cuantosViajes: number;
+  /** «Fin de semana · 2 pasajeros», el contexto de la búsqueda. */
+  contexto: string;
+};
+
+/**
+ * La cabecera de `3c`: la ruta entera con su fotografía detrás. Se enseña
+ * cuando el destino ya está elegido, que es cuando una foto informa en vez de
+ * decorar.
+ */
+export async function resumenDeRuta(corredorSlug: string, pasajeros = 1): Promise<ResumenDeRuta> {
+  const c = fuente.corredores.find((x) => x.slug === corredorSlug);
+  if (!c) throw new Error(`No conocemos la ruta ${corredorSlug}`);
+
+  const destino = fuente.ciudades.find((x) => x.id === c.destination_city_id);
+  const origen = fuente.ciudades.find((x) => x.id === c.origin_city_id);
+  const suyos = fuente.viajes.filter((v) => v.corridor_id === c.id && v.status === 'published');
+
+  // El nombre que se enseña es el del sitio al que se llega de verdad —«Playa
+  // Blanca»—, no el de la ciudad del corredor. Es el que dicen los viajes.
+  const comun = suyos
+    .map((v) => (v.destination_label ?? '').split(' · ')[0])
+    .find((etiqueta, _i, todas) => todas.filter((x) => x === etiqueta).length > 1);
+
+  return demora({
+    slug: c.slug,
+    origen: origen?.name === 'Ciudad de Panamá' ? 'Panamá' : (origen?.name ?? ''),
+    destino: comun ?? destino?.name ?? '',
+    foto: destino?.slug ?? '',
+    distanciaKm: Number(c.distance_km),
+    duracionMin: c.typical_duration_min ?? 0,
+    cuantosViajes: suyos.length,
+    contexto: `Fin de semana · ${pasajeros} ${pasajeros === 1 ? 'pasajero' : 'pasajeros'}`,
+  });
+}
+
 export type GanchoDeConductor = {
   /** Lo que el conductor recupera llevando el carro lleno en esa ruta. */
   recuperasCentavos: number;
