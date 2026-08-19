@@ -24,8 +24,8 @@ import { CampoRojo } from '@/ui/CampoRojo';
 import { tabular } from '@/ui/dinero';
 import { diaLargo, hora } from '@/ui/fechas';
 import { Marca } from '@/ui/iconos';
+import { TRACK_MICRO, familia, color, espacio, interlinea, radio } from '@/ui/tokens';
 import { Vidrio } from '@/ui/Vidrio';
-import { TRACK_MICRO, color, espacio, familia, interlinea, radio } from '@/ui/tokens';
 
 /** Mientras no haya sesión: la pasajera del recorrido del diseño. */
 const DANIELA = '99999999-9999-4999-8999-999999999999';

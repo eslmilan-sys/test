@@ -146,7 +146,7 @@ const estilos = StyleSheet.create({
   },
   titular: {
     fontSize: 27,
-    lineHeight: 30,
+    lineHeight: 29.7,
     letterSpacing: -1.08,
     fontWeight: '400',
     color: '#fff',
@@ -163,7 +163,7 @@ const estilos = StyleSheet.create({
     borderRadius: radio.l,
     padding: 20,
   },
-  parada: { flexDirection: 'row', gap: 14, alignItems: 'flex-start', paddingBottom: 16 },
+  parada: { flexDirection: 'row', gap: 14, alignItems: 'flex-start', paddingBottom: 16.2 },
   puntoLleno: {
     width: 10,
     height: 10,
@@ -181,7 +181,7 @@ const estilos = StyleSheet.create({
     marginTop: 5,
   },
   paradaNombre: { fontSize: 16, lineHeight: 23.2, letterSpacing: -0.29, color: color.ink900, fontFamily: familia },
-  paradaDetalle: { fontSize: 13, lineHeight: 18.85, color: color.ink500, fontFamily: familia },
+  paradaDetalle: { fontSize: 13, lineHeight: 18.85, color: color.ink500, marginTop: 3, fontFamily: familia },
   paradaHora: { fontSize: 13.5, lineHeight: 19.57, color: color.ink600, fontFamily: familia, ...tabular },
 
   velo: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(38,35,43,.48)' },
@@ -207,7 +207,7 @@ const estilos = StyleSheet.create({
   asa: { width: 38, height: 4, borderRadius: radio.pastilla, backgroundColor: color.ink200, alignSelf: 'center' },
   titulo: {
     fontSize: 24,
-    lineHeight: 29,
+    lineHeight: 28.8,
     letterSpacing: -0.84,
     fontWeight: '400',
     marginTop: 10,
@@ -265,5 +265,5 @@ const estilos = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  botonQuietoTexto: { fontSize: 14, lineHeight: 20.3, fontWeight: '600', color: color.ink900, fontFamily: familia },
+  botonQuietoTexto: { fontSize: 14, lineHeight: 20.3, fontWeight: '600', letterSpacing: -0.14, color: color.ink900, fontFamily: familia },
 });
