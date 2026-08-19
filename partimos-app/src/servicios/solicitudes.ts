@@ -158,7 +158,10 @@ function nombreDe(id: string): string {
 }
 
 function comoSolicitud(r: ReservaFila, ahora: Date): Solicitud {
-  const restante = new Date(r.expires_at).getTime() - ahora.getTime();
+  // Una solicitud sin caducidad no ha empezado a correr: se enseña con las
+  // cuatro horas enteras por delante, no como caducada hace un siglo.
+  const caduca = r.expires_at ?? new Date(ahora.getTime() + HORAS_PARA_RESPONDER * 3_600_000).toISOString();
+  const restante = new Date(caduca).getTime() - ahora.getTime();
   const rep = fuente.reputacion[r.passenger_id];
   return {
     id: r.id,

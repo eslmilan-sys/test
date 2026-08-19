@@ -22,6 +22,14 @@ export type Database = {
     Tables: {
       bookings: {
         Row: {
+          boarding_code: string | null
+          arrival_code: string | null
+          boarded_at: string | null
+          released_at: string | null
+          expires_at: string | null
+          detour_minutes: number | null
+          mochilas: number
+          maletas: number
           alight_sequence: number | null
           board_sequence: number | null
           cancellation_reason: string | null
@@ -46,6 +54,14 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          boarding_code?: string | null
+          arrival_code?: string | null
+          boarded_at?: string | null
+          released_at?: string | null
+          expires_at?: string | null
+          detour_minutes?: number | null
+          mochilas?: number
+          maletas?: number
           alight_sequence?: number | null
           board_sequence?: number | null
           cancellation_reason?: string | null
@@ -70,6 +86,14 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          boarding_code?: string | null
+          arrival_code?: string | null
+          boarded_at?: string | null
+          released_at?: string | null
+          expires_at?: string | null
+          detour_minutes?: number | null
+          mochilas?: number
+          maletas?: number
           alight_sequence?: number | null
           board_sequence?: number | null
           cancellation_reason?: string | null
@@ -329,6 +353,7 @@ export type Database = {
       }
       corridors: {
         Row: {
+          max_price_cents: number | null
           bus_price_cents: number | null
           created_at: string
           destination_city_id: string
@@ -342,6 +367,7 @@ export type Database = {
           typical_duration_min: number | null
         }
         Insert: {
+          max_price_cents?: number | null
           bus_price_cents?: number | null
           created_at?: string
           destination_city_id: string
@@ -355,6 +381,7 @@ export type Database = {
           typical_duration_min?: number | null
         }
         Update: {
+          max_price_cents?: number | null
           bus_price_cents?: number | null
           created_at?: string
           destination_city_id?: string
@@ -1624,6 +1651,7 @@ export type Database = {
       }
       trips: {
         Row: {
+          accepts_luggage: boolean
           accepts_cash: boolean
           accepts_yappy_direct: boolean
           arrival_estimate_at: string | null
@@ -1661,6 +1689,7 @@ export type Database = {
           vehicle_id: string
         }
         Insert: {
+          accepts_luggage?: boolean
           accepts_cash?: boolean
           accepts_yappy_direct?: boolean
           arrival_estimate_at?: string | null
@@ -1698,6 +1727,7 @@ export type Database = {
           vehicle_id: string
         }
         Update: {
+          accepts_luggage?: boolean
           accepts_cash?: boolean
           accepts_yappy_direct?: boolean
           arrival_estimate_at?: string | null
@@ -3230,6 +3260,7 @@ export type Database = {
         | "cancelled_driver"
         | "no_show_passenger"
         | "no_show_driver"
+        | "rejected_driver"
       cancel_party: "passenger" | "driver" | "platform" | "system"
       gender_pref: "any" | "women_only"
       ledger_account:
@@ -3402,6 +3433,7 @@ export const Constants = {
         "cancelled_driver",
         "no_show_passenger",
         "no_show_driver",
+        "rejected_driver",
       ],
       cancel_party: ["passenger", "driver", "platform", "system"],
       gender_pref: ["any", "women_only"],

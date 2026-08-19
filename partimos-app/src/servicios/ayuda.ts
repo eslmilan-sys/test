@@ -130,7 +130,7 @@ export async function comprobante(reservaId: string): Promise<Comprobante> {
   const nombre = conductor ? `${conductor.first_name} ${conductor.last_initial ?? ''}`.trim() : '';
 
   return demora({
-    referencia: reserva.boarding_code,
+    referencia: reserva.boarding_code ?? reserva.id.slice(0, 8),
     cuando: reserva.confirmed_at ?? reserva.created_at,
     destino: (viaje.destination_label ?? '').split(' · ')[0],
     totalCentavos: aporte + tarifa,
@@ -154,7 +154,7 @@ export async function comprobante(reservaId: string): Promise<Comprobante> {
         etiqueta: 'Puestos',
         valor: `${reserva.seats} · ${resumenDeEquipaje({ mochilas: reserva.mochilas, maletas: reserva.maletas }).toLowerCase()}`,
       },
-      { etiqueta: 'Referencia', valor: reserva.boarding_code },
+      { etiqueta: 'Referencia', valor: reserva.boarding_code ?? reserva.id.slice(0, 8) },
     ],
     queEsEsto:
       'Sirve como comprobante de gasto compartido. No es una factura: Partimos no vende un transporte, solo reparte el costo.',

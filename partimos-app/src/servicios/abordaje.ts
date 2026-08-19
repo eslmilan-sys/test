@@ -45,7 +45,7 @@ export async function codigoDeAbordaje(reservaId: string): Promise<CodigoDeAbord
 
   return demora({
     reservaId,
-    digitos: reserva.boarding_code.split(''),
+    digitos: (reserva.boarding_code ?? '····').split(''),
     conductor: {
       nombre: `${conductor?.first_name ?? ''} ${conductor?.last_initial ?? ''}`.trim(),
       carro: [carro?.make, carro?.model, carro?.color].filter(Boolean).join(' '),
@@ -183,7 +183,7 @@ export async function resumenDeLlegada(reservaId: string): Promise<Llegada> {
 
   return demora({
     reservaId,
-    digitos: reserva.arrival_code.split(''),
+    digitos: (reserva.arrival_code ?? '····').split(''),
     ciudad: ciudad ?? etiqueta,
     lugar: lugar ?? '',
     llegadaHora: ultima?.scheduled_at ?? viaje.arrival_estimate_at ?? viaje.departure_at,

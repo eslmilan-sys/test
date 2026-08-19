@@ -61,36 +61,7 @@ export type StopKind = Enums['stop_kind'];
  * se caen solos sin tocar ni una pantalla.
  * ------------------------------------------------------------------ */
 
-/** `trips` — el booleano de maletas de `5c`, y el tope guardado de la ruta. */
-export type TripPendiente = {
-  /** «Acepto maletas». Una sola casilla, sin contabilidad de maletero. */
-  accepts_luggage: boolean;
-};
-
-/** `corridors` — el tope por ruta, hoy calculado, mañana columna. */
-export type CorridorPendiente = {
-  max_price_cents: number;
-};
-
-/** `bookings` — abordaje, caducidad de la solicitud y desvío. */
-export type BookingPendiente = {
-  /** El código de 4 dígitos de `1f` / `1g`. */
-  boarding_code: string;
-  /** El segundo código, el de `1i`: cierra el viaje y suelta el aporte. */
-  arrival_code: string;
-  /** La marca que prueba que el viaje pasó. Sin ella no se libera el aporte. */
-  boarded_at: string | null;
-  /** Las 4 h que tiene el conductor para responder (`11a`). */
-  expires_at: string;
-  /** Los minutos que el punto del pasajero le añade al conductor. */
-  detour_minutes: number | null;
-  /** Cuándo se soltó el aporte al conductor. */
-  released_at: string | null;
-  mochilas: number;
-  maletas: number;
-};
-
-/** El estado que le falta al enum `booking_status`: el conductor dice que no. */
+/** Los cuatro estados de una solicitud, dichos como los dice el producto. */
 export type EstadoDeSolicitud = 'pendiente' | 'aceptada' | 'rechazada' | 'caducada';
 
 /**
@@ -138,6 +109,6 @@ export type RutinaFila = Routine & RoutinePendiente;
  * Las filas tal y como las ven las pantallas: la tabla real más lo pendiente.
  * ------------------------------------------------------------------ */
 
-export type ViajeFila = Trip & TripPendiente;
-export type CorredorFila = Corridor & CorridorPendiente;
-export type ReservaFila = Booking & BookingPendiente;
+export type ViajeFila = Trip;
+export type CorredorFila = Corridor;
+export type ReservaFila = Booking;

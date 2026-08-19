@@ -57,7 +57,7 @@ function comoPublicado(v: ViajeFila): ViajePublicado {
   const reservas = fuente.reservas.filter((r) => r.trip_id === v.id);
   const pendientes = reservas
     .filter((r) => r.status === 'pending')
-    .sort((a, b) => a.expires_at.localeCompare(b.expires_at));
+    .sort((a, b) => (a.expires_at ?? '9').localeCompare(b.expires_at ?? '9'));
   const vendidos = v.seats_offered - puestosLibresDe(v.id);
 
   return {
@@ -133,7 +133,7 @@ function comoPuesto(r: (typeof fuente.reservas)[number]): PuestoMio | null {
     iniciales: `${conductor?.first_name[0] ?? ''}${(conductor?.last_initial ?? '')[0] ?? ''}`.toUpperCase(),
     aporteCentavos: r.unit_price_cents * r.seats,
     canal: r.payment_channel,
-    codigo: r.boarding_code,
+    codigo: r.boarding_code ?? '',
     punto: r.proposed_point ?? (viaje.origin_label ?? '').split(' · ')[0],
     distanciaKm: viaje.snap_distance_km ?? 0,
     esDeHoy: enPanama.format(new Date(viaje.departure_at)) === enPanama.format(new Date()),
