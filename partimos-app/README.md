@@ -12,25 +12,78 @@ npx expo start          # escanea el QR con Expo Go
 npx expo start --web    # o en el navegador, en localhost:8081
 ```
 
-Pantallas hechas:
+Las 58 pantallas del traspaso, hechas:
+
+**A · Pasajero: buscar y entrar**
 
 | Id | Pantalla | Ruta |
 | --- | --- | --- |
+| `4a` | Apertura | `/(cuenta)/apertura` |
+| `1a` | Bienvenida | `/(cuenta)/bienvenida` |
 | `3a` | Inicio | `/(pasajero)` |
-| `1b` / `3b` | Resultados | `/(pasajero)/resultados` |
+| `1b` `3b` | Resultados | `/(pasajero)/resultados` |
+| `3c` | Resultados con el destino de fondo | `/(pasajero)/destino` |
 | `5a` | Detalle del viaje | `/(pasajero)/viaje` |
+| `6b` | Perfil público | `/(pasajero)/perfil` |
 | `1c` | La puerta | `/(cuenta)/puerta` |
 | `4b`–`4d` | Registro | `/(cuenta)/registro` |
-| `5c` | Publicar | `/(conductor)/publicar` |
-| `11a` | Solicitudes de puesto | `/(conductor)/solicitudes` |
+| `4e` | Entrar | `/(cuenta)/entrar` |
+| `14e` | Entrar · versión larga | `/(cuenta)/acceso` |
+
+**B · Pasajero: pagar y viajar**
+
+| Id | Pantalla | Ruta |
+| --- | --- | --- |
 | `7a` | Reserva | `/(pasajero)/reservar` |
 | `7b` | Pago del aporte | `/(pasajero)/pagar` |
-| `1f` | Código de abordaje · pasajero | `/(pasajero)/codigo` |
-| `1g` | Código de abordaje · conductor | `/(conductor)/abordaje` |
-| `1i` | Llegada y liberación | `/(pasajero)/llegada` |
-| `6b` | Perfil público | `/(pasajero)/perfil` |
+| `9a` | Métodos de pago | `/(pasajero)/metodos` |
+| `14c` | Añadir método | `/(pasajero)/metodo-nuevo` |
+| `12a` | Pantalla bloqueada | `/(avisos)/bloqueada` |
+| `11b` | Bandeja de avisos | `/(avisos)/avisos` |
 | `6c` | Chat del viaje | `/(pasajero)/chat` |
+| `16a` | Conversaciones | `/(pasajero)/conversaciones` |
+| `1d` | Ya · lista | `/(pasajero)/ya` |
+| `1e` | Ya · mapa | `/(pasajero)/ya-mapa` |
+| `1f` | Código de abordaje | `/(pasajero)/codigo` |
+| `1h` | En ruta | `/(pasajero)/ruta` |
+| `1i` | Llegada y liberación | `/(pasajero)/llegada` |
 | `1j` | Calificar | `/(pasajero)/calificar` |
+
+**C · Conductor: de la cédula al pago**
+
+| Id | Pantalla | Ruta |
+| --- | --- | --- |
+| `6d` | Verificación de cédula | `/(conductor)/cedula` |
+| `6a` | Tu cuenta | `/(cuenta)/cuenta` |
+| `14b` | Registrar el carro | `/(conductor)/carro` |
+| `5c` | Publicar | `/(conductor)/publicar` |
+| `5d` | El tope | `/(conductor)/tope` |
+| `7c` | Puestos y maletas | `/(conductor)/puestos` |
+| `10a` | Panel del conductor | `/(conductor)/panel` |
+| `5b` | Mis viajes | `/(conductor)/misviajes` |
+| `14d` | Editar el viaje | `/(conductor)/editar` |
+| `11a` | Solicitudes de puesto | `/(conductor)/solicitudes` |
+| `15e` | Quién pide puesto | `/(conductor)/solicitante` |
+| `1g` | Código de abordaje · conductor | `/(conductor)/abordaje` |
+| `10b` | Lo que te han aportado | `/(conductor)/aportes` |
+
+**D · Deshacer, reclamar, preguntar**
+
+| Id | Pantalla | Ruta |
+| --- | --- | --- |
+| `14a` | Cancelar el puesto | `/(ayuda)/cancelar` |
+| `7d` | Reembolso | `/(ayuda)/reembolso` |
+| `15c` | Estado del reembolso | `/(ayuda)/estado` |
+| `15b` | Ayuda | `/(ayuda)` |
+| `15d` | Reportar | `/(ayuda)/reportar` |
+| `15a` | Rutas guardadas | `/(pasajero)/rutas` |
+| `8a` | Ajustes | `/(cuenta)/ajustes` |
+| `16b` | Cómo se paga | `/(ayuda)/pagos` |
+| `16c` | Comprobante | `/(pasajero)/comprobante` |
+| `16d` | Permiso de avisos | `/(avisos)/permiso` |
+
+El tablero E del traspaso son documentos —los dos recorridos, el mapa de eventos
+y las tres pruebas de rojo—, no pantallas.
 
 ## Cómo está montada
 
