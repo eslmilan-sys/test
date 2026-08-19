@@ -17,9 +17,25 @@
  * limitada a Panamá y al español en cada consulta.
  */
 
-const LLAVE =
-  process.env.EXPO_PUBLIC_MAPBOX_TOKEN ??
-  'pk.eyJ1IjoiZXNsbWlsYW4iLCJhIjoiY21zbThhdDA2MGh2bTM0cHY1aTU1ZndjOCJ9.JozVmySbgOSXZo-nJyM-Wg';
+/**
+ * El jeton vive en el entorno, nunca en el código.
+ *
+ * No es por secreto —es un jeton `pk.`, público por construcción, y viaja
+ * compilado en el paquete que descarga el navegador— sino porque un jeton
+ * escrito aquí no se puede cambiar sin volver a publicar la app. El día que
+ * haya que rotarlo o restringirlo por dominio, se toca una variable.
+ *
+ * Lo que de verdad protege la cuota es la restricción por dominio en la
+ * consola de Mapbox. Sin ella, el plan gratuito se lo queda quien pase.
+ */
+const LLAVE = process.env.EXPO_PUBLIC_MAPBOX_TOKEN ?? '';
+
+/**
+ * Sin jeton no hay búsqueda de sitios. La pantalla puede preguntarlo y ofrecer
+ * el campo libre en vez de una lista que nunca se llena: un desplegable vacío
+ * sin explicación es peor que no tenerlo.
+ */
+export const hayBusquedaDeLugares = LLAVE !== '';
 
 /** Menos de tres letras no es una búsqueda: es alguien empezando a escribir. */
 const MINIMO = 3;
@@ -53,7 +69,7 @@ export const olvidarSesion = () => {
 
 /** Nombres mientras se escribe. Sin coordenadas todavía. */
 export async function sugerir(texto: string, cerca?: Punto, corte?: AbortSignal): Promise<Lugar[]> {
-  if (texto.trim().length < MINIMO) return [];
+  if (!LLAVE || texto.trim().length < MINIMO) return [];
   const p = new URLSearchParams({
     q: texto.trim(),
     access_token: LLAVE,
@@ -86,6 +102,7 @@ export async function sugerir(texto: string, cerca?: Punto, corte?: AbortSignal)
 
 /** La sugerencia elegida, ya con su punto. */
 export async function concretar(mapboxId: string, corte?: AbortSignal): Promise<Punto | null> {
+  if (!LLAVE) return null;
   const p = new URLSearchParams({ access_token: LLAVE, session_token: laSesion() });
   try {
     const r = await fetch(
@@ -103,7 +120,7 @@ export async function concretar(mapboxId: string, corte?: AbortSignal): Promise<
 
 /** Texto a punto, sin pasar por la lista. */
 export async function geocodificar(texto: string, cerca?: Punto, corte?: AbortSignal): Promise<Lugar[]> {
-  if (texto.trim().length < MINIMO) return [];
+  if (!LLAVE || texto.trim().length < MINIMO) return [];
   const p = new URLSearchParams({
     access_token: LLAVE,
     country: 'pa',
